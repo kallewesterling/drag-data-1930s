@@ -4,6 +4,22 @@ const width = 600
 const height = 300
 
 
+
+size = function(d, type="r") {
+    if (type == "r") {
+        if (d.category == "city") {
+            return 10
+        } else {
+            return Math.sqrt(d.degree * 2)
+        }
+    } else if (type == "text") {
+        if (d.category == "city") {
+            return 6
+        } else {
+            return Math.sqrt(d.degree * 2 )
+        }
+    }
+}
 const clear_text = function(nodes) {
     var arr = nodes.map(d => d['1000x-degree-centrality'])
     var max_degree_centrality = arr.reduce(function(a, b) { return Math.max(a, b); });
@@ -54,20 +70,20 @@ const set_text = function(d, type) {
         // d3.select(this_line).attr('opacity', '1.0')
 
         if (d.revue_name != '') {
-            str += "<h4>Link: " + d.revue_name + "</h4>"
+            str += '<h4><small class="text-muted">LINK</small> ' + d.revue_name + '</h4>'
         } else {
-            str += '<h4 style="color:gray;">Link: Not a named revue</h4>'
+            str += '<h4 class="text-muted"><small>LINK</small> Not a named revue</h4>'
         }
         d.found.forEach(function(source) {
             str += "<p>" + source + "</p>"
         });
     } else if (type == "node") {
         if (d.category == "city") {
-            str += "<h4>City: " + d.id + "</h4>"
+            str += '<h4><small class="text-muted">CITY</small> ' + d.id + '</h4>'
         } else if (d.category == "club") {
-            str += "<h4>Club: " + d.id + "</h4>"
+            str += '<h4><small class="text-muted">CLUB</small> ' + d.id + '</h4>'
         } else if (d.category == "performer") {
-            str += "<h4>Performer: " + d.id + "</h4>"
+            str += '<h4><small class="text-muted">PERFORMER</small> ' + d.id + '</h4>'
         }
         str += "<p><strong>In-degree</strong>: " + d.indegree + "</p>"
         str += "<p><strong>Out-degree</strong>: " + d.outdegree + "</p>"
@@ -146,21 +162,7 @@ d3.json('drag-data-for-1930s.json').then(function(data) {
         .on("zoom", zoomed);
 
 
-    size = function(d, type="r") {
-        if (type == "r") {
-            if (d.category == "city") {
-                return 10
-            } else {
-                return Math.sqrt(d.degree * 2)
-            }
-        } else if (type == "text") {
-            if (d.category == "city") {
-                return 6
-            } else {
-                return Math.sqrt(d.degree * 2 )
-            }
-        }
-    }
+    
 
     const nodes = filter_nodes(data.nodes.map(d => Object.create(d)));
     const links = filter_links(data.links.map(d => Object.create(d)), nodes);
