@@ -1,27 +1,87 @@
 
+
 const width = 600
 const height = 300
 
 
-clear_text = function() {
-    d3.select("#info").html('')
-}
+const clear_text = function(nodes) {
+    var arr = nodes.map(d => d['1000x-degree-centrality'])
+    var max_degree_centrality = arr.reduce(function(a, b) { return Math.max(a, b); });
+    var max_degree_centrality = nodes.find(x => x['1000x-degree-centrality'] === max_eigenvector_centrality);
 
-set_text = function(d) {
-    str = ""
-    if (d.revue_name != '') {
-        str += "<h4>" + d.revue_name + "</h4>"
-    } else {
-        str += "<h4>&nbsp;</h4>"
-    }
-    d.found.forEach(function(source) {
-        str += "<p>" + source + "</p>"
-    });
+    var arr = nodes.map(d => d['1000x-betweenness-centrality'])
+    var max_betweenness_centrality = arr.reduce(function(a, b) { return Math.max(a, b); });
+    var max_betweenness_centrality = nodes.find(x => x['1000x-betweenness-centrality'] === max_eigenvector_centrality);
+
+    var arr = nodes.map(d => d['1000x-closeness-centrality'])
+    var max_closeness_centrality = arr.reduce(function(a, b) { return Math.max(a, b); });
+    var max_closeness_centrality = nodes.find(x => x['1000x-closeness-centrality'] === max_eigenvector_centrality);
+
+    var arr = nodes.map(d => d['1000x-eigenvector-centrality'])
+    var max_eigenvector_centrality = arr.reduce(function(a, b) { return Math.max(a, b); });
+    var max_eigenvector_centrality = nodes.find(x => x['1000x-eigenvector-centrality'] === max_eigenvector_centrality);
+
+    str = `<table class="table table-striped table-sm">
+            <thead>
+            <tr>
+            <th scope="col"></th>
+            <th scope="col">Eigenvector</td>
+            <th scope="col">Degree</td>
+            <th scope="col">Closeness</td>
+            <th scope="col">Betweenness</td>
+            </tr>`
+    nodes.forEach(function(n) {
+        str += `<tr>
+                <th class="small pr-3" scope="row">${n.id}</th>
+                <td class="small">${Number((n['1000x-eigenvector-centrality']).toFixed(2))}</td>
+                <td class="small">${Number((n['1000x-degree-centrality']).toFixed(2))}</td>
+                <td class="small">${Number((n['1000x-closeness-centrality']).toFixed(2))}</td>
+                <td class="small">${Number((n['1000x-betweenness-centrality']).toFixed(2))}</td>
+                </tr>`
+    })
+    str += '</table>'
+    $('.table').DataTable();
     d3.select("#info").html(str)
 }
 
 
-filter_nodes = function(nodes) {
+const set_text = function(d, type) {
+    str = ""
+    if (type == "link") {
+        // this_line = d3.selectAll("line")._groups[0][d.index];
+
+        // d3.selectAll("line")[d].attr("opacity", "0.1")
+        // d3.select(this_line).attr('opacity', '1.0')
+
+        if (d.revue_name != '') {
+            str += "<h4>Link: " + d.revue_name + "</h4>"
+        } else {
+            str += '<h4 style="color:gray;">Link: Not a named revue</h4>'
+        }
+        d.found.forEach(function(source) {
+            str += "<p>" + source + "</p>"
+        });
+    } else if (type == "node") {
+        if (d.category == "city") {
+            str += "<h4>City: " + d.id + "</h4>"
+        } else if (d.category == "club") {
+            str += "<h4>Club: " + d.id + "</h4>"
+        } else if (d.category == "performer") {
+            str += "<h4>Performer: " + d.id + "</h4>"
+        }
+        str += "<p><strong>In-degree</strong>: " + d.indegree + "</p>"
+        str += "<p><strong>Out-degree</strong>: " + d.outdegree + "</p>"
+        str += "<h5>Centrality measures</h5>"
+        str += "<p><strong>Eigenvector</strong>: " + d['1000x-eigenvector-centrality'] + "</p>"
+        str += "<p><strong>Degree</strong>: " + d['1000x-degree-centrality'] + "</p>"
+        str += "<p><strong>Closeness</strong>: " + d['1000x-closeness-centrality'] + "</p>"
+        str += "<p><strong>Betweenness</strong>: " + d['1000x-betweenness-centrality'] + "</p>"
+    }
+    d3.select("#info").html(str)
+}
+
+
+const filter_nodes = function(nodes) {
     new_array = []
     nodes.forEach(function(n) {
         if ( n.category == "city" || n.degree > 1 ) {
@@ -31,7 +91,7 @@ filter_nodes = function(nodes) {
     return new_array;
 }
 
-filter_links = function(links, nodes) {
+const filter_links = function(links, nodes) {
     all_ids = nodes.map(d => d.id)
     new_array = []
     links.forEach(function(l) {
@@ -42,7 +102,7 @@ filter_links = function(links, nodes) {
     return new_array;
 }
 
-drag = simulation => {
+const drag = simulation => {
     function dragstarted(d) {
         if (!d3.event.active) simulation.alphaTarget(0.3).restart();
         d.fx = d.x;
@@ -66,7 +126,7 @@ drag = simulation => {
 d3.json('drag-data-for-1930s.json').then(function(data) {
 
 
-    reset = function() {
+    reset = function(nodes) {
         svg.transition()
             .duration(750)
             .call(
@@ -74,6 +134,7 @@ d3.json('drag-data-for-1930s.json').then(function(data) {
                 d3.zoomIdentity,
                 d3.zoomTransform(svg.node()).invert([width / 2, height / 2])
             );
+        clear_text(nodes);
     }
 
     zoomed = function() {
@@ -115,8 +176,8 @@ d3.json('drag-data-for-1930s.json').then(function(data) {
     const svg = d3.select("#svg").append("svg")
         .attr("viewBox", [-width / 2, -height / 2, width, height])
         .call(zoom)
-        .on("click", reset)
-        .on("mouseover", clear_text() );
+        .on("click", function() { clear_text(nodes); } )
+        .on("mouseover", clear_text(nodes) );
 
 
     const g = svg
@@ -129,7 +190,10 @@ d3.json('drag-data-for-1930s.json').then(function(data) {
         .join("line")
         .attr("class", function(d) { if (d.revue_name != "") { return "link revue"; } else { return "link no-revue"; } }) //d => "node " + d.category
         .attr("stroke-width", d => Math.sqrt(d.weight / 2))
-        .on("mouseover", d => set_text(d) )
+        .on("mouseover", function(d) {
+            set_text(d, 'link');
+            // d3.select(d).select('line').attr('opacity', 1.0)
+        } )
 
     const node = g.append("g")
         .selectAll("g")
@@ -138,6 +202,10 @@ d3.json('drag-data-for-1930s.json').then(function(data) {
         .append("circle")
         .attr("r", d => size(d) )
         .attr("class", d => "node " + d.category)
+        .on("mouseover", function(d) {
+            set_text(d, 'node');
+            // d3.select(d).select('line').attr('opacity', 1.0)
+        } )
         .call(drag(simulation));
 
     const text = g.append("g")
