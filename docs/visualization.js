@@ -5,7 +5,7 @@ const height = 300
 
 
 
-size = function(d, type="r") {
+const size = function(d, type="r") {
     if (type == "r") {
         if (d.category == "city") {
             return 10
@@ -20,6 +20,7 @@ size = function(d, type="r") {
         }
     }
 }
+
 const clear_text = function(nodes) {
     var arr = nodes.map(d => d['1000x-degree-centrality'])
     var max_degree_centrality = arr.reduce(function(a, b) { return Math.max(a, b); });
@@ -60,7 +61,6 @@ const clear_text = function(nodes) {
     d3.select("#info").html(str)
 }
 
-
 const set_text = function(d, type) {
     str = ""
     if (type == "link") {
@@ -95,7 +95,6 @@ const set_text = function(d, type) {
     }
     d3.select("#info").html(str)
 }
-
 
 const filter_nodes = function(nodes) {
     new_array = []
@@ -140,9 +139,7 @@ const drag = simulation => {
 }
 
 d3.json('drag-data-for-1930s.json').then(function(data) {
-
-
-    reset = function(nodes) {
+    const reset = function(nodes) {
         svg.transition()
             .duration(750)
             .call(
@@ -153,16 +150,13 @@ d3.json('drag-data-for-1930s.json').then(function(data) {
         clear_text(nodes);
     }
 
-    zoomed = function() {
+    const zoomed = function() {
         g.attr("transform", d3.event.transform);
     }
 
     const zoom = d3.zoom()
         .scaleExtent([0, 3])
         .on("zoom", zoomed);
-
-
-    
 
     const nodes = filter_nodes(data.nodes.map(d => Object.create(d)));
     const links = filter_links(data.links.map(d => Object.create(d)), nodes);
@@ -181,10 +175,8 @@ d3.json('drag-data-for-1930s.json').then(function(data) {
         .on("click", function() { clear_text(nodes); } )
         .on("mouseover", clear_text(nodes) );
 
-
     const g = svg
         .append("g");
-
 
     const link = g.append("g")
         .selectAll("line")
@@ -240,9 +232,9 @@ d3.json('drag-data-for-1930s.json').then(function(data) {
 
     });
 
-            // invalidation.then(() => simulation.stop());
+    // invalidation.then(() => simulation.stop());
 
-            return svg.node();
+    return svg.node();
 
 
 });
