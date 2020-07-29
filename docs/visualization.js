@@ -158,7 +158,9 @@ d3.json('drag-data-for-1930s.json').then(function(data) {
         .scaleExtent([0, 3])
         .on("zoom", zoomed);
 
-    const nodes = filter_nodes(data.nodes.map(d => Object.create(d)));
+    var nodelist = data.nodes.sort((a, b) => (a.category > b.category) ? 1 : -1)
+
+    const nodes = filter_nodes(nodelist.map(d => Object.create(d)));
     const links = filter_links(data.links.map(d => Object.create(d)), nodes);
 
     const simulation = d3.forceSimulation(nodes)
