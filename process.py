@@ -25,11 +25,11 @@ for row in df.fillna('').itertuples():
     for cat in CLEANING:
         if cat == 'city':
             for search, replace in CLEANING[cat].items():
-                print(f'searching city data for {search} - replacing with {replace}')
+                # print(f'searching city data for {search} - replacing with {replace}')
                 city = city.replace(search, replace)
         elif cat == 'club':
             for search, replace in CLEANING[cat].items():
-                print(f'searching club data for {search} - replacing with {replace}')
+                # print(f'searching club data for {search} - replacing with {replace}')
                 club = club.replace(search, replace)
 
     # clean up date
@@ -52,7 +52,10 @@ for row in df.fillna('').itertuples():
             continue
 
     # strip off any trailing or leading spaces
-    club, city, performer, revue_name = club.strip(), city.strip(), performer.strip(), revue_name.strip()
+    if club:       club = club.strip()
+    if city:       city = city.strip()
+    if performer:  performer = performer.strip()
+    if revue_name: revue_name = revue_name.strip()
 
     add = list()
     if club and city:
@@ -103,8 +106,6 @@ for row in df.fillna('').itertuples():
         date=date.strftime("%Y-%m-%d")
     )
 
-
-
     attrs = {
         city: {'category': 'city', 'lat': '0.4252235', 'lon': '42.235235'},
         club: {'category': 'club'},
@@ -114,7 +115,8 @@ for row in df.fillna('').itertuples():
 
 
 def set_degrees(graph):
-    # set degrees for each node
+    """Set degrees for each node"""
+
     for node in graph.nodes:
         attrs = {
             node: {
@@ -128,6 +130,7 @@ def set_degrees(graph):
 
 
 def set_centralities(graph):
+    """Set centrality measures for each node"""
 
     # 1000x eigenvector centrality measure for each node
     for data in [{node: eigen_central*1000} for node, eigen_central in nx.eigenvector_centrality(graph, max_iter=10000).items()]:
