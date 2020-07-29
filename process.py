@@ -1,16 +1,19 @@
 import networkx as nx
 import pandas as pd
 import json
+from datetime import datetime
+from drag.settings import SPREADSHEET, START_YEAR, END_YEAR, CLEANING
 
-spreadsheet = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT0E0Y7txIa2pfBuusA1cd8X5OVhQ_D0qZC8D40KhTU3xB7McsPR2kuB7GH6ncmNT3nfjEYGbscOPp0/pub?gid=0&single=true&output=csv'
 
-
-df = pd.read_csv(spreadsheet, encoding = 'utf8')
-
+df = pd.read_csv(SPREADSHEET, encoding='utf8')
 graph = nx.DiGraph()
 
+if not START_YEAR:
+    print('Warning: no start year set.')
 
-from datetime import datetime
+if not END_YEAR:
+    print('Warning: no end year set.')
+
 
 for row in df.fillna('').itertuples():
     _id, date, category, performer, club, _city, city, revue_name, normalized_revue_name, unsure_drag, legal_name, alleged_age, assumed_birth_year, source, eima, newspapers_search, fulton_search = row
@@ -19,12 +22,15 @@ for row in df.fillna('').itertuples():
         print(f'no date on row {_id}')
         continue
 
-
-    # clean up city
-    city = city.replace("?", "")
-
-    # clean up club
-    club = club.replace("?", "")
+    for cat in CLEANING:
+        if cat == 'city':
+            for search, replace in CLEANING[cat].items():
+                print(f'searching city data for {search} - replacing with {replace}')
+                city = city.replace(search, replace)
+        elif cat == 'club':
+            for search, replace in CLEANING[cat].items():
+                print(f'searching club data for {search} - replacing with {replace}')
+                club = club.replace(search, replace)
 
     # clean up date
     try:
@@ -34,20 +40,21 @@ for row in df.fillna('').itertuples():
             date = datetime.strptime(date.strip(), '%Y-%m')
         except:
             raise RuntimeError(f"{date} cannot be interpreted")
-    
+
     # clean up source
     source = source.split("[")[0]
-    
-    
-    if performer == "—":
+
+    if performer == "—" or performer == "-":
         performer = None
-    
-    
-    if date.year > 1940 or date.year < 1930:
-        continue
-    
-    
-    add = []
+
+    if START_YEAR and END_YEAR:
+        if date.year > END_YEAR or date.year < START_YEAR:
+            continue
+
+    # strip off any trailing or leading spaces
+    club, city, performer, revue_name = club.strip(), city.strip(), performer.strip(), revue_name.strip()
+
+    add = list()
     if club and city:
         current_weight = graph.get_edge_data(club, city, default={}).get('weight')
         current_found = graph.get_edge_data(club, city, default={}).get('found', [])
