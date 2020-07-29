@@ -112,16 +112,60 @@ for row in df.fillna('').itertuples():
     }
     nx.set_node_attributes(graph, attrs)
 
-# set degrees for each node
-for node in graph.nodes:
-    attrs = {
-        node: {
-            'indegree': len(graph.in_edges(node)),
-            'outdegree': len(graph.out_edges(node)),
-            'degree': len(graph.out_edges(node)) + len(graph.in_edges(node)),
+
+def set_degrees(graph):
+    # set degrees for each node
+    for node in graph.nodes:
+        attrs = {
+            node: {
+                'indegree': len(graph.in_edges(node)),
+                'outdegree': len(graph.out_edges(node)),
+                'degree': len(graph.out_edges(node)) + len(graph.in_edges(node)),
+            }
         }
-    }
-    nx.set_node_attributes(graph, attrs)
+        nx.set_node_attributes(graph, attrs)
+    return(graph)
+
+
+def set_centralities(graph):
+
+    # 1000x eigenvector centrality measure for each node
+    for data in [{node: eigen_central*1000} for node, eigen_central in nx.eigenvector_centrality(graph, max_iter=10000).items()]:
+        attrs = {
+            list(data.keys())[0]: {'1000x-eigenvector-centrality': list(data.values())[0]},
+        }
+        nx.set_node_attributes(graph, attrs)
+
+
+    # 1000x degree centrality measure for each node
+    for data in [{node: degree_central*1000} for node, degree_central in nx.degree_centrality(graph).items()]:
+        attrs = {
+            list(data.keys())[0]: {'1000x-degree-centrality': list(data.values())[0]},
+        }
+        nx.set_node_attributes(graph, attrs)
+
+
+    # 1000x closeness centrality measure for each node
+    for data in [{node: close_central*1000} for node, close_central in nx.closeness_centrality(graph).items()]:
+        attrs = {
+            list(data.keys())[0]: {'1000x-closeness-centrality': list(data.values())[0]},
+        }
+        nx.set_node_attributes(graph, attrs)
+
+
+    # 1000x betweenness centrality measure for each node
+    for data in [{node: between_central*1000} for node, between_central in nx.betweenness_centrality(graph).items()]:
+        attrs = {
+            list(data.keys())[0]: {'1000x-betweenness-centrality': list(data.values())[0]},
+        }
+        nx.set_node_attributes(graph, attrs)
+
+
+    return(graph)
+
+graph = set_degrees(graph)
+graph = set_centralities(graph)
+
 
 # write file
 from pathlib import Path
