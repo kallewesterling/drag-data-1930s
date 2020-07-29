@@ -13,7 +13,7 @@ graph = nx.DiGraph()
 from datetime import datetime
 
 for row in df.fillna('').itertuples():
-    _id, date, category, performer, club, _city, city, revue_name, normalized_revue_name, unsure_drag, legal_name, alleged_age, assumed_birth_year, source, eima = row
+    _id, date, category, performer, club, _city, city, revue_name, normalized_revue_name, unsure_drag, legal_name, alleged_age, assumed_birth_year, source, eima, newspapers_search, fulton_search = row
 
     if not date:
         print(f'no date on row {_id}')
