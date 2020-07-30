@@ -11,3 +11,11 @@ CLEANING = {
         '?': ''
     }
 }
+
+CACHE = './.cache'
+
+
+######################## NO EDITS BELOW ############
+
+from pathlib import Path
+CACHE = Path(CACHE)

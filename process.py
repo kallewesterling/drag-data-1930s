@@ -2,7 +2,36 @@ import networkx as nx
 import pandas as pd
 import json
 from datetime import datetime
-from drag.settings import SPREADSHEET, START_YEAR, END_YEAR, CLEANING
+from drag.settings import SPREADSHEET, START_YEAR, END_YEAR, CLEANING, CACHE
+from pathlib import Path
+
+class Place():
+
+    if not CACHE.exists(): CACHE.mkdir(parents=True)
+
+    from geopy.geocoders import Nominatim
+    geolocator = Nominatim(user_agent="place-app")
+
+    def __init__(self, name:str):
+        self.name = name
+        self.cache = CACHE / f'{self.name}.json'
+
+        if not self.cache.exists():
+            g = self.geolocator.geocode(name + ", United States")
+            if g:
+                self.cache.write_text(json.dumps(g.raw))
+            else:
+                self.cache.write_text(json.dumps({}))
+
+        self.data = json.loads(self.cache.read_text())
+        if self.data == {}:
+            print(f'Warning: Could not find geo data for {name}')
+
+        self.lat = self.data.get('lat')
+        self.lon = self.data.get('lon')
+        self.boundingbox = self.data.get('boundingbox')
+        self.display_name = self.data.get('display_name')
+        self.importance = self.data.get('importance')
 
 
 df = pd.read_csv(SPREADSHEET, encoding='utf8')
@@ -13,7 +42,6 @@ if not START_YEAR:
 
 if not END_YEAR:
     print('Warning: no end year set.')
-
 
 for row in df.fillna('').itertuples():
     _id, date, category, performer, club, _city, city, revue_name, normalized_revue_name, unsure_drag, legal_name, alleged_age, assumed_birth_year, source, eima, newspapers_search, fulton_search = row
@@ -39,7 +67,10 @@ for row in df.fillna('').itertuples():
         try:
             date = datetime.strptime(date.strip(), '%Y-%m')
         except:
-            raise RuntimeError(f"{date} cannot be interpreted")
+            try:
+                date = datetime.strptime(date.strip(), '%Y')
+            except:
+                raise RuntimeError(f"{date} cannot be interpreted")
 
     # clean up source
     source = source.split("[")[0]
@@ -106,11 +137,21 @@ for row in df.fillna('').itertuples():
         date=date.strftime("%Y-%m-%d")
     )
 
+
     attrs = {
-        city: {'category': 'city', 'lat': '0.4252235', 'lon': '42.235235'},
+        city: {
+            'category': 'city',
+            'lat': '0.0',
+            'lon': '0.0'
+        },
         club: {'category': 'club'},
         performer: {'category': 'performer'}
     }
+
+    if city:
+        p = Place(city)
+        attrs[city]['lat'] = p.lat
+        attrs[city]['lon'] = p.lon
     nx.set_node_attributes(graph, attrs)
 
 
@@ -171,5 +212,4 @@ graph = set_centralities(graph)
 
 
 # write file
-from pathlib import Path
 Path('./docs/drag-data-for-1930s.json').write_text(json.dumps(nx.node_link_data(graph)))
