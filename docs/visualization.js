@@ -8,13 +8,15 @@ const height = 300
 const size = function(d, type="r") {
     if (type == "r") {
         if (d.category == "city") {
-            return 10
+            return Math.sqrt(d.degree * 5)
+            //return 10
         } else {
             return Math.sqrt(d.degree * 2)
         }
     } else if (type == "text") {
         if (d.category == "city") {
-            return 6
+            return Math.sqrt(d.degree * 5)
+            //return 6
         } else {
             return Math.sqrt(d.degree * 2 )
         }
@@ -99,7 +101,10 @@ const set_text = function(d, type) {
 const filter_nodes = function(nodes) {
     new_array = []
     nodes.forEach(function(n) {
-        if ( n.category == "city" || n.degree > 1 ) {
+        // if ( n.category == "city" ) {
+        //     new_array.push(n);
+        // }
+        if ( n.degree > 1 ) {
             new_array.push(n);
         }
     });
@@ -188,7 +193,6 @@ d3.json('drag-data-for-1930s.json').then(function(data) {
         .attr("stroke-width", d => Math.sqrt(d.weight / 2))
         .on("mouseover", function(d) {
             set_text(d, 'link');
-            // d3.select(d).select('line').attr('opacity', 1.0)
         } )
 
     const node = g.append("g")
@@ -200,8 +204,57 @@ d3.json('drag-data-for-1930s.json').then(function(data) {
         .attr("class", d => "node " + d.category)
         .on("mouseover", function(d) {
             set_text(d, 'node');
-            // d3.select(d).select('line').attr('opacity', 1.0)
+
+            const rel_nodes = [d.index]
+
+            link
+                .attr("class", function (link_d) {
+                    // console.log(link_d.source);
+                    // console.log(link_d.target);
+                    // console.log(d.index);
+                    // console.log(`${link_d.source.index} ${link_d.target.index} ${d.index}`);
+                    // console.log(`${typeof(link_d.source.index)} ${typeof(link_d.target.index)} ${typeof(d.index)}`);
+                    if (link_d.source.index == d.index || link_d.target.index == d.index) {
+                        if (link_d.source.index == d.index) {
+                            if (rel_nodes.includes(link_d.target.index) != true) {
+                                rel_nodes.push(link_d.target.index);
+                            }
+                        } else if (link_d.target.index == d.index) {
+                            if (rel_nodes.includes(link_d.source.index) != true) {
+                                rel_nodes.push(link_d.source.index);
+                            }
+                        }
+                        return "link selected";
+                    } else {
+                        return "link deselected";
+                    }
+                })
+
+            rel_nodes.forEach((rel_node_index) => {
+                node
+                    .attr("class", function(node_d) {
+                        if (rel_nodes.includes(node_d.index)) {
+                            return "node selected";
+                        } else {
+                            return "node deselected";
+                        }
+                    });
+            })
         } )
+        .on("mouseout", function(d) {
+            link
+                .attr("class", function(link_d) {
+                    if (link_d.revue_name != "") {
+                        return "link revue";
+                    } else {
+                        return "link no-revue";
+                    }
+            });
+            node
+                .attr("class", function(node_d) {
+                    return "node " + node_d.category;
+                });
+        })
         .call(drag(simulation));
 
     const text = g.append("g")

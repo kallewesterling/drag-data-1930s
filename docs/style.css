@@ -14,7 +14,7 @@ p {
 .text-label {
     font-family: 'Roboto Condensed', sans-serif;
     text-anchor: middle;
-    cursor: move;
+    pointer-events: none;
 }
 
 .node.city {
@@ -34,9 +34,28 @@ p {
     opacity: 1;
     stroke-width: 0.1;
     stroke: #fff;
+    cursor: move;
+}
+
+.node.selected {
+    opacity: 1;
+    fill: red;
+}
+
+.node.deselected {
+    opacity: 1;
+    fill: lightgray;
 }
 
 
+
+.link.selected {
+    stroke: red;
+}
+
+.link.deselected {
+    stroke: lightgrey;
+}
 
 .link.revue {
     stroke: #3D5A80;
