@@ -8,9 +8,15 @@
         <link rel="stylesheet" href="//cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
     </head>
     <body>
-        <div id="gravity">
-            <input type="range" id="gravity_selector" name="gravity_selector" min="-1000" max="-10" value="-10" step="100">
-            <label for="gravity">Gravity</label>
+        <div id="settings" class="shadow border p-2">
+            <div style="height:25px;line-height:25px;">
+                <input class="p-0 m-0" type="range" id="gravity_selector" name="gravity_selector" min="-1000" max="-10" value="-200" step="100">
+                <label class="small p-0 m-0" for="gravity_selector" id="gravity_selector_label">Gravity</label>
+            </div>
+            <div style="height:25px;line-height:25px;">
+                <input class="p-0 m-0" type="range" id="min_degree_selector" name="min_degree_selector" min="0" max="10" value="1" step="1">
+                <label class="small p-0 m-0" for="min_degree_selector" id="min_degree_selector_label">Min connections</label>
+            </div>
         </div>
         <div id="svg"></div>
         <div class="container">

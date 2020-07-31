@@ -1,6 +1,6 @@
 const WIDTH = 600;
 const HEIGHT = 300;
-const MIN_DEGREE = 5;
+var MIN_DEGREE = 2;
 var STRENGTH = -200;
 
 const MULTIPLIER = {
@@ -17,12 +17,54 @@ const MULTIPLIER = {
 
 
 
+
+const svg = d3.select("#svg").append("svg")
+    .attr("viewBox", [-WIDTH / 2, -HEIGHT / 2, WIDTH, HEIGHT]);
+
+var g = svg.append("g").attr('id', 'base-g');
+
+
+////////////////// Settings ////////////////////////////////
+
+d3.select("#gravity_selector").node().value = STRENGTH;
+d3.select("#gravity_selector_label").html(`Gravity ${STRENGTH}`);
+
+d3.select("#gravity_selector").on("input", function(d) { d3.select("#gravity_selector_label").html(`Gravity ${this.value}`); });
 d3.select("#gravity_selector").on("change", function(d) {
-    console.log(this.value);
+    // console.log(this.value);
     STRENGTH = this.value;
-    this.parentNode.style.display = 'none';
-    draw();
+    d3.select("#gravity_selector_label").html(`Gravity ${STRENGTH}`);
+    try {
+        d3.select("#base-g").remove();
+        var g = svg.append("g").attr('id', 'base-g');
+        //setup_zoomable_g(nodes, g);
+        draw();
+    } catch {
+        draw();
+    }
 });
+
+d3.select("#min_degree_selector").node().value = MIN_DEGREE;
+d3.select("#min_degree_selector_label").html(`Min degree ${MIN_DEGREE}`);
+
+d3.select("#min_degree_selector").on("input", function(d) { d3.select("#min_degree_selector_label").html(`Min degree ${this.value}`); });
+d3.select("#min_degree_selector").on("change", function(d) {
+    // console.log(this.value);
+    MIN_DEGREE = this.value;
+    d3.select("#min_degree_selector_label").html(`Min connections ${MIN_DEGREE}`);
+    update();
+});
+
+const update = () => {
+    try {
+        d3.select("#base-g").remove();
+        var g = svg.append("g").attr('id', 'base-g');
+        //setup_zoomable_g(nodes, g);
+        draw();
+    } catch {
+        draw();
+    }
+}
 
 const size = function(d, type="r") {
     if (type == "r") {
@@ -96,7 +138,7 @@ const set_text = function(d, type, rel_nodes=[], node=undefined) {
         str += `</div>`
         str += `<div class="col-12">`
         if (d.found.length) {
-            str += `<h5>Sources</h5>`
+            str += `<h5>Sources (${d.found.length})</h5>`
             d.found.forEach(function(source) {
                 str += `<p>${source}</p>`
             });
@@ -182,27 +224,27 @@ const set_text = function(d, type, rel_nodes=[], node=undefined) {
 }
 
 const filter_nodes = function(nodes) {
-    new_array = []
+    _ = []
     nodes.forEach(function(n) {
         // if ( n.category == "city" ) {
-        //     new_array.push(n);
+        //     _.push(n);
         // }
         if ( n.degree > MIN_DEGREE ) {
-            new_array.push(n);
+            _.push(n);
         }
     });
-    return new_array;
+    return _;
 }
 
 const filter_links = (links, nodes) => {
     all_ids = nodes.map(d => d.id)
-    new_array = []
-    links.forEach(function(l) {
-        if (all_ids.includes(l.source) && all_ids.includes(l.target)) {
-            new_array.push(l);
+    _ = []
+    links.forEach(function(d) {
+        if (all_ids.includes(d.source) && all_ids.includes(d.target)) {
+            _.push(d);
         }
     })
-    return new_array;
+    return _;
 }
 
 const drag = simulation => {
@@ -235,25 +277,14 @@ const setup_simulation = (nodes, links) => {
         .force("y", d3.forceY());
 }
 
-const setup_zoomable_g = nodes => {
-    const zoomed = () => {
-        g.attr("transform", d3.event.transform);
-    }
+const setup_zoomable_g = (nodes, g) => {
+    const zoomed = () => { g.attr("transform", d3.event.transform); }
 
-    const zoom = d3.zoom()
-        .scaleExtent([0, 3])
-        .on("zoom", zoomed);
+    const zoom = d3.zoom().scaleExtent([0, 3]).on("zoom", zoomed);
 
-    const svg = d3.select("#svg").append("svg")
-        .attr("viewBox", [-WIDTH / 2, -HEIGHT / 2, WIDTH, HEIGHT])
-        .call(zoom)
+    svg.call(zoom)
         // .on("click", function() { clear_text(nodes); } )
         // .on("mouseover", clear_text(nodes) );
-
-    const g = svg
-        .append("g");
-
-    return g
 }
 
 const get_rel_nodes = function(d_index, link, selected="link selected", deselected="link deselected") {
@@ -285,14 +316,16 @@ const reset_links = (link) => { link.attr("class", function(d) { return set_line
 
 const draw = () => {
     d3.json('drag-data-for-1930s.json').then(function(data) {
-        var nodelist = data.nodes.sort((a, b) => (a.category > b.category) ? 1 : -1)
+        var nodelist = data.nodes.sort((a, b) => (a.category > b.category) ? 1 : -1);
 
         const nodes = filter_nodes(nodelist.map(d => Object.create(d)));
         const links = filter_links(data.links.map(d => Object.create(d)), nodes);
 
-        const simulation = setup_simulation(nodes, links)
+        const simulation = setup_simulation(nodes, links);
 
-        const g = setup_zoomable_g(nodes)
+        const g = d3.select('#base-g');
+
+        setup_zoomable_g(nodes, g);
 
         const link = g.append("g").attr("id", "links")
             .selectAll("line")
@@ -403,3 +436,5 @@ const draw = () => {
 
     });
 }
+
+draw();
