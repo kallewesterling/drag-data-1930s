@@ -35,16 +35,37 @@ p {
     stroke-width: 0.1;
     stroke: #fff;
     cursor: move;
+    /* pointer-events: none; */
 }
 
-.node.selected {
+.node.city.selected {
     opacity: 1;
-    fill: red;
+    fill: rgb(200, 0, 0) !important;
 }
 
-.node.deselected {
+.node.city.deselected {
     opacity: 1;
-    fill: lightgray;
+    fill: rgb(205, 205, 205) !important;
+}
+
+.node.club.selected {
+    opacity: 1;
+    fill: rgb(217, 0, 0) !important;
+}
+
+.node.club.deselected {
+    opacity: 1;
+    fill: rgb(215, 215, 215) !important;
+}
+
+.node.performer.selected {
+    opacity: 1;
+    fill: rgb(235, 0, 0) !important;
+}
+
+.node.performer.deselected {
+    opacity: 1;
+    fill: rgb(225, 225, 225) !important;
 }
 
 

@@ -1,44 +1,56 @@
 
 
-const width = 600
-const height = 300
+const WIDTH = 600;
+const HEIGHT = 300;
+const MIN_DEGREE = 0;
+const STRENGTH = -200;
+
+const MULTIPLIER = {
+    'r': {
+       'city': 10,
+       'standard': 4,
+    },
+    'text': {
+       'city': 10,
+       'standard': 4,
+    }
+}
+
 
 
 
 const size = function(d, type="r") {
     if (type == "r") {
-        if (d.category == "city") {
-            return Math.sqrt(d.degree * 5)
-            //return 10
+        if (Object.keys(MULTIPLIER['r']).includes(d.category)) {
+            return Math.sqrt(d.degree * MULTIPLIER['r'][d.category])
         } else {
-            return Math.sqrt(d.degree * 2)
+            return Math.sqrt(d.degree * MULTIPLIER['r']['standard'])
         }
     } else if (type == "text") {
-        if (d.category == "city") {
-            return Math.sqrt(d.degree * 5)
-            //return 6
+        if (Object.keys(MULTIPLIER['text']).includes(d.category)) {
+            return Math.sqrt(d.degree * MULTIPLIER['text'][d.category])
         } else {
-            return Math.sqrt(d.degree * 2 )
+            return Math.sqrt(d.degree * MULTIPLIER['text']['standard'])
         }
     }
 }
 
-const clear_text = function(nodes) {
+const clear_text = nodes => {
     var arr = nodes.map(d => d['1000x-degree-centrality'])
-    var max_degree_centrality = arr.reduce(function(a, b) { return Math.max(a, b); });
-    var max_degree_centrality = nodes.find(x => x['1000x-degree-centrality'] === max_eigenvector_centrality);
+    // var max_degree_centrality = arr.reduce(function(a, b) { return Math.max(a, b); });
+    // var max_degree_centrality = nodes.find(x => x['1000x-degree-centrality'] === max_eigenvector_centrality);
 
     var arr = nodes.map(d => d['1000x-betweenness-centrality'])
-    var max_betweenness_centrality = arr.reduce(function(a, b) { return Math.max(a, b); });
-    var max_betweenness_centrality = nodes.find(x => x['1000x-betweenness-centrality'] === max_eigenvector_centrality);
+    // var max_betweenness_centrality = arr.reduce(function(a, b) { return Math.max(a, b); });
+    // var max_betweenness_centrality = nodes.find(x => x['1000x-betweenness-centrality'] === max_eigenvector_centrality);
 
     var arr = nodes.map(d => d['1000x-closeness-centrality'])
-    var max_closeness_centrality = arr.reduce(function(a, b) { return Math.max(a, b); });
-    var max_closeness_centrality = nodes.find(x => x['1000x-closeness-centrality'] === max_eigenvector_centrality);
+    // var max_closeness_centrality = arr.reduce(function(a, b) { return Math.max(a, b); });
+    // var max_closeness_centrality = nodes.find(x => x['1000x-closeness-centrality'] === max_eigenvector_centrality);
 
     var arr = nodes.map(d => d['1000x-eigenvector-centrality'])
-    var max_eigenvector_centrality = arr.reduce(function(a, b) { return Math.max(a, b); });
-    var max_eigenvector_centrality = nodes.find(x => x['1000x-eigenvector-centrality'] === max_eigenvector_centrality);
+    // var max_eigenvector_centrality = arr.reduce(function(a, b) { return Math.max(a, b); });
+    // var max_eigenvector_centrality = nodes.find(x => x['1000x-eigenvector-centrality'] === max_eigenvector_centrality);
 
     str = `<table class="table table-striped table-sm">
             <thead>
@@ -63,41 +75,104 @@ const clear_text = function(nodes) {
     d3.select("#info").html(str)
 }
 
-const set_text = function(d, type) {
-    str = ""
+const set_text = function(d, type, rel_nodes=[], node=undefined) {
+    str = `<div class="row">`
     if (type == "link") {
-        // this_line = d3.selectAll("line")._groups[0][d.index];
-
-        // d3.selectAll("line")[d].attr("opacity", "0.1")
-        // d3.select(this_line).attr('opacity', '1.0')
-
+        str += `<div class="col-12">`
         if (d.revue_name != '') {
-            str += '<h4><small class="text-muted">LINK</small> ' + d.revue_name + '</h4>'
+            str += `
+            <h4><small class="text-muted">LINK</small> ${d.revue_name}</h4>
+            `
         } else {
-            str += '<h4 class="text-muted"><small>LINK</small> Not a named revue</h4>'
+            str += `
+            <h4 class="text-muted"><small>LINK</small> Not a named revue</h4>
+            `
         }
-        d.found.forEach(function(source) {
-            str += "<p>" + source + "</p>"
-        });
+        str += `</div>`
+        str += `<div class="col-12">`
+        if (d.found.length) {
+            str += `<h5>Sources</h5>`
+            d.found.forEach(function(source) {
+                str += `<p>${source}</p>`
+            });
+        }
+        str += `</div>`
     } else if (type == "node") {
+
+        collected = []
+        clubs = []
+        cities = []
+        performers = []
+        rel_nodes.forEach((rel_node_index) => {
+            node
+                .attr("pseud", function(node_d) {
+                    if (rel_nodes.includes(node_d.index) && ! collected.includes(node_d.index) && d.index != node_d.index) {
+                        if (node_d.category == 'club') {
+                            clubs.push(node_d);
+                        } else if (node_d.category == 'city') {
+                            cities.push(node_d);
+                        } else if (node_d.category == 'performer') {
+                            performers.push(node_d);
+                        }
+                        collected.push(node_d.index);
+                    }
+                });
+        })
+
+        str += `<div class="col-12">`
         if (d.category == "city") {
-            str += `<h4><small class="text-muted">CITY</small> ${d.id}</h4>`
+            str += `
+                <h4><small class="text-muted">CITY</small> ${d.id}</h4>
+            `
         } else if (d.category == "club") {
-            str += `<h4><small class="text-muted">CLUB</small> ${d.id}</h4>`
+            str += `
+                <h4><small class="text-muted">CLUB</small> ${d.id}</h4>
+            `
         } else if (d.category == "performer") {
-            str += `<h4><small class="text-muted">PERFORMER</small> ${d.id}</h4>`;
+            str += `
+                <h4><small class="text-muted">PERFORMER</small> ${d.id}</h4>
+            `;
+        } else {
+            str += `<h4>&nbsp;</h4>`
         }
+        str += `</div>`
+
+        str += `<div class="col-6">`
+        str += `<h5>Related nodes</h5>`
+
+        if (cities.length) {
+            str += `<h6 class="border-bottom">Cities (${cities.length})</h6>`
+            cities.forEach((d) => {
+                str += `<p class="">${d.id}</p>`
+            })
+        }
+        if (clubs.length) {
+            str += `<h6 class="border-bottom">Clubs (${clubs.length})</h6>`
+            clubs.forEach((d) => {
+                str += `<p class="">${d.display}</p>`
+            })
+        }
+        if (performers.length) {
+            str += `<h6 class="border-bottom">Performers (${performers.length})</h6>`
+            performers.forEach((d) => {
+                str += `<p class="">${d.id}</p>`
+            })
+        }
+        str += `</div>`
+        str += `<div class="col-6">`
         str += `
-        <hr />
-        <h5>Measures</h5>
-        <p><strong>In-degree</strong>: ${d.indegree}</p>
-        <p><strong>Out-degree</strong>: ${d.outdegree}</p>
-        <h5>Centrality measures</h5>
-        <p><strong>Eigenvector</strong>: ${d['1000x-eigenvector-centrality']}</p>
-        <p><strong>Degree</strong>: ${d['1000x-degree-centrality']}</p>
-        <p><strong>Closeness</strong>: ${d['1000x-closeness-centrality']}</p>
-        <p><strong>Betweenness</strong>: ${d['1000x-betweenness-centrality']}</p>`;
+            <h5>Measures</h5>
+            <p><strong>In-degree</strong>: ${d.indegree}</p>
+            <p><strong>Out-degree</strong>: ${d.outdegree}</p>
+
+            <h5>Centrality measures</h5>
+            <p><strong>Eigenvector</strong>: ${d['1000x-eigenvector-centrality']}</p>
+            <p><strong>Degree</strong>: ${d['1000x-degree-centrality']}</p>
+            <p><strong>Closeness</strong>: ${d['1000x-closeness-centrality']}</p>
+            <p><strong>Betweenness</strong>: ${d['1000x-betweenness-centrality']}</p>`;
+        str += `</div>`
     }
+    str += `</div>`
     d3.select("#info").html(str)
 }
 
@@ -107,14 +182,14 @@ const filter_nodes = function(nodes) {
         // if ( n.category == "city" ) {
         //     new_array.push(n);
         // }
-        if ( n.degree > 1 ) {
+        if ( n.degree > MIN_DEGREE ) {
             new_array.push(n);
         }
     });
     return new_array;
 }
 
-const filter_links = function(links, nodes) {
+const filter_links = (links, nodes) => {
     all_ids = nodes.map(d => d.id)
     new_array = []
     links.forEach(function(l) {
@@ -146,19 +221,17 @@ const drag = simulation => {
         .on("end", dragended);
 }
 
-d3.json('drag-data-for-1930s.json').then(function(data) {
-    const reset = function(nodes) {
-        svg.transition()
-            .duration(750)
-            .call(
-                zoom.transform,
-                d3.zoomIdentity,
-                d3.zoomTransform(svg.node()).invert([width / 2, height / 2])
-            );
-        clear_text(nodes);
+const setup_simulation = (nodes, links) => {
+        return d3.forceSimulation(nodes)
+            .force("link", d3.forceLink(links).id(d => d.id))
+            .force("charge", d3.forceManyBody().strength(STRENGTH))
+            //.force("center", d3.forceCenter(WIDTH / 2, HEIGHT / 2));
+            .force("x", d3.forceX())
+            .force("y", d3.forceY());
     }
 
-    const zoomed = function() {
+const setup_zoomable_g = nodes => {
+    const zoomed = () => {
         g.attr("transform", d3.event.transform);
     }
 
@@ -166,21 +239,8 @@ d3.json('drag-data-for-1930s.json').then(function(data) {
         .scaleExtent([0, 3])
         .on("zoom", zoomed);
 
-    var nodelist = data.nodes.sort((a, b) => (a.category > b.category) ? 1 : -1)
-
-    const nodes = filter_nodes(nodelist.map(d => Object.create(d)));
-    const links = filter_links(data.links.map(d => Object.create(d)), nodes);
-
-    const simulation = d3.forceSimulation(nodes)
-        .force("link", d3.forceLink(links).id(d => d.id))
-        .force("charge", d3.forceManyBody())
-        //.force("center", d3.forceCenter(width / 2, height / 2));
-        .force("x", d3.forceX())
-        .force("y", d3.forceY());
-
-
     const svg = d3.select("#svg").append("svg")
-        .attr("viewBox", [-width / 2, -height / 2, width, height])
+        .attr("viewBox", [-WIDTH / 2, -HEIGHT / 2, WIDTH, HEIGHT])
         .call(zoom)
         .on("click", function() { clear_text(nodes); } )
         .on("mouseover", clear_text(nodes) );
@@ -188,38 +248,79 @@ d3.json('drag-data-for-1930s.json').then(function(data) {
     const g = svg
         .append("g");
 
-    const set_line_class = function(d) { if (d.revue_name != "") { return "link revue"; } else { return "link no-revue"; } };
+    return g
+}
 
-    const link = g.append("g")
+const get_rel_nodes = function(d_index, link, selected="link selected", deselected="link deselected") {
+        const rel_nodes = [d_index]
+        link
+            .attr("class", function (link_d) {
+                if (link_d.source.index == d_index || link_d.target.index == d_index) {
+                    if (link_d.source.index == d_index) {
+                        if (rel_nodes.includes(link_d.target.index) != true) {
+                            rel_nodes.push(link_d.target.index);
+                        }
+                    } else if (link_d.target.index == d_index) {
+                        if (rel_nodes.includes(link_d.source.index) != true) {
+                            rel_nodes.push(link_d.source.index);
+                        }
+                    }
+                    return selected;
+                } else {
+                    return deselected;
+                }
+            })
+        return rel_nodes;
+    }
+
+const set_line_class = function(d) { if (d.revue_name != "") { return "link revue"; } else { return "link no-revue"; } };
+
+
+d3.json('drag-data-for-1930s.json').then(function(data) {
+    var nodelist = data.nodes.sort((a, b) => (a.category > b.category) ? 1 : -1)
+
+    const nodes = filter_nodes(nodelist.map(d => Object.create(d)));
+    const links = filter_links(data.links.map(d => Object.create(d)), nodes);
+
+    const simulation = setup_simulation(nodes, links)
+
+    const g = setup_zoomable_g(nodes)
+
+
+    const link = g.append("g").attr("id", "links")
         .selectAll("line")
         .data(links)
         .join("line")
-        .attr("class", function(d) { return set_line_class(d) } ) //d => "node " + d.category
+        .attr("class", function(d) { return set_line_class(d) } )
         .attr("stroke-width", d => Math.sqrt(d.weight / 2))
-        .on("mouseover", function(d) {
-            set_text(d, 'link');
-            link.attr("class", function(d_inner) {
-                if (d.index == d_inner.index ) {
-                    return "link selected";
-                } else {
-                    return "link deselected";
-                }
-            });
-            node.attr("class", function(d_inner) {
-                if (d.source.index == d_inner.index) {
-                    return "node selected";
-                } else if (d.target.index == d_inner.index) {
-                    return "node selected";
-                } else {
-                    return "node deselected";
-                }
-            });
-            // this.attr("class", "link selected")
-        })
-        .on("mouseout", function(d) {
-            link.attr("class", function(d) { return set_line_class(d) });
-            node.attr("class", function(node_d) { return "node " + node_d.category; });
+        .on("click", function(d) {
+            if (d3.select(this).attr('data-clicked') == 'true') {
+                d3.select(this).attr('data-clicked', 'false');
+                link.attr("class", function(d) { return set_line_class(d) });
+                node.attr("class", function(node_d) { return "node " + node_d.category; });
+            } else {
+                d3.select(this).attr('data-clicked', 'true');
+                set_text(d, 'link');
+                link.attr("class", function(d_inner) {
+                    if (d.index == d_inner.index ) {
+                        return "link selected";
+                    } else {
+                        return "link deselected";
+                    }
+                });
+                node.attr("class", function(d_inner) {
+                    if (d.source.index == d_inner.index) {
+                        return `node ${d_inner.category} selected`;
+                    } else if (d.target.index == d_inner.index) {
+                        return `node ${d_inner.category} selected`;
+                    } else {
+                        return `node ${d_inner.category} deselected`;
+                    }
+                });
+            }
+            d3.event.stopPropagation();
         });
+
 
     const node = g.append("g")
         .selectAll("g")
@@ -228,43 +329,27 @@ d3.json('drag-data-for-1930s.json').then(function(data) {
         .append("circle")
         .attr("r", d => size(d) )
         .attr("class", d => "node " + d.category)
-        .on("mouseover", function(d) {
-            set_text(d, 'node');
-
-            const rel_nodes = [d.index]
-
-            link
-                .attr("class", function (link_d) {
-                    if (link_d.source.index == d.index || link_d.target.index == d.index) {
-                        if (link_d.source.index == d.index) {
-                            if (rel_nodes.includes(link_d.target.index) != true) {
-                                rel_nodes.push(link_d.target.index);
+        .on("click", function(d) {
+            if (d3.select(this).attr('data-clicked') == 'true') {
+                d3.select(this).attr('data-clicked', 'false');
+                link.attr("class", function(link_d) { return set_line_class(link_d); });
+                node.attr("class", function(node_d) { return "node " + node_d.category; });
+            } else {
+                d3.select(this).attr('data-clicked', 'true');
+                rel_nodes = get_rel_nodes(d.index, link);
+                rel_nodes.forEach((rel_node_index) => {
+                    node
+                        .attr("class", function(node_d) {
+                            if (rel_nodes.includes(node_d.index)) {
+                                return `node ${node_d.category} selected`;
+                            } else {
+                                return `node ${node_d.category} deselected`;
                             }
-                        } else if (link_d.target.index == d.index) {
-                            if (rel_nodes.includes(link_d.source.index) != true) {
-                                rel_nodes.push(link_d.source.index);
-                            }
-                        }
-                        return "link selected";
-                    } else {
-                        return "link deselected";
-                    }
-                })
-
-            rel_nodes.forEach((rel_node_index) => {
-                node
-                    .attr("class", function(node_d) {
-                        if (rel_nodes.includes(node_d.index)) {
-                            return "node selected";
-                        } else {
-                            return "node deselected";
-                        }
-                    });
-            })
-        } )
-        .on("mouseout", function(d) {
-            link.attr("class", function(link_d) { return set_line_class(link_d); });
-            node.attr("class", function(node_d) { return "node " + node_d.category; });
+                        });
+                });
+                set_text(d, 'node', rel_nodes, node);
+            }
+            d3.event.stopPropagation();
         })
         .call(drag(simulation));
 
@@ -280,7 +365,6 @@ d3.json('drag-data-for-1930s.json').then(function(data) {
         .attr("class", "text-label")
         .text( function(d) {
             if (d.category == 'club') {
-                // console.log(d);
                 return d.display;
             } else {
                 return d.id;
@@ -307,7 +391,7 @@ d3.json('drag-data-for-1930s.json').then(function(data) {
 
     // invalidation.then(() => simulation.stop());
 
-    return svg.node();
+    return g.node();
 
 
 });
