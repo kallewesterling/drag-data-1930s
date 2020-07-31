@@ -54,7 +54,7 @@ p {
 }
 
 .link.deselected {
-    stroke: lightgrey;
+    stroke: #eee;
 }
 
 .link.revue {

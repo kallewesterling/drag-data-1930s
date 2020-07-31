@@ -81,19 +81,22 @@ const set_text = function(d, type) {
         });
     } else if (type == "node") {
         if (d.category == "city") {
-            str += '<h4><small class="text-muted">CITY</small> ' + d.id + '</h4>'
+            str += `<h4><small class="text-muted">CITY</small> ${d.id}</h4>`
         } else if (d.category == "club") {
-            str += '<h4><small class="text-muted">CLUB</small> ' + d.id + '</h4>'
+            str += `<h4><small class="text-muted">CLUB</small> ${d.id}</h4>`
         } else if (d.category == "performer") {
-            str += '<h4><small class="text-muted">PERFORMER</small> ' + d.id + '</h4>'
+            str += `<h4><small class="text-muted">PERFORMER</small> ${d.id}</h4>`;
         }
-        str += "<p><strong>In-degree</strong>: " + d.indegree + "</p>"
-        str += "<p><strong>Out-degree</strong>: " + d.outdegree + "</p>"
-        str += "<h5>Centrality measures</h5>"
-        str += "<p><strong>Eigenvector</strong>: " + d['1000x-eigenvector-centrality'] + "</p>"
-        str += "<p><strong>Degree</strong>: " + d['1000x-degree-centrality'] + "</p>"
-        str += "<p><strong>Closeness</strong>: " + d['1000x-closeness-centrality'] + "</p>"
-        str += "<p><strong>Betweenness</strong>: " + d['1000x-betweenness-centrality'] + "</p>"
+        str += `
+        <hr />
+        <h5>Measures</h5>
+        <p><strong>In-degree</strong>: ${d.indegree}</p>
+        <p><strong>Out-degree</strong>: ${d.outdegree}</p>
+        <h5>Centrality measures</h5>
+        <p><strong>Eigenvector</strong>: ${d['1000x-eigenvector-centrality']}</p>
+        <p><strong>Degree</strong>: ${d['1000x-degree-centrality']}</p>
+        <p><strong>Closeness</strong>: ${d['1000x-closeness-centrality']}</p>
+        <p><strong>Betweenness</strong>: ${d['1000x-betweenness-centrality']}</p>`;
     }
     d3.select("#info").html(str)
 }
@@ -185,15 +188,38 @@ d3.json('drag-data-for-1930s.json').then(function(data) {
     const g = svg
         .append("g");
 
+    const set_line_class = function(d) { if (d.revue_name != "") { return "link revue"; } else { return "link no-revue"; } };
+
     const link = g.append("g")
         .selectAll("line")
         .data(links)
         .join("line")
-        .attr("class", function(d) { if (d.revue_name != "") { return "link revue"; } else { return "link no-revue"; } }) //d => "node " + d.category
+        .attr("class", function(d) { return set_line_class(d) } ) //d => "node " + d.category
         .attr("stroke-width", d => Math.sqrt(d.weight / 2))
         .on("mouseover", function(d) {
             set_text(d, 'link');
-        } )
+            link.attr("class", function(d_inner) {
+                if (d.index == d_inner.index ) {
+                    return "link selected";
+                } else {
+                    return "link deselected";
+                }
+            });
+            node.attr("class", function(d_inner) {
+                if (d.source.index == d_inner.index) {
+                    return "node selected";
+                } else if (d.target.index == d_inner.index) {
+                    return "node selected";
+                } else {
+                    return "node deselected";
+                }
+            });
+            // this.attr("class", "link selected")
+        })
+        .on("mouseout", function(d) {
+            link.attr("class", function(d) { return set_line_class(d) });
+            node.attr("class", function(node_d) { return "node " + node_d.category; });
+        });
 
     const node = g.append("g")
         .selectAll("g")
@@ -209,11 +235,6 @@ d3.json('drag-data-for-1930s.json').then(function(data) {
 
             link
                 .attr("class", function (link_d) {
-                    // console.log(link_d.source);
-                    // console.log(link_d.target);
-                    // console.log(d.index);
-                    // console.log(`${link_d.source.index} ${link_d.target.index} ${d.index}`);
-                    // console.log(`${typeof(link_d.source.index)} ${typeof(link_d.target.index)} ${typeof(d.index)}`);
                     if (link_d.source.index == d.index || link_d.target.index == d.index) {
                         if (link_d.source.index == d.index) {
                             if (rel_nodes.includes(link_d.target.index) != true) {
@@ -242,18 +263,8 @@ d3.json('drag-data-for-1930s.json').then(function(data) {
             })
         } )
         .on("mouseout", function(d) {
-            link
-                .attr("class", function(link_d) {
-                    if (link_d.revue_name != "") {
-                        return "link revue";
-                    } else {
-                        return "link no-revue";
-                    }
-            });
-            node
-                .attr("class", function(node_d) {
-                    return "node " + node_d.category;
-                });
+            link.attr("class", function(link_d) { return set_line_class(link_d); });
+            node.attr("class", function(node_d) { return "node " + node_d.category; });
         })
         .call(drag(simulation));
 
