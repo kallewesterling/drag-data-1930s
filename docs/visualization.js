@@ -1,9 +1,7 @@
-
-
 const WIDTH = 600;
 const HEIGHT = 300;
-const MIN_DEGREE = 0;
-const STRENGTH = -200;
+const MIN_DEGREE = 5;
+var STRENGTH = -200;
 
 const MULTIPLIER = {
     'r': {
@@ -13,11 +11,18 @@ const MULTIPLIER = {
     'text': {
        'city': 10,
        'standard': 4,
-    }
+    },
+    'lines': 0.5
 }
 
 
 
+d3.select("#gravity_selector").on("change", function(d) {
+    console.log(this.value);
+    STRENGTH = this.value;
+    this.parentNode.style.display = 'none';
+    draw();
+});
 
 const size = function(d, type="r") {
     if (type == "r") {
@@ -222,13 +227,13 @@ const drag = simulation => {
 }
 
 const setup_simulation = (nodes, links) => {
-        return d3.forceSimulation(nodes)
-            .force("link", d3.forceLink(links).id(d => d.id))
-            .force("charge", d3.forceManyBody().strength(STRENGTH))
-            //.force("center", d3.forceCenter(WIDTH / 2, HEIGHT / 2));
-            .force("x", d3.forceX())
-            .force("y", d3.forceY());
-    }
+    return d3.forceSimulation(nodes)
+        .force("link", d3.forceLink(links).id(d => d.id))
+        .force("charge", d3.forceManyBody().strength(STRENGTH))
+        //.force("center", d3.forceCenter(WIDTH / 2, HEIGHT / 2));
+        .force("x", d3.forceX())
+        .force("y", d3.forceY());
+}
 
 const setup_zoomable_g = nodes => {
     const zoomed = () => {
@@ -242,8 +247,8 @@ const setup_zoomable_g = nodes => {
     const svg = d3.select("#svg").append("svg")
         .attr("viewBox", [-WIDTH / 2, -HEIGHT / 2, WIDTH, HEIGHT])
         .call(zoom)
-        .on("click", function() { clear_text(nodes); } )
-        .on("mouseover", clear_text(nodes) );
+        // .on("click", function() { clear_text(nodes); } )
+        // .on("mouseover", clear_text(nodes) );
 
     const g = svg
         .append("g");
@@ -275,123 +280,126 @@ const get_rel_nodes = function(d_index, link, selected="link selected", deselect
 
 const set_line_class = function(d) { if (d.revue_name != "") { return "link revue"; } else { return "link no-revue"; } };
 
+const reset_nodes = (node) => { node.attr("class", function(node_d) { return "node " + node_d.category; }); }
+const reset_links = (link) => { link.attr("class", function(d) { return set_line_class(d) }); }
 
-d3.json('drag-data-for-1930s.json').then(function(data) {
-    var nodelist = data.nodes.sort((a, b) => (a.category > b.category) ? 1 : -1)
+const draw = () => {
+    d3.json('drag-data-for-1930s.json').then(function(data) {
+        var nodelist = data.nodes.sort((a, b) => (a.category > b.category) ? 1 : -1)
 
-    const nodes = filter_nodes(nodelist.map(d => Object.create(d)));
-    const links = filter_links(data.links.map(d => Object.create(d)), nodes);
+        const nodes = filter_nodes(nodelist.map(d => Object.create(d)));
+        const links = filter_links(data.links.map(d => Object.create(d)), nodes);
 
-    const simulation = setup_simulation(nodes, links)
+        const simulation = setup_simulation(nodes, links)
 
-    const g = setup_zoomable_g(nodes)
+        const g = setup_zoomable_g(nodes)
+
+        const link = g.append("g").attr("id", "links")
+            .selectAll("line")
+            .data(links)
+            .join("line")
+            .attr("class", function(d) { return set_line_class(d) } )
+            .attr("stroke-width", d => Math.sqrt(d.weight * MULTIPLIER['lines']))
+            .on("click", function(d) {
+                if (d3.select(this).attr('data-clicked') == 'true') {
+                    d3.select(this).attr('data-clicked', 'false');
+                    reset_links(link);
+                    reset_nodes(node);
+                } else {
+                    d3.select(this).attr('data-clicked', 'true');
+                    set_text(d, 'link');
+                    link.attr("class", function(d_inner) {
+                        if (d.index == d_inner.index ) {
+                            return "link selected";
+                        } else {
+                            return "link deselected";
+                        }
+                    });
+                    node.attr("class", function(d_inner) {
+                        if (d.source.index == d_inner.index) {
+                            return `node ${d_inner.category} selected`;
+                        } else if (d.target.index == d_inner.index) {
+                            return `node ${d_inner.category} selected`;
+                        } else {
+                            return `node ${d_inner.category} deselected`;
+                        }
+                    });
+                }
+                d3.event.stopPropagation();
+            });
 
 
-    const link = g.append("g").attr("id", "links")
-        .selectAll("line")
-        .data(links)
-        .join("line")
-        .attr("class", function(d) { return set_line_class(d) } )
-        .attr("stroke-width", d => Math.sqrt(d.weight / 2))
-        .on("click", function(d) {
-            if (d3.select(this).attr('data-clicked') == 'true') {
-                d3.select(this).attr('data-clicked', 'false');
-                link.attr("class", function(d) { return set_line_class(d) });
-                node.attr("class", function(node_d) { return "node " + node_d.category; });
-            } else {
-                d3.select(this).attr('data-clicked', 'true');
-                set_text(d, 'link');
-                link.attr("class", function(d_inner) {
-                    if (d.index == d_inner.index ) {
-                        return "link selected";
-                    } else {
-                        return "link deselected";
-                    }
-                });
-                node.attr("class", function(d_inner) {
-                    if (d.source.index == d_inner.index) {
-                        return `node ${d_inner.category} selected`;
-                    } else if (d.target.index == d_inner.index) {
-                        return `node ${d_inner.category} selected`;
-                    } else {
-                        return `node ${d_inner.category} deselected`;
-                    }
-                });
-            }
-            d3.event.stopPropagation();
+        const node = g.append("g")
+            .selectAll("g")
+            .data(nodes)
+            .join("g")
+            .append("circle")
+            .attr("r", d => size(d) )
+            .attr("class", d => "node " + d.category)
+            .on("click", function(d) {
+                if (d3.select(this).attr('data-clicked') == 'true') {
+                    d3.select(this).attr('data-clicked', 'false');
+                    reset_links(link);
+                    reset_nodes(node);
+                } else {
+                    d3.select(this).attr('data-clicked', 'true');
+                    rel_nodes = get_rel_nodes(d.index, link);
+                    rel_nodes.forEach((rel_node_index) => {
+                        node
+                            .attr("class", function(node_d) {
+                                if (rel_nodes.includes(node_d.index)) {
+                                    return `node selected ${node_d.category}`;
+                                } else {
+                                    return `node deselected ${node_d.category}`;
+                                }
+                            });
+                    });
+                    set_text(d, 'node', rel_nodes, node);
+                }
+                d3.event.stopPropagation();
+            })
+            .call(drag(simulation));
+
+        const text = g.append("g")
+            .selectAll("text")
+            .data(nodes)
+            .join("text")
+
+        const textLabels = text
+            .attr("x", d => d.x )
+            .attr("y", d => d.y )
+            .attr("font-size", d => size(d, type="text") )
+            .attr("class", "text-label")
+            .text( function(d) {
+                if (d.category == 'club') {
+                    return d.display;
+                } else {
+                    return d.id;
+                }
+            } )
+            .call(drag(simulation));
+
+        simulation.on("tick", () => {
+            link
+                .attr("x1", d => d.source.x)
+                .attr("y1", d => d.source.y)
+                .attr("x2", d => d.target.x)
+                .attr("y2", d => d.target.y);
+
+            node
+                .attr("cx", d => d.x)
+                .attr("cy", d => d.y);
+
+            textLabels
+                .attr("x", d => d.x )
+                .attr("y", d => d.y );
+
         });
 
+        // invalidation.then(() => simulation.stop());
 
-    const node = g.append("g")
-        .selectAll("g")
-        .data(nodes)
-        .join("g")
-        .append("circle")
-        .attr("r", d => size(d) )
-        .attr("class", d => "node " + d.category)
-        .on("click", function(d) {
-            if (d3.select(this).attr('data-clicked') == 'true') {
-                d3.select(this).attr('data-clicked', 'false');
-                link.attr("class", function(link_d) { return set_line_class(link_d); });
-                node.attr("class", function(node_d) { return "node " + node_d.category; });
-            } else {
-                d3.select(this).attr('data-clicked', 'true');
-                rel_nodes = get_rel_nodes(d.index, link);
-                rel_nodes.forEach((rel_node_index) => {
-                    node
-                        .attr("class", function(node_d) {
-                            if (rel_nodes.includes(node_d.index)) {
-                                return `node ${node_d.category} selected`;
-                            } else {
-                                return `node ${node_d.category} deselected`;
-                            }
-                        });
-                });
-                set_text(d, 'node', rel_nodes, node);
-            }
-            d3.event.stopPropagation();
-        })
-        .call(drag(simulation));
+        return g.node();
 
-    const text = g.append("g")
-        .selectAll("text")
-        .data(nodes)
-        .join("text")
-
-    const textLabels = text
-        .attr("x", d => d.x )
-        .attr("y", d => d.y )
-        .attr("font-size", d => size(d, type="text") )
-        .attr("class", "text-label")
-        .text( function(d) {
-            if (d.category == 'club') {
-                return d.display;
-            } else {
-                return d.id;
-            }
-        } )
-        .call(drag(simulation));
-
-    simulation.on("tick", () => {
-        link
-            .attr("x1", d => d.source.x)
-            .attr("y1", d => d.source.y)
-            .attr("x2", d => d.target.x)
-            .attr("y2", d => d.target.y);
-
-        node
-            .attr("cx", d => d.x)
-            .attr("cy", d => d.y);
-
-        textLabels
-            .attr("x", d => d.x )
-            .attr("y", d => d.y );
 
     });
-
-    // invalidation.then(() => simulation.stop());
-
-    return g.node();
-
-
-});
+}
