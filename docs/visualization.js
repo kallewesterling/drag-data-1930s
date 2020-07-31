@@ -267,7 +267,14 @@ d3.json('drag-data-for-1930s.json').then(function(data) {
         .attr("y", d => d.y )
         .attr("font-size", d => size(d, type="text") )
         .attr("class", "text-label")
-        .text( d => d.id )
+        .text( function(d) {
+            if (d.category == 'club') {
+                // console.log(d);
+                return d.display;
+            } else {
+                return d.id;
+            }
+        } )
         .call(drag(simulation));
 
     simulation.on("tick", () => {

@@ -44,11 +44,26 @@ if not END_YEAR:
     print('Warning: no end year set.')
 
 for row in df.fillna('').itertuples():
-    _id, date, category, performer, club, _city, city, revue_name, normalized_revue_name, unsure_drag, legal_name, alleged_age, assumed_birth_year, source, eima, newspapers_search, fulton_search = row
+    _id, date, category, performer, club, _city, \
+        city, revue_name, normalized_revue_name, \
+        unsure_drag, legal_name, alleged_age, \
+        assumed_birth_year, source, eima, \
+        newspapers_search, fulton_search, \
+        former_archive, comment = row
 
     if not date:
         print(f'no date on row {_id}')
         continue
+
+    club_display = None
+    club_id = None
+
+    if club and city:
+        club_display = club
+        club_id = club + "-" + city
+    else:
+        club_display = club
+        club_id = club
 
     for cat in CLEANING:
         if cat == 'city':
@@ -58,7 +73,8 @@ for row in df.fillna('').itertuples():
         elif cat == 'club':
             for search, replace in CLEANING[cat].items():
                 # print(f'searching club data for {search} - replacing with {replace}')
-                club = club.replace(search, replace)
+                if club_display != None:
+                    club_display = club_display.replace(search, replace)
 
     # clean up date
     try:
@@ -83,26 +99,27 @@ for row in df.fillna('').itertuples():
             continue
 
     # strip off any trailing or leading spaces
-    if club:       club = club.strip()
-    if city:       city = city.strip()
-    if performer:  performer = performer.strip()
-    if revue_name: revue_name = revue_name.strip()
+    if club_display:  club_display = club_display.strip()
+    if club_id:       club_id = club_id.strip()
+    if city:          city = city.strip()
+    if performer:     performer = performer.strip()
+    if revue_name:    revue_name = revue_name.strip()
 
     add = list()
-    if club and city:
-        current_weight = graph.get_edge_data(club, city, default={}).get('weight')
-        current_found = graph.get_edge_data(club, city, default={}).get('found', [])
+    if club_id and city:
+        current_weight = graph.get_edge_data(club_id, city, default={}).get('weight')
+        current_found = graph.get_edge_data(club_id, city, default={}).get('found', [])
         if current_weight == None:
-            add.append((club, city, 1))
+            add.append((club_id, city, 1))
             found = [source]
         else:
-            add.append((club, city, current_weight+1))
+            add.append((club_id, city, current_weight+1))
             found = current_found
             found.append(source)
     else:
         if performer and city:
             current_weight = graph.get_edge_data(performer, city, default={}).get('weight')
-            current_found = graph.get_edge_data(club, city, default={}).get('found', [])
+            current_found = graph.get_edge_data(performer, city, default={}).get('found', [])
 
             if current_weight == None:
                 add.append((performer, city, 1))
@@ -112,15 +129,15 @@ for row in df.fillna('').itertuples():
                 found = current_found
                 found.append(source)
 
-    if performer and club:
-        current_weight = graph.get_edge_data(performer, club, default={}).get('weight')
-        current_found = graph.get_edge_data(club, city, default={}).get('found', [])
+    if club_id and performer:
+        current_weight = graph.get_edge_data(performer, club_id, default={}).get('weight')
+        current_found = graph.get_edge_data(performer, club_id, default={}).get('found', [])
 
         if current_weight == None:
-            add.append((performer, club, 1))
+            add.append((performer, club_id, 1))
             found = [source]
         else:
-            add.append((performer, club, current_weight+1))
+            add.append((performer, club_id, current_weight+1))
             found = current_found
             found.append(source)
 
@@ -141,17 +158,30 @@ for row in df.fillna('').itertuples():
     attrs = {
         city: {
             'category': 'city',
-            'lat': '0.0',
-            'lon': '0.0'
+            'comment': comment,
         },
-        club: {'category': 'club'},
-        performer: {'category': 'performer'}
+        club_id: {
+            'category': 'club',
+            'display': club,
+            'comment': comment
+        },
+        performer: {
+            'category': 'performer',
+            'comment': comment
+        }
     }
 
     if city:
         p = Place(city)
         attrs[city]['lat'] = p.lat
         attrs[city]['lon'] = p.lon
+
+    if performer and assumed_birth_year:
+        attrs[performer]['assumed_birth_year'] = assumed_birth_year
+
+    if performer and alleged_age:
+        attrs[performer]['alleged_age'] = alleged_age
+
     nx.set_node_attributes(graph, attrs)
 
 
