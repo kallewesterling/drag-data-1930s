@@ -11,7 +11,7 @@
     --performer-deselected: rgb(225, 225, 225);
 
     --link-selected: red;
-    --link-deselected: #eee;
+    --link-deselected: rgba(0, 0, 0, 0.25);
 
     --link-revue: rgba(61, 90, 128, 0.5);
     --link-norevue: rgba(0, 0, 0, 0.15);
