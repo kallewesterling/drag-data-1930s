@@ -40,7 +40,7 @@
     --performer-deselected: rgb(128, 128, 128);
 
     --link-selected: red;
-    --link-deselected: rgb(136, 136, 136, 0.25);
+    --link-deselected: rgb(136, 136, 136, 0.1);
 
     --link-revue: rgba(61, 90, 128, 0.5);
     --link-norevue: rgba(199, 199, 199, 0.15);
