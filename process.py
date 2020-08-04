@@ -2,7 +2,7 @@ import networkx as nx
 import pandas as pd
 import json
 from datetime import datetime
-from drag.settings import SPREADSHEET, START_YEAR, END_YEAR, CLEANING, CACHE
+from drag.settings import SPREADSHEET, DB_SPREADSHEET, START_YEAR, END_YEAR, CLEANING, CACHE
 from pathlib import Path
 
 class Place():
@@ -54,6 +54,9 @@ for row in df.fillna('').itertuples():
     if not date:
         print(f'no date on row {_id}')
         continue
+
+    if not city and _city:
+        city = _city
 
     club_display = None
     club_id = None

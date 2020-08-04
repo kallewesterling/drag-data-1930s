@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html class="theme-light">
     <head>
         <script src="https://d3js.org/d3.v5.min.js"></script>
         <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300&display=swap" rel="stylesheet">
@@ -8,22 +8,29 @@
         <link rel="stylesheet" href="//cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
     </head>
     <body>
-        <div id="settings" class="shadow border p-2">
-            <div style="height:25px;line-height:25px;">
-                <input class="p-0 m-0" type="range" id="gravity_selector" name="gravity_selector" min="-1000" max="-10" value="-200" step="100">
-                <label class="small p-0 m-0" for="gravity_selector" id="gravity_selector_label">Gravity</label>
-            </div>
-            <div style="height:25px;line-height:25px;">
-                <input class="p-0 m-0" type="range" id="min_degree_selector" name="min_degree_selector" min="0" max="10" value="1" step="1">
-                <label class="small p-0 m-0" for="min_degree_selector" id="min_degree_selector_label">Min connections</label>
-            </div>
-        </div>
-        <div id="svg"></div>
-        <div class="container">
+        <div class="container-fluid">
             <div class="row">
-
-                <div id="info" class="pt-1 col-12">
-
+                <div class="col-12 col-xl-8 pl-4 pt-4 pr-4 pr-xl-0">
+                    <div id="settings" class="shadow border p-2">
+                        <div style="height:25px;line-height:25px;">
+                            <input class="p-0 m-0" type="range" id="gravity_selector" name="gravity_selector" min="-1000" max="-10" value="-200" step="100">
+                            <label class="small p-0 m-0" for="gravity_selector" id="gravity_selector_label">Gravity</label>
+                        </div>
+                        <div style="height:25px;line-height:25px;" class="mt-1">
+                            <input class="p-0 m-0" type="range" id="min_degree_selector" name="min_degree_selector" min="0" max="10" value="1" step="1">
+                            <label class="small p-0 m-0" for="min_degree_selector" id="min_degree_selector_label">Min connections</label>
+                        </div>
+                        <div style="height:100%;line-height:100%;" class="mt-1">
+                            <button type="button" class="btn btn-sm btn-light" id="measures" name="measures">Show measures</button>
+                        </div>
+                        <div style="height:100%;line-height:100%;" class="mt-1">
+                            <button type="button" class="btn btn-sm btn-light" id="switch_mode" name="switch_mode">Switch mode</button>
+                        </div>
+                    </div>
+                    <div id="svg" class="border"></div>
+                </div>
+                <div class="col-12 col-xl-4">
+                    <div id="info" class="pt-1 col-12"></div>
                 </div>
             </div>
         </div>

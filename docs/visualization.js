@@ -1,4 +1,4 @@
-const WIDTH = 600;
+const WIDTH = 250;
 const HEIGHT = 300;
 var MIN_DEGREE = 2;
 var STRENGTH = -200;
@@ -18,11 +18,19 @@ const MULTIPLIER = {
 
 
 
-const svg = d3.select("#svg").append("svg")
+/*
+const svg = d3.select("#svg")
+    .append("svg")
     .attr("viewBox", [-WIDTH / 2, -HEIGHT / 2, WIDTH, HEIGHT]);
+*/
+const svg = d3.select("#svg")
+    .append("svg")
+    .attr("viewBox", `0 0 ${WIDTH} ${HEIGHT}`);
+
 
 var g = svg.append("g").attr('id', 'base-g');
 
+var store = []
 
 ////////////////// Settings ////////////////////////////////
 
@@ -31,17 +39,9 @@ d3.select("#gravity_selector_label").html(`Gravity ${STRENGTH}`);
 
 d3.select("#gravity_selector").on("input", function(d) { d3.select("#gravity_selector_label").html(`Gravity ${this.value}`); });
 d3.select("#gravity_selector").on("change", function(d) {
-    // console.log(this.value);
     STRENGTH = this.value;
     d3.select("#gravity_selector_label").html(`Gravity ${STRENGTH}`);
-    try {
-        d3.select("#base-g").remove();
-        var g = svg.append("g").attr('id', 'base-g');
-        //setup_zoomable_g(nodes, g);
-        draw();
-    } catch {
-        draw();
-    }
+    update();
 });
 
 d3.select("#min_degree_selector").node().value = MIN_DEGREE;
@@ -49,20 +49,26 @@ d3.select("#min_degree_selector_label").html(`Min degree ${MIN_DEGREE}`);
 
 d3.select("#min_degree_selector").on("input", function(d) { d3.select("#min_degree_selector_label").html(`Min degree ${this.value}`); });
 d3.select("#min_degree_selector").on("change", function(d) {
-    // console.log(this.value);
     MIN_DEGREE = this.value;
     d3.select("#min_degree_selector_label").html(`Min connections ${MIN_DEGREE}`);
     update();
+});
+
+d3.select("#measures").on("click", function(d) {
+    clear_text(store);
+});
+
+d3.select("#switch_mode").on("click", function(d) {
+    toggleTheme();
 });
 
 const update = () => {
     try {
         d3.select("#base-g").remove();
         var g = svg.append("g").attr('id', 'base-g');
-        //setup_zoomable_g(nodes, g);
         draw();
     } catch {
-        draw();
+        console.log('error when drawing the new basemap.')
     }
 }
 
@@ -99,7 +105,16 @@ const clear_text = nodes => {
     // var max_eigenvector_centrality = arr.reduce(function(a, b) { return Math.max(a, b); });
     // var max_eigenvector_centrality = nodes.find(x => x['1000x-eigenvector-centrality'] === max_eigenvector_centrality);
 
-    str = `<table class="table table-striped table-sm">
+    const display_or_id = n => {
+        if (n.display != undefined) { return n.display } else { return n.id };
+    }
+
+    str = `
+        <h2>Overall data</h2>
+        <strong>Nodes</strong>: ${store.length}
+    `
+    str += `<h3>Measures</h3>
+            <table class="table table-striped table-sm">
             <thead>
             <tr>
             <th scope="col"></th>
@@ -110,7 +125,7 @@ const clear_text = nodes => {
             </tr>`
     nodes.forEach(function(n) {
         str += `<tr>
-                <th class="small pr-3" scope="row">${n.id}</th>
+                <th class="small pr-3" scope="row">${display_or_id(n)}</th>
                 <td class="small">${Number((n['1000x-eigenvector-centrality']).toFixed(2))}</td>
                 <td class="small">${Number((n['1000x-degree-centrality']).toFixed(2))}</td>
                 <td class="small">${Number((n['1000x-closeness-centrality']).toFixed(2))}</td>
@@ -121,6 +136,8 @@ const clear_text = nodes => {
     $('.table').DataTable();
     d3.select("#info").html(str)
 }
+
+const get_assumed_birth_year = (d, prefix='', postfix='') => { if (d.assumed_birth_year) { return prefix + d.assumed_birth_year + postfix; } }
 
 const set_text = function(d, type, rel_nodes=[], node=undefined) {
     str = `<div class="row">`
@@ -179,6 +196,7 @@ const set_text = function(d, type, rel_nodes=[], node=undefined) {
             str += `
                 <h4><small class="text-muted">PERFORMER</small> ${d.id}</h4>
             `;
+            if (d.assumed_birth_year) { str += get_assumed_birth_year(d, '<p class=""><strong>Birth year:</strong> ', '</p>') }
         } else {
             str += `<h4>&nbsp;</h4>`
         }
@@ -202,7 +220,7 @@ const set_text = function(d, type, rel_nodes=[], node=undefined) {
         if (performers.length) {
             str += `<h6 class="border-bottom">Performers (${performers.length})</h6>`
             performers.forEach((d) => {
-                str += `<p class="">${d.id}</p>`
+                if (d.assumed_birth_year) { str += get_assumed_birth_year(d, `<p class="">${d.id} (b. `, ')</p>') }
             })
         }
         str += `</div>`
@@ -231,6 +249,7 @@ const filter_nodes = function(nodes) {
         // }
         if ( n.degree > MIN_DEGREE ) {
             _.push(n);
+            store.push(n);
         }
     });
     return _;
@@ -277,14 +296,11 @@ const setup_simulation = (nodes, links) => {
         .force("y", d3.forceY());
 }
 
-const setup_zoomable_g = (nodes, g) => {
+
+const setup_zoomable_g = (g) => {
     const zoomed = () => { g.attr("transform", d3.event.transform); }
-
     const zoom = d3.zoom().scaleExtent([0, 3]).on("zoom", zoomed);
-
-    svg.call(zoom)
-        // .on("click", function() { clear_text(nodes); } )
-        // .on("mouseover", clear_text(nodes) );
+    svg.call(zoom).on("dblclick.zoom", null)
 }
 
 const get_rel_nodes = function(d_index, link, selected="link selected", deselected="link deselected") {
@@ -325,7 +341,7 @@ const draw = () => {
 
         const g = d3.select('#base-g');
 
-        setup_zoomable_g(nodes, g);
+        setup_zoomable_g(g);
 
         const link = g.append("g").attr("id", "links")
             .selectAll("line")
@@ -438,3 +454,28 @@ const draw = () => {
 }
 
 draw();
+
+
+// Set up theme colors
+
+// function to set a given theme/color-scheme
+function setTheme(themeName) {
+    localStorage.setItem('theme', themeName);
+    document.documentElement.className = themeName;
+}
+// function to toggle between light and dark theme
+function toggleTheme() {
+   if (localStorage.getItem('theme') === 'theme-dark'){
+       setTheme('theme-light');
+   } else {
+       setTheme('theme-dark');
+   }
+}
+// Immediately invoked function to set the theme on initial load
+(function () {
+   if (localStorage.getItem('theme') === 'theme-dark') {
+       setTheme('theme-dark');
+   } else {
+       setTheme('theme-light');
+   }
+})();
