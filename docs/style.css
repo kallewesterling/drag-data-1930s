@@ -13,7 +13,7 @@
     --link-selected: red;
     --link-deselected: #eee;
     --link-revue: rgba(61, 90, 128, 0.5);
-    --link-norevue: rgba(0, 0, 0, 1);
+    --link-norevue: rgba(0, 0, 0, 0.15);
 
     --club: #3D5A80;
     --club-selected: rgba(217, 0, 0, 1);
@@ -22,6 +22,7 @@
     --city: #eee;
     --city-selected: rgba(200, 0, 0, 1);
     --city-deselected: rgba(205, 205, 205, 1);
+
     --node-stroke: rgba(255, 255, 255, 1);
 }
 
