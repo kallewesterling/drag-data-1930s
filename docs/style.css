@@ -15,11 +15,11 @@
     --link-revue: rgba(61, 90, 128, 0.5);
     --link-norevue: rgba(0, 0, 0, 0.15);
 
-    --club: #3D5A80;
+    --club: rgba(61, 90, 128, 1);
     --club-selected: rgba(217, 0, 0, 1);
     --club-deselected: rgba(215, 215, 215, 1);
 
-    --city: #eee;
+    --city: rgba(238, 238, 238, 1);
     --city-selected: rgba(200, 0, 0, 1);
     --city-deselected: rgba(205, 205, 205, 1);
 
@@ -47,7 +47,7 @@
     --club-selected: rgb(217, 0, 0);
     --club-deselected: rgb(107, 107, 107);
 
-    --city: #eee;
+    --city: rgb(124, 124, 124);
     --city-selected: rgb(200, 0, 0);
     --city-deselected: rgb(87, 87, 87);
     --node-stroke: rgba(255, 255, 255, 0.5);
