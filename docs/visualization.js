@@ -386,6 +386,7 @@ const draw = () => {
             .attr("r", d => size(d) )
             .attr("class", d => "node " + d.category)
             .on("click", function(d) {
+                // console.log(d3.event.altKey); THIS IS HOW YOU CHECK FOR ALT KEY PRESSED #TODO: make function to remove the node...
                 if (d3.select(this).attr('data-clicked') == 'true') {
                     d3.select(this).attr('data-clicked', 'false');
                     reset_links(link);
