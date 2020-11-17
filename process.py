@@ -295,14 +295,13 @@ def find_similar(name, list_of_names, threshold=0.75):
 
     lower_list_of_names = [x.lower() for x in list_of_names]
 
-    original_name = name.lower()
     # we only want to keep names that are longer than 2 characters
-    if len(original_name) < 4:
+    if len(name) < 4:
         names = [x.lower() for x in name.split(' ') if len(x) > 2]
         full_name = ' '.join(names)
     else:
         names = [x.lower() for x in name.split(' ')]
-        full_name = original_name
+        full_name = name.lower()
     for name in names:
         for i, test_name in enumerate(lower_list_of_names):
             if name in test_name:
