@@ -173,15 +173,18 @@ for row in df.fillna('').itertuples():
 
     attrs = {
         city: {
+            'pd_id': _id,
             'category': 'city',
             'comment': comment,
         },
         club_id: {
+            'pd_id': _id,
             'category': 'club',
             'display': club,
             'comment': comment
         },
         performer: {
+            'pd_id': _id,
             'category': 'performer',
             'comment': comment
         }
@@ -213,7 +216,20 @@ def set_degrees(graph):
             }
         }
         nx.set_node_attributes(graph, attrs)
-    return(graph)
+    return graph
+
+
+def set_edges(graph):
+    """Sets specific edge data for each edge"""
+
+    attrs = dict()
+    for edge in graph.edges:
+        # print(graph.get_edge_data(edge[0], edge[1]))
+        attrs[(edge[0], edge[1])] = {
+            'pd_id': str(edge[0])+'-'+str(edge[1])
+        }
+        nx.set_edge_attributes(graph, attrs)
+    return graph
 
 
 def set_centralities(graph):
@@ -252,6 +268,7 @@ def set_centralities(graph):
 
 graph = set_degrees(graph)
 graph = set_centralities(graph)
+graph = set_edges(graph)
 
 
 json_data = nx.node_link_data(graph)
