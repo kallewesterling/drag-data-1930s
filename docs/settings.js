@@ -44,7 +44,7 @@ const resetLocalStorage = () => {
     ["theme", "transform", "settings"].forEach((item) => {
         localStorage.removeItem(item);
     });
-    console.log("I have reset local storage.");
+    message("Locally stored settings have been reset.");
     window.location.reload();
 };
 

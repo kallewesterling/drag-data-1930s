@@ -433,7 +433,7 @@ const dropNodesWithNoEdges = () => {
         });
         runs += 1;
     }
-    console.log(`Dropped nodes with no edges (after ${runs} runs).`);
+    message(`Dropped nodes with no edges (after ${runs} runs).`);
     if (fixed === true) {
         troubleshoot(true); // ensures that all nodes are correctly represented in
         restart();
