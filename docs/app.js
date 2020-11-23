@@ -8,7 +8,7 @@ TODO:
 - filter on other things, like city (see `store.count`) and weight!
 */
 console.log("Running d3js v5.");
-let DATAFILE = "drag-data-for-1930s.json";
+let DATAFILE = "drag-data.json";
 let AUTO_ZOOM = 1.25;
 
 const width = 960,

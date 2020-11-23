@@ -3,7 +3,7 @@ import { setup_simulation, drag, setup_zoomable_g } from "./d3_standards.js";
 import { setup_options, get_object_from_settings } from "./setup_options.js";
 
 export var post_change = (variables) => {
-    d3.json("drag-data-for-1930s.json").then(function (data) {
+    d3.json("drag-data.json").then(function (data) {
         data = filter_data(data);
         render(data);
     });
@@ -28,7 +28,7 @@ const filter_data = (data) => {
     return { nodes: nodes, edges: edges };
 };
 
-d3.json("drag-data-for-1930s.json").then(function (data) {
+d3.json("drag-data.json").then(function (data) {
     data = filter_data(data);
     render(data);
 });

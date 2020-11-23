@@ -195,7 +195,7 @@ const get_settings = () => {
 };
 
 draw = () => {
-    d3.json("drag-data-for-1930s.json").then((graph) => {
+    d3.json("drag-data.json").then((graph) => {
         //get settings
         settings = get_settings();
 

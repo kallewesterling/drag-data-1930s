@@ -389,13 +389,13 @@ const update = () => {
     draw();
 };
 
-d3.json("drag-data-for-1930s.json").then(function (data) {
+d3.json("drag-data.json").then(function (data) {
     nodelist = data.nodes.sort((a, b) => (a.category > b.category ? 1 : -1));
     linklist = [...data.links];
 });
 
 const draw = () => {
-    d3.json("drag-data-for-1930s.json").then(function (data) {
+    d3.json("drag-data.json").then(function (data) {
         minDegree = +d3.select("#min_degree_selector").node().value;
         nodelist.forEach(function (n) {
             if (
