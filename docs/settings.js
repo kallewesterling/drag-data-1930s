@@ -1,4 +1,4 @@
-AUTO_SETTINGS = {
+_autoSettings = {
     nodes: {
         minDegree: 6,
         autoClearNodes: true,
@@ -15,19 +15,20 @@ AUTO_SETTINGS = {
         layoutForceX: true,
         layoutForceY: true,
     },
+    zoom: 1.25,
 };
 
 /// save settings to localStorage
-const save_settings = () => {
+const saveSettings = () => {
     // save zoom event transform
     if (d3.event.transform) {
         localStorage.setItem("transform", JSON.stringify(d3.event.transform));
     }
-    settings = get_settings();
+    settings = getSettings();
     localStorage.setItem("settings", JSON.stringify(settings));
 };
 
-const load_settings = (item) => {
+const loadSettings = (item) => {
     _ = localStorage.getItem(item);
     if (_) {
         if (_.includes("{")) {
@@ -44,11 +45,11 @@ const resetLocalStorage = () => {
     ["theme", "transform", "settings"].forEach((item) => {
         localStorage.removeItem(item);
     });
-    message("Locally stored settings have been reset.");
+    debugMessage("Locally stored settings have been reset.");
     window.location.reload();
 };
 
-const get_settings = () => {
+const getSettings = () => {
     let charge = +d3.select("#charge").node().value;
     let collide = +d3.select("#collide").node().value;
     let minDegree = +d3.select("#minDegree").node().value;
@@ -60,10 +61,10 @@ const get_settings = () => {
     let layoutCollide = d3.select("#layoutCollide").node().checked;
     let layoutCharge = d3.select("#layoutCharge").node().checked;
 
-    update_label("collide");
-    update_label("charge");
-    update_label("minDegree");
-    update_label("minWeight");
+    updateLabel("collide");
+    updateLabel("charge");
+    updateLabel("minDegree");
+    updateLabel("minWeight");
 
     return {
         nodes: {
@@ -83,12 +84,12 @@ const get_settings = () => {
     };
 };
 
-const setup_settings = () => {
-    let _settings = load_settings("settings");
+const setupSettings = () => {
+    let _settings = loadSettings("settings");
     if (_settings) {
         // console.log("has saved settings:", _settings);
     } else {
-        _settings = AUTO_SETTINGS;
+        _settings = _autoSettings;
         // console.log("auto setup:", _settings);
     }
     // set range for charge
@@ -119,93 +120,91 @@ const setup_settings = () => {
 };
 
 /// set up settings
-setup_settings();
+setupSettings();
 
 d3.select("#minDegree").on("input", () => {
-    update_label("minDegree");
+    updateLabel("minDegree");
 });
 d3.select("#minDegree").on("change", () => {
-    update_label("minDegree");
+    updateLabel("minDegree");
     filter(); // since it affects the filtering
-    save_settings();
+    saveSettings();
     restart();
-    restart_layout();
+    restartLayout();
 });
 d3.select("#minWeight").on("input", () => {
-    update_label("minWeight");
+    updateLabel("minWeight");
 });
 d3.select("#minWeight").on("change", () => {
-    update_label("minWeight");
+    updateLabel("minWeight");
     filter(); // since it affects the filtering
-    save_settings();
+    saveSettings();
     restart();
-    restart_layout();
+    restartLayout();
 });
 d3.select("#charge").on("input", () => {
-    update_label("charge");
+    updateLabel("charge");
 });
 d3.select("#charge").on("change", () => {
     // filter();
     restart();
-    restart_layout();
-    save_settings();
+    restartLayout();
+    saveSettings();
 });
 d3.select("#collide").on("input", () => {
-    update_label("collide");
+    updateLabel("collide");
 });
 d3.select("#collide").on("change", () => {
     // filter();
     restart();
-    restart_layout();
-    save_settings();
+    restartLayout();
+    saveSettings();
 });
 d3.select("#autoClearNodes").on("change", () => {
     filter();
     restart();
-    restart_layout();
-    save_settings();
+    restartLayout();
+    saveSettings();
 });
 d3.select("#layoutCenter").on("change", () => {
     // console.log("center");
     restart();
-    restart_layout();
-    save_settings();
+    restartLayout();
+    saveSettings();
 });
 d3.select("#layoutForceX").on("change", () => {
     // console.log("forceX");
     restart();
-    restart_layout();
-    save_settings();
+    restartLayout();
+    saveSettings();
 });
 d3.select("#layoutForceY").on("change", () => {
     restart();
-    restart_layout();
-    save_settings();
+    restartLayout();
+    saveSettings();
 });
 d3.select("#layoutCollide").on("change", () => {
     // console.log("collide");
-    update_label("collide");
+    updateLabel("collide");
     restart();
-    restart_layout();
-    save_settings();
+    restartLayout();
+    saveSettings();
 });
 d3.select("#layoutCharge").on("change", () => {
     // console.log("charge");
-    update_label("charge");
+    updateLabel("charge");
     restart();
-    restart_layout();
-    save_settings();
+    restartLayout();
+    saveSettings();
 });
-d3.select("#switch_mode").on("click", function (d) {
+d3.select("#switchMode").on("click", function (d) {
     toggleTheme();
 });
-d3.select("#reset_local_storage").on("click", function (d) {
+d3.select("#resetLocalStorage").on("click", function (d) {
     resetLocalStorage();
 });
-d3.select("#clear_unconnected").on("click", function (d) {
-    ["", "", "", ""].forEach(() => {
-        dropNodesWithNoEdges();
-    });
+d3.select("#clearUnconnected").on("click", function (d) {
+    dropNodesWithNoEdges();
 });
 
 d3.select("#settingsToggle").on("click", () => {
@@ -222,7 +221,7 @@ d3.select("svg").on("click", () => {
 d3.select("html")
     .node()
     .addEventListener("keydown", (e) => {
-        _ = is_visible("#nodeEdgeInfo");
+        _ = isVisible("#nodeEdgeInfo");
         if (e.key === "Escape" && _) {
             toggle("#nodeEdgeInfo");
             deselectNodes();
@@ -239,7 +238,7 @@ d3.select("#collideContainer").on("click", () => {
         d3.select("#collide").attr("disabled") != null
     ) {
         d3.select("#layoutCollide").node().checked = true;
-        update_label("collide");
+        updateLabel("collide");
     }
 });
 
@@ -249,6 +248,6 @@ d3.select("#chargeContainer").on("click", () => {
         d3.select("#charge").attr("disabled") != null
     ) {
         d3.select("#layoutCharge").node().checked = true;
-        update_label("charge");
+        updateLabel("charge");
     }
 });

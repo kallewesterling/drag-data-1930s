@@ -61,7 +61,7 @@ d3.select("#measures").on("click", function (d) {
     clear_text(store);
 });
 
-d3.select("#switch_mode").on("click", function (d) {
+d3.select("#switchMode").on("click", function (d) {
     toggleTheme();
 });
 
@@ -108,7 +108,7 @@ const clear_text = (nodes) => {
     // var max_eigenvector_centrality = arr.reduce(function(a, b) { return Math.max(a, b); });
     // var max_eigenvector_centrality = nodes.find(x => x['1000x-eigenvector-centrality'] === max_eigenvector_centrality);
 
-    const display_or_id = (n) => {
+    const displayOrID = (n) => {
         if (n.display != undefined) {
             return n.display;
         } else {
@@ -132,7 +132,7 @@ const clear_text = (nodes) => {
             </tr>`;
     nodes.forEach(function (n) {
         str += `<tr>
-                <th class="small pr-3" scope="row">${display_or_id(n)}</th>
+                <th class="small pr-3" scope="row">${displayOrID(n)}</th>
                 <td class="small">${Number(
                     n["1000x-eigenvector-centrality"].toFixed(2)
                 )}</td>

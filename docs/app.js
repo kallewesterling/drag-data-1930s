@@ -9,7 +9,7 @@ TODO:
 */
 console.log("Running d3js v5.");
 let DATAFILE = "drag-data.json";
-let AUTO_ZOOM = 1.25;
+let AUTO_ZOOM = 1.25; // TODO: This will not work
 
 const width = 960,
     height = 800,
@@ -28,7 +28,7 @@ let windowWidth = window.innerWidth,
     windowHeight = window.innerHeight,
     k = AUTO_ZOOM;
 
-let date_match = /[0-9]{4}\-(0[1-9]|1[0-2])\-(0[1-9]|[1-2][0-9]|3[0-1])/;
+let dateRegEx = /[0-9]{4}\-(0[1-9]|1[0-2])\-(0[1-9]|[1-2][0-9]|3[0-1])/;
 
 // stop layout until we are ready
 layout.stop();
@@ -55,18 +55,18 @@ d3.select(window).on("resize", transformToWindow);
 d3.json(DATAFILE).then((data) => {
     store.count = Object.assign({}, data.count);
     data.nodes.forEach((d) => {
-        store.nodes.push(Object.assign({ in_graph: false }, d));
+        store.nodes.push(Object.assign({ inGraph: false }, d));
     });
 
     store.edges = [...data.links];
     store.edges.forEach((e) => {
-        e.in_graph = false;
+        e.inGraph = false;
         e.source = store.nodes.find((n) => n.id === e.source);
         e.target = store.nodes.find((n) => n.id === e.target);
         e.dates = [];
         e.range = { start: undefined, end: undefined };
         e.found.forEach((source) => {
-            let date = source.match(date_match);
+            let date = source.match(dateRegEx);
             if (date) {
                 e.dates.push(date[0]);
             }
@@ -81,7 +81,7 @@ d3.json(DATAFILE).then((data) => {
 
     transformToWindow();
     /* // TODO: This does not work!
-    let _ = load_settings("transform");
+    let _ = loadSettings("transform");
     if (_) {
         console.log("transform recorded");
         k = _.k;
@@ -91,7 +91,6 @@ d3.json(DATAFILE).then((data) => {
         g.plot.transition().call(zoom.scaleTo, AUTO_ZOOM);
     }
     */
-    g.plot.transition().call(zoom.scaleTo, AUTO_ZOOM);
 
     d3.select("#minWeight").node().max = Math.max.apply(
         Math,
@@ -102,28 +101,28 @@ d3.json(DATAFILE).then((data) => {
 });
 
 const filter = () => {
-    let settings = get_settings();
+    let settings = getSettings();
 
     resetNodesAndEdges();
     hide("#nodeEdgeInfo");
 
     store.nodes.forEach((n) => {
-        if (n.degree >= settings.nodes.minDegree && !n.in_graph) {
+        if (n.degree >= settings.nodes.minDegree && !n.inGraph) {
             // should not be filtered but is not in graph so add it!
-            n.in_graph = true;
+            n.inGraph = true;
             graph.nodes.push(n); // console.log(n);
-        } else if (n.degree >= settings.nodes.minDegree && n.in_graph) {
+        } else if (n.degree >= settings.nodes.minDegree && n.inGraph) {
             // should not be filtered but is already in graph so no need to do anything
-        } else if (n.degree < settings.nodes.minDegree && n.in_graph) {
+        } else if (n.degree < settings.nodes.minDegree && n.inGraph) {
             // in graph but should not be
-            n.in_graph = false;
+            n.inGraph = false;
             graph.nodes.forEach((o, i) => {
                 if (n.node_id === o.node_id) {
                     graph.nodes.splice(i, 1);
                 }
             });
         } else {
-            n.in_graph = false;
+            n.inGraph = false;
             graph.nodes.forEach((o, i) => {
                 if (n.node_id === o.node_id) {
                     graph.nodes.splice(i, 1);
@@ -133,34 +132,34 @@ const filter = () => {
     });
 
     store.edges.forEach((e) => {
-        if (e.weight < settings.edges.minWeight && !e.in_graph) {
-            // edge is lower than minWeight and not in_graph so leave it out
-            e.in_graph = false;
-        } else if (e.weight < settings.edges.minWeight && e.in_graph) {
+        if (e.weight < settings.edges.minWeight && !e.inGraph) {
+            // edge is lower than minWeight and not inGraph so leave it out
+            e.inGraph = false;
+        } else if (e.weight < settings.edges.minWeight && e.inGraph) {
             // edge is lower than minWeight and in graph so remove it!
-            e.in_graph = false;
+            e.inGraph = false;
             graph.edges.forEach((o, i) => {
                 if (e.edge_id === o.edge_id) {
                     graph.edges.splice(i, 1);
                 }
             });
         } else {
-            if (e.source.in_graph && e.target.in_graph && !e.in_graph) {
+            if (e.source.inGraph && e.target.inGraph && !e.inGraph) {
                 // should not be filtered but is not in graph so add it!
-                e.in_graph = true;
+                e.inGraph = true;
                 graph.edges.push(e);
-            } else if (e.source.in_graph && e.target.in_graph && e.in_graph) {
+            } else if (e.source.inGraph && e.target.inGraph && e.inGraph) {
                 // should not be filtered but is already in graph so no need to do anything
-            } else if ((e.source.in_graph || e.target.in_graph) && e.in_graph) {
+            } else if ((e.source.inGraph || e.target.inGraph) && e.inGraph) {
                 // in graph but should not be
-                e.in_graph = false;
+                e.inGraph = false;
                 graph.edges.forEach((o, i) => {
                     if (e.edge_id === o.edge_id) {
                         graph.edges.splice(i, 1);
                     }
                 });
             } else {
-                e.in_graph = false;
+                e.inGraph = false;
                 graph.edges.forEach((o, i) => {
                     if (e.edge_id === o.edge_id) {
                         graph.edges.splice(i, 1);
@@ -173,11 +172,11 @@ const filter = () => {
     if (settings.nodes.autoClearNodes) {
         dropNodesWithNoEdges();
     }
-    update_info();
+    updateInfo();
 };
 
 const restart = () => {
-    let settings = get_settings();
+    let settings = getSettings();
 
     layout.stop();
     // console.log("--> setting up layout");
@@ -353,9 +352,9 @@ const drag = d3
 
 let zoomed = () => {
     k = Math.round(d3.event.transform.k * 10) / 10;
-    save_settings();
+    saveSettings();
     g.plot.attr("transform", d3.event.transform);
-    update_info();
+    updateInfo();
 };
 
 const zoom = d3.zoom().scaleExtent([0.25, 7]).on("zoom", zoomed);
@@ -382,23 +381,23 @@ const nodeHasEdges = (node_id, count = false) => {
         console.error("Found more than one node with ID " + node_id);
     }
 
-    let return_val = false,
+    let returnValue = false,
         counted = 0;
 
     graph.edges.filter((d) => {
         if (d.source.node_id === n.node_id) {
             // console.log("found connection to " + n.id + " from " + d.source.id);
-            return_val = true;
+            returnValue = true;
             counted += 1;
         }
         if (d.target.node_id === n.node_id) {
             // console.log("found connection to " + n.id + " from " + d.target.id);
-            return_val = true;
+            returnValue = true;
             counted += 1;
         }
     });
 
-    return count === true ? counted : return_val;
+    return count === true ? counted : returnValue;
 };
 
 const getUnconnectedNodes = () => {
@@ -433,15 +432,18 @@ const dropNodesWithNoEdges = () => {
         });
         runs += 1;
     }
-    message(`Dropped nodes with no edges (after ${runs} runs).`);
+    debugMessage(
+        `Dropped nodes with no edges (after ${runs} runs).`,
+        "Information"
+    );
     if (fixed === true) {
         troubleshoot(true); // ensures that all nodes are correctly represented in
         restart();
-        update_info();
+        updateInfo();
     }
 };
 
-const update_label = (name) => {
+const updateLabel = (name) => {
     // console.log(`updating label ${name}`);
     [
         ["layoutCharge", "charge", "charge_label"],
@@ -455,7 +457,7 @@ const update_label = (name) => {
     d3.select("#" + name + "_label").html(name + ` (${value})`);
 };
 
-const update_info = () => {
+const updateInfo = () => {
     d3.select("#info").classed("d-none", false);
     d3.select("#info").html(`
         <p>Graph nodes: ${graph.nodes.length}/${store.nodes.length}</p>
@@ -469,90 +471,96 @@ const update_info = () => {
 
 const troubleshoot = (fix = false) => {
     let _ = {
-        store_nodes: {
-            not_found_in_DOM: 0,
-            filtered_in_graph: store.nodes.filter((d) => d.in_graph),
+        storeNodes: {
+            notInDOM: 0,
+            inGraph: store.nodes.filter((d) => d.inGraph),
         },
-        graph_nodes: {
-            not_found_in_DOM: 0,
-            filtered_in_graph: graph.nodes.filter((d) => d.in_graph),
+        graphNodes: {
+            notInDOM: 0,
+            inGraph: graph.nodes.filter((d) => d.inGraph),
         },
     };
     store.nodes.forEach((n) => {
         if (d3.select("#" + n.node_id).node()) {
         } else {
-            _.store_nodes.not_found_in_DOM += 1;
+            _.storeNodes.notInDOM += 1;
         }
     });
     graph.nodes.forEach((n) => {
         if (d3.select("#" + n.node_id).node()) {
         } else {
-            _.graph_nodes.not_found_in_DOM += 1;
+            _.graphNodes.notInDOM += 1;
         }
     });
     if (fix) {
         // console.log("checking for inconsistency in data...");
-        if (_.store_nodes.filtered_in_graph > _.graph_nodes.filtered_in_graph) {
+        if (_.storeNodes.inGraph > _.graphNodes.inGraph) {
             console.log(
                 "there are more filtered nodes in store than in graph, correcting..."
             );
-            let dropped = [];
-            _.store_nodes.filtered_in_graph.forEach((n) => {
+            let dropped = `Dropped nodes:`;
+            _.storeNodes.inGraph.forEach((n) => {
                 if (
-                    _.graph_nodes.filtered_in_graph.find(
-                        (d) => d.node_id === n.node_id
-                    ) == undefined
+                    _.graphNodes.inGraph.find((d) => d.node_id === n.node_id) ==
+                    undefined
                 ) {
-                    dropped.push(n.node_id);
-                    n.in_graph = false;
+                    dropped += `<li>${n.node_id}</li>`;
+                    n.inGraph = false;
                 }
             });
-            message("Dropped nodes:", dropped);
+            debugMessage(dropped, "Information");
         }
     }
     return _;
 };
 
 let toasterCounter = 1;
-const message = (message, header) => {
+const debugMessage = (message, header) => {
     if (!header) {
         header = "Warning";
     }
-    let html_data = d3.select("#toasterWrapper").html();
-    html_data += `<div class="toast" id="toast${toasterCounter}" role="alert" aria-live="polite" aria-atomic="true" data-delay="3000"><div role="alert" aria-live="assertive" aria-atomic="true">
+    let _id = `toast${toasterCounter}`;
+    let _html = d3.select("#wrapToasters").html();
+    _html += `<div class="toast" id="${_id}" role="alert" aria-live="polite" aria-atomic="true"><div role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-header"><strong class="mr-auto">${header}</strong><button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>
         <div class="toast-body">${message}</div>
         </div></div>`;
+    d3.select("#wrapToasters").html(_html);
+    $(`#${_id}`).toast({ delay: 5000 });
+    $(`#${_id}`).toast("show");
+    setTimeout(() => {
+        console.log(`removing ${_id}`);
+        d3.selectAll(`#${_id}`).remove();
+    }, 6000);
     toasterCounter += 1;
-    $(`#toast${toasterCounter}`).toast("show");
 };
 
-const is_visible = (selector) => {
+const isVisible = (selector) => {
     return d3.select(selector).classed("d-none") === false;
 };
 
 const toggle = (selector) => {
-    d3.select(selector).classed("d-none", is_visible(selector));
+    d3.select(selector).classed("d-none", isVisible(selector));
 };
 
 const hide = (selector) => {
     d3.select(selector).classed("d-none", true);
 };
 
-const restart_layout = () => {
+const restartLayout = () => {
     layout.stop();
     layout.alpha(1);
     layout.restart();
 };
 
-const display_or_id = (elem) => {
+const displayOrID = (elem) => {
     return elem.display != undefined ? elem.display : elem.id;
 };
 
 const setNodeEdgeInfo = (elem) => {
-    let html_data = "";
+    let _html = "";
     if (elem.node_id) {
-        html_data = `<p><strong>${display_or_id(elem)}</strong></p>
+        _html = `<p><strong>${displayOrID(elem)}</strong></p>
             <p>degree: ${elem.degree}</p>
             <p>indegree: ${elem.indegree}</p>
             <p>outdegree: ${elem.outdegree}</p>
@@ -573,34 +581,31 @@ const setNodeEdgeInfo = (elem) => {
         `;
     } else if (elem.edge_id) {
         let dates = [];
-        html_data = `<p><strong>${display_or_id(elem.source)} - ${display_or_id(
+        _html = `<p><strong>${displayOrID(elem.source)} - ${displayOrID(
             elem.target
         )}</strong></p>
         <p>Revue mentioned: ${elem.revue_name}</p>
         <p>Weight: ${elem.weight}</p>`;
         if (elem.found) {
-            html_data += `<p>Found in ${elem.found.length} sources:</p>
+            _html += `<p>Found in ${elem.found.length} sources:</p>
         <ul>`;
             elem.found.forEach((source) => {
-                html_data += `<li>${source}</li>`;
-                // console.log(source);
-                // console.log(date_match);
-                let date = source.match(date_match);
+                _html += `<li>${source}</li>`;
+                let date = source.match(dateRegEx);
                 if (date) {
                     dates.push(date[0]);
                 }
             });
-            html_data += `</ul>`;
+            _html += `</ul>`;
             if (dates) {
-                // console.log(dates);
                 dates.sort();
-                html_data += `<p>Earliest date: ${
-                    dates[0]
-                }</p><p>Latest date: ${dates[dates.length - 1]}</p>`;
+                _html += `<p>Earliest date: ${dates[0]}</p><p>Latest date: ${
+                    dates[dates.length - 1]
+                }</p>`;
             }
         }
     }
-    d3.select("#nodeEdgeInfo").classed("d-none", false).html(html_data);
+    d3.select("#nodeEdgeInfo").classed("d-none", false).html(_html);
 };
 
 const nodeIsSelected = (node) => {
@@ -746,3 +751,7 @@ const selectEdge = (edge) => {
         setNodeEdgeInfo(edge);
     }
 };
+
+window.setInterval(() => {
+    console.log("clearing out messages...");
+}, 60000);

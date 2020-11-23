@@ -186,7 +186,7 @@ const render = () => {
     }
 };
 
-const get_settings = () => {
+const getSettings = () => {
     minConnections = d3.select("#minConnections").node().value;
 
     return {
@@ -197,7 +197,7 @@ const get_settings = () => {
 draw = () => {
     d3.json("drag-data.json").then((graph) => {
         //get settings
-        settings = get_settings();
+        settings = getSettings();
 
         graph.nodes.forEach((d, i) => {
             if (d.degree > minConnections) {

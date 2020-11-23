@@ -197,10 +197,15 @@ svg {
     transition: display 0s, opacity 0.5s linear;
 }
 
-#toasterWrapper {
+#wrapToasters {
     position: absolute;
     left: 50%;
     top: 0;
     width: 400px;
     padding-top: 1em;
+}
+
+.toast {
+    max-width: 300px;
+    font-size: 0.675rem !important;
 }
