@@ -507,10 +507,24 @@ const troubleshoot = (fix = false) => {
                     n.in_graph = false;
                 }
             });
-            console.log("Dropped nodes:", dropped);
+            message("Dropped nodes:", dropped);
         }
     }
     return _;
+};
+
+let toasterCounter = 1;
+const message = (message, header) => {
+    if (!header) {
+        header = "Warning";
+    }
+    html_data = d3.select("#toasterWrapper").html();
+    html_data += `<div class="toast" id="toast${toasterCounter}" role="alert" aria-live="polite" aria-atomic="true" data-delay="3000"><div role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header"><strong class="mr-auto">${header}</strong><button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>
+        <div class="toast-body">${message}</div>
+        </div></div>`;
+    toasterCounter += 1;
+    $(`#toast${toasterCounter}`).toast("show");
 };
 
 const is_visible = (selector) => {
