@@ -1,0 +1,151 @@
+.theme-light {
+    --background: #fff;
+
+    --background-settings: rgba(255, 255, 255, 0.75);
+    --settings-label: rgba(0, 0, 0, 1);
+
+    --text-color: #000;
+
+    --performer: #EE6C4D;
+    --performer-selected: rgb(235, 0, 0);
+    --performer-deselected: rgb(225, 225, 225);
+
+    --link-selected: red;
+    --link-deselected: rgba(0, 0, 0, 0.25);
+
+    --link-revue: rgba(61, 90, 128, 0.5);
+    --link-norevue: rgba(0, 0, 0, 0.15);
+
+    --club: rgba(61, 90, 128, 1);
+    --club-selected: rgba(217, 0, 0, 1);
+    --club-deselected: rgba(215, 215, 215, 1);
+
+    --city: rgba(238, 238, 238, 1);
+    --city-selected: rgba(200, 0, 0, 1);
+    --city-deselected: rgba(205, 205, 205, 1);
+
+    --node-stroke: rgba(255, 255, 255, 1);
+}
+
+.theme-dark {
+    --background: #000;
+
+    --background-settings: rgba(0, 0, 0, 0.75);
+    --settings-label: rgba(255, 255, 255, 1);
+
+    --text-color: #fff;
+
+    --performer: #af4f37;
+    --performer-selected: rgb(235, 0, 0);
+    --performer-deselected: rgb(128, 128, 128);
+
+    --link-selected: red;
+    --link-deselected: rgb(136, 136, 136, 0.1);
+
+    --link-revue: rgba(61, 90, 128, 0.5);
+    --link-norevue: rgba(199, 199, 199, 0.15);
+
+    --club: rgba(61, 90, 128, 1);
+    --club-selected: rgb(217, 0, 0);
+    --club-deselected: rgb(107, 107, 107);
+
+    --city: rgb(124, 124, 124);
+    --city-selected: rgb(200, 0, 0);
+    --city-deselected: rgb(87, 87, 87);
+
+    --node-stroke: rgba(255, 255, 255, 0.5);
+}
+
+#svg {
+    background-color: var(--background);
+}
+
+#info {
+    font-family: 'Roboto Condensed', sans-serif;
+}
+
+p {
+    font-family: 'Roboto Condensed', sans-serif;
+    font-size: 0.75em;
+}
+
+.text-label {
+    font-family: 'Roboto Condensed', sans-serif;
+    text-anchor: middle;
+    pointer-events: none;
+    fill: var(--text-color);
+}
+
+.node.city {
+    fill: var(--city) !important;
+}
+
+.node.performer {
+    fill: var(--performer);
+}
+
+.node.club {
+    fill: var(--club);
+}
+
+.node {
+    stroke-width: 0.1;
+    stroke: var(--node-stroke);
+    cursor: move;
+    /* pointer-events: none; */
+}
+
+.node.city.selected {
+    fill: var(--city-selected) !important;
+}
+
+.node.city.deselected {
+    fill: var(--city-deselected) !important;
+}
+
+.node.club.selected {
+    fill: var(--club-selected) !important;
+}
+
+.node.club.deselected {
+    fill: var(--club-deselected) !important;
+}
+
+.node.performer.selected {
+    fill: var(--performer-selected) !important;
+}
+
+.node.performer.deselected {
+    fill: var(--performer-deselected) !important;
+}
+
+
+
+.link.selected {
+    stroke: var(--link-selected);
+}
+
+.link.deselected {
+    stroke: var(--link-deselected);
+}
+
+.link.revue {
+    stroke: var(--link-revue);
+    stroke-linecap: round;
+}
+
+.link.no-revue {
+    stroke: var(--link-norevue);
+    stroke-linecap: round;
+}
+
+#settings {
+    position: absolute;
+    top: 1em;
+    left: 1em;
+    background-color: var(--background-settings);
+}
+
+label {
+    color: var(--settings-label);
+}

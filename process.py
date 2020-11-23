@@ -1,41 +1,14 @@
+from collections import Counter, OrderedDict
+from collections import Counter
 from difflib import SequenceMatcher
 import re
 import networkx as nx
 import pandas as pd
 import json
 from datetime import datetime
-from drag.settings import SPREADSHEET, DB_SPREADSHEET, START_YEAR, END_YEAR, CLEANING, CACHE
+from drag.settings import SPREADSHEET, DB_SPREADSHEET, START_YEAR, END_YEAR, CLEANING, NOT_ALLOWED_IN_ID, REPLACE_NUMBERS
+from drag.place import Place
 from pathlib import Path
-
-
-class Place():
-
-    if not CACHE.exists():
-        CACHE.mkdir(parents=True)
-
-    from geopy.geocoders import Nominatim
-    geolocator = Nominatim(user_agent="place-app")
-
-    def __init__(self, name: str):
-        self.name = name
-        self.cache = CACHE / f'{self.name}.json'
-
-        if not self.cache.exists():
-            g = self.geolocator.geocode(name + ", United States")
-            if g:
-                self.cache.write_text(json.dumps(g.raw))
-            else:
-                self.cache.write_text(json.dumps({}))
-
-        self.data = json.loads(self.cache.read_text())
-        if self.data == {}:
-            print(f'Warning: Could not find geo data for {name}')
-
-        self.lat = self.data.get('lat')
-        self.lon = self.data.get('lon')
-        self.boundingbox = self.data.get('boundingbox')
-        self.display_name = self.data.get('display_name')
-        self.importance = self.data.get('importance')
 
 
 df = pd.read_csv(SPREADSHEET, encoding='utf8')
@@ -47,8 +20,10 @@ if not START_YEAR:
 if not END_YEAR:
     print('Warning: no end year set.')
 
+counters = {}
+
 for row in df.fillna('').itertuples():
-    _id, date, category, performer, club, _city, \
+    row_num, date, category, performer, club, _city, \
         city, revue_name, normalized_revue_name, \
         unsure_drag, legal_name, alleged_age, \
         assumed_birth_year, source, eima, \
@@ -56,14 +31,13 @@ for row in df.fillna('').itertuples():
         former_archive, comment = row
 
     if not date:
-        print(f'no date on row {_id}')
-        continue
+        print(f'no date on row {row_num}')
+        continue  # skip ahead
 
     if not city and _city:
-        city = _city
+        city = _city  # revert to city if there is no normalized city
 
-    club_display = None
-    club_id = None
+    club_display, club_id = None, None
 
     if club and city:
         club_display = club
@@ -75,11 +49,9 @@ for row in df.fillna('').itertuples():
     for cat in CLEANING:
         if cat == 'city':
             for search, replace in CLEANING[cat].items():
-                # print(f'searching city data for {search} - replacing with {replace}')
                 city = city.replace(search, replace)
         elif cat == 'club':
             for search, replace in CLEANING[cat].items():
-                # print(f'searching club data for {search} - replacing with {replace}')
                 if club_display != None:
                     club_display = club_display.replace(search, replace)
 
@@ -173,18 +145,18 @@ for row in df.fillna('').itertuples():
 
     attrs = {
         city: {
-            'pd_id': _id,
+            'row_num': row_num,
             'category': 'city',
             'comment': comment,
         },
         club_id: {
-            'pd_id': _id,
+            'row_num': row_num,
             'category': 'club',
             'display': club,
             'comment': comment
         },
         performer: {
-            'pd_id': _id,
+            'row_num': row_num,
             'category': 'performer',
             'comment': comment
         }
@@ -208,8 +180,11 @@ def set_degrees(graph):
     """Set degrees for each node"""
 
     for node in graph.nodes:
+        node_id = re.sub(NOT_ALLOWED_IN_ID, '', node.lower())
+        node_id = REPLACE_NUMBERS(node_id)
         attrs = {
             node: {
+                'node_id': node_id,
                 'indegree': len(graph.in_edges(node)),
                 'outdegree': len(graph.out_edges(node)),
                 'degree': len(graph.out_edges(node)) + len(graph.in_edges(node)),
@@ -224,9 +199,11 @@ def set_edges(graph):
 
     attrs = dict()
     for edge in graph.edges:
-        # print(graph.get_edge_data(edge[0], edge[1]))
+        edge0 = re.sub(NOT_ALLOWED_IN_ID, '', edge[0].lower())
+        edge1 = re.sub(NOT_ALLOWED_IN_ID, '', edge[1].lower())
+        edge_id = edge0 + '-' + edge1
         attrs[(edge[0], edge[1])] = {
-            'pd_id': str(edge[0])+'-'+str(edge[1])
+            'edge_id': edge_id
         }
         nx.set_edge_attributes(graph, attrs)
     return graph
@@ -270,7 +247,6 @@ graph = set_degrees(graph)
 graph = set_centralities(graph)
 graph = set_edges(graph)
 
-
 json_data = nx.node_link_data(graph)
 
 
@@ -278,7 +254,7 @@ json_data = nx.node_link_data(graph)
 ## Testing for similarities in names          ##
 ################################################
 
-
+'''
 def clean_name(name):
     name = name.strip()
 
@@ -406,6 +382,42 @@ for name in all_names:
         print('\n')
 
 print('---------------------')
+'''
+
+
+nodes = json_data.get('nodes')
+
+count = dict()
+
+for edge in json_data.get('links'):
+    source_node = next(
+        item for item in nodes if item["id"] == edge.get('source'))
+    target_node = next(
+        item for item in nodes if item["id"] == edge.get('target'))
+
+    # count source
+    category = source_node.get('category')
+    _id = source_node.get('id')
+    if not category in count:
+        count[category] = dict()
+    if not _id in count[category]:
+        count[category][_id] = 0
+    count[category][_id] += 1
+
+    # count target
+    category = target_node.get('category')
+    _id = target_node.get('id')
+    if not category in count:
+        count[category] = dict()
+    if not _id in count[category]:
+        count[category][_id] = 0
+    count[category][_id] += 1
+
+for cat in count:
+    count[cat] = Counter(count[cat]).most_common()
+
+json_data['count'] = count
 
 # write file
 Path('./docs/drag-data-for-1930s.json').write_text(json.dumps(json_data))
+Path('../testing-d3-v4/data_drag.json').write_text(json.dumps(json_data))
