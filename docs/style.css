@@ -196,3 +196,11 @@ svg {
 #settingsContainer {
     transition: display 0s, opacity 0.5s linear;
 }
+
+#toasterWrapper {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 400px;
+    padding-top: 1em;
+}
