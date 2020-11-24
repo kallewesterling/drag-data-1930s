@@ -669,17 +669,21 @@ const troubleshoot = (fix = false) => {
 
 let toasterCounter = 1;
 const debugMessage = (message, header) => {
+    if (getSettings().debugMessages === false) {
+        console.log("[debugMessage: " + header + "] " + message);
+        return false;
+    }
     if (!header) {
         header = "Warning";
     }
     let _id = `toast${toasterCounter}`;
     let _html = d3.select("#wrapToasters").html();
-    _html += `<div class="toast" id="${_id}" role="alert" aria-live="polite" aria-atomic="true"><div role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="toast-header"><strong class="mr-auto">${header}</strong><button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>
+    _html += `<div class="toast" id="${_id}" role="alert" aria-live="polite" aria-atomic="true" data-delay="5000"><div role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header"><strong class="mr-auto">${header}</strong><button type="button" class="ml-2 mb-1 btn-close" data-dismiss="toast" aria-label="Close"></button></div>
         <div class="toast-body">${message}</div>
         </div></div>`;
     d3.select("#wrapToasters").html(_html);
-    $(`#${_id}`).toast({ delay: 5000 });
+    // $(`#${_id}`).toast({ delay: 5000 });
     $(`#${_id}`).toast("show");
     setTimeout(() => {
         // console.log(`removing ${_id}`);
@@ -694,6 +698,11 @@ const isVisible = (selector) => {
 
 const toggle = (selector) => {
     d3.select(selector).classed("d-none", isVisible(selector));
+
+    // special rules
+    if (selector === "#settingsContainer") {
+        d3.select("#settingsToggle").classed("toggled", !isVisible(selector));
+    }
 };
 
 const hide = (selector) => {
