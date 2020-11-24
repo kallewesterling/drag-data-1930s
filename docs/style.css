@@ -309,3 +309,7 @@ svg#main {
 [data-toggle].toggled:hover {
     cursor: pointer;
 }
+
+.modal-backdrop.show {
+    opacity: 0 !important;
+}

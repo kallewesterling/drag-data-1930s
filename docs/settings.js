@@ -405,6 +405,10 @@ let keyMapping = {
         noMeta:
             'changeSetting({selector: "#stickyNodes", setTo: !getSettings().nodes.stickyNodes})',
     },
+    N: {
+        shiftKey:
+            'changeSetting({selector: "#nodeSizeFromCurrent", type: "checkbox", setTo: !getSettings().nodes.nodeSizeFromCurrent})',
+    },
     ArrowRight: {
         noMeta:
             'changeSetting({selector: "#minDegree", type: "slider", setTo: getSettings().nodes.minDegree+1})',
@@ -417,20 +421,36 @@ let keyMapping = {
         shiftKey:
             'changeSetting({selector: "#minWeight", type: "slider", setTo: getSettings().edges.minWeight-1})',
     },
+    ArrowUp: {
+        noMeta:
+            'changeSetting({selector: "#charge", type: "slider", setTo: getSettings().force.charge+10})',
+    },
+    ArrowDown: {
+        noMeta:
+            'changeSetting({selector: "#charge", type: "slider", setTo: getSettings().force.charge-10})',
+    },
 };
 d3.select("html")
     .node()
     .addEventListener("keyup", (e) => {
-        if (e.key === "Meta") {
+        if (e.key === "Meta" || e.key === "Shift") {
             d3.selectAll(".metaShow").classed("d-none", true);
         }
     });
+
+let numbers = [];
+let years = [];
+let numberModal = new bootstrap.Modal(
+    document.getElementById("numberModal"),
+    {}
+);
+
 d3.select("html")
     .node()
     .addEventListener("keydown", (e) => {
-        console.log(e);
+        // console.log(e);
         _ = isVisible("#nodeEdgeInfo");
-        if (e.key === "Meta") {
+        if (e.key === "Meta" || e.key === "Shift") {
             d3.selectAll(".metaShow").classed("d-none", false);
         }
         if (e.key === "Escape" && _) {
@@ -446,6 +466,61 @@ d3.select("html")
                 !getSettings().nodes.autoClearNodes,
                 true
             );
+        }
+        if (
+            ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-"].includes(
+                e.key
+            )
+        ) {
+            numbers.push(e.key);
+            if (years.length === 1) {
+                numberModal._element.querySelector("h5").innerText = "End year";
+            } else {
+                numberModal._element.querySelector("h5").innerText =
+                    "Start year";
+            }
+            numberModal._element.querySelector(
+                "h1"
+            ).innerText = `${+numbers.join("")}`;
+            numberModal.show();
+            setTimeout(() => {
+                numberModal.hide();
+            }, 750);
+            if (numbers.length == 4) {
+                let year = +numbers.join("");
+                if (yearRange.includes(year)) {
+                    years.push(year);
+                } else {
+                    console.log(`${year} is not a year in the graph's range.`);
+                }
+                numbers = [];
+                console.log(years);
+                let startYear = undefined,
+                    endYear = undefined;
+                if (years.length == 2) {
+                    startYear = years.slice(-2)[0];
+                    endYear = years.slice(-2)[1];
+                    console.log(`setting year range: ${startYear}-${endYear}`);
+                    years = [];
+                } else if (years.slice(-2).length == 1) {
+                    console.log(`setting start year: ${years[0]}`);
+                    startYear = years[0];
+                }
+                if (startYear)
+                    changeSetting({
+                        selector: "#startYear",
+                        type: "slider",
+                        setTo: startYear,
+                        _filter: true,
+                    });
+                if (endYear)
+                    changeSetting({
+                        selector: "#endYear",
+                        type: "slider",
+                        setTo: endYear,
+                        _filter: true,
+                    });
+            }
         }
         Object.keys(keyMapping).forEach((key) => {
             if (
