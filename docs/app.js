@@ -5,7 +5,7 @@ TODO:
 - add colors / sizes / etc
 - add text labels
 - make graph not so circular...
-- filter on other things, like city (see `store.count`) and weight!
+- filter on other things, like city (see `store.count`)
 */
 console.log("Running d3js v5.");
 let DATAFILE = "drag-data.json";
@@ -15,7 +15,7 @@ const width = 960,
     height = 800,
     store = { nodes: [], edges: [], count: {} },
     graph = { nodes: [], edges: [] },
-    svg = d3.select("svg"),
+    svg = d3.select("svg#main"),
     g = {
         plot: svg.append("g").attr("id", "plot"),
     };
@@ -26,9 +26,15 @@ let layout = d3 // setup layout with default values
 
 let windowWidth = window.innerWidth,
     windowHeight = window.innerHeight,
-    k = AUTO_ZOOM;
+    k = AUTO_ZOOM,
+    preview = null;
 
-let dateRegEx = /[0-9]{4}\-(0[1-9]|1[0-2])\-(0[1-9]|[1-2][0-9]|3[0-1])/;
+let range = (start, stop, step) =>
+    Array.from(
+        { length: (stop - start) / step + 1 },
+        (_, i) => start + i * step
+    );
+let yearRange = [];
 
 // stop layout until we are ready
 layout.stop();
@@ -65,10 +71,16 @@ d3.json(DATAFILE).then((data) => {
         e.target = store.nodes.find((n) => n.id === e.target);
         e.dates = [];
         e.range = { start: undefined, end: undefined };
+        // console.log(e.found);
+        e.found = e.found.filter((found) => {
+            return found != null && found != "" && found != "";
+        });
         e.found.forEach((source) => {
-            let date = source.match(dateRegEx);
-            if (date) {
-                e.dates.push(date[0]);
+            let date = dateParser(source);
+            if (date && date.iso !== undefined) {
+                e.dates.push(date.iso);
+            } else {
+                // console.log(`Could not interpret date in ${source}`);
             }
         });
         if (e.dates) {
@@ -98,6 +110,69 @@ d3.json(DATAFILE).then((data) => {
             return o.weight;
         })
     );
+
+    let min_year = Math.min.apply(
+        Math,
+        store.edges.map(function (o) {
+            return +o.range.start.substring(0, 4);
+        })
+    );
+    let max_year = Math.max.apply(
+        Math,
+        store.edges.map(function (o) {
+            return +o.range.end.substring(0, 4);
+        })
+    );
+
+    yearRange = range(min_year, max_year, 1);
+
+    let preloadedSettings = loadSettings("settings");
+    if (!preloadedSettings) preloadedSettings = _autoSettings;
+
+    let startYearSet = false;
+    d3.select("#startYear")
+        .selectAll("option")
+        .data(yearRange)
+        .enter()
+        .append("option")
+        .attr("value", (d) => d)
+        .text((d) => d)
+        .attr("selected", (d) => {
+            if (
+                d === preloadedSettings.edges.startYear &&
+                preloadedSettings.edges.startYear <
+                    preloadedSettings.edges.endYear
+            ) {
+                startYearSet = true;
+                return true;
+            }
+        });
+    if (!startYearSet) {
+        d3.select("#startYear").node().value = _autoSettings.edges.startYear;
+    }
+    let endYearSet = false;
+    d3.select("#endYear")
+        .selectAll("option")
+        .data(yearRange)
+        .enter()
+        .append("option")
+        .attr("value", (d) => d)
+        .text((d) => d)
+        .attr("selected", (d) => {
+            if (
+                d === preloadedSettings.edges.endYear &&
+                preloadedSettings.edges.startYear <=
+                    preloadedSettings.edges.endYear
+            ) {
+                endYearSet = true;
+                return true;
+            }
+        });
+    if (!endYearSet) {
+        d3.select("#endYear").node().value = _autoSettings.edges.endYear;
+    }
+
+    preview = preview(store);
 });
 
 const filter = () => {
@@ -132,11 +207,48 @@ const filter = () => {
     });
 
     store.edges.forEach((e) => {
+        // TODO: recalibrate weight here
+        // console.log(e.found.length);
+
         if (e.weight < settings.edges.minWeight && !e.inGraph) {
             // edge is lower than minWeight and not inGraph so leave it out
             e.inGraph = false;
         } else if (e.weight < settings.edges.minWeight && e.inGraph) {
             // edge is lower than minWeight and in graph so remove it!
+            e.inGraph = false;
+            graph.edges.forEach((o, i) => {
+                if (e.edge_id === o.edge_id) {
+                    graph.edges.splice(i, 1);
+                }
+            });
+        } else if (
+            +e.range.start.substring(0, 4) <= settings.edges.startYear &&
+            !e.inGraph
+        ) {
+            // edge is earlier than startYear and not inGraph so leave it out"
+            e.inGraph = false;
+        } else if (
+            +e.range.start.substring(0, 4) <= settings.edges.startYear &&
+            e.inGraph
+        ) {
+            // edge is earlier than startYear and inGraph so drop it
+            e.inGraph = false;
+            graph.edges.forEach((o, i) => {
+                if (e.edge_id === o.edge_id) {
+                    graph.edges.splice(i, 1);
+                }
+            });
+        } else if (
+            +e.range.end.substring(0, 4) >= settings.edges.endYear &&
+            !e.inGraph
+        ) {
+            // range end is higher than endYear and not inGraph so leave it out
+            e.inGraph = false;
+        } else if (
+            +e.range.end.substring(0, 4) >= settings.edges.endYear &&
+            e.inGraph
+        ) {
+            // edge has later range than endYear and inGraph so drop it"
             e.inGraph = false;
             graph.edges.forEach((o, i) => {
                 if (e.edge_id === o.edge_id) {
@@ -167,6 +279,10 @@ const filter = () => {
                 });
             }
         }
+    });
+
+    graph.nodes.forEach((n) => {
+        n.current_degree = nodeHasEdges(n.node_id, true);
     });
 
     if (settings.nodes.autoClearNodes) {
@@ -232,11 +348,32 @@ const restart = () => {
         .append("circle")
         .attr("class", (n) => "node " + n.category)
         .attr("id", (n) => n.node_id)
-        .attr("r", (n) => {
-            return Math.sqrt(n.degree) * 1.5;
-        })
         .attr("cx", (n) => n.x)
         .attr("cy", (n) => n.y);
+
+    g.nodes
+        .selectAll("circle.node")
+        .data(graph.nodes, (d) => d.node_id)
+        .transition()
+        .attr("r", (n) => {
+            if (settings.nodes.nodeSizeFromCurrent === true) {
+                y = d3
+                    .scaleLinear()
+                    .range([1, 10])
+                    .domain(d3.extent(graph.nodes, (d) => d.current_degree));
+                // console.log("settings.nodeSizeFromCurrent is on!");
+                return y(n.current_degree);
+                return Math.sqrt(n.current_degree) * 2.5;
+            } else {
+                y = d3
+                    .scaleLinear()
+                    .range([1, 10])
+                    .domain(d3.extent(graph.nodes, (d) => d.degree));
+                return y(n.degree);
+                // console.log("settings.nodeSizeFromCurrent is off!");
+                return Math.sqrt(n.degree) * 1.5;
+            }
+        });
 
     node = node.merge(newNode);
 
@@ -283,7 +420,16 @@ const restart = () => {
         .attr("x2", (e) => e.target.x)
         .attr("y2", (e) => e.target.y)
         .style("stroke-width", (e) => {
-            return Math.sqrt(e.weight) * 0.5;
+            let weight = Math.sqrt(e.weight) * 0.5;
+            weight =
+                weight < settings.edgeMinStroke
+                    ? settings.edgeMinStroke
+                    : weight;
+            weight =
+                weight > settings.edgeMaxStroke
+                    ? settings.edgeMaxStroke
+                    : weight;
+            return weight;
         })
         .call(function (link) {
             link.transition().attr("stroke-opacity", 0.3);
@@ -346,8 +492,13 @@ const drag = d3
 
         // no longer fix the node position after drag ended
         // allows layout to calculate its position again
-        n.fx = null;
-        n.fy = null;
+        if (getSettings().nodes.stickyNodes) {
+            n.fx = n.x;
+            n.fy = n.y;
+        } else {
+            n.fx = null;
+            n.fy = null;
+        }
     });
 
 let zoomed = () => {
@@ -432,10 +583,12 @@ const dropNodesWithNoEdges = () => {
         });
         runs += 1;
     }
+    /*
     debugMessage(
         `Dropped nodes with no edges (after ${runs} runs).`,
         "Information"
     );
+    */
     if (fixed === true) {
         troubleshoot(true); // ensures that all nodes are correctly represented in
         restart();
@@ -529,7 +682,7 @@ const debugMessage = (message, header) => {
     $(`#${_id}`).toast({ delay: 5000 });
     $(`#${_id}`).toast("show");
     setTimeout(() => {
-        console.log(`removing ${_id}`);
+        // console.log(`removing ${_id}`);
         d3.selectAll(`#${_id}`).remove();
     }, 6000);
     toasterCounter += 1;
@@ -560,12 +713,13 @@ const displayOrID = (elem) => {
 const setNodeEdgeInfo = (elem) => {
     let _html = "";
     if (elem.node_id) {
+        //let related = getRelated(elem.node_id);
         _html = `<p><strong>${displayOrID(elem)}</strong></p>
             <p>degree: ${elem.degree}</p>
-            <p>indegree: ${elem.indegree}</p>
-            <p>outdegree: ${elem.outdegree}</p>
+            <p>—> in: ${elem.indegree}</p>
+            <p>—> out: ${elem.outdegree}</p>
             <p>current network degree: ${nodeHasEdges(elem.node_id, true)}</p>
-            <p class="mt-1"><strong>Centrality measures (across network)</strong></p>
+            <p class="mt-2"><strong>Centrality measures (across network)</strong></p>
             <p>Betweenness (1000x): ${
                 Math.round(elem["1000x-betweenness-centrality"] * 100) / 100
             }</p>
@@ -578,7 +732,12 @@ const setNodeEdgeInfo = (elem) => {
             <p>Eigenvector (1000x): ${
                 Math.round(elem["1000x-eigenvector-centrality"] * 100) / 100
             }</p>
+            <p class="mt-2"><strong>Related nodes</strong></p>`;
+        /* // TODO: Do something interactive with these?
+            <p>Secondary: ${related.secondaryNodeIDs}</p>
+            <p>Tertiary: ${related.tertiaryNodeIDS}</p>
         `;
+        */
     } else if (elem.edge_id) {
         let dates = [];
         _html = `<p><strong>${displayOrID(elem.source)} - ${displayOrID(
@@ -586,24 +745,23 @@ const setNodeEdgeInfo = (elem) => {
         )}</strong></p>
         <p>Revue mentioned: ${elem.revue_name}</p>
         <p>Weight: ${elem.weight}</p>`;
+        if (elem.dates) {
+            elem.dates.sort();
+            _html += `<p>Span: ${elem.dates[0]}–${
+                elem.dates[elem.dates.length - 1]
+            }</p>`;
+        }
         if (elem.found) {
-            _html += `<p>Found in ${elem.found.length} sources:</p>
+            _html += `<p>Found in ${elem.found.length} source${
+                elem.found.length > 1 ? "s" : ""
+            }:</p>
         <ul>`;
             elem.found.forEach((source) => {
                 _html += `<li>${source}</li>`;
-                let date = source.match(dateRegEx);
-                if (date) {
-                    dates.push(date[0]);
-                }
             });
             _html += `</ul>`;
-            if (dates) {
-                dates.sort();
-                _html += `<p>Earliest date: ${dates[0]}</p><p>Latest date: ${
-                    dates[dates.length - 1]
-                }</p>`;
-            }
         }
+        _html += `<p>Edge ID: ${elem.edge_id}</p>`;
     }
     d3.select("#nodeEdgeInfo").classed("d-none", false).html(_html);
 };
@@ -705,13 +863,71 @@ const selectRelatedEdges = (node) => {
     });
 };
 
+const getRelated = (node) => {
+    if (typeof node === "string") {
+        node = d3.select("#" + node).datum();
+    }
+    let secondaryEdges = getRelatedEdges(node.node_id);
+    let secondaryNodeIDs = [
+        ...new Set([
+            ...secondaryEdges.map((e) => e.source.node_id),
+            ...secondaryEdges.map((e) => e.target.node_id),
+        ]),
+    ].filter((d) => d != node.node_id);
+
+    let tertiaryNodeIDs = [],
+        tertiaryEdges = [];
+    secondaryNodeIDs.forEach((node_id) => {
+        let _tertiaryEdges = getRelatedEdges(node_id);
+        let _tertiaryNodeIDs = [
+            ...new Set([
+                ..._tertiaryEdges.map((e) => e.source.node_id),
+                ..._tertiaryEdges.map((e) => e.target.node_id),
+            ]),
+        ].filter((d) => d != node_id && d != node.node_id);
+        tertiaryNodeIDs = [...tertiaryNodeIDs, ..._tertiaryNodeIDs];
+        tertiaryEdges = [...tertiaryEdges, ..._tertiaryEdges];
+    });
+    secondaryEdges = secondaryEdges.map((e) => e.edge_id);
+    tertiaryEdges = tertiaryEdges.map((e) => e.edge_id);
+    let returnValue = {
+        primary: node.node_id,
+        secondaryNodeIDs: secondaryNodeIDs,
+        tertiaryNodeIDs: tertiaryNodeIDs,
+        secondaryEdges: secondaryEdges,
+        tertiaryEdges: tertiaryEdges,
+    };
+    console.log(returnValue);
+    return returnValue;
+};
+
 const unselectNodes = (excludeNode) => {
+    let related = undefined;
     g.nodes.selectAll("circle.node").classed("deselected", (node) => {
         if (excludeNode && node === excludeNode) {
+            node.fx = node.x;
+            node.fy = node.y;
+            related = getRelated(node);
             return false;
         } else {
             return true;
         }
+    });
+    console.log(related);
+    related.secondaryNodeIDs.forEach((node_id) => {
+        let elem = d3.select(`#${node_id}`);
+        elem.classed("selected-secondary", true);
+        elem.classed("deselected", false);
+    });
+    related.tertiaryNodeIDs.forEach((node_id) => {
+        let elem = d3.select(`#${node_id}`);
+        elem.classed("selected-tertiary", true);
+        elem.classed("deselected", false);
+    });
+    related.tertiaryEdges.forEach((edge_id) => {
+        let elem = d3.select(`#${edge_id}`);
+        elem.classed("selected-tertiary", true);
+        elem.classed("deselected", false);
     });
 };
 
@@ -724,7 +940,13 @@ const resetNodesAndEdges = () => {
             return "link no-revue";
         }
     });
-    g.nodes.selectAll("text.label").attr("class", "label");
+    g.nodes
+        .selectAll("text.label")
+        .attr("class", "label")
+        .attr("selected", (n) => {
+            n.fx = null;
+            n.fy = null;
+        });
 };
 
 const selectNode = (node) => {
@@ -734,9 +956,10 @@ const selectNode = (node) => {
         // selectRelatedEdges(node);
         resetNodesAndEdges();
     } else {
+        resetNodesAndEdges();
+        selectRelatedEdges(node);
         deselectNodes(node);
         unselectNodes(node);
-        selectRelatedEdges(node);
         setNodeEdgeInfo(node);
     }
 };

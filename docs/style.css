@@ -7,21 +7,27 @@
     --text-color: rgba(255, 255, 255, 1);
 
     --performer: rgba(175, 79, 55, 1);
-    --performer-selected: rgb(235, 0, 0);
+    --performer-selected-primary: rgb(235, 0, 0);
+    --performer-selected-secondary: rgb(235, 0, 0);
+    --performer-selected-tertiary: rgb(227, 172, 172);
     --performer-deselected: rgb(128, 128, 128);
 
-    --link-selected: red;
+    --link-selected-primary: red;
     --link-deselected: rgb(136, 136, 136, 0.1);
 
     --link-revue: rgba(61, 90, 128, 1);
     --link-norevue: rgba(199, 199, 199, 1);
 
     --club: rgba(61, 90, 128, 1);
-    --club-selected: rgb(217, 0, 0);
+    --club-selected-primary: rgb(217, 0, 0);
+    --club-selected-secondary: rgb(218, 162, 162);
+    --club-selected-tertiary: rgb(218, 162, 162);
     --club-deselected: rgb(107, 107, 107);
 
     --city: rgb(124, 124, 124);
-    --city-selected: rgb(200, 0, 0);
+    --city-selected-primary: rgb(200, 0, 0);
+    --city-selected-secondary: rgb(213, 169, 169);
+    --city-selected-tertiary: rgb(213, 169, 169);
     --city-deselected: rgb(87, 87, 87);
 
     --node-stroke: rgba(255, 255, 255, 0.5);
@@ -36,22 +42,30 @@
     --text-color: rgba(0, 0, 0, 1);
 
     --performer: rgba(238, 108, 77, 1);
-    --performer-selected: rgb(235, 0, 0);
-    --performer-deselected: rgb(225, 225, 225);
+    --performer-selected-primary: #ff0000;
+    --performer-selected-secondary: #ffb0b0;
+    --performer-selected-tertiary: #ffdfdf;
+    --performer-deselected: rgb(239, 239, 239);
 
-    --link-selected: red;
-    --link-deselected: rgba(0, 0, 0, 0.25);
+    --link-selected-primary: #ff0000;
+    --link-selected-secondary: #ffb0b0;
+    --link-selected-tertiary: #ffdfdf;
+    --link-deselected: rgba(0, 0, 0, 0.09);
 
     --link-revue: rgba(61, 90, 128, 0.5);
     --link-norevue: rgba(0, 0, 0, 0.15);
 
     --club: rgba(61, 90, 128, 1);
-    --club-selected: rgba(217, 0, 0, 1);
-    --club-deselected: rgba(215, 215, 215, 1);
+    --club-selected-primary: #ff0000;
+    --club-selected-secondary: #ffb0b0;
+    --club-selected-tertiary: #ffdfdf;
+    --club-deselected: rgba(245, 245, 245, 1);
 
     --city: rgba(238, 238, 238, 1);
-    --city-selected: rgba(200, 0, 0, 1);
-    --city-deselected: rgba(205, 205, 205, 1);
+    --city-selected-primary: #ff0000;
+    --city-selected-secondary: #ffb0b0;
+    --city-selected-tertiary: #ffdfdf;
+    --city-deselected: rgba(241, 241, 241, 1);
 
     --node-stroke: rgba(255, 255, 255, 1);
 }
@@ -62,6 +76,8 @@
     left: 1em;
     background-color: var(--background-settings);
     color: var(--text-color);
+    max-width: 250px;
+    overflow: hidden;
 }
 
 #settings button {
@@ -74,6 +90,9 @@
     top: 1em;
     right: 1em;
     background-color: var(--background-settings);
+    min-width: 250px;
+    max-width: 250px;
+    overflow: hidden;
 }
 
 #infoContainer > p,
@@ -88,14 +107,18 @@
     bottom: 1em;
     left: 1em;
     background-color: var(--background-settings);
+    max-height: 30%;
+    overflow: hidden;
+    overflow-y: scroll;
 }
 
 body {
     background: var(--background);
 }
 
-svg {
+svg#main {
     background: var(--background);
+    z-index: -100;
 }
 
 .label {
@@ -117,7 +140,15 @@ svg {
 }
 
 .link.selected {
-    stroke: var(--link-selected) !important;
+    stroke: var(--link-selected-primary) !important;
+}
+
+.link.selected-secondary {
+    stroke: var(--link-selected-secondary) !important;
+}
+
+.link.selected-tertiary {
+    stroke: var(--link-selected-tertiary) !important;
 }
 
 .link.deselected {
@@ -140,7 +171,13 @@ svg {
 }
 
 .node.city.selected {
-    fill: var(--city-selected) !important;
+    fill: var(--city-selected-primary) !important;
+    stroke-width: 10px;
+    stroke: rgba(255, 0, 0, 0.3);
+}
+
+.node.city.selected-secondary {
+    fill: var(--city-selected-secondary) !important;
 }
 
 .node.city.deselected {
@@ -152,7 +189,12 @@ svg {
 }
 
 .node.club.selected {
-    fill: var(--club-selected) !important;
+    fill: var(--club-selected-primary) !important;
+    stroke-width: 10px;
+    stroke: rgba(255, 0, 0, 0.3);
+}
+.node.club.selected-secondary {
+    fill: var(--club-selected-secondary) !important;
 }
 
 .node.club.deselected {
@@ -164,15 +206,17 @@ svg {
 }
 
 .node.performer.selected {
-    fill: var(--performer-selected) !important;
+    fill: var(--performer-selected-primary) !important;
+    stroke-width: 10px;
+    stroke: rgba(255, 0, 0, 0.3);
+}
+
+.node.performer.selected-secondary {
+    fill: var(--performer-selected-secondary) !important;
 }
 
 .node.performer.deselected {
     fill: var(--performer-deselected) !important;
-}
-
-.node.fixed {
-    fill: #f00;
 }
 
 html,
@@ -181,7 +225,7 @@ body {
     padding: 0;
     overflow: hidden;
 }
-svg {
+svg#main {
     position: fixed;
     top: 0;
     bottom: 0;
@@ -189,8 +233,12 @@ svg {
     right: 0;
 }
 
-#settingsHide {
+#settingsToggle {
     cursor: pointer;
+}
+
+#settingsToggle::before {
+    content: "||";
 }
 
 #settingsContainer {
@@ -199,7 +247,7 @@ svg {
 
 #wrapToasters {
     position: absolute;
-    left: 50%;
+    left: calc(50% - 175px);
     top: 0;
     width: 400px;
     padding-top: 1em;
@@ -208,4 +256,30 @@ svg {
 .toast {
     max-width: 300px;
     font-size: 0.675rem !important;
+}
+
+.node.club.selected-tertiary {
+    fill: var(--club-selected-tertiary) !important;
+}
+.node.city.selected-tertiary {
+    fill: var(--city-selected-tertiary) !important;
+}
+.node.performer.selected-tertiary {
+    fill: var(--performer-selected-tertiary) !important;
+}
+
+/* Bar graph */
+
+.bar {
+    fill: steelblue;
+}
+
+#previewData {
+    position: absolute;
+    bottom: 1em;
+    right: 1em;
+    background-color: var(--background-settings);
+    color: var(--text-color);
+    max-width: 500px;
+    overflow: hidden;
 }

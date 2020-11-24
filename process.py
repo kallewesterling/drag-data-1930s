@@ -30,6 +30,8 @@ for row in df.fillna('').itertuples():
         newspapers_search, fulton_search, \
         former_archive, comment = row
 
+    comment = comment.strip()
+
     if not date:
         print(f'no date on row {row_num}')
         continue  # skip ahead
@@ -68,7 +70,8 @@ for row in df.fillna('').itertuples():
                 raise RuntimeError(f"{date} cannot be interpreted")
 
     # clean up source
-    source = source.split("[")[0]
+    source = source.strip()
+    # source = source.split("[")[0]
 
     if performer == "—" or performer == "-":
         performer = None
@@ -420,4 +423,4 @@ json_data['count'] = count
 
 # write file
 Path('./docs/drag-data.json').write_text(json.dumps(json_data))
-Path('../testing-d3-v4/data_drag.json').write_text(json.dumps(json_data))
+# Path('../testing-d3-v4/data_drag.json').write_text(json.dumps(json_data))

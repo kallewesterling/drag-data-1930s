@@ -8,7 +8,7 @@
     </head>
     <body>
         <div id="wrapToasters"></div>
-        <svg width="100%" height="100%" class="border-bottom shadow-sm"></svg>
+        <svg id="main" width="100%" height="100%"></svg>
         <div id="settings" class="shadow border p-2 rounded-lg">
             <div class="p-1" id="settingsToggle" style="height:1em;overflow:hidden; position:absolute;right:0;top:0;clear:both;">*</div>
             <div id="settingsContainer">
@@ -21,17 +21,23 @@
                     <label class="small p-0 m-0" for="minWeight" id="minWeight_label">minWeight</label>
                 </div>
                 <div class="small mb-2 mt-2 pt-2 border-top">
+                    <label class="small p-0 m-0" for="startYear">startYear</label>
+                    <select id="startYear"></select>
+                    <label class="small p-0 m-0" for="startYear">endYear</label>
+                    <select id="endYear"></select>
+                </div>
+                <div class="small mb-2 mt-2 pt-2 border-top">
                     <p class="mb-1"><strong>auto-clear</strong></p>
                     <p class="m-0">
-                        <label class="mr-1 for="autoClearNodes"><input type="checkbox" id="autoClearNodes"> auto-clear unconnected nodes</label>
+                        <label class="mr-1" for="autoClearNodes"><input type="checkbox" id="autoClearNodes"> auto-clear unconnected nodes</label>
                     </p>
                 </div>
                 <div class="small mb-2 mt-2 pt-2 border-top">
                     <p class="mb-1"><strong>force</strong></p>
                     <p class="m-0">
-                        <label class="mr-1 for="layoutCenter"><input type="checkbox" id="layoutCenter"> center</label>
-                        <label class="mr-1 for="layoutForceX"><input type="checkbox" id="layoutForceX"> forceX</label>
-                        <label class="mr-1 for="layoutForceY"><input type="checkbox" id="layoutForceY"> forceY</label>
+                        <label class="mr-1" for="layoutCenter"><input type="checkbox" id="layoutCenter"> center</label>
+                        <label class="mr-1" for="layoutForceX"><input type="checkbox" id="layoutForceX"> forceX</label>
+                        <label class="mr-1" for="layoutForceY"><input type="checkbox" id="layoutForceY"> forceY</label>
                     </p>
                     <p class="m-0">
                         <label class="mr-1" for="layoutCollide"><input type="checkbox" id="layoutCollide"> collide</label>
@@ -49,6 +55,14 @@
                 <!--<div class="mb-1">
                     <div><div id="citySelector"></div><input type="submit" id="cityUpdate" value="Select cities"></div>
                 </div>-->
+
+                <div class="small mb-1 mt-4 pt-4 border-top">
+                    <label class="mr-1" for="stickyNodes"><input type="checkbox" id="stickyNodes"> stickyNodes</label>
+                </div>
+                <div class="small">
+                    <label class="mr-1" for="nodeSizeFromCurrent"><input type="checkbox" id="nodeSizeFromCurrent"> node size from current graph</label>
+                </div>
+
             </div>
         </div>
         <div id="infoContainer" class="small shadow border p-2 rounded-lg">
@@ -62,14 +76,20 @@
             <div class="mb-2">
                 <button type="button" class="btn btn-sm btn-light" id="clearUnconnected" name="clearUnconnected">Clear unconnected nodes</button>
             </div>
+            <div class="mt-4">
+                <a type="button" class="btn btn-outline-success btn-sm" href="https://docs.google.com/spreadsheets/d/1UlpFQ9WWA6_6X-RuMJ3vHdIbyqhCZ1VRYgcQYjXprAg/edit#gid=0" target="_blank">Show entire dataset</a>
+            </div>
         </div>
         <div id="nodeEdgeInfo" class="small shadow border p-2 rounded-lg d-none"></div>
+        <div id="previewData" class="small shadow border p-2 rounded-lg"><svg id="preview"></svg></div>
 
         <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+        <script src="regex.js"></script>
         <script src="settings.js"></script>
         <script src="theme.js"></script>
         <script src="app.js"></script>
+        <script src="previewData.js"></script>
     </body>
 </html>
