@@ -22,6 +22,7 @@ let _autoSettings = {
     zoom: 1.25,
     edgeMinStroke: 1,
     edgeMaxStroke: 7,
+    debugMessages: false,
 };
 
 /// save settings to localStorage
@@ -72,6 +73,7 @@ const getSettings = () => {
     let layoutCollide = d3.select("#layoutCollide").node().checked;
     let layoutCharge = d3.select("#layoutCharge").node().checked;
     let stickyNodes = d3.select("#stickyNodes").node().checked;
+    let debugMessages = d3.select("#debugMessages").node().checked;
 
     if (!startYear) {
         startYear = _autoSettings.edges.startYear;
@@ -105,6 +107,7 @@ const getSettings = () => {
         zoom: _autoSettings.zoom,
         edgeMinStroke: _autoSettings.edgeMinStroke,
         edgeMaxStroke: _autoSettings.edgeMaxStroke,
+        debugMessages: debugMessages,
     };
 };
 
@@ -145,26 +148,24 @@ const setupSettings = () => {
     d3.select("#layoutForceY").node().checked = _settings.force.layoutForceY;
     d3.select("#layoutCharge").node().checked = _settings.force.layoutCharge;
     d3.select("#layoutCollide").node().checked = _settings.force.layoutCollide;
+
+    d3.select("#stickyNodes").node().checked = _settings.nodes.stickyNodes;
+    d3.select("#debugMessages").node().checked = _settings.debugMessages;
 };
 
 /// set up settings
 setupSettings();
 
 d3.select("#minDegree").on("input", () => {
-    updateLabel("minDegree");
-});
-d3.select("#minDegree").on("change", () => {
-    updateLabel("minDegree");
-    filter(); // since it affects the filtering
+    //updateLabel("minDegree");
+    filter();
     saveSettings();
     restart();
     restartLayout();
 });
+
 d3.select("#minWeight").on("input", () => {
-    updateLabel("minWeight");
-});
-d3.select("#minWeight").on("change", () => {
-    updateLabel("minWeight");
+    //updateLabel("minWeight");
     filter(); // since it affects the filtering
     saveSettings();
     restart();
@@ -182,19 +183,19 @@ d3.select("#endYear").on("change", () => {
     restart();
     restartLayout();
 });
+
 d3.select("#charge").on("input", () => {
-    updateLabel("charge");
-});
-d3.select("#charge").on("change", () => {
     // filter();
     restart();
     restartLayout();
     saveSettings();
 });
+/*
 d3.select("#collide").on("input", () => {
     updateLabel("collide");
 });
-d3.select("#collide").on("change", () => {
+*/
+d3.select("#collide").on("input", () => {
     // filter();
     restart();
     restartLayout();
@@ -227,6 +228,9 @@ d3.select("#layoutForceX").on("change", () => {
 d3.select("#layoutForceY").on("change", () => {
     restart();
     restartLayout();
+    saveSettings();
+});
+d3.select("#debugMessages").on("change", () => {
     saveSettings();
 });
 d3.select("#stickyNodes").on("change", () => {

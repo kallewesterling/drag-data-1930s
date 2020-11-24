@@ -3,89 +3,114 @@
     <head>
         <script src="https://d3js.org/d3.v5.min.js"></script>
         <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-CuOF+2SnTUfTwSZjCXf01h7uYhfOBuxIhGKPbfEJ3+FqH/s6cIFN9bGr1HmAg4fQ" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha3/dist/js/bootstrap.min.js" integrity="sha384-t6I8D5dJmMXjCsRLhSzCltuhNZg6P10kE0m0nAncLUjH6GeYLhRU1zfLoW3QNQDF" crossorigin="anonymous"></script>
         <link rel="stylesheet" href="style.css">
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     </head>
     <body>
         <div id="wrapToasters"></div>
         <svg id="main" width="100%" height="100%"></svg>
-        <div id="settings" class="shadow border p-2 rounded-lg">
-            <div class="p-1" id="settingsToggle" style="height:1em;overflow:hidden; position:absolute;right:0;top:0;clear:both;">*</div>
-            <div id="settingsContainer">
-                <div class="mb-1" style="padding-top:1em;">
-                    <input class="p-0 m-0" type="range" id="minDegree" name="minDegree" min="1" max="40" value="1" step="1">
-                    <label class="small p-0 m-0" for="minDegree" id="minDegree_label">minDegree</label>
-                </div>
-                <div class="mb-1">
-                    <input class="p-0 m-0" type="range" id="minWeight" name="minWeight" min="0" max="40" value="1" step="1">
-                    <label class="small p-0 m-0" for="minWeight" id="minWeight_label">minWeight</label>
-                </div>
-                <div class="small mb-2 mt-2 pt-2 border-top">
-                    <label class="small p-0 m-0" for="startYear">startYear</label>
-                    <select id="startYear"></select>
-                    <label class="small p-0 m-0" for="startYear">endYear</label>
-                    <select id="endYear"></select>
-                </div>
-                <div class="small mb-2 mt-2 pt-2 border-top">
-                    <p class="mb-1"><strong>auto-clear</strong></p>
-                    <p class="m-0">
-                        <label class="mr-1" for="autoClearNodes"><input type="checkbox" id="autoClearNodes"> auto-clear unconnected nodes</label>
-                    </p>
-                </div>
-                <div class="small mb-2 mt-2 pt-2 border-top">
-                    <p class="mb-1"><strong>force</strong></p>
-                    <p class="m-0">
-                        <label class="mr-1" for="layoutCenter"><input type="checkbox" id="layoutCenter"> center</label>
-                        <label class="mr-1" for="layoutForceX"><input type="checkbox" id="layoutForceX"> forceX</label>
-                        <label class="mr-1" for="layoutForceY"><input type="checkbox" id="layoutForceY"> forceY</label>
-                    </p>
-                    <p class="m-0">
-                        <label class="mr-1" for="layoutCollide"><input type="checkbox" id="layoutCollide"> collide</label>
-                        <label class="mr-1" for="layoutCharge"><input type="checkbox" id="layoutCharge"> charge</label>
-                    </p>
-                </div>
-                <div class="mb-1" id="chargeContainer"><!-- mb-2 if element below -->
-                    <input class="p-0 m-0" type="range" id="charge" name="charge" min="1" max="40" value="1" step="1">
-                    <label class="small p-0 m-0" for="charge" id="charge_label">charge</label>
-                </div>
-                <div class="mb-1" id="collideContainer"><!-- mb-2 if element below -->
-                    <input class="p-0 m-0" type="range" id="collide" name="collide" min="1" max="40" value="1" step="1">
-                    <label class="small p-0 m-0" for="collide" id="collide_label">collide</label>
-                </div>
-                <!--<div class="mb-1">
-                    <div><div id="citySelector"></div><input type="submit" id="cityUpdate" value="Select cities"></div>
-                </div>-->
-
-                <div class="small mb-1 mt-4 pt-4 border-top">
-                    <label class="mr-1" for="stickyNodes"><input type="checkbox" id="stickyNodes"> stickyNodes</label>
-                </div>
-                <div class="small">
-                    <label class="mr-1" for="nodeSizeFromCurrent"><input type="checkbox" id="nodeSizeFromCurrent"> node size from current graph</label>
-                </div>
-
+        <div id="settings" class="small card shadow border rounded-lg">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                Settings <button id="settingsToggle" type="button" class="btn-close" aria-label="Close"></button>
             </div>
+            <ul id="settingsContainer" class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <div class="mb-2">
+                        <p class="small text-muted p-0 m-0"><strong>Node settings</strong></p>
+                    </div>
+                    <div class="mb-2">
+                        <input class="p-0 m-0" type="range" id="minDegree" name="minDegree" min="1" max="40" value="1" step="1">
+                        <label class="small p-0 m-0" for="minDegree" id="minDegree_label">minDegree</label>
+                    </div>
+                    <div class="mb-2">
+                        <input class="p-0 m-0" type="range" id="minWeight" name="minWeight" min="0" max="40" value="1" step="1">
+                        <label class="small p-0 m-0" for="minWeight" id="minWeight_label">minWeight</label>
+                    </div>
+                    <div class="mb-2">
+                        <label class="small p-0 m-0" for="startYear">startYear</label>
+                        <select id="startYear"></select>
+                        <label class="small p-0 m-0" for="startYear">endYear</label>
+                        <select id="endYear"></select>
+                    </div>
+                    <div class="mb-2">
+                        <p class="mb-1"><strong>auto-clear</strong></p>
+                        <p class="m-0">
+                            <label class="mr-1" for="autoClearNodes"><input type="checkbox" id="autoClearNodes"> auto-clear unconnected nodes</label>
+                        </p>
+                    </div>
+                </li>
+
+                <li class="list-group-item">
+                    <div class="mb-2">
+                        <p class="small text-muted p-0 m-0"><strong>Force settings</strong></p>
+                    </div>
+                    <div class="mb-2">
+                        <p class="m-0">
+                            <label class="mr-1" for="layoutCenter"><input type="checkbox" id="layoutCenter"> center</label>
+                            <label class="mr-1" for="layoutForceX"><input type="checkbox" id="layoutForceX"> forceX</label>
+                            <label class="mr-1" for="layoutForceY"><input type="checkbox" id="layoutForceY"> forceY</label>
+                        </p>
+                        <p class="m-0">
+                            <label class="mr-1" for="layoutCollide"><input type="checkbox" id="layoutCollide"> collide</label>
+                            <label class="mr-1" for="layoutCharge"><input type="checkbox" id="layoutCharge"> charge</label>
+                        </p>
+                    </div>
+                    <div class="mb-2" id="chargeContainer">
+                        <input class="p-0 m-0" type="range" id="charge" name="charge" min="1" max="40" value="1" step="1">
+                        <label class="small p-0 m-0" for="charge" id="charge_label">charge</label>
+                    </div>
+                    <div class="mb-2" id="collideContainer">
+                        <input class="p-0 m-0" type="range" id="collide" name="collide" min="1" max="40" value="1" step="1">
+                        <label class="small p-0 m-0" for="collide" id="collide_label">collide</label>
+                    </div>
+                </li>
+
+                <li class="list-group-item">
+                    <div class="mb-2">
+                        <p class="small text-muted p-0 m-0"><strong>Node behavior</strong></p>
+                    </div>
+                    <div class="mb-2">
+                        <label class="mr-1" for="stickyNodes"><input type="checkbox" id="stickyNodes"> stickyNodes</label>
+                    </div>
+                    <div class="mb-2">
+                        <label class="mr-1" for="nodeSizeFromCurrent"><input type="checkbox" id="nodeSizeFromCurrent"> node size from current graph</label>
+                    </div>
+                </li>
+
+                <li class="list-group-item">
+                    <div class="mb-2">
+                        <p class="small text-muted p-0 m-0"><strong>Debug</strong></p>
+                    </div>
+                    <div class="mb-2">
+                        <label class="mr-1" for="debugMessages"><input type="checkbox" id="debugMessages"> debugMessages</label>
+                    </div>
+                </li>
+            </ul>
         </div>
-        <div id="infoContainer" class="small shadow border p-2 rounded-lg">
-            <div id="info" class="mb-2 pb-2"></div>
-            <div class="mb-2">
+        <div id="infoContainer" class="card shadow border rounded-lg small">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                Info/Quick Access <button id="settingsToggle" type="button" class="btn-close" aria-label="Close"></button>
+            </div>
+            <div id="info" class="p-3"></div>
+            <div class="pt-3 border-top p-3 text-center">
                 <button type="button" class="btn btn-sm btn-light" id="switchMode" name="switchMode">Switch mode</button>
             </div>
-            <div class="mb-2">
+            <div class="p-1 text-center">
                 <button type="button" class="btn btn-sm btn-light" id="resetLocalStorage" name="resetLocalStorage">Reset saved settings</button>
             </div>
-            <div class="mb-2">
+            <div class="p-1 text-center">
                 <button type="button" class="btn btn-sm btn-light" id="clearUnconnected" name="clearUnconnected">Clear unconnected nodes</button>
             </div>
-            <div class="mt-4">
+            <div class="p-1 pb-3 text-center">
                 <a type="button" class="btn btn-outline-success btn-sm" href="https://docs.google.com/spreadsheets/d/1UlpFQ9WWA6_6X-RuMJ3vHdIbyqhCZ1VRYgcQYjXprAg/edit#gid=0" target="_blank">Show entire dataset</a>
             </div>
         </div>
-        <div id="nodeEdgeInfo" class="small shadow border p-2 rounded-lg d-none"></div>
-        <div id="previewData" class="small shadow border p-2 rounded-lg"><svg id="preview"></svg></div>
+        <div id="nodeEdgeInfo" class="small shadow border p-3 rounded-lg d-none"></div>
+        <div id="previewData" class="small shadow border p-3 rounded-lg"><svg id="preview"></svg></div>
 
         <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
         <script src="regex.js"></script>
         <script src="settings.js"></script>
         <script src="theme.js"></script>
