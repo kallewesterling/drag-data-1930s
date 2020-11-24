@@ -114,17 +114,27 @@ d3.json(DATAFILE).then((data) => {
     let min_year = Math.min.apply(
         Math,
         store.edges.map(function (o) {
-            return +o.range.start.substring(0, 4);
+            if (o.range.start) {
+                return +o.range.start.substring(0, 4);
+            } else {
+                return 1900;
+            }
         })
     );
     let max_year = Math.max.apply(
         Math,
         store.edges.map(function (o) {
-            return +o.range.end.substring(0, 4);
+            if (o.range.end) {
+                return +o.range.end.substring(0, 4);
+            } else {
+                return 1900;
+            }
         })
     );
 
     yearRange = range(min_year, max_year, 1);
+
+    console.log(yearRange);
 
     let preloadedSettings = loadSettings("settings");
     if (!preloadedSettings) preloadedSettings = _autoSettings;
@@ -222,12 +232,14 @@ const filter = () => {
                 }
             });
         } else if (
+            e.range.start &&
             +e.range.start.substring(0, 4) <= settings.edges.startYear &&
             !e.inGraph
         ) {
             // edge is earlier than startYear and not inGraph so leave it out"
             e.inGraph = false;
         } else if (
+            e.range.start &&
             +e.range.start.substring(0, 4) <= settings.edges.startYear &&
             e.inGraph
         ) {
@@ -239,12 +251,14 @@ const filter = () => {
                 }
             });
         } else if (
+            e.range.end &&
             +e.range.end.substring(0, 4) >= settings.edges.endYear &&
             !e.inGraph
         ) {
             // range end is higher than endYear and not inGraph so leave it out
             e.inGraph = false;
         } else if (
+            e.range.end &&
             +e.range.end.substring(0, 4) >= settings.edges.endYear &&
             e.inGraph
         ) {

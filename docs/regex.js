@@ -28,7 +28,7 @@ const fixMonth = (month_string) => {
 
 let regeExes = [
     {
-        map: "YYYY-MM-DD", // matches 1934-10-26
+        map: "YYYY\\-MM\\-DD", // matches 1934-10-26
         locations: {
             full: 0,
             Y: 1,
@@ -58,7 +58,7 @@ let regeExes = [
     },
     {
         // 10-09-40
-        map: "DD-MM-YY",
+        map: "DD\\-MM\\-YY",
         locations: {
             full: 0,
             Y: 3,
@@ -78,7 +78,7 @@ let regeExes = [
     },
     {
         // starr-jackie-11-14-37
-        map: "MM-DD-YY",
+        map: "MM\\-DD\\-YY",
         locations: {
             full: 0,
             Y: 3,
@@ -88,7 +88,7 @@ let regeExes = [
     },
     {
         // 30-12-17
-        map: "YY-MM-DD",
+        map: "YY\\-MM\\-DD",
         locations: {
             full: 0,
             Y: 1,
@@ -107,6 +107,16 @@ let regeExes = [
         },
     },
     {
+        // 5-11-26
+        map: "Dnozero\\-Mnozero\\-YY",
+        locations: {
+            full: 0,
+            Y: 3,
+            M: 2,
+            D: 1,
+        },
+    },
+    {
         // 1940
         map: "YYYY",
         locations: {
@@ -119,9 +129,11 @@ let regeExes = [
 ];
 
 let day_regex = "(0[1-9]|[1-2][0-9]|3[0-1])";
+let day_D_regex = "([1-9]|[1-2][0-9]|3[0-1])";
 let month_MMM_regex =
     "(January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)";
 let month_MM_regex = "(0[1-9]|1[0-2])";
+let month_M_regex = "([1-9]|1[0-2])";
 let year_YYYY_regex = "(1[0-9][0-9][0-9])"; // since we are only looking for 1900s
 let year_YY_regex = "([0-9]{2})"; // since we are only looking for 1900s
 
@@ -137,7 +149,9 @@ const dateParser = (test_string) => {
                         .replace("YYYY", year_YYYY_regex)
                         .replace("MMM", month_MMM_regex)
                         .replace("MM", month_MM_regex)
+                        .replace("Mnozero", month_M_regex)
                         .replace("DD", day_regex)
+                        .replace("Dnozero", day_D_regex)
                         .replace("YY", year_YY_regex)
                 );
                 date = test_string.match(dynamic_rx);
