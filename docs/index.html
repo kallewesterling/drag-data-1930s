@@ -91,28 +91,30 @@
         </div>
         <div id="infoContainer" class="card shadow border rounded-lg small">
             <div class="card-header d-flex justify-content-between align-items-center">
-                Info/Quick Access <button id="settingsToggle" type="button" class="btn-close" aria-label="Close"></button>
+                Info/Quick Access <button id="infoToggle" type="button" class="btn-close" aria-label="Close"></button>
             </div>
-            <div id="info" class="p-3"></div>
-            <div class="pt-3 border-top p-3 text-center">
-                <button type="button" class="btn btn-sm btn-light" id="switchMode" name="switchMode">Switch mode</button>
-            </div>
-            <div class="p-1 text-center">
-                <button type="button" class="btn btn-sm btn-light" id="resetLocalStorage" name="resetLocalStorage">Reset saved settings</button>
-            </div>
-            <div class="p-1 text-center">
-                <button type="button" class="btn btn-sm btn-light" id="clearUnconnected" name="clearUnconnected">Clear unconnected nodes</button>
-            </div>
-            <div class="p-1 pb-3 text-center">
-                <a type="button" class="btn btn-outline-success btn-sm" href="https://docs.google.com/spreadsheets/d/1UlpFQ9WWA6_6X-RuMJ3vHdIbyqhCZ1VRYgcQYjXprAg/edit#gid=0" target="_blank">Show entire dataset</a>
+            <div id="infoToggleDiv">
+                <div id="info" class="p-3"></div>
+                <div class="pt-3 border-top p-3 text-center">
+                    <button type="button" class="btn btn-sm btn-light" id="switchMode" name="switchMode">Switch mode</button>
+                </div>
+                <div class="p-1 text-center">
+                    <button type="button" class="btn btn-sm btn-light" id="resetLocalStorage" name="resetLocalStorage">Reset saved settings</button>
+                </div>
+                <div class="p-1 text-center">
+                    <button type="button" class="btn btn-sm btn-light" id="clearUnconnected" name="clearUnconnected">Clear unconnected nodes</button>
+                </div>
+                <div class="p-1 pb-3 text-center">
+                    <a type="button" class="btn btn-outline-success btn-sm" href="https://docs.google.com/spreadsheets/d/1UlpFQ9WWA6_6X-RuMJ3vHdIbyqhCZ1VRYgcQYjXprAg/edit#gid=0" target="_blank">Show entire dataset</a>
+                </div>
             </div>
         </div>
         <div id="nodeEdgeInfo" class="small shadow border p-3 rounded-lg d-none"></div>
         <div id="previewData" class="small shadow border p-3 rounded-lg"><svg id="preview"></svg></div>
 
         <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-        <script src="regex.js"></script>
         <script src="settings.js"></script>
+        <script src="regex.js"></script>
         <script src="theme.js"></script>
         <script src="app.js"></script>
         <script src="previewData.js"></script>

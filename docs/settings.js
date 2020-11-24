@@ -272,6 +272,10 @@ d3.select("#settingsToggle").on("click", () => {
     toggle("#settingsContainer");
 });
 
+d3.select("#infoToggle").on("click", () => {
+    toggle("#infoToggleDiv");
+});
+
 d3.select("svg").on("click", () => {
     d3.select("#nodeEdgeInfo").classed("d-none", true);
     deselectNodes();
@@ -282,15 +286,27 @@ d3.select("svg").on("click", () => {
 d3.select("html")
     .node()
     .addEventListener("keydown", (e) => {
-        console.log(e);
+        // console.log(e);
         _ = isVisible("#nodeEdgeInfo");
         if (e.key === "Escape" && _) {
             toggle("#nodeEdgeInfo");
             deselectNodes();
             resetNodesAndEdges();
         } else if (e.key === "Escape" || e.key === " ") {
-            toggle("#settingsContainer");
-            toggle("#infoContainer");
+            if (
+                isVisible("#settingsContainer") &&
+                !isVisible("#infoToggleDiv")
+            ) {
+                toggle("#settingsContainer");
+            } else if (
+                !isVisible("#settingsContainer") &&
+                isVisible("#infoToggleDiv")
+            ) {
+                toggle("#infoToggleDiv");
+            } else {
+                toggle("#settingsContainer");
+                toggle("#infoToggleDiv");
+            }
         }
     });
 

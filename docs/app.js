@@ -7,7 +7,8 @@ TODO:
 - make graph not so circular...
 - filter on other things, like city (see `store.count`)
 */
-console.log("Running d3js v5.");
+// console.log("Running d3js v5.");
+
 let DATAFILE = "drag-data.json";
 let AUTO_ZOOM = 1.25; // TODO: This will not work
 
@@ -684,7 +685,8 @@ const troubleshoot = (fix = false) => {
 let toasterCounter = 1;
 const debugMessage = (message, header) => {
     if (getSettings().debugMessages === false) {
-        console.log("[debugMessage: " + header + "] " + message);
+        // console.log("[debugMessage: " + header + "] " + message);
+        console.log("debugMessage suppressed.");
         return false;
     }
     if (!header) {
@@ -716,6 +718,8 @@ const toggle = (selector) => {
     // special rules
     if (selector === "#settingsContainer") {
         d3.select("#settingsToggle").classed("toggled", !isVisible(selector));
+    } else if (selector === "#infoToggleDiv") {
+        d3.select("#infoToggle").classed("toggled", !isVisible(selector));
     }
 };
 
@@ -920,7 +924,7 @@ const getRelated = (node) => {
         secondaryEdges: secondaryEdges,
         tertiaryEdges: tertiaryEdges,
     };
-    console.log(returnValue);
+    // console.log(returnValue);
     return returnValue;
 };
 
@@ -936,7 +940,7 @@ const unselectNodes = (excludeNode) => {
             return true;
         }
     });
-    console.log(related);
+    // console.log(related);
     related.secondaryNodeIDs.forEach((node_id) => {
         let elem = d3.select(`#${node_id}`);
         elem.classed("selected-secondary", true);
@@ -997,7 +1001,3 @@ const selectEdge = (edge) => {
         setNodeEdgeInfo(edge);
     }
 };
-
-window.setInterval(() => {
-    console.log("clearing out messages...");
-}, 60000);
