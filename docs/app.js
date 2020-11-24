@@ -135,7 +135,7 @@ d3.json(DATAFILE).then((data) => {
 
     yearRange = range(min_year, max_year, 1);
 
-    console.log(yearRange);
+    // console.log(yearRange);
 
     let preloadedSettings = loadSettings("settings");
     if (!preloadedSettings) preloadedSettings = _autoSettings;

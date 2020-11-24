@@ -28,7 +28,11 @@ for row in df.fillna('').itertuples():
         unsure_drag, legal_name, alleged_age, \
         assumed_birth_year, source, eima, \
         newspapers_search, fulton_search, \
-        former_archive, comment = row
+        former_archive, comment, exclude = row
+
+    if exclude:
+        print(exclude)
+        continue  # skip ahead
 
     comment = comment.strip()
 
