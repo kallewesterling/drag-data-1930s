@@ -31,14 +31,14 @@ for row in df.fillna('').itertuples():
         former_archive, comment, exclude = row
 
     if exclude:
-        print(exclude)
+        print(f'skipping {row_num}: manually requested')
+        continue  # skip ahead
+
+    if not date:
+        print(f'skipping {row_num}: no date')
         continue  # skip ahead
 
     comment = comment.strip()
-
-    if not date:
-        print(f'no date on row {row_num}')
-        continue  # skip ahead
 
     if not city and _city:
         city = _city  # revert to city if there is no normalized city
