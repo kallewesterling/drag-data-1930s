@@ -2,8 +2,6 @@
 
 /*
 TODO:
-- add colors / sizes / etc
-- add text labels
 - make graph not so circular...
 - filter on other things, like city (see `store.count`)
 */
@@ -48,6 +46,7 @@ g.nodes = g.plot.append("g").attr("id", "nodes");
 const transformToWindow = () => {
     let windowWidth = window.innerWidth,
         windowHeight = window.innerHeight;
+    /*
     g.nodes.attr(
         "transform",
         `translate(${windowWidth / 2}, ${windowHeight / 2})`
@@ -56,6 +55,11 @@ const transformToWindow = () => {
         "transform",
         `translate(${windowWidth / 2}, ${windowHeight / 2})`
     ); // shifts plot so 0,0 is at center
+    */
+    g.plot.attr(
+        "transform",
+        `translate(${windowWidth / 2}, ${windowHeight / 2})`
+    );
 };
 d3.select(window).on("resize", transformToWindow);
 
@@ -533,13 +537,20 @@ const drag = d3
 let zoomed = () => {
     k = Math.round(d3.event.transform.k * 10) / 10;
     saveSettings();
-    g.plot.attr("transform", d3.event.transform);
+    let windowWidth = window.innerWidth,
+        windowHeight = window.innerHeight;
+    let xValue = windowWidth / 2 + d3.event.transform.x;
+    let yValue = windowHeight / 2 + d3.event.transform.y;
+    g.plot.attr(
+        "transform",
+        `translate(${xValue}, ${yValue}) scale(${d3.event.transform.k})`
+    );
     updateInfo();
 };
 
 const zoom = d3.zoom().scaleExtent([0.25, 7]).on("zoom", zoomed);
 
-svg.call(zoom);
+g.plot.call(zoom);
 
 const nodeHasEdges = (node_id, count = false) => {
     // console.log("searching for edges for" + node_id);
