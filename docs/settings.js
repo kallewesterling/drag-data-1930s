@@ -395,35 +395,74 @@ const UIToggleAllSettingBoxes = () => {
 d3.select("svg").on("click", () => {
     resetDraw();
 });
+
 let keyMapping = {
-    U: [
-        'changeSetting({selector: "#autoClearNodes", setTo: !getSettings().nodes.autoClearNodes})',
-    ],
-    S: [
-        'changeSetting({selector: "#stickyNodes", setTo: !getSettings().nodes.stickyNodes})',
-    ],
-    ArrowRight: [
-        'changeSetting({selector: "#minDegree", type: "slider", setTo: getSettings().nodes.minDegree+1})',
-    ],
-    ArrowLeft: [
-        'changeSetting({selector: "#minDegree", type: "slider", setTo: getSettings().nodes.minDegree-1})',
-    ],
+    U: {
+        noMeta:
+            'changeSetting({selector: "#autoClearNodes", setTo: !getSettings().nodes.autoClearNodes})',
+    },
+    S: {
+        noMeta:
+            'changeSetting({selector: "#stickyNodes", setTo: !getSettings().nodes.stickyNodes})',
+    },
+    ArrowRight: {
+        noMeta:
+            'changeSetting({selector: "#minDegree", type: "slider", setTo: getSettings().nodes.minDegree+1})',
+        shiftKey:
+            'changeSetting({selector: "#minWeight", type: "slider", setTo: getSettings().edges.minWeight+1})',
+    },
+    ArrowLeft: {
+        noMeta:
+            'changeSetting({selector: "#minDegree", type: "slider", setTo: getSettings().nodes.minDegree-1})',
+        shiftKey:
+            'changeSetting({selector: "#minWeight", type: "slider", setTo: getSettings().edges.minWeight-1})',
+    },
 };
 d3.select("html")
     .node()
+    .addEventListener("keyup", (e) => {
+        if (e.key === "Meta") {
+            d3.selectAll(".metaShow").classed("d-none", true);
+        }
+    });
+d3.select("html")
+    .node()
     .addEventListener("keydown", (e) => {
-        // console.log(e);
+        console.log(e);
         _ = isVisible("#nodeEdgeInfo");
+        if (e.key === "Meta") {
+            d3.selectAll(".metaShow").classed("d-none", false);
+        }
         if (e.key === "Escape" && _) {
+            console.log("Escape 1 called!");
             resetDraw();
         } else if (e.key === "Escape" || e.key === " ") {
+            console.log("Escape 2 called!");
             UIToggleAllSettingBoxes();
         } else if (e.key === "c" && e.metaKey) {
-            dropNodesWithNoEdges();
+            console.log("command+c called");
+            changeSetting(
+                "#autoClearNodes",
+                !getSettings().nodes.autoClearNodes,
+                true
+            );
         }
         Object.keys(keyMapping).forEach((key) => {
-            if (key === e.key) {
-                Function(keyMapping[key])();
+            if (
+                key === e.key &&
+                keyMapping[key].noMeta &&
+                e.shiftKey == false &&
+                e.metaKey == false &&
+                e.altKey == false &&
+                e.ctrlKey == false
+            ) {
+                Function(keyMapping[key].noMeta)();
+            } else if (
+                key === e.key &&
+                keyMapping[key].shiftKey &&
+                e.shiftKey == true
+            ) {
+                Function(keyMapping[key].shiftKey)();
             }
         });
     });
