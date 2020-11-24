@@ -9,6 +9,7 @@ let _autoSettings = {
         minWeight: 0,
         startYear: 1920,
         endYear: 1940,
+        weightFromCurrent: false,
     },
     force: {
         charge: -320,
@@ -25,10 +26,24 @@ let _autoSettings = {
     debugMessages: false,
 };
 
+const updateLabel = (name) => {
+    // console.log(`updating label ${name}`);
+    [
+        ["layoutCharge", "charge", "charge_label"],
+        ["layoutCollide", "collide", "collide_label"],
+    ].forEach((d) => {
+        let disable = d3.select(`#${d[0]}`).node().checked === false;
+        d3.select(`#${d[1]}`).node().disabled = disable;
+        d3.select(`#${d[2]}`).classed("text-muted", disable);
+    });
+    let value = d3.select("#" + name).node().value;
+    d3.select("#" + name + "_label").html(name + ` (${value})`);
+};
+
 /// save settings to localStorage
 const saveSettings = () => {
     // save zoom event transform
-    if (d3.event.transform) {
+    if (d3.event && d3.event.transform) {
         localStorage.setItem("transform", JSON.stringify(d3.event.transform));
     }
     // console.log("save settings called...");
@@ -67,6 +82,7 @@ const getSettings = () => {
     let endYear = +d3.select("#endYear").node().value;
     let autoClearNodes = d3.select("#autoClearNodes").node().checked;
     let nodeSizeFromCurrent = d3.select("#nodeSizeFromCurrent").node().checked;
+    let weightFromCurrent = d3.select("#weightFromCurrent").node().checked;
     let layoutCenter = d3.select("#layoutCenter").node().checked;
     let layoutForceX = d3.select("#layoutForceX").node().checked;
     let layoutForceY = d3.select("#layoutForceY").node().checked;
@@ -94,7 +110,12 @@ const getSettings = () => {
             stickyNodes: stickyNodes,
             nodeSizeFromCurrent: nodeSizeFromCurrent,
         },
-        edges: { minWeight: minWeight, startYear: startYear, endYear: endYear },
+        edges: {
+            minWeight: minWeight,
+            startYear: startYear,
+            endYear: endYear,
+            weightFromCurrent: weightFromCurrent,
+        },
         force: {
             layoutCenter: layoutCenter,
             layoutForceX: layoutForceX,
@@ -129,6 +150,10 @@ const setupSettings = () => {
     d3.select("#collide").node().step = 0.1;
 
     // set range for minWeight
+    d3.select("#minDegree").node().min = 0;
+    d3.select("#minDegree").node().step = 1;
+
+    // set range for minWeight
     d3.select("#minWeight").node().min = 0;
     d3.select("#minWeight").node().step = 1;
 
@@ -141,6 +166,8 @@ const setupSettings = () => {
         _settings.nodes.autoClearNodes;
     d3.select("#nodeSizeFromCurrent").node().checked =
         _settings.nodes.nodeSizeFromCurrent;
+    d3.select("#weightFromCurrent").node().checked =
+        _settings.edges.weightFromCurrent;
     d3.select("#charge").node().value = _settings.force.charge;
     d3.select("#collide").node().value = _settings.force.collide;
     d3.select("#layoutCenter").node().checked = _settings.force.layoutCenter;
@@ -156,6 +183,21 @@ const setupSettings = () => {
 /// set up settings
 setupSettings();
 
+// dropdowns
+d3.select("#startYear").on("change", () => {
+    filter(); // since it affects the filtering
+    saveSettings();
+    restart();
+    restartLayout();
+});
+d3.select("#endYear").on("change", () => {
+    filter(); // since it affects the filtering
+    saveSettings();
+    restart();
+    restartLayout();
+});
+
+// sliders
 d3.select("#minDegree").on("input", () => {
     //updateLabel("minDegree");
     filter();
@@ -171,18 +213,6 @@ d3.select("#minWeight").on("input", () => {
     restart();
     restartLayout();
 });
-d3.select("#startYear").on("change", () => {
-    filter(); // since it affects the filtering
-    saveSettings();
-    restart();
-    restartLayout();
-});
-d3.select("#endYear").on("change", () => {
-    filter(); // since it affects the filtering
-    saveSettings();
-    restart();
-    restartLayout();
-});
 
 d3.select("#charge").on("input", () => {
     // filter();
@@ -190,73 +220,125 @@ d3.select("#charge").on("input", () => {
     restartLayout();
     saveSettings();
 });
-/*
-d3.select("#collide").on("input", () => {
-    updateLabel("collide");
-});
-*/
 d3.select("#collide").on("input", () => {
     // filter();
     restart();
     restartLayout();
     saveSettings();
 });
+
+const changeSetting = (
+    selector,
+    setTo,
+    _filter = true,
+    type = "checkbox",
+    additionalPreFunctions = [],
+    additionalPostFunctions = []
+) => {
+    if (typeof selector === "object") {
+        setTo = selector.setTo;
+        // console.log(selector.setTo, setTo);
+        _filter = selector._filter ? selector._filter : true;
+        type = selector.type ? selector.type : "checkbox";
+        additionalPreFunctions = selector.additionalPreFunctions
+            ? selector.additionalPreFunctions
+            : [];
+        additionalPostFunctions = selector.additionalPostFunctions
+            ? selector.additionalPostFunctions
+            : [];
+        selector = selector.selector;
+        /*
+        console.log(
+            selector,
+            setTo,
+            _filter,
+            type,
+            additionalPreFunctions,
+            additionalPostFunctions
+        );
+        */
+    }
+    let force = false;
+    if (setTo === "force") {
+        //console.log("force on: " + setTo);
+        force = true;
+        if (type === "checkbox") {
+            setTo = d3.select(selector).node().checked;
+        } else if (type === "slider") {
+            setTo = d3.select(selector).node().value;
+        }
+    }
+    if (
+        force ||
+        (type === "checkbox" && d3.select(selector).node().checked != setTo) ||
+        (type === "slider" && d3.select(selector).node().value != setTo)
+    ) {
+        if (type === "checkbox") {
+            d3.select(selector).node().checked = setTo;
+        } else if (type === "slider") {
+            let maxValue = +d3.select(selector).node().max;
+            let minValue = +d3.select(selector).node().min;
+            if (setTo >= maxValue) {
+                setTo = maxValue;
+                /*console.log(
+                    `${selector}'s setTo (${setTo}) is LARGER than maxValue (${maxValue})`
+                );*/
+            } else if (setTo <= minValue) {
+                setTo = minValue;
+                /*console.log(
+                    `${selector}'s setTo (${setTo}) is SMALLER than minValue (${minValue})`
+                );*/
+            }
+            d3.select(selector).node().value = setTo;
+            updateLabel(selector.slice(1));
+        }
+        additionalPreFunctions.forEach((func) => {
+            Function(func)();
+        });
+        if (_filter === true) filter();
+        restart();
+        restartLayout();
+        saveSettings();
+        additionalPostFunctions.forEach((func) => {
+            runFunction(func)();
+        });
+    } else {
+        // console.log("already correctly set.");
+    }
+};
 d3.select("#autoClearNodes").on("change", () => {
-    filter();
-    restart();
-    restartLayout();
-    saveSettings();
+    changeSetting("#autoClearNodes", "force", true);
+});
+d3.select("#weightFromCurrent").on("change", () => {
+    changeSetting("#weightFromCurrent", "force", true);
 });
 d3.select("#nodeSizeFromCurrent").on("change", () => {
-    filter();
-    restart();
-    restartLayout();
-    saveSettings();
+    changeSetting("#nodeSizeFromCurrent", "force", true);
 });
 d3.select("#layoutCenter").on("change", () => {
-    // console.log("center");
-    restart();
-    restartLayout();
-    saveSettings();
+    changeSetting("#layoutCenter", "force", false);
 });
 d3.select("#layoutForceX").on("change", () => {
-    // console.log("forceX");
-    restart();
-    restartLayout();
-    saveSettings();
+    changeSetting("#layoutForceX", "force", false);
 });
 d3.select("#layoutForceY").on("change", () => {
-    restart();
-    restartLayout();
-    saveSettings();
+    changeSetting("#layoutForceY", "force", false);
 });
 d3.select("#debugMessages").on("change", () => {
     saveSettings();
 });
 d3.select("#stickyNodes").on("change", () => {
-    if (!getSettings().nodes.stickyNodes) {
-        g.nodes.selectAll("circle.node").classed("selected", (node) => {
-            node.fx = null;
-            return false;
-        });
-    }
-    restart();
-    restartLayout();
-    saveSettings();
+    changeSetting("#stickyNodes", "force", false, "checkbox", ["resetDraw()"]);
 });
 d3.select("#layoutCollide").on("change", () => {
-    // console.log("collide");
-    updateLabel("collide");
-    restart();
-    restartLayout();
-    saveSettings();
+    changeSetting("#layoutCollide", "force", false, "checkbox", [
+        'updateLabel("collide")',
+    ]);
 });
 d3.select("#layoutCharge").on("change", () => {
-    // console.log("charge");
-    updateLabel("charge");
-    restart();
-    restartLayout();
-    saveSettings();
+    changeSetting("#layoutCharge", "force", false, "checkbox", [
+        'updateLabel("charge")',
+    ]);
 });
 d3.select("#switchMode").on("click", function (d) {
     toggleTheme();
@@ -267,6 +349,19 @@ d3.select("#resetLocalStorage").on("click", function (d) {
 d3.select("#clearUnconnected").on("click", function (d) {
     dropNodesWithNoEdges();
 });
+d3.select("#showAllPotentialNodes").on("click", function (d) {
+    // console.log("show all potential nodes...");
+    d3.select("#startYear").node().value = Math.min.apply(
+        Math,
+        [...d3.select("#startYear").node().options].map((d) => d.value)
+    );
+    d3.select("#endYear").node().value = Math.max.apply(
+        Math,
+        [...d3.select("#endYear").node().options].map((d) => d.value)
+    );
+    changeSetting({ selector: "#autoClearNodes", setTo: false });
+    d3.select("#minWeight").node().value = 0;
+});
 
 d3.select("#settingsToggle").on("click", () => {
     toggle("#settingsContainer");
@@ -276,38 +371,61 @@ d3.select("#infoToggle").on("click", () => {
     toggle("#infoToggleDiv");
 });
 
-d3.select("svg").on("click", () => {
+const resetDraw = () => {
+    // console.log("resetDraw called");
     d3.select("#nodeEdgeInfo").classed("d-none", true);
     deselectNodes();
     resetNodesAndEdges();
-});
+};
 
-// d3 does not have support for esc in their listener, so adding ES6 here
+const UIToggleAllSettingBoxes = () => {
+    if (isVisible("#settingsContainer") && !isVisible("#infoToggleDiv")) {
+        toggle("#settingsContainer");
+    } else if (
+        !isVisible("#settingsContainer") &&
+        isVisible("#infoToggleDiv")
+    ) {
+        toggle("#infoToggleDiv");
+    } else {
+        toggle("#settingsContainer");
+        toggle("#infoToggleDiv");
+    }
+};
+
+d3.select("svg").on("click", () => {
+    resetDraw();
+});
+let keyMapping = {
+    U: [
+        'changeSetting({selector: "#autoClearNodes", setTo: !getSettings().nodes.autoClearNodes})',
+    ],
+    S: [
+        'changeSetting({selector: "#stickyNodes", setTo: !getSettings().nodes.stickyNodes})',
+    ],
+    ArrowRight: [
+        'changeSetting({selector: "#minDegree", type: "slider", setTo: getSettings().nodes.minDegree+1})',
+    ],
+    ArrowLeft: [
+        'changeSetting({selector: "#minDegree", type: "slider", setTo: getSettings().nodes.minDegree-1})',
+    ],
+};
 d3.select("html")
     .node()
     .addEventListener("keydown", (e) => {
         // console.log(e);
         _ = isVisible("#nodeEdgeInfo");
         if (e.key === "Escape" && _) {
-            toggle("#nodeEdgeInfo");
-            deselectNodes();
-            resetNodesAndEdges();
+            resetDraw();
         } else if (e.key === "Escape" || e.key === " ") {
-            if (
-                isVisible("#settingsContainer") &&
-                !isVisible("#infoToggleDiv")
-            ) {
-                toggle("#settingsContainer");
-            } else if (
-                !isVisible("#settingsContainer") &&
-                isVisible("#infoToggleDiv")
-            ) {
-                toggle("#infoToggleDiv");
-            } else {
-                toggle("#settingsContainer");
-                toggle("#infoToggleDiv");
-            }
+            UIToggleAllSettingBoxes();
+        } else if (e.key === "c" && e.metaKey) {
+            dropNodesWithNoEdges();
         }
+        Object.keys(keyMapping).forEach((key) => {
+            if (key === e.key) {
+                Function(keyMapping[key])();
+            }
+        });
     });
 
 d3.select("#collideContainer").on("click", () => {
@@ -328,4 +446,14 @@ d3.select("#chargeContainer").on("click", () => {
         d3.select("#layoutCharge").node().checked = true;
         updateLabel("charge");
     }
+});
+
+d3.selectAll("[data-toggle]").on("click", () => {
+    d3.event.stopPropagation();
+    if (d3.event.target.classList.contains("toggled")) {
+        d3.event.target.classList.remove("toggled");
+    } else {
+        d3.event.target.classList.add("toggled");
+    }
+    toggle("#" + d3.event.target.dataset.toggle);
 });

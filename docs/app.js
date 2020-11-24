@@ -112,6 +112,11 @@ d3.json(DATAFILE).then((data) => {
         })
     );
 
+    d3.select("#minDegree").node().max = Math.max.apply(
+        Math,
+        store.nodes.map((o) => o.degree)
+    );
+
     let min_year = Math.min.apply(
         Math,
         store.edges.map(function (o) {
@@ -193,6 +198,7 @@ const filter = () => {
     hide("#nodeEdgeInfo");
 
     store.nodes.forEach((n) => {
+        // if (n.degree > settings.nodes.minDegree) console.log(n);
         if (n.degree >= settings.nodes.minDegree && !n.inGraph) {
             // should not be filtered but is not in graph so add it!
             n.inGraph = true;
@@ -219,12 +225,17 @@ const filter = () => {
 
     store.edges.forEach((e) => {
         // TODO: recalibrate weight here
-        // console.log(e.found.length);
+        e.calibrated_weight = e.found.length;
 
-        if (e.weight < settings.edges.minWeight && !e.inGraph) {
+        let compareWeightValue =
+            settings.edges.weightFromCurrent === true
+                ? e.calibrated_weight
+                : e.weight;
+
+        if (compareWeightValue < settings.edges.minWeight && !e.inGraph) {
             // edge is lower than minWeight and not inGraph so leave it out
             e.inGraph = false;
-        } else if (e.weight < settings.edges.minWeight && e.inGraph) {
+        } else if (compareWeightValue < settings.edges.minWeight && e.inGraph) {
             // edge is lower than minWeight and in graph so remove it!
             e.inGraph = false;
             graph.edges.forEach((o, i) => {
@@ -435,7 +446,10 @@ const restart = () => {
         .attr("x2", (e) => e.target.x)
         .attr("y2", (e) => e.target.y)
         .style("stroke-width", (e) => {
-            let weight = Math.sqrt(e.weight) * 0.5;
+            let weight =
+                settings.edges.weightFromCurrent === true
+                    ? Math.sqrt(e.calibrated_weight) * 0.5
+                    : Math.sqrt(e.weight) * 0.5;
             weight =
                 weight < settings.edgeMinStroke
                     ? settings.edgeMinStroke
@@ -544,7 +558,7 @@ const nodeHasEdges = (node_id, count = false) => {
             return false;
         }
     } else {
-        console.error("Found more than one node with ID " + node_id);
+        // console.error("Found more than one node with ID " + node_id); // TODO: This is strange...
     }
 
     let returnValue = false,
@@ -611,20 +625,6 @@ const dropNodesWithNoEdges = () => {
     }
 };
 
-const updateLabel = (name) => {
-    // console.log(`updating label ${name}`);
-    [
-        ["layoutCharge", "charge", "charge_label"],
-        ["layoutCollide", "collide", "collide_label"],
-    ].forEach((d) => {
-        let disable = d3.select(`#${d[0]}`).node().checked === false;
-        d3.select(`#${d[1]}`).node().disabled = disable;
-        d3.select(`#${d[2]}`).classed("text-muted", disable);
-    });
-    let value = d3.select("#" + name).node().value;
-    d3.select("#" + name + "_label").html(name + ` (${value})`);
-};
-
 const updateInfo = () => {
     d3.select("#info").classed("d-none", false);
     d3.select("#info").html(`
@@ -663,9 +663,10 @@ const troubleshoot = (fix = false) => {
     if (fix) {
         // console.log("checking for inconsistency in data...");
         if (_.storeNodes.inGraph > _.graphNodes.inGraph) {
+            /* // TODO: turn on this message?
             console.log(
                 "there are more filtered nodes in store than in graph, correcting..."
-            );
+            );*/
             let dropped = `Dropped nodes:`;
             _.storeNodes.inGraph.forEach((n) => {
                 if (
@@ -967,13 +968,15 @@ const resetNodesAndEdges = () => {
             return "link no-revue";
         }
     });
-    g.nodes
-        .selectAll("text.label")
-        .attr("class", "label")
-        .attr("selected", (n) => {
-            n.fx = null;
-            n.fy = null;
-        });
+    if (!getSettings().nodes.stickyNodes) {
+        g.nodes
+            .selectAll("text.label")
+            .attr("class", "label")
+            .attr("selected", (n) => {
+                n.fx = null;
+                n.fy = null;
+            });
+    }
 };
 
 const selectNode = (node) => {
