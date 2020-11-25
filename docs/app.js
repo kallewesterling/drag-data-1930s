@@ -228,7 +228,6 @@ const filter = () => {
     });
 
     store.edges.forEach((e) => {
-        // TODO: recalibrate weight here
         e.calibrated_weight = e.found.length;
 
         let compareWeightValue =
@@ -550,7 +549,7 @@ let zoomed = () => {
 
 const zoom = d3.zoom().scaleExtent([0.25, 7]).on("zoom", zoomed);
 
-g.plot.call(zoom);
+svg.call(zoom);
 
 const nodeHasEdges = (node_id, count = false) => {
     // console.log("searching for edges for" + node_id);
