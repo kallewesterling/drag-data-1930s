@@ -147,25 +147,26 @@ for row in df.fillna('').itertuples():
         add,
         found=list(set(found)),
         revue_name=revue_name,
-        date=date.strftime("%Y-%m-%d")
+        date=date.strftime("%Y-%m-%d"),
+        comment=comment
     )
 
     attrs = {
         city: {
             'row_num': row_num,
             'category': 'city',
-            'comment': comment,
+            # 'comment': comment, #comments are never about clubs in my dataset, only performers/revues so only adding comments to those edges
         },
         club_id: {
             'row_num': row_num,
             'category': 'club',
             'display': club,
-            'comment': comment
+            # 'comment': comment #comments are never about clubs in my dataset, only performers/revues so only adding comments to those edges
         },
         performer: {
             'row_num': row_num,
             'category': 'performer',
-            'comment': comment
+            # 'comment': comment
         }
     }
 
