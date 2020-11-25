@@ -427,9 +427,9 @@ const restart = () => {
         .transition(750)
         .attr("font-size", (d) => {
             if (settings.nodes.nodeSizeFromCurrent === true) {
-                return yScale(d.current_degree);
+                return yScale(d.current_degree) * 1.5;
             } else {
-                return yScale(d.degree);
+                return yScale(d.degree) * 1.5;
             }
         })
         .text((d) => {
