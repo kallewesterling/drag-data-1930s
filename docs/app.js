@@ -8,7 +8,7 @@ TODO:
 // console.log("Running d3js v5.");
 
 let DATAFILE = "drag-data.json";
-let AUTO_ZOOM = 1.25; // TODO: This will not work
+let AUTO_ZOOM = 1.25; // TODO: #10 This will not work
 
 const width = 960,
     height = 800,
@@ -97,15 +97,15 @@ d3.json(DATAFILE).then((data) => {
     restart();
 
     transformToWindow();
-    /* // TODO: This does not work!
+    /* // TODO #10: This does not work!
     let _ = loadSettings("transform");
     if (_) {
         console.log("transform recorded");
         k = _.k;
-        g.plot.transition().call(zoom.scaleTo, _.k);
-        g.plot.transition().call(zoom.translateTo, _.x, _.y);
+        g.plot.transition(750).call(zoom.scaleTo, _.k);
+        g.plot.transition(750).call(zoom.translateTo, _.x, _.y);
     } else {
-        g.plot.transition().call(zoom.scaleTo, AUTO_ZOOM);
+        g.plot.transition(750).call(zoom.scaleTo, AUTO_ZOOM);
     }
     */
 
@@ -370,7 +370,7 @@ const restart = () => {
         .selectAll("circle.node")
         .data(graph.nodes, (d) => d.node_id);
 
-    node.exit().transition().attr("r", 0).remove();
+    node.exit().transition(750).attr("r", 0).remove();
 
     let newNode = node
         .enter()
@@ -380,27 +380,30 @@ const restart = () => {
         .attr("cx", (n) => n.x)
         .attr("cy", (n) => n.y);
 
+    let yScale = null;
+    if (settings.nodes.nodeSizeFromCurrent === true) {
+        yScale = d3
+            .scaleLinear()
+            .range([1, 10])
+            .domain(d3.extent(graph.nodes, (d) => d.current_degree));
+        // console.log("settings.nodeSizeFromCurrent is on!");
+    } else {
+        yScale = d3
+            .scaleLinear()
+            .range([1, 10])
+            .domain(d3.extent(graph.nodes, (d) => d.degree));
+        // console.log("settings.nodeSizeFromCurrent is off!");
+    }
+
     g.nodes
         .selectAll("circle.node")
         .data(graph.nodes, (d) => d.node_id)
-        .transition()
+        .transition(750)
         .attr("r", (n) => {
             if (settings.nodes.nodeSizeFromCurrent === true) {
-                y = d3
-                    .scaleLinear()
-                    .range([1, 10])
-                    .domain(d3.extent(graph.nodes, (d) => d.current_degree));
-                // console.log("settings.nodeSizeFromCurrent is on!");
-                return y(n.current_degree);
-                return Math.sqrt(n.current_degree) * 2.5;
+                return yScale(n.current_degree);
             } else {
-                y = d3
-                    .scaleLinear()
-                    .range([1, 10])
-                    .domain(d3.extent(graph.nodes, (d) => d.degree));
-                return y(n.degree);
-                // console.log("settings.nodeSizeFromCurrent is off!");
-                return Math.sqrt(n.degree) * 1.5;
+                return yScale(n.degree);
             }
         });
 
@@ -410,14 +413,25 @@ const restart = () => {
         .selectAll("text.label")
         .data(graph.nodes, (d) => d.node_id);
 
-    text.exit().transition().attr("opacity", 0).remove();
+    text.exit().transition(750).attr("opacity", 0).remove();
 
     let newText = text
         .enter()
         .append("text")
         .attr("class", "label")
-        .attr("style", "pointer-events: none;")
-        .attr("font-size", (d) => Math.sqrt(d.degree))
+        .attr("style", "pointer-events: none;");
+
+    g.nodes
+        .selectAll("text.label")
+        .data(graph.nodes, (d) => d.node_id)
+        .transition(750)
+        .attr("font-size", (d) => {
+            if (settings.nodes.nodeSizeFromCurrent === true) {
+                return yScale(d.current_degree);
+            } else {
+                return yScale(d.degree);
+            }
+        })
         .text((d) => {
             if (d.display) {
                 return d.display;
@@ -431,7 +445,7 @@ const restart = () => {
         .selectAll("line.link")
         .data(graph.edges, (d) => d.edge_id);
 
-    edge.exit().transition().attr("stroke-opacity", 0).remove();
+    edge.exit().transition(750).attr("stroke-opacity", 0).remove();
 
     let newEdge = edge
         .enter()
@@ -464,7 +478,7 @@ const restart = () => {
             return weight;
         })
         .call(function (link) {
-            link.transition().attr("stroke-opacity", 0.3);
+            link.transition(750).attr("stroke-opacity", 0.3);
         });
 
     edge = edge.merge(newEdge);
@@ -568,7 +582,7 @@ const nodeHasEdges = (node_id, count = false) => {
             return false;
         }
     } else {
-        // console.error("Found more than one node with ID " + node_id); // TODO: This is strange...
+        // console.error("Found more than one node with ID " + node_id); // TODO: #9 This is strange...
     }
 
     let returnValue = false,

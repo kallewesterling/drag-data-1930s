@@ -208,6 +208,8 @@ def set_edges(graph):
     for edge in graph.edges:
         edge0 = re.sub(NOT_ALLOWED_IN_ID, '', edge[0].lower())
         edge1 = re.sub(NOT_ALLOWED_IN_ID, '', edge[1].lower())
+        edge0 = REPLACE_NUMBERS(edge0)
+        edge1 = REPLACE_NUMBERS(edge1)
         edge_id = edge0 + '-' + edge1
         attrs[(edge[0], edge[1])] = {
             'edge_id': edge_id
