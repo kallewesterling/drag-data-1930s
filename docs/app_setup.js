@@ -23,6 +23,8 @@ const _autoSettings = {
         layoutForceY: true,
     },
     zoom: 1.25,
+    zoomMin: 0.75,
+    zoomMax: 8,
     edgeMinStroke: 1,
     edgeMaxStroke: 7,
     debugMessages: false,

@@ -163,6 +163,8 @@ const getSettings = () => {
             collide: collide,
         },
         zoom: _autoSettings.zoom,
+        zoomMin: _autoSettings.zoomMin,
+        zoomMax: _autoSettings.zoomMax,
         edgeMinStroke: _autoSettings.edgeMinStroke,
         edgeMaxStroke: _autoSettings.edgeMaxStroke,
         debugMessages: debugMessages,
