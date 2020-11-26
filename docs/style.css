@@ -15,8 +15,8 @@ svg.theme-dark {
     --link-selected-primary: red;
     --link-deselected: rgb(136, 136, 136, 0.1);
 
-    --link-revue: rgba(61, 90, 128, 1);
-    --link-norevue: rgba(199, 199, 199, 1);
+    --link-revue: rgba(61, 90, 128);
+    --link-norevue: rgba(199, 199, 199);
 
     --club: rgba(61, 90, 128, 1);
     --club-selected-primary: rgb(217, 0, 0);

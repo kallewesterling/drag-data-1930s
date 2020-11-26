@@ -1,7 +1,7 @@
 let x = null,
     y = null;
 
-preview = (store) => {
+const preview = (store) => {
     var margin = { top: 20, right: 20, bottom: 20, left: 20 },
         width = 500 - margin.left - margin.right,
         height = 200 - margin.top - margin.bottom;
