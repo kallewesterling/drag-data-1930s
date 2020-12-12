@@ -15,6 +15,13 @@ const resetDraw = () => {
  * The return value is true in all cases.
  */
 const UIToggleAllSettingBoxes = () => {
+    // if #info-box is visible, just hide that!
+    if (isVisible("#info-box")) {
+        toggle("#info-box");
+        return true;
+    }
+
+    // toggle all the settings containers to the correct state!
     if (isVisible("#settingsContainer") && !isVisible("#infoToggleDiv")) {
         toggle("#settingsContainer");
     } else if (
@@ -565,6 +572,17 @@ const setMiscHandlers = () => {
         }
         toggle("#" + d3.event.target.dataset.toggle);
     });
+
+    d3.select("#toggleInfoBox").on("click", () => {
+        toggle('#info-box');
+    })
+
+    d3.select("#info-box").on('click', () => {
+        if (d3.event.target.id === 'info-box') {
+            console.log('closing info box!')
+            toggle('#info-box');
+        }
+    })
 
     d3.select(window).on("resize", transformToWindow);
 };
