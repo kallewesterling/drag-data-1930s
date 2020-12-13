@@ -331,6 +331,13 @@ svg#main {
     margin: 0 !important;
 }
 
-#info-box {
-    padding: 12rem!important;
+@media screen and (min-width: 1200px) {
+    #info-box {
+        padding: 12rem!important;
+    }
+}
+@media screen and (max-width: 1199.98px) {
+    #info-box {
+        padding: 1rem !important;
+    }
 }
