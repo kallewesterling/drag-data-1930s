@@ -585,4 +585,5 @@ const setMiscHandlers = () => {
     })
 
     d3.select(window).on("resize", transformToWindow);
+
 };

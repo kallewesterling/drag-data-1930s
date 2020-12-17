@@ -246,8 +246,8 @@ const setNodeEdgeInfo = (elem) => {
     if (elem.node_id) {
         _html = `<p><strong>${displayOrID(elem)}</strong></p>
         <p>degree: ${elem.degree}</p>
-        <p>—> in: ${elem.indegree}</p>
-        <p>—> out: ${elem.outdegree}</p>
+        <p>--> in: ${elem.indegree}</p>
+        <p>--> out: ${elem.outdegree}</p>
         <p>current network degree: ${nodeHasEdges(elem.node_id, true)}</p>
         <p class="mt-2"><strong>Centrality measures (across network)</strong></p>
         <p>Betweenness (1000x): ${

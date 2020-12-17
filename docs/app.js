@@ -231,6 +231,84 @@ const modifyGraphNodes = () => {
     });
 };
 
+const graphNodesContains = (node_id) => {
+    return [...graph.nodes.map(n=>n.node_id)].includes(node_id);
+};
+
+const graphEdgesContains = (edge_id) => {
+    return [...graph.edges.map(e=>e.edge_id)].includes(edge_id);
+};
+
+const egoNetwork = (node) => {
+    // filter nodes based on a given node
+    if (window.egoNetwork) {
+        console.log('ego network already active - resetting network view...')
+        resetLocalStorage();
+    } else {
+        console.log('filtering out an ego network based on ' + node.node_id);
+        let related = getRelated(node.node_id);
+        console.log('related secondary nodes:');
+        console.log(related.secondaryNodeIDs);
+
+        window.egoNetwork = true
+
+        if (isVisible('#settings') || isVisible('#infoContainer')) {
+            console.log('hiding quick access and settings for this one...')
+            hide('#settings')
+            hide('#infoContainer')
+        }
+
+        store.nodes.forEach(n => {
+            if (n.node_id === node.node_id) {
+                n.inGraph = true;
+            } else if (related.secondaryNodeIDs.includes(n.node_id)) {
+                n.inGraph = true;
+            } else {
+                graph.nodes.forEach((o, i) => {
+                    if (n.node_id === o.node_id) {
+                        graph.nodes.splice(i, 1);
+                    }
+                });
+                n.inGraph = false;
+            };
+        })
+        store.edges.forEach(e => {
+            if (related.secondaryEdges.includes(e.edge_id)) {
+                console.log('this edge should stay')
+                e.inGraph = true;
+                if (graphEdgesContains(e.edge_id)) {
+                    
+                } else {
+                    graph.edges.push(e);
+                }
+            } else {
+                if (graphEdgesContains(e.edge_id)) {
+                    console.log('this edge should be removed')
+                    graph.edges.forEach((o, i) => {
+                        if (e.edge_id === o.edge_id) {
+                            graph.edges.splice(i, 1);
+                        }
+                    });
+                    e.inGraph = false;
+                }
+            }
+        })
+
+        d3.select('#main').on('click', () => {
+            if (d3.event.metaKey && window.egoNetwork) {
+                console.log('svg command + click detected');
+                console.log('ego network already active - resetting network view...')
+                resetLocalStorage();
+            }
+        })
+    }
+    
+    modifyGraphNodes();
+    dropNodesWithNoEdges();
+    updateInfo();
+    restart();
+}
+
 const filter = () => {
     let settings = getSettings();
 
@@ -356,7 +434,16 @@ const setupInteractivity = (settings, node, edge) => {
 
     node.on("click", (n) => {
         d3.event.stopPropagation();
-        selectNode(n);
+        if (d3.event.metaKey === true) {
+            if (nodeIsSelected(n)) {
+                // this is how we would hide
+                hide("#nodeEdgeInfo");
+                resetNodesAndEdges();
+            }
+            egoNetwork(n);
+        } else {
+            selectNode(n);
+        }
     });
 
     edge.on("click", (n) => {
