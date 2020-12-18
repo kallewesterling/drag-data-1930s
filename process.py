@@ -21,6 +21,14 @@ if not END_YEAR:
     print('Warning: no end year set.')
 
 counters = {}
+all_comments = {
+    'edges': {},
+    'nodes': {},
+}
+comment_sources = {
+    'edges': {},
+    'nodes': {}
+}
 
 for row in df.fillna('').itertuples():
     row_num, date, category, performer, club, _city, \
@@ -28,7 +36,11 @@ for row in df.fillna('').itertuples():
         unsure_drag, legal_name, alleged_age, \
         assumed_birth_year, source, eima, \
         newspapers_search, fulton_search, \
-        former_archive, comment, exclude = row
+        former_archive, comment, exclude, \
+        quote, comment_performer, comment_club, comment_city, comment_revue, *_ = row
+
+    for x in _:
+        print(f'could not handle {x} -- make sure all columns are properly assigned in script')
 
     if exclude:
         print(f'skipping {row_num}: manually requested')
@@ -96,6 +108,28 @@ for row in df.fillna('').itertuples():
     if revue_name:
         revue_name = revue_name.strip()
 
+    # process comment_sources
+    if comment_city:
+        if comment_city in comment_sources['nodes']: print('warning: double comments about the city.')
+        comment_sources['nodes'][comment_city] = source
+
+    if comment_performer:
+        if comment_performer in comment_sources['nodes']: print('warning: double comments about the performer.')
+        comment_sources['nodes'][comment_performer] = source
+
+    if comment_club:
+        if comment_club in comment_sources['nodes']: print('warning: double comments about the club.')
+        comment_sources['nodes'][comment_club] = source
+    
+    if comment_revue:
+        if comment_revue in comment_sources['edges']: print('warning: double comments about the revue.')
+        comment_sources['edges'][comment_revue] = source
+
+    if comment:
+        if comment in comment_sources['nodes']: print('warning: double comments (general).')
+        comment_sources['nodes'][comment] = source
+    
+
     add = list()
     if club_id and city:
         current_weight = graph.get_edge_data(
@@ -148,25 +182,28 @@ for row in df.fillna('').itertuples():
         found=list(set(found)),
         revue_name=revue_name,
         date=date.strftime("%Y-%m-%d"),
-        comment=comment
+        comment=comment_revue
     )
 
     attrs = {
         city: {
             'row_num': row_num,
             'category': 'city',
-            # 'comment': comment, #comments are never about clubs in my dataset, only performers/revues so only adding comments to those edges
+            'comment': comment_city,
+            'general_comment': comment,
         },
         club_id: {
             'row_num': row_num,
             'category': 'club',
             'display': club,
-            # 'comment': comment #comments are never about clubs in my dataset, only performers/revues so only adding comments to those edges
+            'comment': comment_club,
+            'general_comment': comment,
         },
         performer: {
             'row_num': row_num,
             'category': 'performer',
-            # 'comment': comment
+            'comment': comment_performer,
+            'general_comment': comment,
         }
     }
 
@@ -252,7 +289,7 @@ def set_centralities(graph):
 
     return(graph)
 
-
+# print(comment_sources)
 graph = set_degrees(graph)
 graph = set_centralities(graph)
 graph = set_edges(graph)
@@ -405,6 +442,15 @@ for edge in json_data.get('links'):
     target_node = next(
         item for item in nodes if item["id"] == edge.get('target'))
 
+    # process comment
+    if edge.get('comment'):
+        if not edge.get('edge_id') in all_comments['edges']:
+            all_comments['edges'][edge.get('edge_id')] = []
+        all_comments['edges'][edge.get('edge_id')].append({
+            'comment': edge.get('comment'),
+            'source': comment_sources['edges'][edge.get('comment')]
+        })
+
     # count source
     category = source_node.get('category')
     _id = source_node.get('id')
@@ -423,10 +469,31 @@ for edge in json_data.get('links'):
         count[category][_id] = 0
     count[category][_id] += 1
 
+for node in json_data.get('nodes'):
+    if node.get('comment') or node.get('general_comment'):
+        if not node['node_id'] in all_comments['nodes']:
+            all_comments['nodes'][node['node_id']] = {'general_comments': [], 'comments': []}
+        
+        if node['comment']:
+            print('--> has comment')
+            all_comments['nodes'][node['node_id']]['comments'].append({
+                'comment': node['comment'],
+                'source': comment_sources['nodes'][node['comment']]
+            })
+        
+        if node['general_comment']:
+            print('--> has general comment')
+            all_comments['nodes'][node['node_id']]['general_comments'].append({
+                'comment': node['general_comment'],
+                'source': comment_sources['nodes'][node['general_comment']]
+            })
+
 for cat in count:
     count[cat] = Counter(count[cat]).most_common()
 
 json_data['count'] = count
+
+json_data['comments'] = all_comments
 
 # write file
 Path('./docs/drag-data.json').write_text(json.dumps(json_data))

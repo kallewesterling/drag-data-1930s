@@ -395,7 +395,9 @@ const setEventHandlers = () => {
 
     // set up clicking on html elements
     graph.svg.on("click", () => {
-        resetDraw();
+        if (isVisible('#popup-info')) {
+            hide('#popup-info');
+        }
     });
 
     // set up settings containers
@@ -407,6 +409,26 @@ const setEventHandlers = () => {
     });
 };
 
+const getComments = (node_or_edge, id, return_value) => {
+    let bank = []
+    if (node_or_edge === 'node') {
+        bank = store.comments.nodes
+    } else if (node_or_edge === 'edge') {
+        bank = store.comments.nodes
+    }
+    if (bank[id]) {
+        if (return_value === 'general') {
+            return bank[id]['general_comments']
+        } else if (return_value === 'comments') {
+            return bank[id]['comments']
+        } else if (return_value === 'count') {
+            return [...getComments(node_or_edge, id, 'general'), ...getComments(node_or_edge, id, 'comments')].length
+        } else {
+            return [...getComments(node_or_edge, id, 'general'), ...getComments(node_or_edge, id, 'comments')]
+        }
+    }
+}
+
 /**
  * setKeyHandlers takes X argument/s... TODO: Finish this.
  * The return value is ...
@@ -417,6 +439,10 @@ const setKeyHandlers = () => {
         .addEventListener("keyup", (e) => {
             if (e.key === "Meta" || e.key === "Shift") {
                 d3.selectAll(".metaShow").classed("d-none", true);
+            }
+            if (e.key === 'Alt') {
+                resetDraw();
+                hide('#popup-info')
             }
         });
 
@@ -430,16 +456,25 @@ const setKeyHandlers = () => {
     d3.select("html")
         .node()
         .addEventListener("keydown", (e) => {
-            // console.log(e);
-            _ = isVisible("#nodeEdgeInfo");
+            let _ = isVisible("#nodeEdgeInfo");
+            let __ = isVisible('#popup-info')
             if (e.key === "Meta" || e.key === "Shift") {
                 d3.selectAll(".metaShow").classed("d-none", false);
             }
-            if (e.key === "Escape" && _) {
+            if (e.key === 'Alt') {
+                d3.selectAll("circle:not(.has-comments):not(.has-general-comments)").classed("d-none", true); // hide circles with no comments
+                d3.selectAll("circle.has-general-comments").attr("r", (n) => {
+                    return getComments('node', n.node_id, 'count') * 10;
+                });
+            }
+            if (e.key === "Escape" && __) {
                 console.log("Escape 1 called!");
+                hide('#popup-info');
+            } else if (e.key === "Escape" && _) {
+                console.log("Escape 2 called!");
                 resetDraw();
             } else if (e.key === "Escape" || e.key === " ") {
-                console.log("Escape 2 called!");
+                console.log("Escape 3 called!");
                 UIToggleAllSettingBoxes();
             } else if (e.key === "c" && e.metaKey) {
                 console.log("command+c called");

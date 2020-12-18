@@ -29,6 +29,13 @@ TODO:
  */
 const loadNetwork = () => {
     d3.json(DATAFILE).then((data) => {
+        console.log('here!')
+        // for debug purposes (TODO can be removed)
+        store.raw = data;
+
+        // set up store.comments
+        store.comments = Object.assign({}, data.comments);
+
         // set up store.count
         store.count = Object.assign({}, data.count);
 
@@ -434,6 +441,7 @@ const setupInteractivity = (settings, node, edge) => {
 
     node.on("click", (n) => {
         d3.event.stopPropagation();
+        console.log(d3.event)
         if (d3.event.metaKey === true) {
             if (nodeIsSelected(n)) {
                 // this is how we would hide
@@ -441,6 +449,13 @@ const setupInteractivity = (settings, node, edge) => {
                 resetNodesAndEdges();
             }
             egoNetwork(n);
+        } if (d3.event.altKey === true) {
+            if (store.comments.nodes[n.node_id]) {
+                d3.select('#popup-info')
+                    .html(generateCommentHTML(n.node_id))
+                    .classed('d-none', false)
+                    .attr('style', `top: ${d3.event.y}px !important; left: ${d3.event.x}px !important;`);
+            }
         } else {
             selectNode(n);
         }
@@ -451,6 +466,43 @@ const setupInteractivity = (settings, node, edge) => {
         selectEdge(n);
     });
 };
+
+const getNodeClass = (n) => {
+    let _ = "node"
+    
+    _ += " " + n.category;
+
+    if (store.comments.nodes[n.node_id]) {
+        if (store.comments.nodes[n.node_id]['general_comments'].length) {
+            _ += " has-general-comments"
+            console.log(n.node_id + ' has general comments')
+        }
+        if (store.comments.nodes[n.node_id]['comments'].length) {
+            _ += " has-comments"
+            console.log(n.node_id + ' has comments')
+        }
+    }
+    return _;
+}
+
+const getSize = (n, r_or_text) => {
+    let settings = getSettings();
+    let yScale = nodeScale(settings);
+
+    if (r_or_text === 'r') {
+        if (settings.nodes.nodeSizeFromCurrent === true) {
+            return yScale(n.current_degree);
+        } else {
+            return yScale(n.degree);
+        }
+    } else if (r_or_text === 'text') {
+        if (settings.nodes.nodeSizeFromCurrent === true) {
+            return yScale(n.current_degree) * 1.5;
+        } else {
+            return yScale(n.degree) * 1.5;
+        }
+    }
+}
 
 const restart = () => {
     let settings = getSettings();
@@ -465,24 +517,16 @@ const restart = () => {
     let newNode = node
         .enter()
         .append("circle")
-        .attr("class", (n) => "node " + n.category)
         .attr("id", (n) => n.node_id)
         .attr("cx", (n) => n.x)
-        .attr("cy", (n) => n.y);
-
-    let yScale = nodeScale(settings);
+        .attr("cy", (n) => n.y)
+        .attr("class", n => getNodeClass(n));
 
     g.nodes
         .selectAll("circle.node")
         .data(graph.nodes, (d) => d.node_id)
         .transition(750)
-        .attr("r", (n) => {
-            if (settings.nodes.nodeSizeFromCurrent === true) {
-                return yScale(n.current_degree);
-            } else {
-                return yScale(n.degree);
-            }
-        });
+        .attr("r", (n) => getSize(n, 'r'));
 
     node = node.merge(newNode);
 
@@ -501,20 +545,14 @@ const restart = () => {
 
     g.nodes
         .selectAll("text.label")
-        .data(graph.nodes, (d) => d.node_id)
+        .data(graph.nodes, (n) => n.node_id)
         .transition(750)
-        .attr("font-size", (d) => {
-            if (settings.nodes.nodeSizeFromCurrent === true) {
-                return yScale(d.current_degree) * 1.5;
+        .attr("font-size", (n) => getSize(n, 'text'))
+        .text((n) => {
+            if (n.display) {
+                return n.display;
             } else {
-                return yScale(d.degree) * 1.5;
-            }
-        })
-        .text((d) => {
-            if (d.display) {
-                return d.display;
-            } else {
-                return d.id;
+                return n.id;
             }
         });
 

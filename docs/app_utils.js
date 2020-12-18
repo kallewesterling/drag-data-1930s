@@ -219,6 +219,14 @@ const hide = (selector) => {
 };
 
 /**
+ * hide takes X argument/s... TODO: Finish this.
+ * The return value is ...
+ */
+const show = (selector) => {
+    d3.select(selector).classed("d-none", false);
+};
+
+/**
  * restartLayout takes X argument/s... TODO: Finish this.
  * The return value is ...
  */
@@ -518,7 +526,21 @@ const unselectNodes = (excludeNode) => {
  * The return value is ...
  */
 const resetNodesAndEdges = () => {
-    g.nodes.selectAll("circle.node").attr("class", (n) => "node " + n.category);
+    let settings = getSettings();
+    let yScale = nodeScale(settings);
+
+    g.nodes.selectAll("circle.node")
+        .attr("class", (n) => "node " + n.category)
+        .attr("r", (n) => {
+            if (settings.nodes.nodeSizeFromCurrent === true) {
+                return yScale(n.current_degree);
+            } else {
+                return yScale(n.degree);
+            }
+        })
+        .classed("d-none", false) // show all of them circles
+        .attr("class", n => getNodeClass(n));
+
     g.edges.selectAll("line.link").attr("class", (e) => {
         if (e.revue_name != "") {
             return "link revue";
@@ -570,3 +592,18 @@ const selectEdge = (edge) => {
         setNodeEdgeInfo(edge);
     }
 };
+
+const generateCommentHTML = (node_id) => {
+    let _ = ''
+    if (store.comments.nodes[node_id]['general_comments'].length) {
+        store.comments.nodes[node_id]['general_comments'].forEach(c => {
+            _ += `<p>${c.comment} (${c.source})</p>\n`;
+        })
+    }
+    if (store.comments.nodes[node_id]['comments'].length) {
+        store.comments.nodes[node_id]['comments'].forEach(c => {
+            _ += `<p>${c.comment} (${c.source})</p>\n`;
+        })
+    }
+    return _;
+}

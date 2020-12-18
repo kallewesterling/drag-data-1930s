@@ -69,6 +69,7 @@ let DATAFILE = "drag-data.json";
 let AUTO_ZOOM = 1.25; // TODO: #10 This will not work
 
 const store = {
+    raw: {},
     nodes: [],
     edges: [],
     count: {},
