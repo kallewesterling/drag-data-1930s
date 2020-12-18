@@ -29,7 +29,7 @@ TODO:
  */
 const loadNetwork = () => {
     d3.json(DATAFILE).then((data) => {
-        console.log('here!')
+        console.log("here!");
         // for debug purposes (TODO can be removed)
         store.raw = data;
 
@@ -239,33 +239,33 @@ const modifyGraphNodes = () => {
 };
 
 const graphNodesContains = (node_id) => {
-    return [...graph.nodes.map(n=>n.node_id)].includes(node_id);
+    return [...graph.nodes.map((n) => n.node_id)].includes(node_id);
 };
 
 const graphEdgesContains = (edge_id) => {
-    return [...graph.edges.map(e=>e.edge_id)].includes(edge_id);
+    return [...graph.edges.map((e) => e.edge_id)].includes(edge_id);
 };
 
 const egoNetwork = (node) => {
     // filter nodes based on a given node
     if (window.egoNetwork) {
-        console.log('ego network already active - resetting network view...')
+        console.log("ego network already active - resetting network view...");
         resetLocalStorage();
     } else {
-        console.log('filtering out an ego network based on ' + node.node_id);
+        console.log("filtering out an ego network based on " + node.node_id);
         let related = getRelated(node.node_id);
-        console.log('related secondary nodes:');
+        console.log("related secondary nodes:");
         console.log(related.secondaryNodeIDs);
 
-        window.egoNetwork = true
+        window.egoNetwork = true;
 
-        if (isVisible('#settings') || isVisible('#infoContainer')) {
-            console.log('hiding quick access and settings for this one...')
-            hide('#settings')
-            hide('#infoContainer')
+        if (isVisible("#settings") || isVisible("#infoContainer")) {
+            console.log("hiding quick access and settings for this one...");
+            hide("#settings");
+            hide("#infoContainer");
         }
 
-        store.nodes.forEach(n => {
+        store.nodes.forEach((n) => {
             if (n.node_id === node.node_id) {
                 n.inGraph = true;
             } else if (related.secondaryNodeIDs.includes(n.node_id)) {
@@ -277,20 +277,19 @@ const egoNetwork = (node) => {
                     }
                 });
                 n.inGraph = false;
-            };
-        })
-        store.edges.forEach(e => {
+            }
+        });
+        store.edges.forEach((e) => {
             if (related.secondaryEdges.includes(e.edge_id)) {
-                console.log('this edge should stay')
+                console.log("this edge should stay");
                 e.inGraph = true;
                 if (graphEdgesContains(e.edge_id)) {
-                    
                 } else {
                     graph.edges.push(e);
                 }
             } else {
                 if (graphEdgesContains(e.edge_id)) {
-                    console.log('this edge should be removed')
+                    console.log("this edge should be removed");
                     graph.edges.forEach((o, i) => {
                         if (e.edge_id === o.edge_id) {
                             graph.edges.splice(i, 1);
@@ -299,22 +298,24 @@ const egoNetwork = (node) => {
                     e.inGraph = false;
                 }
             }
-        })
+        });
 
-        d3.select('#main').on('click', () => {
+        d3.select("#main").on("click", () => {
             if (d3.event.metaKey && window.egoNetwork) {
-                console.log('svg command + click detected');
-                console.log('ego network already active - resetting network view...')
+                console.log("svg command + click detected");
+                console.log(
+                    "ego network already active - resetting network view..."
+                );
                 resetLocalStorage();
             }
-        })
+        });
     }
-    
+
     modifyGraphNodes();
     dropNodesWithNoEdges();
     updateInfo();
     restart();
-}
+};
 
 const filter = () => {
     let settings = getSettings();
@@ -441,7 +442,7 @@ const setupInteractivity = (settings, node, edge) => {
 
     node.on("click", (n) => {
         d3.event.stopPropagation();
-        console.log(d3.event)
+        console.log(d3.event);
         if (d3.event.metaKey === true) {
             if (nodeIsSelected(n)) {
                 // this is how we would hide
@@ -449,12 +450,16 @@ const setupInteractivity = (settings, node, edge) => {
                 resetNodesAndEdges();
             }
             egoNetwork(n);
-        } if (d3.event.altKey === true) {
+        }
+        if (d3.event.altKey === true) {
             if (store.comments.nodes[n.node_id]) {
-                d3.select('#popup-info')
+                d3.select("#popup-info")
                     .html(generateCommentHTML(n.node_id))
-                    .classed('d-none', false)
-                    .attr('style', `top: ${d3.event.y}px !important; left: ${d3.event.x}px !important;`);
+                    .classed("d-none", false)
+                    .attr(
+                        "style",
+                        `top: ${d3.event.y}px !important; left: ${d3.event.x}px !important;`
+                    );
             }
         } else {
             selectNode(n);
@@ -468,41 +473,41 @@ const setupInteractivity = (settings, node, edge) => {
 };
 
 const getNodeClass = (n) => {
-    let _ = "node"
-    
+    let _ = "node";
+
     _ += " " + n.category;
 
     if (store.comments.nodes[n.node_id]) {
-        if (store.comments.nodes[n.node_id]['general_comments'].length) {
-            _ += " has-general-comments"
-            console.log(n.node_id + ' has general comments')
+        if (store.comments.nodes[n.node_id]["general_comments"].length) {
+            _ += " has-general-comments";
+            console.log(n.node_id + " has general comments");
         }
-        if (store.comments.nodes[n.node_id]['comments'].length) {
-            _ += " has-comments"
-            console.log(n.node_id + ' has comments')
+        if (store.comments.nodes[n.node_id]["comments"].length) {
+            _ += " has-comments";
+            console.log(n.node_id + " has comments");
         }
     }
     return _;
-}
+};
 
 const getSize = (n, r_or_text) => {
     let settings = getSettings();
     let yScale = nodeScale(settings);
 
-    if (r_or_text === 'r') {
+    if (r_or_text === "r") {
         if (settings.nodes.nodeSizeFromCurrent === true) {
             return yScale(n.current_degree);
         } else {
             return yScale(n.degree);
         }
-    } else if (r_or_text === 'text') {
+    } else if (r_or_text === "text") {
         if (settings.nodes.nodeSizeFromCurrent === true) {
             return yScale(n.current_degree) * 1.5;
         } else {
             return yScale(n.degree) * 1.5;
         }
     }
-}
+};
 
 const restart = () => {
     let settings = getSettings();
@@ -520,13 +525,13 @@ const restart = () => {
         .attr("id", (n) => n.node_id)
         .attr("cx", (n) => n.x)
         .attr("cy", (n) => n.y)
-        .attr("class", n => getNodeClass(n));
+        .attr("class", (n) => getNodeClass(n));
 
     g.nodes
         .selectAll("circle.node")
         .data(graph.nodes, (d) => d.node_id)
         .transition(750)
-        .attr("r", (n) => getSize(n, 'r'));
+        .attr("r", (n) => getSize(n, "r"));
 
     node = node.merge(newNode);
 
@@ -547,7 +552,7 @@ const restart = () => {
         .selectAll("text.label")
         .data(graph.nodes, (n) => n.node_id)
         .transition(750)
-        .attr("font-size", (n) => getSize(n, 'text'))
+        .attr("font-size", (n) => getSize(n, "text"))
         .text((n) => {
             if (n.display) {
                 return n.display;

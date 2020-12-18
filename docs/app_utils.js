@@ -529,9 +529,10 @@ const resetNodesAndEdges = () => {
     let settings = getSettings();
     let yScale = nodeScale(settings);
 
-    g.nodes.selectAll("circle.node")
+    g.nodes
+        .selectAll("circle.node")
         .classed("d-none", false) // show all of them circles
-        .attr("class", n => getNodeClass(n))
+        .attr("class", (n) => getNodeClass(n))
         .transition()
         .attr("r", (n) => {
             if (settings.nodes.nodeSizeFromCurrent === true) {
@@ -539,7 +540,7 @@ const resetNodesAndEdges = () => {
             } else {
                 return yScale(n.degree);
             }
-        })
+        });
 
     g.edges.selectAll("line.link").attr("class", (e) => {
         if (e.revue_name != "") {
@@ -594,16 +595,16 @@ const selectEdge = (edge) => {
 };
 
 const generateCommentHTML = (node_id) => {
-    let _ = ''
-    if (store.comments.nodes[node_id]['general_comments'].length) {
-        store.comments.nodes[node_id]['general_comments'].forEach(c => {
+    let _ = "";
+    if (store.comments.nodes[node_id]["general_comments"].length) {
+        store.comments.nodes[node_id]["general_comments"].forEach((c) => {
             _ += `<p>${c.comment} (${c.source})</p>\n`;
-        })
+        });
     }
-    if (store.comments.nodes[node_id]['comments'].length) {
-        store.comments.nodes[node_id]['comments'].forEach(c => {
+    if (store.comments.nodes[node_id]["comments"].length) {
+        store.comments.nodes[node_id]["comments"].forEach((c) => {
             _ += `<p>${c.comment} (${c.source})</p>\n`;
-        })
+        });
     }
     return _;
-}
+};

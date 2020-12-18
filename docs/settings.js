@@ -395,8 +395,8 @@ const setEventHandlers = () => {
 
     // set up clicking on html elements
     graph.svg.on("click", () => {
-        if (isVisible('#popup-info')) {
-            hide('#popup-info');
+        if (isVisible("#popup-info")) {
+            hide("#popup-info");
         }
     });
 
@@ -410,24 +410,30 @@ const setEventHandlers = () => {
 };
 
 const getComments = (node_or_edge, id, return_value) => {
-    let bank = []
-    if (node_or_edge === 'node') {
-        bank = store.comments.nodes
-    } else if (node_or_edge === 'edge') {
-        bank = store.comments.nodes
+    let bank = [];
+    if (node_or_edge === "node") {
+        bank = store.comments.nodes;
+    } else if (node_or_edge === "edge") {
+        bank = store.comments.nodes;
     }
     if (bank[id]) {
-        if (return_value === 'general') {
-            return bank[id]['general_comments']
-        } else if (return_value === 'comments') {
-            return bank[id]['comments']
-        } else if (return_value === 'count') {
-            return [...getComments(node_or_edge, id, 'general'), ...getComments(node_or_edge, id, 'comments')].length
+        if (return_value === "general") {
+            return bank[id]["general_comments"];
+        } else if (return_value === "comments") {
+            return bank[id]["comments"];
+        } else if (return_value === "count") {
+            return [
+                ...getComments(node_or_edge, id, "general"),
+                ...getComments(node_or_edge, id, "comments"),
+            ].length;
         } else {
-            return [...getComments(node_or_edge, id, 'general'), ...getComments(node_or_edge, id, 'comments')]
+            return [
+                ...getComments(node_or_edge, id, "general"),
+                ...getComments(node_or_edge, id, "comments"),
+            ];
         }
     }
-}
+};
 
 /**
  * setKeyHandlers takes X argument/s... TODO: Finish this.
@@ -440,9 +446,9 @@ const setKeyHandlers = () => {
             if (e.key === "Meta" || e.key === "Shift") {
                 d3.selectAll(".metaShow").classed("d-none", true);
             }
-            if (e.key === 'Alt') {
+            if (e.key === "Alt") {
                 resetDraw();
-                hide('#popup-info')
+                hide("#popup-info");
             }
         });
 
@@ -457,21 +463,24 @@ const setKeyHandlers = () => {
         .node()
         .addEventListener("keydown", (e) => {
             let _ = isVisible("#nodeEdgeInfo");
-            let __ = isVisible('#popup-info')
+            let __ = isVisible("#popup-info");
             if (e.key === "Meta" || e.key === "Shift") {
                 d3.selectAll(".metaShow").classed("d-none", false);
             }
-            if (e.key === 'Alt') {
-                d3.selectAll("circle:not(.has-comments):not(.has-general-comments)").classed("d-none", true); // hide circles with no comments
+            if (e.key === "Alt") {
+                d3.selectAll(
+                    "circle:not(.has-comments):not(.has-general-comments)"
+                ).classed("d-none", true); // hide circles with no comments
                 d3.selectAll("circle.has-general-comments")
                     .transition()
                     .attr("r", (n) => {
-                        return getComments('node', n.node_id, 'count') * 10;
+                        return getComments("node", n.node_id, "count") * 10;
                     });
+                d3.selectAll("text");
             }
             if (e.key === "Escape" && __) {
                 console.log("Escape 1 called!");
-                hide('#popup-info');
+                hide("#popup-info");
             } else if (e.key === "Escape" && _) {
                 console.log("Escape 2 called!");
                 resetDraw();
@@ -611,16 +620,15 @@ const setMiscHandlers = () => {
     });
 
     d3.select("#toggleInfoBox").on("click", () => {
-        toggle('#info-box');
-    })
+        toggle("#info-box");
+    });
 
-    d3.select("#info-box").on('click', () => {
-        if (d3.event.target.id === 'info-box') {
-            console.log('closing info box!')
-            toggle('#info-box');
+    d3.select("#info-box").on("click", () => {
+        if (d3.event.target.id === "info-box") {
+            console.log("closing info box!");
+            toggle("#info-box");
         }
-    })
+    });
 
     d3.select(window).on("resize", transformToWindow);
-
 };

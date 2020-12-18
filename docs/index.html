@@ -23,8 +23,8 @@
         <div id="wrapToasters"></div>
         <svg id="main" width="100%" height="100%"></svg>
         <div id="settings" class="small card shadow border rounded-lg">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                Settings <button id="settingsToggle" type="button" class="btn-close" aria-label="Close"></button>
+            <div class="card-header d-flex justify-content-between align-items-center" id="settingsToggle">
+                Settings<!-- <button id="settingsToggle" type="button" class="btn-close" aria-label="Close"></button>-->
             </div>
             <ul id="settingsContainer" class="list-group list-group-flush">
                 <li class="list-group-item">
@@ -109,26 +109,30 @@
             </ul>
         </div>
         <div id="infoContainer" class="card shadow border rounded-lg small">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                Info/Quick Access <button id="infoToggle" type="button" class="btn-close" aria-label="Close"></button>
+            <div class="card-header d-flex justify-content-between align-items-center" id="infoToggle">
+                Info/Quick Access<!-- <button id="infoToggle" type="button" class="btn-close" aria-label="Close"></button>-->
             </div>
             <div id="infoToggleDiv">
-                <div class="p-1 pt-3 text-center"><a id="toggleInfoBox" class="btn btn-sm btn-success text-light">Explanation/Rationale</a></div>
+                <div class="p-1 pt-3 text-center"><a id="toggleInfoBox" class="btn btn-sm btn-success">Explanation/Rationale</a></div>
                 <div id="info" class="p-3"></div>
                 <div class="pt-3 border-top p-3 text-center">
-                    <button type="button" class="btn btn-sm btn-light" id="switchMode" name="switchMode">Switch mode</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="switchMode" name="switchMode">Switch mode</button>
                 </div>
-                <div class="p-1 text-center">
-                    <button type="button" class="btn btn-sm btn-light" id="resetLocalStorage" name="resetLocalStorage">Reset saved settings</button>
-                </div>
-                <div class="p-1 text-center">
-                    <button type="button" class="btn btn-sm btn-light" id="clearUnconnected" name="clearUnconnected">Clear unconnected nodes</button>
-                </div>
-                <div class="p-1 text-center">
-                    <a type="button" class="btn btn-sm btn-outline-success" href="https://docs.google.com/spreadsheets/d/1UlpFQ9WWA6_6X-RuMJ3vHdIbyqhCZ1VRYgcQYjXprAg/edit#gid=0" target="_blank">Show entire dataset</a>
-                </div>
-                <div class="p-1 pb-3 text-center">
-                    <button type="button" class="btn btn-sm btn-outline-success" id="showAllPotentialNodes" name="showAllPotentialNodes">Show all potential nodes</button>
+                <div class="pb-3">
+                    <div class="p-1 text-center">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="resetLocalStorage" name="resetLocalStorage">Reset saved settings</button>
+                    </div>
+                    <div class="p-1 text-center">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="clearUnconnected" name="clearUnconnected">Clear unconnected nodes</button>
+                    </div>
+                    <div class="p-1 text-center">
+                        <a type="button" class="btn btn-sm btn-outline-success" href="https://docs.google.com/spreadsheets/d/1UlpFQ9WWA6_6X-RuMJ3vHdIbyqhCZ1VRYgcQYjXprAg/edit#gid=0" target="_blank">Show entire dataset</a>
+                    </div>
+                    <!-- TODO: THis is not working currently
+                    <div class="p-1 pb-3 text-center">
+                        <button type="button" class="btn btn-sm btn-outline-success" id="showAllPotentialNodes" name="showAllPotentialNodes">Show all potential nodes</button>
+                    </div>
+                    -->
                 </div>
             </div>
         </div>
