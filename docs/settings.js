@@ -463,9 +463,11 @@ const setKeyHandlers = () => {
             }
             if (e.key === 'Alt') {
                 d3.selectAll("circle:not(.has-comments):not(.has-general-comments)").classed("d-none", true); // hide circles with no comments
-                d3.selectAll("circle.has-general-comments").attr("r", (n) => {
-                    return getComments('node', n.node_id, 'count') * 10;
-                });
+                d3.selectAll("circle.has-general-comments")
+                    .transition()
+                    .attr("r", (n) => {
+                        return getComments('node', n.node_id, 'count') * 10;
+                    });
             }
             if (e.key === "Escape" && __) {
                 console.log("Escape 1 called!");

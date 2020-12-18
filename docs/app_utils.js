@@ -530,7 +530,9 @@ const resetNodesAndEdges = () => {
     let yScale = nodeScale(settings);
 
     g.nodes.selectAll("circle.node")
-        .attr("class", (n) => "node " + n.category)
+        .classed("d-none", false) // show all of them circles
+        .attr("class", n => getNodeClass(n))
+        .transition()
         .attr("r", (n) => {
             if (settings.nodes.nodeSizeFromCurrent === true) {
                 return yScale(n.current_degree);
@@ -538,8 +540,6 @@ const resetNodesAndEdges = () => {
                 return yScale(n.degree);
             }
         })
-        .classed("d-none", false) // show all of them circles
-        .attr("class", n => getNodeClass(n));
 
     g.edges.selectAll("line.link").attr("class", (e) => {
         if (e.revue_name != "") {
