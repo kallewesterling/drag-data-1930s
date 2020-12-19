@@ -30,50 +30,20 @@ comment_sources = {
     'nodes': {}
 }
 
+PRINT_WARNINGS = False
+
 for row in df.fillna('').itertuples():
-    row_num, date, category, performer, club, _city, \
-        city, revue_name, normalized_revue_name, \
-        unsure_drag, legal_name, alleged_age, \
-        assumed_birth_year, source, eima, \
-        newspapers_search, fulton_search, \
-        former_archive, comment, exclude, \
-        quote, comment_performer, comment_club, comment_city, comment_revue, *_ = row
+    row_num, date, category, performer, club, _city, city, revue_name, normalized_revue_name, unsure_drag, legal_name, alleged_age, assumed_birth_year, source, eima, newspapers_search, fulton_search, former_archive, comment, exclude, quote, comment_performer, comment_club, comment_city, comment_revue, *_ = row
 
-    for x in _:
-        print(f'could not handle {x} -- make sure all columns are properly assigned in script')
+    # If manual skip is requested or no date is provided, we want to skip this row
+    if exclude or not date:
+        if exclude and PRINT_WARNINGS:
+            print(f'skipping {row_num}: manually requested')
+        if not date and PRINT_WARNINGS:
+            print(f'skipping {row_num}: no date')
+        continue
 
-    if exclude:
-        print(f'skipping {row_num}: manually requested')
-        continue  # skip ahead
-
-    if not date:
-        print(f'skipping {row_num}: no date')
-        continue  # skip ahead
-
-    comment = comment.strip()
-
-    if not city and _city:
-        city = _city  # revert to city if there is no normalized city
-
-    club_display, club_id = None, None
-
-    if club and city:
-        club_display = club
-        club_id = club + "-" + city
-    else:
-        club_display = club
-        club_id = club
-
-    for cat in CLEANING:
-        if cat == 'city':
-            for search, replace in CLEANING[cat].items():
-                city = city.replace(search, replace)
-        elif cat == 'club':
-            for search, replace in CLEANING[cat].items():
-                if club_display != None:
-                    club_display = club_display.replace(search, replace)
-
-    # clean up date
+    # Clean up date and see if it falls outside our range; if so, skip this row
     try:
         date = datetime.strptime(date, '%Y-%m-%d')
     except:
@@ -85,92 +55,183 @@ for row in df.fillna('').itertuples():
             except:
                 raise RuntimeError(f"{date} cannot be interpreted")
 
-    # clean up source
-    source = source.strip()
-    # source = source.split("[")[0]
-
-    if performer == "—" or performer == "-":
-        performer = None
-
     if START_YEAR and END_YEAR:
         if date.year > END_YEAR or date.year < START_YEAR:
             continue
 
-    # strip off any trailing or leading spaces
-    if club_display:
-        club_display = club_display.strip()
-    if club_id:
-        club_id = club_id.strip()
-    if city:
-        city = city.strip()
-    if performer:
-        performer = performer.strip()
-    if revue_name:
-        revue_name = revue_name.strip()
+    # Provide warning in case there are column present that we are not able to process here
+    for x in _ and PRINT_WARNINGS:
+        print(
+            f'warning: could not handle {x} -- make sure all columns are properly assigned in script')
+
+    # Clean up of variables
+    category, performer, club, _city, city, revue_name, normalized_revue_name, unsure_drag, legal_name, source, newspapers_search, fulton_search, former_archive, comment, exclude, quote, comment_performer, comment_club, comment_city, comment_revue = category.strip(), performer.strip(), club.strip(), _city.strip(), city.strip(), revue_name.strip(), normalized_revue_name.strip(), unsure_drag.strip(), legal_name.strip(), source.strip(), newspapers_search.strip(), fulton_search.strip(), former_archive.strip(), comment.strip(), exclude.strip(), quote.strip(), comment_performer.strip(), comment_club.strip(), comment_city.strip(), comment_revue.strip()
+
+    if performer == "-" or performer == "–" or performer == "—" or performer == "———":
+        performer = None
+
+    # Revert to city if there is no normalized city
+    if not city and _city:
+        city = _city
+
+    # Set up correct ID and display for club
+    if club and city:
+        club_display = club
+        club_id = club + "-" + city
+    elif club:
+        club_display = club
+        club_id = club
+    else:
+        club_display = None
+        club_id = None
+
+    # Detailed cleaning
+    for cat in CLEANING:
+        if cat == 'city':
+            for search, replace in CLEANING[cat].items():
+                city = city.replace(search, replace)
+        elif cat == 'club':
+            for search, replace in CLEANING[cat].items():
+                if club_display != None:
+                    club_display = club_display.replace(search, replace)
 
     # process comment_sources
     if comment_city:
-        if comment_city in comment_sources['nodes']: print('warning: double comments about the city.')
+        if comment_city in comment_sources['nodes'] and PRINT_WARNINGS:
+            print(
+                f'warning: double comments about the city: \n         {comment_city[:50]}')
         comment_sources['nodes'][comment_city] = source
 
     if comment_performer:
-        if comment_performer in comment_sources['nodes']: print('warning: double comments about the performer.')
+        if comment_performer in comment_sources['nodes'] and PRINT_WARNINGS:
+            print(
+                f'warning: double comments about the performer: \n         {comment_performer[:50]}')
         comment_sources['nodes'][comment_performer] = source
 
     if comment_club:
-        if comment_club in comment_sources['nodes']: print('warning: double comments about the club.')
+        if comment_club in comment_sources['nodes'] and PRINT_WARNINGS:
+            print(
+                f'warning: double comments about the club: \n         {comment_club[:50]}')
         comment_sources['nodes'][comment_club] = source
-    
+
     if comment_revue:
-        if comment_revue in comment_sources['edges']: print('warning: double comments about the revue.')
+        if comment_revue in comment_sources['edges'] and PRINT_WARNINGS:
+            print(
+                f'warning: double comments about the revue: \n         {comment_revue[:50]}')
         comment_sources['edges'][comment_revue] = source
 
     if comment:
-        if comment in comment_sources['nodes']: print('warning: double comments (general).')
+        if comment in comment_sources['nodes'] and PRINT_WARNINGS:
+            print(
+                f'warning: double comments (general): \n         {comment[:50]}')
         comment_sources['nodes'][comment] = source
-    
 
-    add = list()
+    add, edge_comments, edge_general_comments = list(), list(), list()
     if club_id and city:
-        current_weight = graph.get_edge_data(
-            club_id, city, default={}).get('weight')
-        current_found = graph.get_edge_data(
-            club_id, city, default={}).get('found', [])
+        id1 = club_id
+        id2 = city
+        edge_data = graph.get_edge_data(id1, id2, default={})
+        current_weight = edge_data.get('weight')
+        current_found = edge_data.get('found', [])
+        current_comments = edge_data.get('comments', [])
+        current_general_comments = edge_data.get('general_comments', [])
+
         if current_weight == None:
-            add.append((club_id, city, 1))
+            add.append((id1, id2, 1))
             found = [source]
         else:
-            add.append((club_id, city, current_weight+1))
+            add.append((id1, id2, current_weight+1))
             found = current_found
             found.append(source)
+        
+        if comment:
+            data = {'comment': comment, 'source': source}
+            if current_general_comments == []:
+                edge_general_comments = [data]
+            else:
+                edge_general_comments = current_general_comments
+                if not data in edge_general_comments:
+                    edge_general_comments.append(data)
+        
+        if comment_revue:
+            data = {'comment': comment_revue, 'source': source}
+            if current_comments == []:
+                edge_comments = [data]
+            else:
+                edge_comments = current_comments
+                if not data in edge_comments:
+                    edge_comments.append(data)
+        
     else:
         if performer and city:
-            current_weight = graph.get_edge_data(
-                performer, city, default={}).get('weight')
-            current_found = graph.get_edge_data(
-                performer, city, default={}).get('found', [])
+            id1 = performer
+            id2 = city
+            edge_data = graph.get_edge_data(id1, id2, default={})
+            current_weight = edge_data.get('weight')
+            current_found = edge_data.get('found', [])
+            current_comments = edge_data.get('comments', [])
+            current_general_comments = edge_data.get('general_comments', [])
 
             if current_weight == None:
-                add.append((performer, city, 1))
+                add.append((id1, id2, 1))
                 found = [source]
             else:
-                add.append((performer, city, current_weight+1))
+                add.append((id1, id2, current_weight+1))
                 found = current_found
                 found.append(source)
 
+            if comment:
+                data = {'comment': comment, 'source': source}
+                if current_general_comments == []:
+                    edge_general_comments = [data]
+                else:
+                    edge_general_comments = current_general_comments
+                    if not data in edge_general_comments:
+                        edge_general_comments.append(data)
+        
+            if comment_revue:
+                data = {'comment': comment_revue, 'source': source}
+                if current_comments == []:
+                    edge_comments = [data]
+                else:
+                    edge_comments = current_comments
+                    if not data in edge_comments:
+                        edge_comments.append(data)
+
     if club_id and performer:
-        current_weight = graph.get_edge_data(
-            performer, club_id, default={}).get('weight')
-        current_found = graph.get_edge_data(
-            performer, club_id, default={}).get('found', [])
+        id1 = performer
+        id2 = club_id
+        edge_data = graph.get_edge_data(id1, id2, default={})
+        current_weight = edge_data.get('weight')
+        current_found = edge_data.get('found', [])
+        current_comments = edge_data.get('comments', [])
+        current_general_comments = edge_data.get('general_comments', [])
 
         if current_weight == None:
-            add.append((performer, club_id, 1))
+            add.append((id1, id2, 1))
             found = [source]
         else:
-            add.append((performer, club_id, current_weight+1))
+            add.append((id1, id2, current_weight+1))
             found = current_found
             found.append(source)
+
+        if comment:
+            data = {'comment': comment, 'source': source}
+            if current_general_comments == []:
+                edge_general_comments = [data]
+            else:
+                edge_general_comments = current_general_comments
+                if not data in edge_general_comments:
+                    edge_general_comments.append(data)
+        
+        if comment_revue:
+            data = {'comment': comment_revue, 'source': source}
+            if current_comments == []:
+                edge_comments = [data]
+            else:
+                edge_comments = current_comments
+                if not data in edge_comments:
+                    edge_comments.append(data)
 
     try:
         found
@@ -182,28 +243,52 @@ for row in df.fillna('').itertuples():
         found=list(set(found)),
         revue_name=revue_name,
         date=date.strftime("%Y-%m-%d"),
-        comment=comment_revue
+        comments=edge_comments,
+        general_comments = edge_general_comments
     )
+    
+    # Fix up comments
+    current_node_comments = nx.get_node_attributes(graph, 'comments')
+    
+    comments_performer, comments_city, comments_club = [], [], []
+    if comment_performer:
+        if performer in current_node_comments:
+            comments_performer = current_node_comments[performer]
+        comments_performer.append({
+            'comment': comment_performer,
+            'source': source
+        })
+    if comment_city:
+        if city in current_node_comments:
+            comments_city = current_node_comments[city]
+        comments_city.append({
+            'comment': comment_city,
+            'source': source
+        })
+    if comment_club:
+        if club_id in current_node_comments:
+            comments_club = current_node_comments[club_id]
+        comments_club.append({
+            'comment': comment_club,
+            'source': source
+        })
 
     attrs = {
         city: {
             'row_num': row_num,
             'category': 'city',
-            'comment': comment_city,
-            'general_comment': comment,
+            'comments': comments_city,
         },
         club_id: {
             'row_num': row_num,
             'category': 'club',
             'display': club,
-            'comment': comment_club,
-            'general_comment': comment,
+            'comments': comments_club,
         },
         performer: {
             'row_num': row_num,
             'category': 'performer',
-            'comment': comment_performer,
-            'general_comment': comment,
+            'comments': comments_performer,
         }
     }
 
@@ -219,7 +304,6 @@ for row in df.fillna('').itertuples():
         attrs[performer]['alleged_age'] = alleged_age
 
     nx.set_node_attributes(graph, attrs)
-
 
 def set_degrees(graph):
     """Set degrees for each node"""
@@ -288,6 +372,7 @@ def set_centralities(graph):
         nx.set_node_attributes(graph, attrs)
 
     return(graph)
+
 
 # print(comment_sources)
 graph = set_degrees(graph)
@@ -442,15 +527,6 @@ for edge in json_data.get('links'):
     target_node = next(
         item for item in nodes if item["id"] == edge.get('target'))
 
-    # process comment
-    if edge.get('comment'):
-        if not edge.get('edge_id') in all_comments['edges']:
-            all_comments['edges'][edge.get('edge_id')] = []
-        all_comments['edges'][edge.get('edge_id')].append({
-            'comment': edge.get('comment'),
-            'source': comment_sources['edges'][edge.get('comment')]
-        })
-
     # count source
     category = source_node.get('category')
     _id = source_node.get('id')
@@ -470,23 +546,7 @@ for edge in json_data.get('links'):
     count[category][_id] += 1
 
 for node in json_data.get('nodes'):
-    if node.get('comment') or node.get('general_comment'):
-        if not node['node_id'] in all_comments['nodes']:
-            all_comments['nodes'][node['node_id']] = {'general_comments': [], 'comments': []}
-        
-        if node['comment']:
-            print('--> has comment')
-            all_comments['nodes'][node['node_id']]['comments'].append({
-                'comment': node['comment'],
-                'source': comment_sources['nodes'][node['comment']]
-            })
-        
-        if node['general_comment']:
-            print('--> has general comment')
-            all_comments['nodes'][node['node_id']]['general_comments'].append({
-                'comment': node['general_comment'],
-                'source': comment_sources['nodes'][node['general_comment']]
-            })
+    pass
 
 for cat in count:
     count[cat] = Counter(count[cat]).most_common()
