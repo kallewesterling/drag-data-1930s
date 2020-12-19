@@ -1,3 +1,9 @@
+"use strict";
+
+/**
+ * fixMonth takes X argument/s... TODO: Finish this.
+ * The return value is ...
+ */
 const fixMonth = (month_string) => {
     return month_string
         .replace("January", "01")
@@ -137,6 +143,10 @@ let month_M_regex = "([1-9]|1[0-2])";
 let year_YYYY_regex = "(1[0-9][0-9][0-9])"; // since we are only looking for 1900s
 let year_YY_regex = "([0-9]{2})"; // since we are only looking for 1900s
 
+/**
+ * dateParser takes X argument/s... TODO: Finish this.
+ * The return value is ...
+ */
 const dateParser = (test_string) => {
     if (!test_string) {
     } else {
@@ -144,7 +154,7 @@ const dateParser = (test_string) => {
             found = false;
         regeExes.forEach((rx) => {
             if (!found) {
-                dynamic_rx = new RegExp(
+                let dynamic_rx = new RegExp(
                     rx.map
                         .replace("YYYY", year_YYYY_regex)
                         .replace("MMM", month_MMM_regex)
@@ -154,7 +164,7 @@ const dateParser = (test_string) => {
                         .replace("Dnozero", day_D_regex)
                         .replace("YY", year_YY_regex)
                 );
-                date = test_string.match(dynamic_rx);
+                let date = test_string.match(dynamic_rx);
                 if (date) {
                     let test_date = "";
                     if (rx.locations.Y && rx.locations.M && rx.locations.D) {

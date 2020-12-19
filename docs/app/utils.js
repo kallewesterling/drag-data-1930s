@@ -1,4 +1,43 @@
+"use strict";
 // TODO: this file might need splitting up... make an index of all these functions and where they are used?!
+
+/*
+functions:
+- nodeHasEdges
+- getUnconnectedNodes
+- hasUnconnectedNodes
+- dropNodesWithNoEdges
+- updateInfo
+- troubleshoot
+- debugMessage
+- isVisible
+- toggle
+- hide
+- show
+- restartLayout
+- displayOrID
+- setNodeEdgeInfo
+- nodeIsSelected
+- edgeIsSelected
+- deselectNodes
+- deselectEdges
+- getRelatedEdges
+- selectRelatedEdges
+- getRelated
+- unselectNodes
+- resetNodesAndEdges
+- selectNode
+- selectEdge
+- urlify
+- generateCommentHTML
+- modifyGraphNodes
+- graphNodesContains
+- graphEdgesContains
+- modifyForceLayout
+- getNodeClass
+- getEdgeClass
+- getSize
+*/
 
 /**
  * nodeHasEdges takes X argument/s... TODO: Finish this.
@@ -43,7 +82,7 @@ const nodeHasEdges = (node_id, count = false) => {
  * The return value is ...
  */
 const getUnconnectedNodes = () => {
-    unConnectedNodes = [];
+    let unConnectedNodes = [];
     graph.nodes.forEach((n) => {
         if (nodeHasEdges(n.node_id) === false) {
             unConnectedNodes.push(n);
@@ -89,7 +128,7 @@ const dropNodesWithNoEdges = () => {
     */
     if (fixed === true) {
         troubleshoot(true); // ensures that all nodes are correctly represented in
-        restart();
+        reloadNetwork();
         updateInfo();
     }
 };
@@ -147,8 +186,9 @@ const troubleshoot = (fix = false) => {
             let dropped = `Dropped nodes:`;
             info.storeNodes.inGraph.forEach((n) => {
                 if (
-                    info.graphNodes.inGraph.find((d) => d.node_id === n.node_id) ==
-                    undefined
+                    info.graphNodes.inGraph.find(
+                        (d) => d.node_id === n.node_id
+                    ) == undefined
                 ) {
                     dropped += `<li>${n.node_id}</li>`;
                     n.inGraph = false;
@@ -548,7 +588,7 @@ const resetNodesAndEdges = () => {
         .attr("class", (e) => getEdgeClass(e))
         .transition()
         .attr("stroke-opacity", 0.3);
-        
+
     if (!getSettings().nodes.stickyNodes) {
         g.nodes
             .selectAll("text.label")
@@ -559,7 +599,12 @@ const resetNodesAndEdges = () => {
             });
     }
 
-    g.nodes.selectAll("text.label").transition().duration(750).attr('opacity', 1).attr("font-size", (n) => getSize(n, "text"))
+    g.nodes
+        .selectAll("text.label")
+        .transition()
+        .duration(750)
+        .attr("opacity", 1)
+        .attr("font-size", (n) => getSize(n, "text"));
 };
 
 /**
@@ -586,16 +631,12 @@ const selectNode = (node) => {
  * The return value is ...
  */
 const selectEdge = (edge) => {
-    if (edgeIsSelected(edge)) {
-        hide("#nodeEdgeInfo");
-        resetNodesAndEdges();
-    } else {
-        // console.log("edge not selected yet");
-        deselectEdges(edge);
-        setNodeEdgeInfo(edge);
-    }
+    deselectEdges(edge);
+    setNodeEdgeInfo(edge);
+    return true;
 };
 
+// TODO; move to app/utils/text
 /**
  * urlify takes X argument/s... TODO: Finish this.
  * The return value is ...
@@ -604,9 +645,10 @@ const urlify = (text) => {
     // https://stackoverflow.com/questions/1500260/detect-urls-in-text-with-javascript
     // TODO: Fix, this doesn't work right now...
     var urlRegex = /(https?:\/\/[^\s]+)/g;
-    return text.replace(urlRegex, '<a href="$1">$1</a>')
+    return text.replace(urlRegex, '<a href="$1">$1</a>');
 };
 
+// TODO; move to app/utils/text
 /**
  * generateCommentHTML takes X argument/s... TODO: Finish this.
  * The return value is ...
@@ -615,7 +657,7 @@ const generateCommentHTML = (node_or_edge, identifier) => {
     let html = "";
     if (node_or_edge === "node") {
         let node_id = identifier;
-        node = store.nodes.find((x) => x.node_id === node_id);
+        let node = store.nodes.find((x) => x.node_id === node_id);
         html += `<h1>${displayOrID(node)}</h1>`;
         if (node.has_comments) {
             html += "<h2>Comments</h2>";
@@ -625,7 +667,7 @@ const generateCommentHTML = (node_or_edge, identifier) => {
         }
     } else if (node_or_edge === "edge") {
         let edge_id = identifier;
-        edge = store.edges.find((x) => x.edge_id === edge_id);
+        let edge = store.edges.find((x) => x.edge_id === edge_id);
         if (edge.revue_name) {
             html += `<h1>${edge.revue_name}</h1>`;
             html += `<h2>${displayOrID(edge.source)} - ${displayOrID(
@@ -651,4 +693,136 @@ const generateCommentHTML = (node_or_edge, identifier) => {
         }
     }
     return html;
+};
+
+
+
+/**
+ * modifyGraphNodes takes X argument/s... TODO: Finish this.
+ * The return value is ...
+ */
+const modifyGraphNodes = () => {
+    graph.nodes.forEach((n) => {
+        n.current_degree = nodeHasEdges(n.node_id, true);
+    });
+};
+
+/**
+ * graphNodesContains takes X argument/s... TODO: Finish this.
+ * The return value is ...
+ */
+const graphNodesContains = (node_id) => {
+    return [...graph.nodes.map((n) => n.node_id)].includes(node_id);
+};
+
+/**
+ * graphEdgesContains takes X argument/s... TODO: Finish this.
+ * The return value is ...
+ */
+const graphEdgesContains = (edge_id) => {
+    return [...graph.edges.map((e) => e.edge_id)].includes(edge_id);
+};
+
+/**
+ * modifyForceLayout takes X argument/s... TODO: Finish this.
+ * The return value is ...
+ */
+const modifyForceLayout = (settings, node, edge, text) => {
+    graph.layout.force("link").links(graph.edges);
+    graph.layout.nodes(graph.nodes);
+    if (settings.force.layoutCenter) {
+        graph.layout.force("center", d3.forceCenter());
+        graph.layout.force("center").strength = 1;
+    } else {
+        graph.layout.force("center", null);
+    }
+    if (settings.force.layoutForceX) {
+        graph.layout.force("forceX", d3.forceX());
+    } else {
+        graph.layout.force("forceX", null);
+    }
+    if (settings.force.layoutForceX) {
+        graph.layout.force("forceY", d3.forceY());
+    } else {
+        graph.layout.force("forceY", null);
+    }
+    if (settings.force.layoutCharge) {
+        graph.layout.force("charge", d3.forceManyBody());
+        graph.layout.force("charge").strength(settings.force.charge);
+    } else {
+        graph.layout.force("charge", null);
+    }
+    if (settings.force.layoutCollide) {
+        graph.layout.force("collide", d3.forceCollide());
+        graph.layout.force("collide").strength(settings.force.collide);
+    } else {
+        graph.layout.force("collide", null);
+    }
+
+    graph.layout.force("link").strength(0.4);
+
+    graph.layout.on("tick", function (n) {
+        node.attr("cx", (n) => n.x);
+        node.attr("cy", (n) => n.y);
+
+        edge.attr("x1", (e) => e.source.x);
+        edge.attr("y1", (e) => e.source.y);
+        edge.attr("x2", (e) => e.target.x);
+        edge.attr("y2", (e) => e.target.y);
+
+        text.attr("x", (n) => n.x);
+        text.attr("y", (n) => n.y + 4);
+    });
+
+    // restart the layout now that everything is set
+    graph.layout.restart();
+};
+
+
+/**
+ * getNodeClass takes X argument/s... TODO: Finish this.
+ * The return value is ...
+ */
+const getNodeClass = (n) => {
+    let classes = "node " + n.category;
+    classes += n.has_comments ? " has-comments" : "";
+    
+    return classes;
+};
+
+/**
+ * getEdgeClass takes X argument/s... TODO: Finish this.
+ * The return value is ...
+ */
+const getEdgeClass = (e) => {
+    let classes = "link";
+
+    classes += e.revue_name != "" ? " revue" : " no-revue";
+    classes += e.has_comments ? " has-comments" : "";
+    classes += e.has_general_comments ? " has-comments" : "";
+
+    return classes;
+};
+
+/**
+ * getSize takes X argument/s... TODO: Finish this.
+ * The return value is ...
+ */
+const getSize = (n, r_or_text) => {
+    let settings = getSettings();
+    let yScale = nodeScale(settings);
+
+    if (r_or_text === "r") {
+        if (settings.nodes.nodeSizeFromCurrent === true) {
+            return yScale(n.current_degree);
+        } else {
+            return yScale(n.degree);
+        }
+    } else if (r_or_text === "text") {
+        if (settings.nodes.nodeSizeFromCurrent === true) {
+            return yScale(n.current_degree) * 1.5;
+        } else {
+            return yScale(n.degree) * 1.5;
+        }
+    }
 };

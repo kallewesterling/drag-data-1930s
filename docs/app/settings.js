@@ -296,7 +296,7 @@ const changeSetting = (
         });
         d3.select(selector).node().value = setTo;
         if (_filter === true) filter();
-        restart();
+        reloadNetwork();
         restartLayout();
         saveSettings();
         additionalPostFunctions.forEach((func) => {
@@ -415,11 +415,17 @@ const setEventHandlers = () => {
  */
 const setCommentVisibilityForNodesAndEdges = () => {
     const isSourceOrTarget = (n) => {
-        let commentedEdges = graph.edges.filter(d=>d.has_comments || d.has_general_comments)
-        let isSource = commentedEdges.map(d=>d.source.node_id).includes(n.node_id)
-        let isTarget = commentedEdges.map(d=>d.target.node_id).includes(n.node_id)
+        let commentedEdges = graph.edges.filter(
+            (d) => d.has_comments || d.has_general_comments
+        );
+        let isSource = commentedEdges
+            .map((d) => d.source.node_id)
+            .includes(n.node_id);
+        let isTarget = commentedEdges
+            .map((d) => d.target.node_id)
+            .includes(n.node_id);
         return isSource || isTarget;
-    }
+    };
 
     // Nodes with comments
     d3.selectAll("circle.has-comments")
@@ -427,11 +433,9 @@ const setCommentVisibilityForNodesAndEdges = () => {
         .attr("r", (n) => {
             return Math.sqrt(n.comments.length) * 5;
         });
-    
+
     // Nodes with no comments
-    d3.selectAll(
-        "circle:not(.has-comments)"
-    )
+    d3.selectAll("circle:not(.has-comments)")
         .transition()
         .attr("r", (n) => {
             if (isSourceOrTarget(n)) {
@@ -440,43 +444,41 @@ const setCommentVisibilityForNodesAndEdges = () => {
                 return 0; // hide circles with no comments
             }
         })
-        .attr('class', (n) => {
+        .attr("class", (n) => {
             if (isSourceOrTarget(n)) {
-                return 'node disabled'; // change class for these
+                return "node disabled"; // change class for these
             } else {
                 return getNodeClass(n); // don't change class for others
             }
         });
 
     // Text with comments
-    d3.selectAll("text.label.has-comments")
-        .transition()
-        .attr("font-size", 10);
+    d3.selectAll("text.label.has-comments").transition().attr("font-size", 10);
 
     // Text with no comments
     d3.selectAll("text.label:not(.has-comments)")
-        .transition().attr('opacity', (n) => {
+        .transition()
+        .attr("opacity", (n) => {
             if (isSourceOrTarget(n)) {
                 return 0.1;
             } else {
                 return 0.01;
             }
-            })
-        .attr('font-size', (n) => {
+        })
+        .attr("font-size", (n) => {
             if (isSourceOrTarget(n)) {
                 return 6;
             } else {
                 return 0;
             }
         });
-    
+
     // Edges with no comments
     d3.selectAll("line:not(.has-comments)")
-        .classed('disabled', true)
+        .classed("disabled", true)
         .transition()
         .attr("stroke-opacity", 0.01);
-
-}
+};
 
 /**
  * setKeyHandlers takes X argument/s... TODO: Finish this.
@@ -494,7 +496,7 @@ const setKeyHandlers = () => {
                     resetDraw();
                     // hide("#popup-info");
                 } else {
-                    console.log('window has ego network...')
+                    console.log("window has ego network...");
                     // TODO: If ego network is open, and alt key is pressed and then released, we want to reset view?
                 }
             }
