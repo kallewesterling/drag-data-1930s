@@ -409,32 +409,6 @@ const setEventHandlers = () => {
     });
 };
 
-const getComments = (node_or_edge, id, return_value) => {
-    let bank = [];
-    if (node_or_edge === "node") {
-        bank = store.comments.nodes;
-    } else if (node_or_edge === "edge") {
-        bank = store.comments.nodes;
-    }
-    if (bank[id]) {
-        if (return_value === "general") {
-            return bank[id]["general_comments"];
-        } else if (return_value === "comments") {
-            return bank[id]["comments"];
-        } else if (return_value === "count") {
-            return [
-                ...getComments(node_or_edge, id, "general"),
-                ...getComments(node_or_edge, id, "comments"),
-            ].length;
-        } else {
-            return [
-                ...getComments(node_or_edge, id, "general"),
-                ...getComments(node_or_edge, id, "comments"),
-            ];
-        }
-    }
-};
-
 /**
  * setKeyHandlers takes X argument/s... TODO: Finish this.
  * The return value is ...
@@ -447,8 +421,12 @@ const setKeyHandlers = () => {
                 d3.selectAll(".metaShow").classed("d-none", true);
             }
             if (e.key === "Alt") {
-                resetDraw();
-                hide("#popup-info");
+                if (!window.egoNetwork) {
+                    resetDraw();
+                    // hide("#popup-info");
+                } else {
+                    console.log('window has ego network...')
+                }
             }
         });
 
@@ -469,14 +447,34 @@ const setKeyHandlers = () => {
             }
             if (e.key === "Alt") {
                 d3.selectAll(
-                    "circle:not(.has-comments):not(.has-general-comments)"
-                ).classed("d-none", true); // hide circles with no comments
-                d3.selectAll("circle.has-general-comments")
+                    "circle:not(.has-comments)"
+                )
                     .transition()
                     .attr("r", (n) => {
-                        return getComments("node", n.node_id, "count") * 10;
+                        let commentedEdges = graph.edges.filter(d=>d.has_comments || d.has_general_comments)
+                        let isSource = commentedEdges.map(d=>d.source.node_id).includes(n.node_id)
+                        let isTarget = commentedEdges.map(d=>d.target.node_id).includes(n.node_id)
+                        if (isSource || isTarget) {
+                            return 3; // make small circles for those that are connected to edges with comment
+                        } else {
+                            return 0; // hide circles with no comments
+                        }
+                    })
+                    .attr('class', 'node')
+                    .attr('fill', 'red !important');
+
+                d3.selectAll("circle.has-comments")
+                    .transition()
+                    .attr("r", (n) => {
+                        return Math.sqrt(n.comments.length) * 5;
                     });
-                d3.selectAll("text");
+
+                d3.selectAll("text.label:not(.has-comments)").transition().attr('opacity', 0.01)
+                d3.selectAll("text.label.has-comments").transition().attr("font-size", 10)
+
+                d3.selectAll(
+                    "line:not(.has-comments)"
+                ).transition().attr("stroke-opacity", 0.01)
             }
             if (e.key === "Escape" && __) {
                 console.log("Escape 1 called!");

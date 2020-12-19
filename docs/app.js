@@ -29,7 +29,6 @@ TODO:
  */
 const loadNetwork = () => {
     d3.json(DATAFILE).then((data) => {
-        console.log("here!");
         // for debug purposes (TODO can be removed)
         store.raw = data;
 
@@ -41,18 +40,29 @@ const loadNetwork = () => {
 
         // set up store.nodes
         data.nodes.forEach((d) => {
-            store.nodes.push(Object.assign({ inGraph: false }, d));
+            if (d.node_id === '' || d.node_id === '-' || d.node_id === '–' || d.node_id === '—') {
+                console.log('found an erroneous data point:'); console.log(d);
+            } else {
+                store.nodes.push(Object.assign({
+                    inGraph: false,
+                    has_comments: d.comments.length > 0 ? true : false,
+                }, d));
+            }
         });
-
+        
         // set up store.edges
-        store.edges = [...data.links];
+        data.links.forEach(e => {
+            store.edges.push(Object.assign({
+                has_comments: e.comments.length > 0 ? true : false,
+                has_general_comments: e.general_comments.length > 0 ? true : false,
+                inGraph: false,
+                dates: [],
+                range: { start: undefined, end: undefined }
+            }, e));
+        })
         store.edges.forEach((e) => {
-            e.inGraph = false;
             e.source = store.nodes.find((n) => n.id === e.source);
             e.target = store.nodes.find((n) => n.id === e.target);
-            e.dates = [];
-            e.range = { start: undefined, end: undefined };
-            // console.log(e.found);
             e.found = e.found.filter((found) => {
                 return found != null && found != "" && found != "";
             });
@@ -61,7 +71,7 @@ const loadNetwork = () => {
                 if (date && date.iso !== undefined) {
                     e.dates.push(date.iso);
                 } else {
-                    // console.log(`Could not interpret date in ${source}`);
+                    console.log(`Could not interpret date in ${source}`);
                 }
             });
             if (e.dates) {
@@ -114,8 +124,8 @@ const loadNetwork = () => {
         // send us on to filter()
         filter();
 
-        // setup preview
-        preview(store);
+        // setup preview TODO: This is currently disabled
+        // preview(store);
     });
 };
 
@@ -270,6 +280,8 @@ const egoNetwork = (node) => {
                 n.inGraph = true;
             } else if (related.secondaryNodeIDs.includes(n.node_id)) {
                 n.inGraph = true;
+            } else if (related.tertiaryNodeIDs.includes(n.node_id)) {
+                
             } else {
                 graph.nodes.forEach((o, i) => {
                     if (n.node_id === o.node_id) {
@@ -279,8 +291,9 @@ const egoNetwork = (node) => {
                 n.inGraph = false;
             }
         });
+
         store.edges.forEach((e) => {
-            if (related.secondaryEdges.includes(e.edge_id)) {
+            if (related.secondaryEdges.includes(e.edge_id) || related.tertiaryEdges.includes(e.edge_id)) {
                 console.log("this edge should stay");
                 e.inGraph = true;
                 if (graphEdgesContains(e.edge_id)) {
@@ -442,19 +455,34 @@ const setupInteractivity = (settings, node, edge) => {
 
     node.on("click", (n) => {
         d3.event.stopPropagation();
-        console.log(d3.event);
         if (d3.event.metaKey === true) {
             if (nodeIsSelected(n)) {
-                // this is how we would hide
                 hide("#nodeEdgeInfo");
                 resetNodesAndEdges();
             }
             egoNetwork(n);
         }
+        if (d3.event.altKey === true && n.has_comments) {
+            d3.select("#popup-info")
+                .html(generateCommentHTML("node", n.node_id))
+                .classed("d-none", false)
+                .attr(
+                    "style",
+                    `top: ${d3.event.y}px !important; left: ${d3.event.x}px !important;`
+                );
+        } else {
+            selectNode(n);
+        }
+    });
+
+    edge.on("click", (e) => {
+        d3.event.stopPropagation();
         if (d3.event.altKey === true) {
-            if (store.comments.nodes[n.node_id]) {
+            console.log(store.comments.edges)
+            console.log(e.edge_id)
+            if (e.has_comments || e.has_general_comments) {
                 d3.select("#popup-info")
-                    .html(generateCommentHTML(n.node_id))
+                    .html(generateCommentHTML("edge", e.edge_id))
                     .classed("d-none", false)
                     .attr(
                         "style",
@@ -462,13 +490,8 @@ const setupInteractivity = (settings, node, edge) => {
                     );
             }
         } else {
-            selectNode(n);
+            selectEdge(e);
         }
-    });
-
-    edge.on("click", (n) => {
-        d3.event.stopPropagation();
-        selectEdge(n);
     });
 };
 
@@ -476,17 +499,8 @@ const getNodeClass = (n) => {
     let _ = "node";
 
     _ += " " + n.category;
+    _ += n.has_comments ? " has-comments" : ""
 
-    if (store.comments.nodes[n.node_id]) {
-        if (store.comments.nodes[n.node_id]["general_comments"].length) {
-            _ += " has-general-comments";
-            console.log(n.node_id + " has general comments");
-        }
-        if (store.comments.nodes[n.node_id]["comments"].length) {
-            _ += " has-comments";
-            console.log(n.node_id + " has comments");
-        }
-    }
     return _;
 };
 
@@ -508,6 +522,16 @@ const getSize = (n, r_or_text) => {
         }
     }
 };
+
+const getEdgeClass = (e) => {
+    let _ = "link";
+    
+    _ += e.revue_name != "" ? " revue" : " no-revue";
+    _ += e.has_comments ? " has-comments" : "";
+    _ += e.has_general_comments ? " has-comments" : "";
+
+    return _
+}
 
 const restart = () => {
     let settings = getSettings();
@@ -551,7 +575,8 @@ const restart = () => {
     g.nodes
         .selectAll("text.label")
         .data(graph.nodes, (n) => n.node_id)
-        .transition(750)
+        .transition()
+        .duration(750)
         .attr("font-size", (n) => getSize(n, "text"))
         .text((n) => {
             if (n.display) {
@@ -559,7 +584,8 @@ const restart = () => {
             } else {
                 return n.id;
             }
-        });
+        })
+        .attr('class', (n) => { return n.has_comments ? 'label has-comments' : 'label' });
 
     text = text.merge(newText);
 
@@ -576,13 +602,7 @@ const restart = () => {
         .enter()
         .append("line")
         .attr("id", (e) => e.edge_id)
-        .attr("class", (e) => {
-            if (e.revue_name != "") {
-                return "link revue";
-            } else {
-                return "link no-revue";
-            }
-        })
+        .attr("class", (e) => getEdgeClass(e))
         .attr("x1", (e) => e.source.x)
         .attr("y1", (e) => e.source.y)
         .attr("x2", (e) => e.target.x)
@@ -593,7 +613,8 @@ const restart = () => {
     g.edges
         .selectAll("line.link")
         .data(graph.edges, (d) => d.edge_id)
-        .transition(10000) // TODO: Look into why this transition is not working — or is it possibly my slow computer?
+        .transition()
+        .duration(3000)
         .style("stroke-width", (e) => {
             let evalWeight = settings.edges.weightFromCurrent
                 ? e.calibrated_weight

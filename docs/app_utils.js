@@ -165,7 +165,7 @@ const troubleshoot = (fix = false) => {
 const debugMessage = (message, header) => {
     if (getSettings().debugMessages === false) {
         // console.log("[debugMessage: " + header + "] " + message);
-        console.log("debugMessage suppressed.");
+        // console.log("debugMessage suppressed."); //TODO: Turn back on?
         return false;
     }
     if (!header) {
@@ -542,13 +542,11 @@ const resetNodesAndEdges = () => {
             }
         });
 
-    g.edges.selectAll("line.link").attr("class", (e) => {
-        if (e.revue_name != "") {
-            return "link revue";
-        } else {
-            return "link no-revue";
-        }
-    });
+    g.edges
+        .selectAll("line.link")
+        .attr("class", (e) => getEdgeClass(e))
+        .transition()
+        .attr("stroke-opacity", 0.3);
     if (!getSettings().nodes.stickyNodes) {
         g.nodes
             .selectAll("text.label")
@@ -558,6 +556,8 @@ const resetNodesAndEdges = () => {
                 n.fy = null;
             });
     }
+
+    d3.selectAll("text.label").transition().duration(750).attr('opacity', 1).attr("font-size", (n) => getSize(n, "text"))
 };
 
 /**
@@ -594,17 +594,53 @@ const selectEdge = (edge) => {
     }
 };
 
-const generateCommentHTML = (node_id) => {
+const urlify = (text) => {
+    // https://stackoverflow.com/questions/1500260/detect-urls-in-text-with-javascript
+    // TODO: Fix, this doesn't work right now...
+    var urlRegex = /(https?:\/\/[^\s]+)/g;
+    return text.replace(urlRegex, '<a href="$1">$1</a>')
+};
+
+const generateCommentHTML = (node_or_edge, identifier) => {
     let _ = "";
-    if (store.comments.nodes[node_id]["general_comments"].length) {
-        store.comments.nodes[node_id]["general_comments"].forEach((c) => {
-            _ += `<p>${c.comment} (${c.source})</p>\n`;
-        });
-    }
-    if (store.comments.nodes[node_id]["comments"].length) {
-        store.comments.nodes[node_id]["comments"].forEach((c) => {
-            _ += `<p>${c.comment} (${c.source})</p>\n`;
-        });
+    if (node_or_edge === "node") {
+        let node_id = identifier;
+        node = store.nodes.find((x) => x.node_id === node_id);
+        _ += `<h1>${displayOrID(node)}</h1>`;
+        if (node.has_comments) {
+            _ += "<h2>Comments</h2>";
+            node.comments.forEach((c) => {
+                _ += `<p>${urlify(c.comment)} (${c.source})</p>\n`;
+            });
+        }
+    } else if (node_or_edge === "edge") {
+        let edge_id = identifier;
+        edge = store.edges.find((x) => x.edge_id === edge_id);
+        console.log(edge);
+        if (edge.revue_name) {
+            _ += `<h1>${edge.revue_name}</h1>`;
+            _ += `<h2>${displayOrID(edge.source)} - ${displayOrID(
+                edge.target
+            )}</h2>`;
+        } else {
+            _ += `<h1>${displayOrID(edge.source)} - ${displayOrID(
+                edge.target
+            )}</h1>`;
+        }
+
+        if (edge.has_comments) {
+            _ += "<h2>Comments</h2>";
+            edge.comments.forEach((c) => {
+                _ += `<p>${urlify(c.comment)} (${c.source})</p>\n`;
+            });
+        }
+        if (edge.has_general_comments) {
+            _ += "<h2>General comments</h2>";
+            edge.general_comments.forEach((c) => {
+                _ += `<p>${urlify(c.comment)} (${c.source})</p>\n`;
+            });
+        }
+        console.log(_);
     }
     return _;
 };

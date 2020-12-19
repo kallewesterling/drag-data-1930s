@@ -12,7 +12,9 @@
     --performer-selected-tertiary: rgb(227, 172, 172);
     --performer-deselected: rgb(128, 128, 128);
 
-    --link-selected-primary: red;
+    --link-selected-primary: #ff0000;
+    --link-selected-secondary: #ffb0b0;
+    --link-selected-tertiary: #ffdfdf;
     --link-deselected: rgb(136, 136, 136, 0.1);
 
     --link-revue: rgba(61, 90, 128);
@@ -29,7 +31,8 @@
     --city-selected-secondary: rgb(213, 169, 169);
     --city-selected-tertiary: rgb(213, 169, 169);
     --city-deselected: rgb(87, 87, 87);
-
+    
+    --empty-node: rgba(255, 255, 255, 0.5);
     --node-stroke: rgba(255, 255, 255, 0.5);
 }
 
@@ -67,6 +70,7 @@
     --city-selected-tertiary: #ffdfdf;
     --city-deselected: rgba(241, 241, 241, 1);
 
+    --empty-node: rgba(0, 0, 0, 0.5);
     --node-stroke: rgba(255, 255, 255, 1);
 }
 
@@ -201,6 +205,7 @@ svg#main {
 }
 
 .node {
+    fill: var(--empty-node)
     stroke-width: 0.1;
     stroke: var(--node-stroke);
     cursor: move;
@@ -360,11 +365,30 @@ svg#main {
 
 #popup-info {
     position: fixed;
+    padding: 1rem;
     top: 0;
     left: 0;
     width: 400px;
-    height:300px;
+    height: 300px;
+    overflow: hidden;
+    overflow-y: scroll;
     max-height: 600px;
     background-color: rgba(255,255,255,0.75);
 }
 
+#popup-info > h1 {
+    font-size: 1em;
+    font-weight: bold;
+    padding-bottom: 0;
+}
+
+#popup-info > h2 {
+    font-size: 0.8em;
+    font-weight: bold;
+    padding-top: 0.5em;
+    padding-bottom: 0;
+}
+
+#popup-info > p {
+    font-size: 0.8em;
+}
