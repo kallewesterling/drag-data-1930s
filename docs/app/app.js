@@ -23,6 +23,7 @@ TODO:
 
 */
 
+// TODO move to app/load
 /**
  * loadNetwork takes no arguments, but ensures that all the settings containers on the screen are in/visible to the user when appropriate.
  * The return value is true in all cases.
@@ -41,7 +42,7 @@ const loadNetwork = () => {
         // set up store.nodes
         data.nodes.forEach((d) => {
             if (d.node_id === '' || d.node_id === '-' || d.node_id === '–' || d.node_id === '—') {
-                console.log('found an erroneous data point:'); console.log(d);
+                console.error('found an erroneous data point:'); console.log(d);
             } else {
                 store.nodes.push(Object.assign({
                     inGraph: false,
@@ -71,7 +72,7 @@ const loadNetwork = () => {
                 if (date && date.iso !== undefined) {
                     e.dates.push(date.iso);
                 } else {
-                    console.log(`Could not interpret date in ${source}`);
+                    console.error(`Could not interpret date in ${source}`);
                 }
             });
             if (e.dates) {
@@ -87,7 +88,7 @@ const loadNetwork = () => {
         let range = (start, stop, step) =>
             Array.from(
                 { length: (stop - start) / step + 1 },
-                (_, i) => start + i * step
+                (x, i) => start + i * step
             );
 
         store.ranges.nodeDegree = d3.extent(store.nodes, (d) => d.degree);
@@ -110,12 +111,12 @@ const loadNetwork = () => {
         setMiscHandlers();
 
         /* // TODO #10: This does not work!
-        let _ = loadSettings("transform");
-        if (_) {
+        let transformSettings = loadSettings("transform");
+        if (transformSettings) {
             console.log("transform recorded");
-            k = _.k;
-            graph.plot.transition(750).call(zoom.scaleTo, _.k);
-            graph.plot.transition(750).call(zoom.translateTo, _.x, _.y);
+            k = transformSettings.k;
+            graph.plot.transition(750).call(zoom.scaleTo, transformSettings.k);
+            graph.plot.transition(750).call(zoom.translateTo, transformSettings.x, transformSettings.y);
         } else {
             graph.plot.transition(750).call(zoom.scaleTo, AUTO_ZOOM);
         }
@@ -129,6 +130,7 @@ const loadNetwork = () => {
     });
 };
 
+// TODO move to app/filters
 const filterNodes = (settings) => {
     store.nodes.forEach((n) => {
         // if (n.degree > settings.nodes.minDegree) console.log(n);
@@ -157,6 +159,7 @@ const filterNodes = (settings) => {
     });
 };
 
+// TODO move to app/filters
 const filterEdges = (settings) => {
     store.edges.forEach((e) => {
         e.calibrated_weight = e.found.length;
@@ -242,20 +245,24 @@ const filterEdges = (settings) => {
     });
 };
 
+// TODO move to app/utils
 const modifyGraphNodes = () => {
     graph.nodes.forEach((n) => {
         n.current_degree = nodeHasEdges(n.node_id, true);
     });
 };
 
+// TODO move to app/utils
 const graphNodesContains = (node_id) => {
     return [...graph.nodes.map((n) => n.node_id)].includes(node_id);
 };
 
+// TODO move to app/utils
 const graphEdgesContains = (edge_id) => {
     return [...graph.edges.map((e) => e.edge_id)].includes(edge_id);
 };
 
+// TODO move to app/utils
 const egoNetwork = (node) => {
     // filter nodes based on a given node
     if (window.egoNetwork) {
@@ -313,11 +320,12 @@ const egoNetwork = (node) => {
             }
         });
 
+        
+
         d3.select("#main").on("click", () => {
             if (d3.event.metaKey && window.egoNetwork) {
-                console.log("svg command + click detected");
                 console.log(
-                    "ego network already active - resetting network view..."
+                    "svg command + click detected while ego network active - resetting network view..."
                 );
                 resetLocalStorage();
             }
@@ -330,6 +338,7 @@ const egoNetwork = (node) => {
     restart();
 };
 
+// TODO move to app/filters
 const filter = () => {
     let settings = getSettings();
 
@@ -348,6 +357,7 @@ const filter = () => {
     updateInfo();
 };
 
+// TODO move to app/utils
 const modifyForceLayout = (settings, node, edge, text) => {
     graph.layout.force("link").links(graph.edges);
     graph.layout.nodes(graph.nodes);
@@ -399,6 +409,7 @@ const modifyForceLayout = (settings, node, edge, text) => {
     graph.layout.restart();
 };
 
+// TODO move to app/scales
 const nodeScale = (settings) => {
     if (settings === true || settings.nodes.nodeSizeFromCurrent === true) {
         return d3
@@ -413,6 +424,7 @@ const nodeScale = (settings) => {
     }
 };
 
+// TODO move to app/scales
 const edgeScale = (settings) => {
     if (settings === true || settings.edges.weightFromCurrent === true) {
         return d3
@@ -427,6 +439,7 @@ const edgeScale = (settings) => {
     }
 };
 
+// TODO move to app/utils
 const setupInteractivity = (settings, node, edge) => {
     node.call(
         d3
@@ -478,8 +491,8 @@ const setupInteractivity = (settings, node, edge) => {
     edge.on("click", (e) => {
         d3.event.stopPropagation();
         if (d3.event.altKey === true) {
-            console.log(store.comments.edges)
-            console.log(e.edge_id)
+            //console.log(store.comments.edges)
+            //console.log(e.edge_id)
             if (e.has_comments || e.has_general_comments) {
                 d3.select("#popup-info")
                     .html(generateCommentHTML("edge", e.edge_id))
@@ -495,15 +508,15 @@ const setupInteractivity = (settings, node, edge) => {
     });
 };
 
+// TODO move to app/utils
 const getNodeClass = (n) => {
-    let _ = "node";
+    let classes = "node " + n.category;
+    classes += n.has_comments ? " has-comments" : ""
 
-    _ += " " + n.category;
-    _ += n.has_comments ? " has-comments" : ""
-
-    return _;
+    return classes;
 };
 
+// TODO move to app/utils
 const getSize = (n, r_or_text) => {
     let settings = getSettings();
     let yScale = nodeScale(settings);
@@ -523,16 +536,18 @@ const getSize = (n, r_or_text) => {
     }
 };
 
+// TODO move to app/utils
 const getEdgeClass = (e) => {
-    let _ = "link";
+    let classes = "link";
     
-    _ += e.revue_name != "" ? " revue" : " no-revue";
-    _ += e.has_comments ? " has-comments" : "";
-    _ += e.has_general_comments ? " has-comments" : "";
+    classes += e.revue_name != "" ? " revue" : " no-revue";
+    classes += e.has_comments ? " has-comments" : "";
+    classes += e.has_general_comments ? " has-comments" : "";
 
-    return _
+    return classes
 }
 
+// TODO move to app/load
 const restart = () => {
     let settings = getSettings();
 
@@ -613,8 +628,6 @@ const restart = () => {
     g.edges
         .selectAll("line.link")
         .data(graph.edges, (d) => d.edge_id)
-        .transition()
-        .duration(3000)
         .style("stroke-width", (e) => {
             let evalWeight = settings.edges.weightFromCurrent
                 ? e.calibrated_weight
@@ -628,6 +641,7 @@ const restart = () => {
     modifyForceLayout(settings, node, edge, text);
 };
 
+// TODO: move to app/zoom
 // TODO: Continue clean-up here... + add docstring.
 let zoomed = () => {
     graph.k = Math.round(d3.event.transform.k * 10) / 10;

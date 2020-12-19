@@ -1,0 +1,77 @@
+.theme-dark {
+    --background: rgba(0, 0, 0, 1);
+
+    --background-settings: rgba(0, 0, 0, 0.75);
+    --settings-label: rgba(255, 255, 255, 1);
+
+    --text-color: rgba(255, 255, 255, 1);
+
+    --performer: rgba(175, 79, 55, 1);
+    --performer-selected-primary: rgb(235, 0, 0);
+    --performer-selected-secondary: rgb(235, 0, 0);
+    --performer-selected-tertiary: rgb(227, 172, 172);
+    --performer-deselected: rgb(128, 128, 128);
+
+    --link-selected-primary: #ff0000;
+    --link-selected-secondary: #ffb0b0;
+    --link-selected-tertiary: #ffdfdf;
+    --link-deselected: rgb(136, 136, 136, 0.1);
+
+    --link-revue: rgba(61, 90, 128);
+    --link-norevue: rgba(199, 199, 199);
+
+    --club: rgba(61, 90, 128, 1);
+    --club-selected-primary: rgb(217, 0, 0);
+    --club-selected-secondary: rgb(218, 162, 162);
+    --club-selected-tertiary: rgb(218, 162, 162);
+    --club-deselected: rgb(107, 107, 107);
+
+    --city: rgb(124, 124, 124);
+    --city-selected-primary: rgb(200, 0, 0);
+    --city-selected-secondary: rgb(213, 169, 169);
+    --city-selected-tertiary: rgb(213, 169, 169);
+    --city-deselected: rgb(87, 87, 87);
+    
+    --empty-node: rgba(255, 255, 255, 0.5);
+    --disabled-node: rgba(255, 255, 255, 0.05);
+    --node-stroke: rgba(255, 255, 255, 0.5);
+}
+
+.theme-light {
+    --background: rgba(0, 0, 0, 0.009);
+
+    --background-settings: rgba(255, 255, 255, 0.75);
+    --settings-label: rgba(0, 0, 0, 1);
+
+    --text-color: rgba(0, 0, 0, 1);
+
+    --performer: rgba(238, 108, 77, 1);
+    --performer-selected-primary: #ff0000;
+    --performer-selected-secondary: #ffb0b0;
+    --performer-selected-tertiary: #ffdfdf;
+    --performer-deselected: rgb(239, 239, 239);
+
+    --link-selected-primary: #ff0000;
+    --link-selected-secondary: #ffb0b0;
+    --link-selected-tertiary: #ffdfdf;
+    --link-deselected: rgba(0, 0, 0, 0.09);
+
+    --link-revue: rgba(61, 90, 128, 0.5);
+    --link-norevue: rgba(0, 0, 0, 0.15);
+
+    --club: rgba(61, 90, 128, 1);
+    --club-selected-primary: #ff0000;
+    --club-selected-secondary: #ffb0b0;
+    --club-selected-tertiary: #ffdfdf;
+    --club-deselected: rgba(245, 245, 245, 1);
+
+    --city: rgba(238, 238, 238, 1);
+    --city-selected-primary: #ff0000;
+    --city-selected-secondary: #ffb0b0;
+    --city-selected-tertiary: #ffdfdf;
+    --city-deselected: rgba(241, 241, 241, 1);
+
+    --empty-node: rgba(0, 0, 0, 0.5);
+    --disabled-node: rgba(0, 0, 0, 0.05);
+    --node-stroke: rgba(255, 255, 255, 1);
+}

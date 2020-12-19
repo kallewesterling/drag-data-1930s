@@ -84,12 +84,12 @@ const saveSettings = () => {
  * @param {string} item - The name of the stored setting to load
  */
 const loadSettings = (item) => {
-    let _ = localStorage.getItem(item);
-    if (_) {
-        if (_.includes("{")) {
-            return JSON.parse(_);
+    let rawSetting = localStorage.getItem(item);
+    if (rawSetting) {
+        if (rawSetting.includes("{")) {
+            return JSON.parse(rawSetting);
         } else {
-            return _;
+            return rawSetting;
         }
     } else {
         return undefined;
@@ -410,6 +410,75 @@ const setEventHandlers = () => {
 };
 
 /**
+ * setCommentVisibilityForNodesAndEdges takes X argument/s... TODO: Finish this.
+ * The return value is ...
+ */
+const setCommentVisibilityForNodesAndEdges = () => {
+    const isSourceOrTarget = (n) => {
+        let commentedEdges = graph.edges.filter(d=>d.has_comments || d.has_general_comments)
+        let isSource = commentedEdges.map(d=>d.source.node_id).includes(n.node_id)
+        let isTarget = commentedEdges.map(d=>d.target.node_id).includes(n.node_id)
+        return isSource || isTarget;
+    }
+
+    // Nodes with comments
+    d3.selectAll("circle.has-comments")
+        .transition()
+        .attr("r", (n) => {
+            return Math.sqrt(n.comments.length) * 5;
+        });
+    
+    // Nodes with no comments
+    d3.selectAll(
+        "circle:not(.has-comments)"
+    )
+        .transition()
+        .attr("r", (n) => {
+            if (isSourceOrTarget(n)) {
+                return 3; // make small circles for those that are connected to edges with comment
+            } else {
+                return 0; // hide circles with no comments
+            }
+        })
+        .attr('class', (n) => {
+            if (isSourceOrTarget(n)) {
+                return 'node disabled'; // change class for these
+            } else {
+                return getNodeClass(n); // don't change class for others
+            }
+        });
+
+    // Text with comments
+    d3.selectAll("text.label.has-comments")
+        .transition()
+        .attr("font-size", 10);
+
+    // Text with no comments
+    d3.selectAll("text.label:not(.has-comments)")
+        .transition().attr('opacity', (n) => {
+            if (isSourceOrTarget(n)) {
+                return 0.1;
+            } else {
+                return 0.01;
+            }
+            })
+        .attr('font-size', (n) => {
+            if (isSourceOrTarget(n)) {
+                return 6;
+            } else {
+                return 0;
+            }
+        });
+    
+    // Edges with no comments
+    d3.selectAll("line:not(.has-comments)")
+        .classed('disabled', true)
+        .transition()
+        .attr("stroke-opacity", 0.01);
+
+}
+
+/**
  * setKeyHandlers takes X argument/s... TODO: Finish this.
  * The return value is ...
  */
@@ -426,6 +495,7 @@ const setKeyHandlers = () => {
                     // hide("#popup-info");
                 } else {
                     console.log('window has ego network...')
+                    // TODO: If ego network is open, and alt key is pressed and then released, we want to reset view?
                 }
             }
         });
@@ -440,53 +510,23 @@ const setKeyHandlers = () => {
     d3.select("html")
         .node()
         .addEventListener("keydown", (e) => {
-            let _ = isVisible("#nodeEdgeInfo");
-            let __ = isVisible("#popup-info");
             if (e.key === "Meta" || e.key === "Shift") {
                 d3.selectAll(".metaShow").classed("d-none", false);
             }
             if (e.key === "Alt") {
-                d3.selectAll(
-                    "circle:not(.has-comments)"
-                )
-                    .transition()
-                    .attr("r", (n) => {
-                        let commentedEdges = graph.edges.filter(d=>d.has_comments || d.has_general_comments)
-                        let isSource = commentedEdges.map(d=>d.source.node_id).includes(n.node_id)
-                        let isTarget = commentedEdges.map(d=>d.target.node_id).includes(n.node_id)
-                        if (isSource || isTarget) {
-                            return 3; // make small circles for those that are connected to edges with comment
-                        } else {
-                            return 0; // hide circles with no comments
-                        }
-                    })
-                    .attr('class', 'node')
-                    .attr('fill', 'red !important');
-
-                d3.selectAll("circle.has-comments")
-                    .transition()
-                    .attr("r", (n) => {
-                        return Math.sqrt(n.comments.length) * 5;
-                    });
-
-                d3.selectAll("text.label:not(.has-comments)").transition().attr('opacity', 0.01)
-                d3.selectAll("text.label.has-comments").transition().attr("font-size", 10)
-
-                d3.selectAll(
-                    "line:not(.has-comments)"
-                ).transition().attr("stroke-opacity", 0.01)
+                setCommentVisibilityForNodesAndEdges();
             }
-            if (e.key === "Escape" && __) {
-                console.log("Escape 1 called!");
+            if (e.key === "Escape" && isVisible("#popup-info")) {
+                //console.log("Escape 1 called!");
                 hide("#popup-info");
-            } else if (e.key === "Escape" && _) {
-                console.log("Escape 2 called!");
+            } else if (e.key === "Escape" && isVisible("#nodeEdgeInfo")) {
+                //console.log("Escape 2 called!");
                 resetDraw();
             } else if (e.key === "Escape" || e.key === " ") {
-                console.log("Escape 3 called!");
+                //console.log("Escape 3 called!");
                 UIToggleAllSettingBoxes();
             } else if (e.key === "c" && e.metaKey) {
-                console.log("command+c called");
+                //console.log("command+c called");
                 changeSetting(
                     "#autoClearNodes",
                     !getSettings().nodes.autoClearNodes,
@@ -520,7 +560,7 @@ const setKeyHandlers = () => {
                     "h1"
                 ).innerText = `${+numbers.join("")}`;
                 numberModal.show();
-                setTimeout(() => {
+                let t = setTimeout(() => {
                     numberModal.hide();
                 }, 750);
                 if (numbers.length == 4) {
@@ -531,6 +571,7 @@ const setKeyHandlers = () => {
                         console.log(
                             `${year} is not a year in the graph's range.`
                         );
+                        // TODO: Stop `t` from timing out, flash the numberModal red, and let the user know that nothing happened
                     }
                     numbers = [];
                     // console.log(years);
@@ -623,7 +664,7 @@ const setMiscHandlers = () => {
 
     d3.select("#info-box").on("click", () => {
         if (d3.event.target.id === "info-box") {
-            console.log("closing info box!");
+            //console.log("closing info box!");
             toggle("#info-box");
         }
     });

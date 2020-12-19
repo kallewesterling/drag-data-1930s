@@ -1,3 +1,5 @@
+// TODO: this file might need splitting up... make an index of all these functions and where they are used?!
+
 /**
  * nodeHasEdges takes X argument/s... TODO: Finish this.
  * The return value is ...
@@ -16,7 +18,7 @@ const nodeHasEdges = (node_id, count = false) => {
             return false;
         }
     } else {
-        // console.error("Found more than one node with ID " + node_id); // TODO: #9 This is strange...
+        console.error("Found more than one node with ID " + node_id); // TODO: #9 This is strange...
     }
 
     let returnValue = false,
@@ -41,13 +43,13 @@ const nodeHasEdges = (node_id, count = false) => {
  * The return value is ...
  */
 const getUnconnectedNodes = () => {
-    _ = [];
+    unConnectedNodes = [];
     graph.nodes.forEach((n) => {
         if (nodeHasEdges(n.node_id) === false) {
-            _.push(n);
+            unConnectedNodes.push(n);
         }
     });
-    return _;
+    return unConnectedNodes;
 };
 
 /**
@@ -113,7 +115,7 @@ const updateInfo = () => {
  * The return value is ...
  */
 const troubleshoot = (fix = false) => {
-    let _ = {
+    let info = {
         storeNodes: {
             notInDOM: 0,
             inGraph: store.nodes.filter((d) => d.inGraph),
@@ -126,26 +128,26 @@ const troubleshoot = (fix = false) => {
     store.nodes.forEach((n) => {
         if (d3.select("#" + n.node_id).node()) {
         } else {
-            _.storeNodes.notInDOM += 1;
+            info.storeNodes.notInDOM += 1;
         }
     });
     graph.nodes.forEach((n) => {
         if (d3.select("#" + n.node_id).node()) {
         } else {
-            _.graphNodes.notInDOM += 1;
+            info.graphNodes.notInDOM += 1;
         }
     });
     if (fix) {
         // checking for inconsistency in data...
-        if (_.storeNodes.inGraph > _.graphNodes.inGraph) {
+        if (info.storeNodes.inGraph > info.graphNodes.inGraph) {
             /* // TODO: turn on this message?
             console.log(
                 "there are more filtered nodes in store than in graph, correcting..."
             );*/
             let dropped = `Dropped nodes:`;
-            _.storeNodes.inGraph.forEach((n) => {
+            info.storeNodes.inGraph.forEach((n) => {
                 if (
-                    _.graphNodes.inGraph.find((d) => d.node_id === n.node_id) ==
+                    info.graphNodes.inGraph.find((d) => d.node_id === n.node_id) ==
                     undefined
                 ) {
                     dropped += `<li>${n.node_id}</li>`;
@@ -155,7 +157,7 @@ const troubleshoot = (fix = false) => {
             debugMessage(dropped, "Information");
         }
     }
-    return _;
+    return info;
 };
 
 /**
@@ -395,26 +397,25 @@ const deselectEdges = (excludeEdge = undefined) => {
  */
 const getRelatedEdges = (node, asSource = true, asTarget = true) => {
     if (typeof node === "string") {
-        // console.log("got string.. so looking up node object");
+        // console.log("got string.. so looking up node object from graph.nodes");
         node = graph.nodes.find((n) => n.node_id === node);
     }
-    let _ = [],
-        __ = [];
+    let allRelatedEdges = [];
     if (asTarget) {
-        __ = g.edges
+        let relatedEdgesAsTarget = g.edges
             .selectAll("line.link")
             .data()
             .filter((l) => l.target === node);
-        _.push(...__);
+        allRelatedEdges.push(...relatedEdgesAsTarget);
     }
     if (asSource) {
-        __ = g.edges
+        let relatedEdgesAsSource = g.edges
             .selectAll("line.link")
             .data()
             .filter((l) => l.source === node);
-        _.push(...__);
+        allRelatedEdges.push(...relatedEdgesAsSource);
     }
-    return _;
+    return allRelatedEdges;
 };
 
 /**
@@ -547,6 +548,7 @@ const resetNodesAndEdges = () => {
         .attr("class", (e) => getEdgeClass(e))
         .transition()
         .attr("stroke-opacity", 0.3);
+        
     if (!getSettings().nodes.stickyNodes) {
         g.nodes
             .selectAll("text.label")
@@ -557,7 +559,7 @@ const resetNodesAndEdges = () => {
             });
     }
 
-    d3.selectAll("text.label").transition().duration(750).attr('opacity', 1).attr("font-size", (n) => getSize(n, "text"))
+    g.nodes.selectAll("text.label").transition().duration(750).attr('opacity', 1).attr("font-size", (n) => getSize(n, "text"))
 };
 
 /**
@@ -594,6 +596,10 @@ const selectEdge = (edge) => {
     }
 };
 
+/**
+ * urlify takes X argument/s... TODO: Finish this.
+ * The return value is ...
+ */
 const urlify = (text) => {
     // https://stackoverflow.com/questions/1500260/detect-urls-in-text-with-javascript
     // TODO: Fix, this doesn't work right now...
@@ -601,46 +607,48 @@ const urlify = (text) => {
     return text.replace(urlRegex, '<a href="$1">$1</a>')
 };
 
+/**
+ * generateCommentHTML takes X argument/s... TODO: Finish this.
+ * The return value is ...
+ */
 const generateCommentHTML = (node_or_edge, identifier) => {
-    let _ = "";
+    let html = "";
     if (node_or_edge === "node") {
         let node_id = identifier;
         node = store.nodes.find((x) => x.node_id === node_id);
-        _ += `<h1>${displayOrID(node)}</h1>`;
+        html += `<h1>${displayOrID(node)}</h1>`;
         if (node.has_comments) {
-            _ += "<h2>Comments</h2>";
+            html += "<h2>Comments</h2>";
             node.comments.forEach((c) => {
-                _ += `<p>${urlify(c.comment)} (${c.source})</p>\n`;
+                html += `<p>${urlify(c.comment)} (${c.source})</p>\n`;
             });
         }
     } else if (node_or_edge === "edge") {
         let edge_id = identifier;
         edge = store.edges.find((x) => x.edge_id === edge_id);
-        console.log(edge);
         if (edge.revue_name) {
-            _ += `<h1>${edge.revue_name}</h1>`;
-            _ += `<h2>${displayOrID(edge.source)} - ${displayOrID(
+            html += `<h1>${edge.revue_name}</h1>`;
+            html += `<h2>${displayOrID(edge.source)} - ${displayOrID(
                 edge.target
             )}</h2>`;
         } else {
-            _ += `<h1>${displayOrID(edge.source)} - ${displayOrID(
+            html += `<h1>${displayOrID(edge.source)} - ${displayOrID(
                 edge.target
             )}</h1>`;
         }
 
         if (edge.has_comments) {
-            _ += "<h2>Comments</h2>";
+            html += "<h2>Comments</h2>";
             edge.comments.forEach((c) => {
-                _ += `<p>${urlify(c.comment)} (${c.source})</p>\n`;
+                html += `<p>${urlify(c.comment)} (${c.source})</p>\n`;
             });
         }
         if (edge.has_general_comments) {
-            _ += "<h2>General comments</h2>";
+            html += "<h2>General comments</h2>";
             edge.general_comments.forEach((c) => {
-                _ += `<p>${urlify(c.comment)} (${c.source})</p>\n`;
+                html += `<p>${urlify(c.comment)} (${c.source})</p>\n`;
             });
         }
-        console.log(_);
     }
-    return _;
+    return html;
 };
