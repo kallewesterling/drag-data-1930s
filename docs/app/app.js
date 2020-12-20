@@ -1,11 +1,11 @@
 "use strict";
 
+////// list of things left to do
 /*
-TODO:
-- filter on more things, like city (see `store.count`)
-- choose indegree / outdegree as nodeSize !important
+- TODO: filter on more things, like city (see `store.count`)
+- TODO: choose indegree / outdegree as nodeSize !important
 
-- add auto-generated explanation of data:
+- TODO: add auto-generated explanation of data:
         color = three different categories of nodes (if you click them, they will turn red)
             if stickyNodes is on: if you drag the nodes, they will stick in the place where you've dragged them. If you don't desire this feature, just click here, and it will be removed and reset.
 
@@ -21,7 +21,6 @@ TODO:
             - eigenvector
 
         What about the placement of the nodes? This is taken care of by the "force simulation" [TODO: read this https://medium.com/@sxywu/understanding-the-force-ef1237017d5]
-
 */
 
 

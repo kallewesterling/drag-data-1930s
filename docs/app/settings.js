@@ -1,18 +1,21 @@
 "use strict";
 
 /**
- * resetDraw takes X argument/s... TODO: Finish this.
- * The return value is ...
+ * resetDraw takes no arguments, but has the purpose of running subordinate functions in the correct order, for resetting the graph to its original look.
+ * The return value is always true.
+ * @returns {boolean} - true
  */
 const resetDraw = () => {
-    d3.select("#nodeEdgeInfo").classed("d-none", true);
+    hide("#nodeEdgeInfo");
     deselectNodes();
-    resetNodesAndEdges();
+    resetGraphElements();
+    return true;
 };
 
 /**
  * UIToggleAllSettingBoxes takes no arguments, but ensures that all the settings containers on the screen are in/visible to the user when appropriate.
  * The return value is true in all cases.
+ * @returns {boolean} - true
  */
 const UIToggleAllSettingBoxes = () => {
     // if #info-box is visible, just hide that!
@@ -39,6 +42,7 @@ const UIToggleAllSettingBoxes = () => {
 /**
  * transformToWindow takes no arguments but sets the `transform` attribute on the `plot` property in the `g` object to the height and width of the user's viewport.
  * The return value is true in all cases.
+ * @returns {boolean} - true
  */
 const transformToWindow = () => {
     graph.plot.attr(
@@ -49,8 +53,10 @@ const transformToWindow = () => {
 };
 
 /**
- * updateLabel takes X argument/s... TODO: Finish this.
- * The return value is ...
+ * updateLabel takes one required argument, the name of any given label to update. Depending on checkboxes, it may disable slider UI elements.
+ * The return value is always true.
+ * @param {string} name - The name of the label that needs updating.
+ * @returns {boolean} - true
  */
 const updateLabel = (name) => {
     [
@@ -61,13 +67,15 @@ const updateLabel = (name) => {
         d3.select(`#${d[1]}`).node().disabled = disable;
         d3.select(`#${d[2]}`).classed("text-muted", disable);
     });
-    let value = d3.select("#" + name).node().value;
-    d3.select("#" + name + "_label").html(name + ` (${value})`);
+    let value = d3.select(`#${name}`).node().value;
+    d3.select(`#${name}_label`).html(`${name} (${value})`);
+    return true;
 };
 
 /**
  * saveSettings takes no arguments but saves two items to the user's `localStorage`: their current `transform` (zoom) and settings.
  * The return value is true in all cases.
+ * @returns {boolean} - true
  */
 const saveSettings = () => {
     if (d3.event && d3.event.transform) {
@@ -81,7 +89,8 @@ const saveSettings = () => {
 /**
  * loadSettings takes one argument, which defines the name of the stored setting to load.
  * The return value is `undefined` in case no item can be found, and a (parsed) object if the item was stringified before it was saved (see `saveSettings`).
- * @param {string} item - The name of the stored setting to load
+ * @param {string} item - The name of the stored setting to load.
+ * @returns {Object|string|undefined} - `undefined` in case no setting with the provided name can be found, and a (parsed) object if the item was stringified before it was saved. If no JSON data exists for the saved setting, a string is returned.
  */
 const loadSettings = (item) => {
     let rawSetting = localStorage.getItem(item);
@@ -97,20 +106,23 @@ const loadSettings = (item) => {
 };
 
 /**
- * resetLocalStorage takes X argument/s... TODO: Finish this.
- * The return value is ...
+ * resetLocalStorage takes no arguments, and removes all of the locally stored settings. It reloads the window after settings are deleted, to signal a change to the user.
+ * The return value is true in all cases.
+ * @returns {boolean} - true
  */
 const resetLocalStorage = () => {
     ["theme", "transform", "settings"].forEach((item) => {
         localStorage.removeItem(item);
     });
     debugMessage("Locally stored settings have been reset.");
-    return window.location.reload();
+    window.location.reload();
+    return true;
 };
 
 /**
- * getSettings takes X argument/s... TODO: Finish this.
- * The return value is ...
+ * getSettings takes no arguments but loads the current settings.
+ * The return value is an object with all of the settings as property values.
+ * @returns {Object} - All of the app's settings.
  */
 const getSettings = () => {
     // if settings are not set up, set it all up!

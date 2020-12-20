@@ -1,7 +1,7 @@
 "use strict";
 
 /**
- * loadNetwork takes no arguments, but ensures that all the settings containers on the screen are in/visible to the user when appropriate.
+ * loadNetwork takes no arguments, but loads the entire network, and runs the other appropriate functions at the start of the script.
  * The return value is true in all cases.
  */
 const loadNetwork = () => {
@@ -121,13 +121,15 @@ const loadNetwork = () => {
         // setup preview TODO: This is currently disabled
         // preview(store);
     });
+    return true;
 };
 
 /**
  * setupInteractivity takes X argument/s... TODO: Finish this.
  * The return value is ...
  */
-const setupInteractivity = (settings, node, edge) => {
+const setupInteractivity = (node, edge) => {
+    let settings = getSettings();
     node.call(
         d3
             .drag()
@@ -158,13 +160,13 @@ const setupInteractivity = (settings, node, edge) => {
         if (d3.event.metaKey === true) {
             if (nodeIsSelected(n)) {
                 hide("#nodeEdgeInfo");
-                resetNodesAndEdges();
+                resetGraphElements();
             }
             loadEgoNetwork(n);
         }
         if (d3.event.altKey === true && n.has_comments) {
             d3.select("#popup-info")
-                .html(generateCommentHTML("node", n.node_id))
+                .html(generateCommentHTML(n))
                 .classed("d-none", false)
                 .attr(
                     "style",
@@ -182,7 +184,7 @@ const setupInteractivity = (settings, node, edge) => {
             //console.log(e.edge_id)
             if (e.has_comments || e.has_general_comments) {
                 d3.select("#popup-info")
-                    .html(generateCommentHTML("edge", e.edge_id))
+                    .html(generateCommentHTML(e))
                     .classed("d-none", false)
                     .attr(
                         "style",
@@ -192,7 +194,7 @@ const setupInteractivity = (settings, node, edge) => {
         } else {
             if (edgeIsSelected(e)) {
                 hide("#nodeEdgeInfo");
-                resetNodesAndEdges();
+                resetGraphElements();
             } else {
                 selectEdge(e);
             }
@@ -226,7 +228,7 @@ const reloadNetwork = () => {
         .selectAll("circle.node")
         .data(graph.nodes, (d) => d.node_id)
         .transition(750)
-        .attr("r", (n) => getSize(n, "r"));
+        .attr("r", (n) => getSize(n));
 
     node = node.merge(newNode);
 
@@ -295,8 +297,8 @@ const reloadNetwork = () => {
 
     edge = edge.merge(newEdge);
 
-    setupInteractivity(settings, node, edge);
-    modifyForceLayout(settings, node, edge, text);
+    setupInteractivity(node, edge);
+    modifyForceLayout(node, edge, text);
 };
 
 /**
@@ -372,7 +374,7 @@ const loadEgoNetwork = (node) => {
         });
     }
 
-    modifyGraphNodes();
+    modifyNodeDegrees();
     dropNodesWithNoEdges();
     updateInfo();
     reloadNetwork();

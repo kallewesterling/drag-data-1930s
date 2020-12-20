@@ -1,9 +1,12 @@
+"use strict";
 
 /**
- * filterNodes takes X argument/s... TODO: Finish this.
- * The return value is ...
+ * filterNodes takes no argument, and serves to run through all of the store.nodes and adding/removing nodes from graph.nodes, depending on filter values.
+ * The return value is always true.
+ * @returns {boolean} - true
  */
-const filterNodes = (settings) => {
+const filterNodes = () => {
+    let settings = getSettings();
     store.nodes.forEach((n) => {
         // if (n.degree > settings.nodes.minDegree) console.log(n);
         if (n.degree >= settings.nodes.minDegree && !n.inGraph) {
@@ -29,13 +32,16 @@ const filterNodes = (settings) => {
             });
         }
     });
+    return true;
 };
 
 /**
- * filterEdges takes X argument/s... TODO: Finish this.
- * The return value is ...
+ * filterEdges takes no argument, and serves to run through all of the store.edges and adding/removing edges from graph.edges, depending on filter values.
+ * The return value is always true.
+ * @returns {boolean} - true
  */
-const filterEdges = (settings) => {
+const filterEdges = () => {
+    let settings = getSettings();
     store.edges.forEach((e) => {
         e.calibrated_weight = e.found.length;
 
@@ -118,26 +124,30 @@ const filterEdges = (settings) => {
             }
         }
     });
+    return true;
 };
 
 /**
- * filter takes X argument/s... TODO: Finish this.
- * The return value is ...
+ * filter takes no arguments, and serves to run subordinate functions in the correct order when filtering the entire network visualization.
+ * The return value is always true.
+ * @returns {boolean} - true
  */
 const filter = () => {
     let settings = getSettings();
 
-    resetNodesAndEdges();
+    resetGraphElements();
     hide("#nodeEdgeInfo");
 
-    filterNodes(settings);
-    filterEdges(settings);
+    filterNodes();
+    filterEdges();
 
-    modifyGraphNodes();
+    modifyNodeDegrees();
 
     if (settings.nodes.autoClearNodes) {
         dropNodesWithNoEdges();
     }
 
     updateInfo();
+    
+    return true;
 };

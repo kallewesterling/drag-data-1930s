@@ -1,6 +1,5 @@
 "use strict";
 
-// TODO: move to app/zoom
 // TODO: Continue clean-up here... + add docstring.
 let zoomed = () => {
     graph.k = Math.round(d3.event.transform.k * 10) / 10;
