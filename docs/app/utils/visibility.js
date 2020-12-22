@@ -43,7 +43,11 @@ const hide = (selector) => {
     if (typeof selector === "object") {
         selector.classed("d-none", true);
     } else {
-        d3.select(selector).classed("d-none", true);
+        if (!selector.startsWith("#")) {
+            d3.selectAll(selector).classed("d-none", true);
+        } else {
+            d3.select(selector).classed("d-none", true);
+        }
     }
     return true;
 };
@@ -58,7 +62,11 @@ const show = (selector) => {
     if (typeof selector === "object") {
         selector.classed("d-none", false);
     } else {
-        d3.select(selector).classed("d-none", false);
+        if (!selector.startsWith("#")) {
+            d3.selectAll(selector).classed("d-none", false);
+        } else {
+            d3.select(selector).classed("d-none", false);
+        }
     }
 };
 

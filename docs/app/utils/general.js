@@ -4,36 +4,20 @@
  * nodeHasEdges takes two arguments, the first of which defines a node_id and the second whether a count should be provided.
  * The return value depends on whether the count parameter was set to true or false. If it's true, it will return the number
  * of edges from the given node_id. Otherwise, it will return a boolean that tells you whether the node has edges or not.
- * @param {string} node_id - The name of the node in question
+ * @param {Object} - A d3 node selection.
  * @param {boolean} [count] - Tell the function whether it should return a count of edges (true) or a boolean (false)
  * @returns {boolean|number} - A boolean that describes whether the node has edges or not, or the number of edges that are connected to the node.
  */
-const nodeHasEdges = (node_id, count = false) => {
-    let n = graph.nodes.filter((n) => {
-        return n.node_id === node_id ? n : false;
-    });
-
-    if (n.length == 1) {
-        n = n[0];
-    } else if (n.length < 1) {
-        if (count === true) {
-            return 0;
-        } else {
-            return false;
-        }
-    } else {
-        console.error("Found more than one node with ID " + node_id); // TODO: #9 This is strange...
-    }
-
+const nodeHasEdges = (node, count = false) => {
     let returnValue = false,
         counted = 0;
 
-    graph.edges.filter((d) => {
-        if (d.source.node_id === n.node_id) {
+    graph.edges.filter((edge) => {
+        if (edge.source.node_id === node.node_id) {
             returnValue = true;
             counted += 1;
         }
-        if (d.target.node_id === n.node_id) {
+        if (edge.target.node_id === node.node_id) {
             returnValue = true;
             counted += 1;
         }
@@ -42,6 +26,7 @@ const nodeHasEdges = (node_id, count = false) => {
     return count === true ? counted : returnValue;
 };
 
+
 /**
  * getUnconnectedNodes takes no arguments but looks through graph.nodes in the current viz for any unconnected nodes.
  * The return value is a list of all the node objects that are currently unconnected.
@@ -49,13 +34,14 @@ const nodeHasEdges = (node_id, count = false) => {
  */
 const getUnconnectedNodes = () => {
     let unConnectedNodes = [];
-    graph.nodes.forEach((n) => {
-        if (nodeHasEdges(n.node_id) === false) {
-            unConnectedNodes.push(n);
+    graph.nodes.forEach((node) => {
+        if (nodeHasEdges(node) === false) {
+            unConnectedNodes.push(node);
         }
     });
     return unConnectedNodes;
 };
+
 
 /**
  * hasUnconnectedNodes takes no arguments but checks whether the current graph.nodes contains unconnected nodes.
@@ -64,40 +50,6 @@ const getUnconnectedNodes = () => {
  */
 const hasUnconnectedNodes = () => {
     return getUnconnectedNodes().length > 0;
-};
-
-/**
- * dropNodesWithNoEdges takes no arguments but loops through the visualization, looking for unconnected nodes.
- * The return value is an object with information about the dropped nodes.
- * @returns {Object} - Object with two properties, `runs` denotes how many iterations the function ran through, and `dropped` with a list of all node_ids that were removed.
- */
-const dropNodesWithNoEdges = () => {
-    let returnObject = {
-        runs: 0,
-        dropped: [],
-    };
-    while (hasUnconnectedNodes()) {
-        graph.nodes.forEach((n) => {
-            if (nodeHasEdges(n.node_id) === false) {
-                // console.log(`——> remove node ${n.node_id}!`);
-                graph.nodes.forEach((o, i) => {
-                    if (n.node_id === o.node_id) {
-                        graph.nodes.splice(i, 1);
-                        returnObject.dropped.push(n.node_id);
-                    }
-                });
-            }
-        });
-        returnObject.runs += 1;
-    }
-
-    if (returnObject.dropped.length > 0) {
-        troubleshoot(true); // ensures that all nodes are correctly represented in
-        reloadNetwork();
-        updateInfo();
-    }
-
-    return returnObject; // could be passed to a debugMessage thus: debugMessage(`Dropped nodes with no edges (after ${runs} runs).`, "Information");
 };
 
 
@@ -117,14 +69,14 @@ const troubleshoot = (fix = false) => {
         },
         droppedNodes: [],
     };
-    store.nodes.forEach((n) => {
-        if (d3.select("#" + n.node_id).node()) {
+    store.nodes.forEach((node) => {
+        if (d3.select("#" + node.node_id).node()) {
         } else {
             returnObject.storeNodes.notInDOM += 1;
         }
     });
-    graph.nodes.forEach((n) => {
-        if (d3.select("#" + n.node_id).node()) {
+    graph.nodes.forEach((node) => {
+        if (d3.select("#" + node.node_id).node()) {
         } else {
             returnObject.graphNodes.notInDOM += 1;
         }
@@ -137,20 +89,21 @@ const troubleshoot = (fix = false) => {
             console.log(
                 "there are more filtered nodes in store than in graph, correcting..."
             );*/
-            returnObject.storeNodes.inGraph.forEach((n) => {
+            returnObject.storeNodes.inGraph.forEach((node) => {
                 if (
                     returnObject.graphNodes.inGraph.find(
-                        (d) => d.node_id === n.node_id
+                        (d) => d.node_id === node.node_id
                     ) == undefined
                 ) {
-                    returnObject.droppedNodes.push(n.node_id);
-                    n.inGraph = false;
+                    returnObject.droppedNodes.push(node.node_id);
+                    node.inGraph = false;
                 }
             });
         }
     }
     return returnObject; // can be used in a debugMessage, like debugMessage(dropped, "Dropped nodes");
 };
+
 
 /**
  * debugMessage takes two arguments, a first required message that will appear in the div, and an optional second which defines the header.
@@ -184,14 +137,17 @@ const debugMessage = (message, header = "Warning") => {
 
 
 /**
- * restartLayout takes no arguments but simply runs the three commends that restarts the movement in the visualization. It is used when a setting is changed, to ensure that the layout keeps rendering correctly.
+ * restartSimulation takes no arguments but simply runs the three commends that restarts the movement in the visualization. It is used when a setting is changed, to ensure that the simulation keeps rendering correctly.
  * The return value is always true.
  * @returns {boolean} - true
  */
-const restartLayout = () => {
-    graph.layout.stop();
-    graph.layout.alpha(1);
-    graph.layout.restart();
+const restartSimulation = () => {
+    graph.nodes.forEach(node => {
+        console.log(node.vx); // TODO: reset stickyness here too...?
+    })
+    graph.simulation.stop();
+    graph.simulation.alpha(1);
+    graph.simulation.restart();
     return true;
 };
 
@@ -206,6 +162,7 @@ const nodeIsSelected = (node) => {
     return d3.select(`#${node.node_id}`).classed("selected");
 };
 
+
 /**
  * edgeIsSelected takes one argument and determines whether the provided edge is selected or not, by checking whether it has been classed with `selected`.
  * The return value is a boolean, whether it is selected (`true`) or not (`false`).
@@ -216,6 +173,7 @@ const edgeIsSelected = (edge) => {
     return d3.select(`#${edge.edge_id}`).classed("selected");
 };
 
+
 /**
  * deselectNodes takes one optional argument of a d3 selected node to be excluded from the "deselection" process (in reality, the removal of the `selected` class from the DOM elements).
  * The return value is always true;
@@ -223,7 +181,7 @@ const edgeIsSelected = (edge) => {
  * @returns {boolean} - true
  */
 const deselectNodes = (excludeNode = undefined) => {
-    g.nodes.selectAll("circle.node").classed("selected", (node) => {
+    nodeElements.classed("selected", (node) => {
         if (excludeNode && node === excludeNode) {
             if (nodeIsSelected(node)) {
                 // do nothing
@@ -234,7 +192,7 @@ const deselectNodes = (excludeNode = undefined) => {
             return false;
         }
     });
-    g.nodes.selectAll("text.label").classed("selected", (node) => {
+    textElements.classed("selected", (node) => {
         if (excludeNode && node === excludeNode && nodeIsSelected(node)) {
             return true;
         } else {
@@ -244,7 +202,7 @@ const deselectNodes = (excludeNode = undefined) => {
 
     // formerly unselectNodes:
     let related = undefined;
-    g.nodes.selectAll("circle.node").classed("deselected", (node) => {
+    nodeElements.classed("deselected", (node) => {
         if (excludeNode && node === excludeNode) {
             node.fx = node.x;
             node.fy = node.y;
@@ -275,6 +233,7 @@ const deselectNodes = (excludeNode = undefined) => {
     return true;
 };
 
+
 /**
  * deselectEdges takes one optional argument of a d3 selected edge to be excluded from the "deselection" process (in reality, the removal of the `selected` class from the DOM elements).
  * The return value is always true;
@@ -282,7 +241,7 @@ const deselectNodes = (excludeNode = undefined) => {
  * @returns {boolean} - true
  */
 const deselectEdges = (excludeEdge = undefined) => {
-    g.edges.selectAll("line.link").classed("selected", (edge) => {
+    edgeElements.classed("selected", (edge) => {
         if (excludeEdge && edge === excludeEdge) {
             if (edgeIsSelected(edge)) {
                 // do nothing
@@ -293,13 +252,36 @@ const deselectEdges = (excludeEdge = undefined) => {
             return false;
         }
     });
-    g.edges.selectAll("line.link").classed("deselected", (edge) => {
+    edgeElements.classed("deselected", (edge) => {
         if (excludeEdge && edge === excludeEdge) {
         } else {
             return true;
         }
     });
 };
+
+
+/**
+ * isSourceOrTarget takes one required argument, a node (which can either be a d3 node selection or a string denoting a `node_id`), and one optional argument, which specifies // TODO
+ * The return value is a list of all the related edges, depending on the parameters.
+ * @param {Object|string} node - A d3 selection for a node, or a string denoting a node's identification name
+ * @param {boolean} [edgeList] - A list with all the edges that you want to check against.
+ * @returns {Array} - List of all the edges that are connected to the given node
+ */
+// TODO: This function essentially doubles with nodeHasEdges...
+const isSourceOrTarget = (node, edgeList = graph.edges) => {
+    if (typeof node === "string")
+        node = lookupNode(node);
+
+    let isSource = edgeList
+        .map((d) => d.source.node_id)
+        .includes(node.node_id);
+    let isTarget = edgeList
+        .map((d) => d.target.node_id)
+        .includes(node.node_id);
+    return isSource || isTarget;
+};
+
 
 /**
  * getRelatedEdges takes one required argument, a node (which can either be a d3 node selection or a string denoting a `node_id`), and two optional arguments, which specifies if you want to get a list of related edges, where the node is the target (`asTarget`), the source (`asSource`) or both (set both to `true`).
@@ -310,9 +292,9 @@ const deselectEdges = (excludeEdge = undefined) => {
  * @returns {Array} - List of all the edges that are connected to the given node
  */
 const getRelatedEdges = (node, asSource = true, asTarget = true) => {
-    if (typeof node === "string") {
-        node = graph.nodes.find((n) => n.node_id === node);
-    }
+    if (typeof node === "string")
+        node = lookupNode(node);
+
     let allRelatedEdges = [];
     if (asTarget) {
         let relatedEdgesAsTarget = g.edges
@@ -331,6 +313,7 @@ const getRelatedEdges = (node, asSource = true, asTarget = true) => {
     return allRelatedEdges;
 };
 
+
 /**
  * selectRelatedEdges takes one required argument, a node (which can either be a d3 node selection or a string denoting a `node_id`).
  * The return value is always true.
@@ -339,7 +322,7 @@ const getRelatedEdges = (node, asSource = true, asTarget = true) => {
  */
 const selectRelatedEdges = (node) => {
     if (typeof node === "string") {
-        node = graph.nodes.find((n) => n.node_id === node);
+        node = lookupNode(node);
     }
     g.edges.selectAll("line.link").classed("deselected", true);
     getRelatedEdges(node).forEach((e) => {
@@ -349,33 +332,6 @@ const selectRelatedEdges = (node) => {
     return true;
 };
 
-/* TODO // do something like this for the egoNetwork to work correctly.
-const getRelatedRecursive = (node) => {
-    if (typeof node === "string") {
-        node = graph.nodes.find((n) => n.node_id === node);
-    }
-
-    let collected = []
-    let nextLevelEdges = getRelatedEdges(node.node_id);
-    let nextLevelNodes = [
-        ...new Set([
-            ...nextLevelEdges.map((e) => e.source.node_id),
-            ...nextLevelEdges.map((e) => e.target.node_id),
-        ]),
-    ].filter((d) => d != node.node_id);
-    while (added > 0) {
-        nextLevelNodes.forEach(node_id => {
-            nextLevelEdges = getRelatedEdges(node_id);
-
-        })
-        let before = collected.length;
-        collected.push(...nextLevelNodes)
-        collected = [...new Set(collected)];
-        let added = collected.length - before
-        console.log(collected)
-    }
-}
-*/
 
 /**
  * getRelated takes one required argument, a node (which can either be a d3 node selection or a string denoting a `node_id`). Then it loops through the related edges and nodes for each of its children,
@@ -385,10 +341,10 @@ const getRelatedRecursive = (node) => {
  */
 const getRelated = (node) => {
     if (typeof node === "string") {
-        node = graph.nodes.find((n) => n.node_id === node);
+        node = lookupNode(node);
     }
 
-    let secondaryEdges = getRelatedEdges(node.node_id);
+    let secondaryEdges = getRelatedEdges(node);
     let secondaryNodeIDs = [
         ...new Set([
             ...secondaryEdges.map((e) => e.source.node_id),
@@ -412,7 +368,7 @@ const getRelated = (node) => {
     secondaryEdges = secondaryEdges.map((e) => e.edge_id);
     tertiaryEdges = tertiaryEdges.map((e) => e.edge_id);
     let returnValue = {
-        primary: node.node_id,
+        primary: node,
         secondaryNodeIDs: secondaryNodeIDs,
         tertiaryNodeIDs: tertiaryNodeIDs,
         secondaryEdges: secondaryEdges,
@@ -422,47 +378,44 @@ const getRelated = (node) => {
     return returnValue;
 };
 
+
 /**
  * resetGraphElements takes no arguments but resets all the different graph elements (nodes, edges, labels) to their original settings.
  * The return value is always true.
  * @returns {boolean} - true
  */
 const resetGraphElements = () => {
-    let settings = getSettings();
-    let yScale = nodeScale(settings);
+    loading('resetGraphElements called...')
 
-    g.nodes
-        .selectAll("circle.node")
+    nodeElements
         .classed("d-none", false) // show all of them circles
-        .attr("class", (n) => getNodeClass(n))
+        .attr("class", (node) => getNodeClass(node))
         .transition()
-        .attr("r", (n) => getSize(n));
+        .attr("r", (node) => getSize(node));
 
-    g.edges
-        .selectAll("line.link")
+    edgeElements
         .attr("class", (e) => getEdgeClass(e))
         .transition()
         .attr("stroke-opacity", 0.3);
 
     if (!getSettings().nodes.stickyNodes) {
-        g.nodes
-            .selectAll("text.label")
+        textElements
             .attr("class", "label")
-            .attr("pseudo", (n) => {
-                n.fx = null;
-                n.fy = null;
+            .attr("", (node) => {
+                node.fx = null;
+                node.fy = null;
             });
     }
 
-    g.nodes
-        .selectAll("text.label")
+    textElements
         .transition()
         .duration(750)
         .attr("opacity", 1)
-        .attr("font-size", (n) => getSize(n, "text"));
+        .attr("font-size", (node) => getSize(node, "text"));
 
     return true;
 };
+
 
 /**
  * selectNode takes one required argument, the d3 selector for a given node. This is the function that handles the "click" event on the node.
@@ -472,9 +425,11 @@ const resetGraphElements = () => {
  */
 const selectNode = (node) => {
     if (nodeIsSelected(node)) {
+        window.node_selected = undefined;
         hide("#nodeEdgeInfo");
         resetGraphElements();
     } else {
+        window.node_selected = true;
         resetGraphElements();
         deselectNodes(node);
         selectRelatedEdges(node);
@@ -483,6 +438,7 @@ const selectNode = (node) => {
     return true;
 };
 
+
 /**
  * selectEdge takes one required argument, the d3 selector for a given edge. This is the function that handles the "click" event on the edge.
  * The return value is always true.
@@ -490,10 +446,18 @@ const selectNode = (node) => {
  * @returns {boolean} - true
  */
 const selectEdge = (edge) => {
-    deselectEdges(edge);
-    setNodeEdgeInfo(edge);
+    if (edgeIsSelected(edge)) {
+        window.edge_selected = undefined;
+        hide("#nodeEdgeInfo");
+        resetGraphElements();
+    } else {
+        window.edge_selected = true;    
+        deselectEdges(edge);
+        setNodeEdgeInfo(edge);
+    }
     return true;
 };
+
 
 /**
  * modifyNodeDegrees takes no arguments and just makes sure that each node in the current graph has a `current_degree` set to match its number of edges.
@@ -502,10 +466,11 @@ const selectEdge = (edge) => {
  */
 const modifyNodeDegrees = () => {
     graph.nodes.forEach((n) => {
-        n.current_degree = nodeHasEdges(n.node_id, true)
+        n.current_degree = nodeHasEdges(n, true)
     });
     return true;
 };
+
 
 /**
  * graphNodesContains takes one required argument, the d3 selector for a given node.
@@ -517,6 +482,7 @@ const graphNodesContains = (node_id) => {
     return [...graph.nodes.map((n) => n.node_id)].includes(node_id);
 };
 
+
 /**
  * graphEdgesContains takes one required argument, the d3 selector for a given node.
  * The return value provides an answer to whether the edge is represented in the current visualization or not.
@@ -527,68 +493,70 @@ const graphEdgesContains = (edge_id) => {
     return [...graph.edges.map((e) => e.edge_id)].includes(edge_id);
 };
 
+
 /**
- * modifyForceLayout takes three required arguments, the d3 data containers for `node`, `edge`, and `text`. It is the function that runs every time that the d3 network layout is initiated or started.
+ * modifySimulation takes no arguments but is the function that runs every time that the d3 network simulation is initiated or started.
  * The return value is always true.
  */
-const modifyForceLayout = (node, edge, text) => {
-    let settings = getSettings()
+const modifySimulation = () => {
+    let settings = getSettings().force;
 
-    graph.layout.force("link").links(graph.edges);
-    graph.layout.nodes(graph.nodes);
-    if (settings.force.layoutCenter) {
-        graph.layout.force("center", d3.forceCenter());
-        graph.layout.force("center").strength = 1;
+    graph.simulation.force("link").links(graph.edges);
+    graph.simulation.nodes(graph.nodes);
+    if (settings.layoutCenter) {
+        graph.simulation.force("center", d3.forceCenter());
+        graph.simulation.force("center").strength = 1;
     } else {
-        graph.layout.force("center", null);
+        graph.simulation.force("center", null);
     }
-    if (settings.force.layoutForceX) {
-        graph.layout.force("forceX", d3.forceX());
+    if (settings.layoutForceX) {
+        graph.simulation.force("forceX", d3.forceX());
     } else {
-        graph.layout.force("forceX", null);
+        graph.simulation.force("forceX", null);
     }
-    if (settings.force.layoutForceX) {
-        graph.layout.force("forceY", d3.forceY());
+    if (settings.layoutForceX) {
+        graph.simulation.force("forceY", d3.forceY());
     } else {
-        graph.layout.force("forceY", null);
+        graph.simulation.force("forceY", null);
     }
-    if (settings.force.layoutCharge) {
-        graph.layout.force("charge", d3.forceManyBody());
-        graph.layout.force("charge").strength(settings.force.charge);
+    if (settings.layoutCharge) {
+        graph.simulation.force("charge", d3.forceManyBody());
+        graph.simulation.force("charge").strength(settings.charge);
     } else {
-        graph.layout.force("charge", null);
+        graph.simulation.force("charge", null);
     }
-    if (settings.force.layoutCollide) {
-        graph.layout.force("collide", d3.forceCollide());
-        graph.layout.force("collide").strength(settings.force.collide);
+    if (settings.layoutCollide) {
+        graph.simulation.force("collide", d3.forceCollide());
+        graph.simulation.force("collide").strength(settings.collide);
     } else {
-        graph.layout.force("collide", null);
+        graph.simulation.force("collide", null);
     }
 
-    graph.layout.force("link").strength(0.4);
+    graph.simulation.force("link").strength(0.4);
 
-    graph.layout.on("tick", function (n) {
-        node.attr("cx", (n) => n.x);
-        node.attr("cy", (n) => n.y);
+    graph.simulation.on("tick", function () {
+        nodeElements.attr("cx", (n) => n.x);
+        nodeElements.attr("cy", (n) => n.y);
 
-        edge.attr("x1", (e) => e.source.x);
-        edge.attr("y1", (e) => e.source.y);
-        edge.attr("x2", (e) => e.target.x);
-        edge.attr("y2", (e) => e.target.y);
+        edgeElements.attr("x1", (e) => e.source.x);
+        edgeElements.attr("y1", (e) => e.source.y);
+        edgeElements.attr("x2", (e) => e.target.x);
+        edgeElements.attr("y2", (e) => e.target.y);
 
-        text.attr("x", (n) => n.x);
-        text.attr("y", (n) => n.y + 4);
+        textElements.attr("x", (n) => n.x);
+        textElements.attr("y", (n) => n.y + 4);
     });
 
-    // restart the layout now that everything is set
-    graph.layout.restart();
+    // restart the simulation now that everything is set
+    graph.simulation.restart();
 
     return true;
 };
 
+
 /**
  * getNodeClass takes one required argument, the d3 selector for a given node. It is the function that provides the class for any given node in the visualization.
- * The return value is ...
+ * The return value is a string of classes.
  * @param {Object} node - d3 selector for a given node.
  * @returns {string} - The string of classes to return to the node.
  */
@@ -598,8 +566,10 @@ const getNodeClass = (node) => {
     return classes;
 };
 
+
 /**
- * getEdgeClass takes one required argument, the d3 selector for a given edge. It is the function that provides the class for any given edge in the visualization. * The return value is ...
+ * getEdgeClass takes one required argument, the d3 selector for a given edge. It is the function that provides the class for any given edge in the visualization.
+ * The return value is a string of classes.
  * @param {Object} edge - d3 selector for a given edge.
  * @returns {string} - The string of classes to return to the edge.
  */
@@ -608,6 +578,34 @@ const getEdgeClass = (edge) => {
     classes += edge.revue_name != "" ? " revue" : " no-revue";
     classes += edge.has_comments ? " has-comments" : "";
     classes += edge.has_general_comments ? " has-comments" : "";
+    return classes;
+};
+
+/**
+ * getEdgeStrokeWidth takes one required argument, the d3 selector for a given edge. It is the function that provides the `stroke-width` value for the edges in the visualization.
+ * The return value is a string with the stroke width followed by "px".
+ * @param {Object} edge - d3 selector for a given edge.
+ * @returns {string} - The string with the stroke width.
+ */
+const getEdgeStrokeWidth = (edge) => {
+    let settings = getSettings();
+    let weightScale = edgeScale(settings);
+
+    let evalWeight = settings.edges.weightFromCurrent
+        ? edge.calibrated_weight
+        : edge.weight;
+    return weightScale(evalWeight) + "px";
+}
+
+/**
+ * getNodeClass takes one required argument, the d3 selector for a given node. It is the function that provides the class for any given node in the visualization.
+ * The return value is ...
+ * @param {Object} node - d3 selector for a given node.
+ * @returns {string} - The string of classes to return to the node.
+ */
+const getTextClass = (node) => {
+    let classes = "label " + node.category;
+    classes += node.has_comments ? " has-comments" : "";
     return classes;
 };
 
@@ -621,18 +619,23 @@ const getEdgeClass = (edge) => {
 const getSize = (node, type = "r") => {
     let settings = getSettings();
     let yScale = nodeScale(settings);
-
+    
     if (type === "r") {
         if (settings.nodes.nodeSizeFromCurrent === true) {
-            return yScale(node.current_degree);
+            return yScale(node.current_degree) * settings.nodes.multiplier;
         } else {
-            return yScale(node.degree);
+            return yScale(node.degree) * settings.nodes.multiplier;
         }
     } else if (type === "text") {
         if (settings.nodes.nodeSizeFromCurrent === true) {
-            return yScale(node.current_degree) * 1.5;
+            return (yScale(node.current_degree) * settings.nodes.multiplier) * 1.5;
         } else {
-            return yScale(node.degree) * 1.5;
+            return (yScale(node.degree) * settings.nodes.multiplier) * 1.5;
         }
     }
 };
+
+
+const lookupNode = (node_id, store=graph.nodes) => {
+    return store.find((node) => node.node_id === node_id);
+}

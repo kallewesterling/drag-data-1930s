@@ -23,9 +23,9 @@
         What about the placement of the nodes? This is taken care of by the "force simulation" [TODO: read this https://medium.com/@sxywu/understanding-the-force-ef1237017d5]
 */
 
-
 (function () {
     // Immediately invoked function to set the theme on initial load
+    window.egoNetwork = false;
     loadNetwork();
     graph.svg.call(zoom); // only call zoom on the graph.svg object at the start
 })();

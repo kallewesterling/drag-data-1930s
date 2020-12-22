@@ -134,6 +134,7 @@ const getSettings = () => {
     let charge = +d3.select("#charge").node().value;
     let collide = +d3.select("#collide").node().value;
     let minDegree = +d3.select("#minDegree").node().value;
+    let multiplier = +d3.select("#multiplier").node().value;
     let minWeight = +d3.select("#minWeight").node().value;
     let startYear = +d3.select("#startYear").node().value;
     let endYear = +d3.select("#endYear").node().value;
@@ -155,13 +156,14 @@ const getSettings = () => {
         endYear = _autoSettings.edges.endYear;
     }
 
-    ["collide", "charge", "minDegree", "minWeight"].forEach((label) =>
+    ["collide", "charge", "minDegree", "multiplier", "minWeight"].forEach((label) =>
         updateLabel(label)
     );
 
     return {
         nodes: {
             minDegree: minDegree,
+            multiplier: multiplier,
             autoClearNodes: autoClearNodes,
             stickyNodes: stickyNodes,
             nodeSizeFromCurrent: nodeSizeFromCurrent,
@@ -191,16 +193,22 @@ const getSettings = () => {
 };
 
 /**
- * setupSettings takes X argument/s... TODO: Finish this.
- * The return value is ...
+ * setupSettings takes no arguments but sets up the settings box correctly, with all the max, min, and step values for UI elements,
+ * The return value is true in all cases.
+ * @returns {boolean} - true
  */
 const setupSettings = () => {
-    let _settings = loadSettings("settings")
+    let settings = loadSettings("settings")
         ? loadSettings("settings")
         : _autoSettings;
 
     d3.select("#minWeight").node().max = store.ranges.edgeWidth[1];
     d3.select("#minDegree").node().max = store.ranges.nodeDegree[1];
+
+    // set range for multiplier
+    d3.select("#multiplier").node().min = 1;
+    d3.select("#multiplier").node().max = 5;
+    d3.select("#multiplier").node().step = 0.25;
 
     var options = [];
     store.ranges.years.array.forEach((year) => {
@@ -227,31 +235,40 @@ const setupSettings = () => {
     d3.select("#minWeight").node().step = 1;
 
     // set auto values
-    d3.select("#minDegree").node().value = _settings.nodes.minDegree;
-    d3.select("#minWeight").node().value = _settings.edges.minWeight;
-    d3.select("#startYear").node().value = _settings.edges.startYear; // set up in the d3 load of the JSON
-    d3.select("#endYear").node().value = _settings.edges.endYear; // set up in the d3 load of the JSON
-    d3.select("#autoClearNodes").node().checked =
-        _settings.nodes.autoClearNodes;
+    d3.select("#minDegree").node().value = settings.nodes.minDegree;
+    d3.select("#multiplier").node().value = settings.nodes.multiplier;
+    d3.select("#minWeight").node().value = settings.edges.minWeight;
+    d3.select("#startYear").node().value = settings.edges.startYear; // set up in the d3 load of the JSON
+    d3.select("#endYear").node().value = settings.edges.endYear; // set up in the d3 load of the JSON
+    d3.select("#autoClearNodes").node().checked = settings.nodes.autoClearNodes;
     d3.select("#nodeSizeFromCurrent").node().checked =
-        _settings.nodes.nodeSizeFromCurrent;
+        settings.nodes.nodeSizeFromCurrent;
     d3.select("#weightFromCurrent").node().checked =
-        _settings.edges.weightFromCurrent;
-    d3.select("#charge").node().value = _settings.force.charge;
-    d3.select("#collide").node().value = _settings.force.collide;
-    d3.select("#layoutCenter").node().checked = _settings.force.layoutCenter;
-    d3.select("#layoutForceX").node().checked = _settings.force.layoutForceX;
-    d3.select("#layoutForceY").node().checked = _settings.force.layoutForceY;
-    d3.select("#layoutCharge").node().checked = _settings.force.layoutCharge;
-    d3.select("#layoutCollide").node().checked = _settings.force.layoutCollide;
+        settings.edges.weightFromCurrent;
+    d3.select("#charge").node().value = settings.force.charge;
+    d3.select("#collide").node().value = settings.force.collide;
+    d3.select("#layoutCenter").node().checked = settings.force.layoutCenter;
+    d3.select("#layoutForceX").node().checked = settings.force.layoutForceX;
+    d3.select("#layoutForceY").node().checked = settings.force.layoutForceY;
+    d3.select("#layoutCharge").node().checked = settings.force.layoutCharge;
+    d3.select("#layoutCollide").node().checked = settings.force.layoutCollide;
 
-    d3.select("#stickyNodes").node().checked = _settings.nodes.stickyNodes;
-    d3.select("#debugMessages").node().checked = _settings.debugMessages;
+    d3.select("#stickyNodes").node().checked = settings.nodes.stickyNodes;
+    d3.select("#debugMessages").node().checked = settings.debugMessages;
+
+    return true;
 };
 
 /**
- * changeSetting takes X argument/s... TODO: Finish this.
- * The return value is ...
+ * changeSetting is a complex function that can change any given setting, and also makes sure to change the UI representation of that value in the settings box. It is also the function that is run every time a setting UI element is changed in the settings box.
+ * The return value is always true.
+ * @param {string} selector - A CSS selector to the object in question (preferably `#id` but can also be `.class` or `tag`).
+ * @param {number|boolean} setTo - The value to set the selector to. Boolean if you want to change a checkbox or similar UI elements. Number if you're changing a number-based UI element.
+ * @param {boolean} [_filter] - Set to `true` (default) if you want to end by running `filter()` again (node changes, predominantly).
+ * @param {string} [type] - "checkbox" (default), "slider", "dropdown" are valid types.
+ * @param {Array} additionalPreFunctions - Array of executables that you want to run _before_ the setting is changed.
+ * @param {Array} additionalPostFunctions - Array of executables that you want to run _after_ the setting is changed.
+ * @returns {boolean} - true
  */
 const changeSetting = (
     selector,
@@ -261,6 +278,7 @@ const changeSetting = (
     additionalPreFunctions = [],
     additionalPostFunctions = []
 ) => {
+    loading("changeSetting called...");
     if (typeof selector === "object") {
         setTo = selector.setTo;
         _filter = selector._filter ? selector._filter : true;
@@ -309,7 +327,7 @@ const changeSetting = (
         d3.select(selector).node().value = setTo;
         if (_filter === true) filter();
         reloadNetwork();
-        restartLayout();
+        restartSimulation();
         saveSettings();
         additionalPostFunctions.forEach((func) => {
             runFunction(func)();
@@ -317,14 +335,16 @@ const changeSetting = (
     } else {
         console.log("already correctly set.");
     }
+    return true;
 };
 
 /**
- * setEventHandlers takes X argument/s... TODO: Finish this.
- * The return value is ...
+ * setupSettingInteractivity takes no arguments but is part of the set up of the interactivity in the settings box.
+ * The return value is always true.
+ * @returns {boolean} - true
  */
-const setEventHandlers = () => {
-    // set change event handlers - for dropdowns
+const setupSettingInteractivity = () => {
+    // dropdown interactivity
     d3.select("#startYear").on("change", () => {
         changeSetting("#startYear", "force", true, "dropdown");
     });
@@ -332,9 +352,12 @@ const setEventHandlers = () => {
         changeSetting("#endYear", "force", true, "dropdown");
     });
 
-    // set change event handlers - for sliders
+    // slider interactivity
     d3.select("#minDegree").on("input", () => {
         changeSetting("#minDegree", "force", true, "slider");
+    });
+    d3.select("#multiplier").on("input", () => {
+        changeSetting("#multiplier", "force", true, "slider");
     });
     d3.select("#minWeight").on("input", () => {
         changeSetting("#minWeight", "force", true, "slider");
@@ -346,7 +369,7 @@ const setEventHandlers = () => {
         changeSetting("#charge", "force", false, "slider");
     });
 
-    // set change event handlers - for checkboxes
+    // checkbox interactivity
     d3.select("#autoClearNodes").on("change", () => {
         changeSetting("#autoClearNodes", "force", true);
     });
@@ -369,7 +392,7 @@ const setEventHandlers = () => {
         saveSettings();
     });
 
-    // set change event handlers - for checkboxes with special functions
+    // checkboxes (special) interactivity
     d3.select("#stickyNodes").on("change", () => {
         changeSetting("#stickyNodes", "force", false, "checkbox", [
             "resetDraw()",
@@ -386,7 +409,7 @@ const setEventHandlers = () => {
         ]);
     });
 
-    // set change handlers for simple buttons
+    // simple button interactivity
     d3.select("#switchMode").on("click", function (d) {
         toggleTheme();
     });
@@ -394,7 +417,7 @@ const setEventHandlers = () => {
         resetLocalStorage();
     });
     d3.select("#clearUnconnected").on("click", function (d) {
-        dropNodesWithNoEdges();
+        filterNodesWithoutEdge();
     });
     d3.select("#showAllPotentialNodes").on("click", function (d) {
         d3.select("#startYear").node().value = store.ranges.years.min;
@@ -405,13 +428,6 @@ const setEventHandlers = () => {
         changeSetting({ selector: "#autoClearNodes", setTo: false });
     });
 
-    // set up clicking on html elements
-    graph.svg.on("click", () => {
-        if (isVisible("#popup-info")) {
-            hide("#popup-info");
-        }
-    });
-
     // set up settings containers
     d3.select("#settingsToggle").on("click", () => {
         toggle("#settingsContainer");
@@ -419,229 +435,8 @@ const setEventHandlers = () => {
     d3.select("#infoToggle").on("click", () => {
         toggle("#infoToggleDiv");
     });
-};
 
-/**
- * setCommentVisibilityForNodesAndEdges takes X argument/s... TODO: Finish this.
- * The return value is ...
- */
-const setCommentVisibilityForNodesAndEdges = () => {
-    const isSourceOrTarget = (n) => {
-        let commentedEdges = graph.edges.filter(
-            (d) => d.has_comments || d.has_general_comments
-        );
-        let isSource = commentedEdges
-            .map((d) => d.source.node_id)
-            .includes(n.node_id);
-        let isTarget = commentedEdges
-            .map((d) => d.target.node_id)
-            .includes(n.node_id);
-        return isSource || isTarget;
-    };
-
-    // Nodes with comments
-    d3.selectAll("circle.has-comments")
-        .transition()
-        .attr("r", (n) => {
-            return Math.sqrt(n.comments.length) * 5;
-        });
-
-    // Nodes with no comments
-    d3.selectAll("circle:not(.has-comments)")
-        .transition()
-        .attr("r", (n) => {
-            if (isSourceOrTarget(n)) {
-                return 3; // make small circles for those that are connected to edges with comment
-            } else {
-                return 0; // hide circles with no comments
-            }
-        })
-        .attr("class", (n) => {
-            if (isSourceOrTarget(n)) {
-                return "node disabled"; // change class for these
-            } else {
-                return getNodeClass(n); // don't change class for others
-            }
-        });
-
-    // Text with comments
-    d3.selectAll("text.label.has-comments").transition().attr("font-size", 10);
-
-    // Text with no comments
-    d3.selectAll("text.label:not(.has-comments)")
-        .transition()
-        .attr("opacity", (n) => {
-            if (isSourceOrTarget(n)) {
-                return 0.1;
-            } else {
-                return 0.01;
-            }
-        })
-        .attr("font-size", (n) => {
-            if (isSourceOrTarget(n)) {
-                return 6;
-            } else {
-                return 0;
-            }
-        });
-
-    // Edges with no comments
-    d3.selectAll("line:not(.has-comments)")
-        .classed("disabled", true)
-        .transition()
-        .attr("stroke-opacity", 0.01);
-};
-
-/**
- * setKeyHandlers takes X argument/s... TODO: Finish this.
- * The return value is ...
- */
-const setKeyHandlers = () => {
-    d3.select("html")
-        .node()
-        .addEventListener("keyup", (e) => {
-            if (e.key === "Meta" || e.key === "Shift") {
-                d3.selectAll(".metaShow").classed("d-none", true);
-            }
-            if (e.key === "Alt") {
-                if (!window.egoNetwork) {
-                    resetDraw();
-                    // hide("#popup-info");
-                } else {
-                    console.log("window has ego network...");
-                    // TODO: If ego network is open, and alt key is pressed and then released, we want to reset view?
-                }
-            }
-        });
-
-    let numbers = [];
-    let years = [];
-    let numberModal = new bootstrap.Modal(
-        document.getElementById("numberModal"),
-        {}
-    );
-
-    d3.select("html")
-        .node()
-        .addEventListener("keydown", (e) => {
-            if (e.key === "Meta" || e.key === "Shift") {
-                d3.selectAll(".metaShow").classed("d-none", false);
-            }
-            if (e.key === "Alt") {
-                setCommentVisibilityForNodesAndEdges();
-            }
-            if (e.key === "Escape" && isVisible("#popup-info")) {
-                //console.log("Escape 1 called!");
-                hide("#popup-info");
-            } else if (e.key === "Escape" && isVisible("#nodeEdgeInfo")) {
-                //console.log("Escape 2 called!");
-                resetDraw();
-            } else if (e.key === "Escape" || e.key === " ") {
-                //console.log("Escape 3 called!");
-                UIToggleAllSettingBoxes();
-            } else if (e.key === "c" && e.metaKey) {
-                //console.log("command+c called");
-                changeSetting(
-                    "#autoClearNodes",
-                    !getSettings().nodes.autoClearNodes,
-                    true
-                );
-            }
-            if (
-                [
-                    "1",
-                    "2",
-                    "3",
-                    "4",
-                    "5",
-                    "6",
-                    "7",
-                    "8",
-                    "9",
-                    "0",
-                    "-",
-                ].includes(e.key)
-            ) {
-                numbers.push(e.key);
-                if (years.length === 1) {
-                    numberModal._element.querySelector("h5").innerText =
-                        "End year";
-                } else {
-                    numberModal._element.querySelector("h5").innerText =
-                        "Start year";
-                }
-                numberModal._element.querySelector(
-                    "h1"
-                ).innerText = `${+numbers.join("")}`;
-                numberModal.show();
-                let t = setTimeout(() => {
-                    numberModal.hide();
-                }, 750);
-                if (numbers.length == 4) {
-                    let year = +numbers.join("");
-                    if (store.ranges.years.array.includes(year)) {
-                        years.push(year);
-                    } else {
-                        console.log(
-                            `${year} is not a year in the graph's range.`
-                        );
-                        // TODO: Stop `t` from timing out, flash the numberModal red, and let the user know that nothing happened
-                    }
-                    numbers = [];
-                    // console.log(years);
-                    let startYear = undefined,
-                        endYear = undefined;
-                    if (years.length == 2) {
-                        startYear = years.slice(-2)[0];
-                        endYear = years.slice(-2)[1];
-                        // console.log(`setting year range: ${startYear}-${endYear}`);
-                        years = [];
-                    } else if (years.slice(-2).length == 1) {
-                        // console.log(`setting start year: ${years[0]}`);
-                        startYear = years[0];
-                    }
-                    if (startYear)
-                        changeSetting({
-                            selector: "#startYear",
-                            type: "slider",
-                            setTo: startYear,
-                            _filter: true,
-                        });
-                    if (endYear)
-                        changeSetting({
-                            selector: "#endYear",
-                            type: "slider",
-                            setTo: endYear,
-                            _filter: true,
-                        });
-                }
-            }
-            Object.keys(keyMapping).forEach((key) => {
-                if (
-                    key === e.key &&
-                    keyMapping[key].noMeta &&
-                    e.shiftKey == false &&
-                    e.metaKey == false &&
-                    e.altKey == false &&
-                    e.ctrlKey == false
-                ) {
-                    Function(keyMapping[key].noMeta)();
-                } else if (
-                    key === e.key &&
-                    keyMapping[key].shiftKey &&
-                    e.shiftKey == true
-                ) {
-                    Function(keyMapping[key].shiftKey)();
-                }
-            });
-        });
-};
-
-/**
- * setMiscHandlers takes X argument/s... TODO: Finish this.
- * The return value is ...
- */
-const setMiscHandlers = () => {
+    // set up collideContainer and chargeContainer (special cases)
     d3.select("#collideContainer").on("click", () => {
         if (
             d3.event.target.id === "collide" &&
@@ -661,7 +456,141 @@ const setMiscHandlers = () => {
             updateLabel("charge");
         }
     });
+    return true;
+};
 
+
+/**
+ * setupKeyHandlers takes no arguments but sets up the key interaction with the network visualization.
+ * The return value is always true.
+ * @returns {boolean} - true
+ */
+const setupKeyHandlers = () => {
+    // resetting on keyUp
+    d3.select("html").on("keyup", () => {
+        if (d3.event.key === "Meta" || d3.event.key === "Shift") {
+            hide(".metaShow");
+        }
+        if (d3.event.key === "Alt") {
+            toggleCommentedElements();
+        }
+    });
+
+    let numbers = [];
+    let years = [];
+    let numberModal = new bootstrap.Modal(
+        document.getElementById("numberModal"),
+        {}
+    );
+
+    d3.select("html").on("keydown", () => {
+        let e = d3.event;
+        if (e.key === "Meta" || e.key === "Shift") {
+            show(".metaShow");
+        }
+        if (e.key === "Alt") {
+            toggleCommentedElements();
+        }
+        if (e.key === "Escape" && isVisible("#popup-info")) {
+            //console.log("Escape 1 called!");
+            hide("#popup-info");
+        } else if (e.key === "Escape" && isVisible("#nodeEdgeInfo")) {
+            //console.log("Escape 2 called!");
+            resetDraw();
+        } else if (e.key === "Escape" || e.key === " ") {
+            //console.log("Escape 3 called!");
+            UIToggleAllSettingBoxes();
+        } else if (e.key === "c" && e.metaKey) {
+            //console.log("command+c called");
+            changeSetting(
+                "#autoClearNodes",
+                !getSettings().nodes.autoClearNodes
+            );
+        }
+        if (
+            ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-"].includes(
+                e.key
+            )
+        ) {
+            numbers.push(e.key);
+            if (years.length === 1) {
+                numberModal._element.querySelector("h5").innerText = "End year";
+            } else {
+                numberModal._element.querySelector("h5").innerText =
+                    "Start year";
+            }
+            numberModal._element.querySelector(
+                "h1"
+            ).innerText = `${+numbers.join("")}`;
+            numberModal.show();
+            let t = setTimeout(() => {
+                numberModal.hide();
+            }, 750);
+            if (numbers.length == 4) {
+                let year = +numbers.join("");
+                if (store.ranges.years.array.includes(year)) {
+                    years.push(year);
+                } else {
+                    console.log(`${year} is not a year in the graph's range.`);
+                    // TODO: Stop `t` from timing out, flash the numberModal red, and let the user know that nothing happened
+                }
+                numbers = [];
+                // console.log(years);
+                let startYear = undefined,
+                    endYear = undefined;
+                if (years.length == 2) {
+                    startYear = years.slice(-2)[0];
+                    endYear = years.slice(-2)[1];
+                    // console.log(`setting year range: ${startYear}-${endYear}`);
+                    years = [];
+                } else if (years.slice(-2).length == 1) {
+                    // console.log(`setting start year: ${years[0]}`);
+                    startYear = years[0];
+                }
+                if (startYear)
+                    changeSetting({
+                        selector: "#startYear",
+                        type: "slider",
+                        setTo: startYear,
+                        _filter: true,
+                    });
+                if (endYear)
+                    changeSetting({
+                        selector: "#endYear",
+                        type: "slider",
+                        setTo: endYear,
+                        _filter: true,
+                    });
+            }
+        }
+        Object.keys(keyMapping).forEach((key) => {
+            if (
+                key === e.key &&
+                keyMapping[key].noMeta &&
+                e.shiftKey == false &&
+                e.metaKey == false &&
+                e.altKey == false &&
+                e.ctrlKey == false
+            ) {
+                Function(keyMapping[key].noMeta)();
+            } else if (
+                key === e.key &&
+                keyMapping[key].shiftKey &&
+                e.shiftKey == true
+            ) {
+                Function(keyMapping[key].shiftKey)();
+            }
+        });
+    });
+    return true;
+};
+
+/**
+ * setupMiscInteractivity takes no arguments but sets up the miscellaneous interaction with elements in the network visualization, and those UI elements that belong to it.
+ * The return value is always true.
+ * @returns {boolean} - true
+ */
+const setupMiscInteractivity = () => {
     d3.selectAll("[data-toggle]").on("click", () => {
         d3.event.stopPropagation();
         if (d3.event.target.classList.contains("toggled")) {
@@ -684,4 +613,13 @@ const setMiscHandlers = () => {
     });
 
     d3.select(window).on("resize", transformToWindow);
+
+    // set up clicking on html elements
+    graph.svg.on("click", () => {
+        if (isVisible("#popup-info")) {
+            hide("#popup-info");
+        }
+    });
+
+    return true;
 };

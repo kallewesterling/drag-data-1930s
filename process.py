@@ -545,7 +545,12 @@ for edge in json_data.get('links'):
         count[category][_id] = 0
     count[category][_id] += 1
 
+check_ids = []
 for node in json_data.get('nodes'):
+    if not node.get('node_id') in check_ids:
+        check_ids.append(node.get('node_id'))
+    else:
+        print(f'warning - fix the double ID: {node.get("node_id")}')
     pass
 
 for cat in count:

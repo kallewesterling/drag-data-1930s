@@ -3,15 +3,16 @@
 const _autoSettings = {
     nodes: {
         minDegree: 6,
+        multiplier: 1,
         autoClearNodes: true,
         stickyNodes: true,
-        nodeSizeFromCurrent: false,
+        nodeSizeFromCurrent: true,
     },
     edges: {
         minWeight: 0,
         startYear: 1920,
         endYear: 1940,
-        weightFromCurrent: false,
+        weightFromCurrent: true,
     },
     force: {
         charge: -320,
@@ -81,15 +82,16 @@ const store = {
 const graph = {
     nodes: [],
     edges: [],
-    layout: d3.forceSimulation().force("link", d3.forceLink()),
+    simulation: d3.forceSimulation().force("link", d3.forceLink()),
     svg: d3.select("svg#main"),
     k: 1,
 };
 
 graph.plot = graph.svg.append("g").attr("id", "plot");
 
-// place links underneath nodes
+// place links underneath nodes, and labels on top of everything
 let g = {
     edges: graph.plot.append("g").attr("id", "links"),
     nodes: graph.plot.append("g").attr("id", "nodes"),
+    labels: graph.plot.append("g").attr("id", "labels"),
 };

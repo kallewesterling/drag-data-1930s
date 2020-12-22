@@ -1,3 +1,8 @@
+body, html {
+    height: 100% !important;
+    z-index: -1000;
+}
+
 #settings {
     position: absolute;
     top: 1em;
@@ -54,6 +59,7 @@
     min-width: 250px;
     max-width: 250px;
     overflow: hidden;
+    z-index: 400;
 }
 
 #infoContainer > p,
@@ -87,7 +93,7 @@ body {
 
 svg#main {
     background-color: var(--background);
-    z-index: -100;
+    z-index: 100;
 }
 
 .label {
@@ -212,6 +218,7 @@ svg#main {
 #settingsContainer {
     background-color: var(--background-settings);
     transition: display 0s, opacity 0.5s linear;
+    z-index: 400;
 }
 
 #wrapToasters {
@@ -299,11 +306,13 @@ svg#main {
     top: 0;
     left: 0;
     width: 400px;
-    height: 300px;
+    /* height: 300px; */
+    max-height: 300px;
     overflow: hidden;
     overflow-y: scroll;
     max-height: 600px;
-    background-color: rgba(255,255,255,0.75);
+    background-color: rgba(255,255,255,0.9);
+    z-index: 500;
 }
 
 #popup-info > h1 {
@@ -321,4 +330,16 @@ svg#main {
 
 #popup-info > p {
     font-size: 0.8em;
+}
+
+#egoNetwork > #node {
+    font-weight: bold;
+}
+
+#plot {
+    z-index: -1000 !important;
+}
+
+#loading {
+    z-index: 500;
 }

@@ -5,6 +5,7 @@
  * The return value is true in all cases.
  */
 const loadNetwork = () => {
+    loading('loadNetwork called...');
     d3.json(DATAFILE).then((data) => {
         // for debug purposes (TODO can be removed)
         store.raw = data;
@@ -55,11 +56,9 @@ const loadNetwork = () => {
             );
         });
         store.edges.forEach((e) => {
-            e.source = store.nodes.find((n) => n.id === e.source);
-            e.target = store.nodes.find((n) => n.id === e.target);
-            e.found = e.found.filter((found) => {
-                return found != null && found != "" && found != "";
-            });
+            e.source = store.nodes.find((node) => node.id === e.source); // set up as object
+            e.target = store.nodes.find((node) => node.id === e.target); // set up as object
+            e.found = e.found.filter((found) => found != null && found != "" && found != "" ? true : false);
             e.found.forEach((source) => {
                 let date = dateParser(source);
                 if (date && date.iso !== undefined) {
@@ -99,9 +98,9 @@ const loadNetwork = () => {
         transformToWindow();
 
         // set up handlers
-        setEventHandlers();
-        setKeyHandlers();
-        setMiscHandlers();
+        setupKeyHandlers();
+        setupSettingInteractivity();
+        setupMiscInteractivity();
 
         /* // TODO #10: This does not work!
         let transformSettings = loadSettings("transform");
@@ -128,60 +127,61 @@ const loadNetwork = () => {
  * setupInteractivity takes X argument/s... TODO: Finish this.
  * The return value is ...
  */
-const setupInteractivity = (node, edge) => {
+const setupInteractivity = () => {
+    loading('setupInteractivity called...');
+
     let settings = getSettings();
-    node.call(
+    nodeElements.call(
         d3
             .drag()
-            .on("start", (n) => {
-                if (!d3.event.active) graph.layout.alphaTarget(0.3).restart(); // avoid restarting except on the first drag start event
-                n.fx = n.x;
-                n.fy = n.y;
+            .on("start", (node) => {
+                if (!d3.event.active) graph.simulation.alphaTarget(0.3).restart(); // avoid restarting except on the first drag start event
+                node.fx = node.x;
+                node.fy = node.y;
             })
-            .on("drag", (n) => {
-                n.fx = d3.event.x;
-                n.fy = d3.event.y;
+            .on("drag", (node) => {
+                node.fx = d3.event.x;
+                node.fy = d3.event.y;
             })
-            .on("end", (n) => {
-                if (!d3.event.active) graph.layout.alphaTarget(0); // restore alphaTarget to normal value
+            .on("end", (node) => {
+                if (!d3.event.active) graph.simulation.alphaTarget(0); // restore alphaTarget to normal value
 
                 if (settings.nodes.stickyNodes) {
-                    n.fx = n.x;
-                    n.fy = n.y;
+                    node.fx = node.x;
+                    node.fy = node.y;
                 } else {
-                    n.fx = null;
-                    n.fy = null;
+                    node.fx = null;
+                    node.fy = null;
                 }
             })
     );
 
-    node.on("click", (n) => {
+    nodeElements.on("click", (node) => {
         d3.event.stopPropagation();
         if (d3.event.metaKey === true) {
-            if (nodeIsSelected(n)) {
+            if (nodeIsSelected(node)) {
                 hide("#nodeEdgeInfo");
                 resetGraphElements();
             }
-            loadEgoNetwork(n);
-        }
-        if (d3.event.altKey === true && n.has_comments) {
+            loading('starting egoNetwork...')
+            toggleEgoNetwork(node);
+            // return true;
+        } else if (d3.event.altKey === true && node.has_comments) {
             d3.select("#popup-info")
-                .html(generateCommentHTML(n))
+                .html(generateCommentHTML(node))
                 .classed("d-none", false)
                 .attr(
                     "style",
                     `top: ${d3.event.y}px !important; left: ${d3.event.x}px !important;`
                 );
         } else {
-            selectNode(n);
+            selectNode(node);
         }
     });
 
-    edge.on("click", (e) => {
+    edgeElements.on("click", (e) => {
         d3.event.stopPropagation();
         if (d3.event.altKey === true) {
-            //console.log(store.comments.edges)
-            //console.log(e.edge_id)
             if (e.has_comments || e.has_general_comments) {
                 d3.select("#popup-info")
                     .html(generateCommentHTML(e))
@@ -192,190 +192,90 @@ const setupInteractivity = (node, edge) => {
                     );
             }
         } else {
-            if (edgeIsSelected(e)) {
-                hide("#nodeEdgeInfo");
-                resetGraphElements();
-            } else {
-                selectEdge(e);
-            }
+            selectEdge(e);
         }
     });
 };
 
+let textElements = g.labels.selectAll("text"),
+    nodeElements = g.nodes.selectAll("circle"),
+    edgeElements = g.edges.selectAll("line");
+
 /**
- * restart takes X argument/s... TODO: Finish this.
- * The return value is ...
+ * reloadNetwork takes no arguments.
+ * The return value is always true.
+ * @returns {boolean} - true
  */
 const reloadNetwork = () => {
-    let settings = getSettings();
+    loading('reloadNetwork called...')
 
     // TODO: Rewrite the following node section according to d3's `join` method
-    let node = g.nodes
-        .selectAll("circle.node")
-        .data(graph.nodes, (d) => d.node_id);
+    nodeElements = g.nodes
+        .selectAll("circle")
+        .data(graph.nodes, (node) => node.node_id);
 
-    node.exit().transition(750).attr("r", 0).remove();
+    textElements = g.labels
+        .selectAll("text")
+        .data(graph.nodes, (node) => node.node_id);
 
-    let newNode = node
+    edgeElements = g.edges
+        .selectAll("line")
+        .data(graph.edges, (edge) => edge.edge_id);
+
+
+    // NODES
+    let newNode = nodeElements
         .enter()
         .append("circle")
-        .attr("id", (n) => n.node_id)
-        .attr("cx", (n) => n.x)
-        .attr("cy", (n) => n.y)
-        .attr("class", (n) => getNodeClass(n));
+        .attr("id", (node) => node.node_id)
+        .attr("class", (node) => getNodeClass(node));
 
-    g.nodes
-        .selectAll("circle.node")
-        .data(graph.nodes, (d) => d.node_id)
+    nodeElements.exit().transition(750).attr("r", 0).remove();
+    
+    nodeElements = nodeElements.merge(newNode);
+    
+    nodeElements
         .transition(750)
-        .attr("r", (n) => getSize(n));
+        .attr("r", (node) => getSize(node));
 
-    node = node.merge(newNode);
 
-    // TODO: Rewrite the following text section according to d3's `join` method
-    let text = g.nodes
-        .selectAll("text.label")
-        .data(graph.nodes, (d) => d.node_id);
-
-    text.exit().transition(750).attr("opacity", 0).remove();
-
-    let newText = text
+    // LABELS
+    let newText = textElements
         .enter()
         .append("text")
-        .attr("class", "label")
+        .attr("class", node => getTextClass(node))
         .attr("style", "pointer-events: none;");
+    
+    textElements.exit().transition(750).attr("opacity", 0).remove();
+    
+    textElements = textElements.merge(newText);
 
-    g.nodes
-        .selectAll("text.label")
-        .data(graph.nodes, (n) => n.node_id)
+    textElements
         .transition()
         .duration(750)
-        .attr("font-size", (n) => getSize(n, "text"))
-        .text((n) => {
-            if (n.display) {
-                return n.display;
-            } else {
-                return n.id;
-            }
-        })
-        .attr("class", (n) => {
-            return n.has_comments ? "label has-comments" : "label";
-        });
-
-    text = text.merge(newText);
+        .attr("font-size", (node) => getSize(node, "text"))
+        .text((node) => displayOrID(node))
+        .attr("opacity", 1)
+        .attr("class", node => getTextClass(node));
 
     // TODO: Rewrite the following edge section according to d3's `join` method
-    let weightScale = edgeScale(settings);
-
-    let edge = g.edges
-        .selectAll("line.link")
-        .data(graph.edges, (d) => d.edge_id);
-
-    edge.exit().transition(750).attr("stroke-opacity", 0).remove();
-
-    let newEdge = edge
+    
+    let newEdge = edgeElements
         .enter()
         .append("line")
-        .attr("id", (e) => e.edge_id)
-        .attr("class", (e) => getEdgeClass(e))
-        .attr("x1", (e) => e.source.x)
-        .attr("y1", (e) => e.source.y)
-        .attr("x2", (e) => e.target.x)
-        .attr("y2", (e) => e.target.y)
+        
+        edgeElements.exit().transition(750).attr("stroke-opacity", 0).remove();
+        
+        edgeElements = edgeElements.merge(newEdge);
+        
+    edgeElements
+        .attr("id", edge => edge.edge_id)
+        .attr("class", edge => getEdgeClass(edge))
         .attr("stroke-opacity", 0.3)
-        .style("stroke-width", "0px");
+        .style("stroke-width", (e) => getEdgeStrokeWidth(e));
 
-    g.edges
-        .selectAll("line.link")
-        .data(graph.edges, (d) => d.edge_id)
-        .style("stroke-width", (e) => {
-            let evalWeight = settings.edges.weightFromCurrent
-                ? e.calibrated_weight
-                : e.weight;
-            return weightScale(evalWeight) + "px";
-        });
+    setupInteractivity();
+    modifySimulation();
 
-    edge = edge.merge(newEdge);
-
-    setupInteractivity(node, edge);
-    modifyForceLayout(node, edge, text);
-};
-
-/**
- * restart takes X argument/s... TODO: Finish this.
- * The return value is ...
- */
-const loadEgoNetwork = (node) => {
-    // filter nodes based on a given node
-    if (window.egoNetwork) {
-        console.log("ego network already active - resetting network view...");
-        resetLocalStorage();
-    } else {
-        console.log("filtering out an ego network based on " + node.node_id);
-        let related = getRelated(node.node_id);
-        console.log("related secondary nodes:");
-        console.log(related.secondaryNodeIDs);
-
-        window.egoNetwork = true;
-
-        if (isVisible("#settings") || isVisible("#infoContainer")) {
-            console.log("hiding quick access and settings for this one...");
-            hide("#settings");
-            hide("#infoContainer");
-        }
-
-        store.nodes.forEach((n) => {
-            if (n.node_id === node.node_id) {
-                n.inGraph = true;
-            } else if (related.secondaryNodeIDs.includes(n.node_id)) {
-                n.inGraph = true;
-            } else if (related.tertiaryNodeIDs.includes(n.node_id)) {
-            } else {
-                graph.nodes.forEach((o, i) => {
-                    if (n.node_id === o.node_id) {
-                        graph.nodes.splice(i, 1);
-                    }
-                });
-                n.inGraph = false;
-            }
-        });
-
-        store.edges.forEach((e) => {
-            if (
-                related.secondaryEdges.includes(e.edge_id) ||
-                related.tertiaryEdges.includes(e.edge_id)
-            ) {
-                console.log("this edge should stay");
-                e.inGraph = true;
-                if (graphEdgesContains(e.edge_id)) {
-                } else {
-                    graph.edges.push(e);
-                }
-            } else {
-                if (graphEdgesContains(e.edge_id)) {
-                    console.log("this edge should be removed");
-                    graph.edges.forEach((o, i) => {
-                        if (e.edge_id === o.edge_id) {
-                            graph.edges.splice(i, 1);
-                        }
-                    });
-                    e.inGraph = false;
-                }
-            }
-        });
-
-        d3.select("#main").on("click", () => {
-            if (d3.event.metaKey && window.egoNetwork) {
-                console.log(
-                    "svg command + click detected while ego network active - resetting network view..."
-                );
-                resetLocalStorage();
-            }
-        });
-    }
-
-    modifyNodeDegrees();
-    dropNodesWithNoEdges();
-    updateInfo();
-    reloadNetwork();
+    return true;
 };
