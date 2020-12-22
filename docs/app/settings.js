@@ -327,6 +327,7 @@ const changeSetting = (
         d3.select(selector).node().value = setTo;
         if (_filter === true) filter();
         reloadNetwork();
+        resetGraphElements();
         restartSimulation();
         saveSettings();
         additionalPostFunctions.forEach((func) => {

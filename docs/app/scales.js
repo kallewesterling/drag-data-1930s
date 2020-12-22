@@ -5,22 +5,17 @@
  * The return value is ...
  */
 const nodeScale = (settings) => {
-    let val = 0;
     if (settings === true || settings.nodes.nodeSizeFromCurrent === true) {
-        let extent = d3.extent(graph.nodes, (d) => d.current_degree);
-        val = d3
+        return d3
             .scaleLinear()
             .range([1, 10])
-            .domain(extent);
+            .domain(d3.extent(graph.nodes, (d) => d.current_degree));
     } else {
-        let extent = d3.extent(graph.nodes, (d) => d.degree);
-        val = d3
+        return d3
             .scaleLinear()
             .range([1, 10])
-            .domain(extent);
+            .domain(d3.extent(graph.nodes, (d) => d.degree));
     }
-    
-    return val;
 };
 
 /**
@@ -28,19 +23,15 @@ const nodeScale = (settings) => {
  * The return value is ...
  */
 const edgeScale = (settings) => {
-    let val = 0;
     if (settings === true || settings.edges.weightFromCurrent === true) {
-        let extent = d3.extent(graph.edges, (d) => d.calibrated_weight);
-        val = d3
+        return d3
             .scaleLinear()
             .range([settings.edgeMinStroke, settings.edgeMaxStroke])
-            .domain(extent);
+            .domain(d3.extent(graph.edges, (d) => d.calibrated_weight));
     } else {
-        let extent = d3.extent(store.edges, (d) => d.weight);
-        val = d3
+        return d3
             .scaleLinear()
             .range([settings.edgeMinStroke, settings.edgeMaxStroke])
-            .domain(extent);
+            .domain(d3.extent(store.edges, (d) => d.weight));
     }
-    return val;
 };

@@ -180,10 +180,10 @@ const filter = (nodeList = [], edgeList = []) => {
         filterNodesWithoutEdge();
     }
     
+    reloadNetwork();
+    
     resetGraphElements();
     updateInfo();
-
-    reloadNetwork();
     
     return true;
 };
@@ -274,7 +274,7 @@ const getEgoNetwork = (node, limit=10000) => { // limit automatically set to 10,
 
     let nodes = []
     nodeIDs.forEach(node_id=> {
-        nodes.push(graph.nodes.find((node) => node.node_id === node_id));
+        nodes.push(lookupNode(node_id));
     })
 
     return nodes;
@@ -323,6 +323,7 @@ const toggleEgoNetwork = async (node, toggleSettings = true) => {
         console.log("ego network already active - resetting network view...");
         await egoNetworkOff();
         reloadNetwork();
+        resetGraphElements();
 
         if (toggleSettings) {
             console.log("--> show quick access and settings");
@@ -333,6 +334,7 @@ const toggleEgoNetwork = async (node, toggleSettings = true) => {
         console.log("filtering out an ego network based on " + node.node_id);
         await egoNetworkOn(node);
         reloadNetwork();
+        resetGraphElements();
 
         d3.select("#main").on("click", () => {
             if (d3.event.metaKey && window.egoNetwork) {
