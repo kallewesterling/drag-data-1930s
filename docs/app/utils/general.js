@@ -60,7 +60,7 @@ const hasUnconnectedNodes = () => {
  */
 const restartSimulation = () => {
     graph.nodes.forEach(node => {
-        console.log(node.vx); // TODO: reset stickyness here too...?
+        // console.log(node.vx); // TODO: reset stickyness here too...?
     })
     graph.simulation.stop();
     graph.simulation.alpha(1);
@@ -257,9 +257,8 @@ const selectRelatedEdges = (node) => {
  * @returns {Object} - Object that contains all the information about the nodes and edges (2nd and 3rd removed) from the provided node
  */
 const getRelated = (node) => {
-    if (typeof node === "string") {
+    if (typeof node === "string")
         node = lookupNode(node);
-    }
 
     let secondaryEdges = getRelatedEdges(node);
     let secondaryNodeIDs = [
@@ -303,6 +302,9 @@ const getRelated = (node) => {
  */
 const resetGraphElements = () => {
     loading('resetGraphElements called...')
+    if (window.egoNetwork != undefined) console.log(`window.egoNetwork: ${window.egoNetwork}`)
+    if (window.toggledCommentedElements != undefined) console.log(`window.toggledCommentedElements: ${window.toggledCommentedElements}`)
+    if (window.nodeSelected != undefined) console.log(`window.nodeSelected: ${window.nodeSelected}`)
 
     nodeElements
         .classed("d-none", false) // show all of them circles
@@ -342,11 +344,11 @@ const resetGraphElements = () => {
  */
 const selectNode = (node) => {
     if (nodeIsSelected(node)) {
-        window.node_selected = undefined;
+        window.nodeSelected = undefined;
         hide("#nodeEdgeInfo");
         resetGraphElements();
     } else {
-        window.node_selected = true;
+        window.nodeSelected = true;
         resetGraphElements();
         deselectNodes(node);
         selectRelatedEdges(node);

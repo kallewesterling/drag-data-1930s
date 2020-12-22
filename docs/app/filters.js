@@ -17,7 +17,6 @@ const dropEdge = (edge) => {
     graph.edges.forEach((o, i) => {
         if (edge.edge_id === o.edge_id) {
             loading(`dropping edge ${o.edge_id}...`)
-            // console.log(`dropping edge ${edge.edge_id}`)
             //console.log(`   graph.edges length before: ${graph.edges.length}`);
             graph.edges.splice(i, 1);
             edge.inGraph = false;
@@ -55,7 +54,7 @@ const filterNodes = (nodeList = []) => {
         store.nodes.forEach(node => {
             if (nodeList.includes(node)) {
                 if (!node.inGraph) {
-                    console.log('node is not in graph, so add it...')
+                    // console.log('node is not in graph, so add it...')
                     node.inGraph = true;
                     graph.nodes.push(node);
                 } else {
@@ -139,12 +138,12 @@ const filterEdges = (edgeList = []) => {
             }
         });
     } else {
-        console.log('have edgeList');
-        console.log(edgeList);
+        // console.log('have edgeList');
+        // console.log(edgeList);
         store.edges.forEach(edge => {
             if (edgeList.includes(edge)) {
                 if (!edge.inGraph) {
-                    console.log('edge is not in graph, so add it...')
+                    // console.log('edge is not in graph, so add it...')
                     edge.inGraph = true;
                     graph.edges.push(edge);
                 } else {
@@ -326,7 +325,7 @@ const toggleEgoNetwork = async (node, toggleSettings = true) => {
         resetGraphElements();
 
         if (toggleSettings) {
-            console.log("--> show quick access and settings");
+            //console.log("--> show quick access and settings");
             show("#settings");
             show("#infoContainer");
         }
@@ -346,7 +345,7 @@ const toggleEgoNetwork = async (node, toggleSettings = true) => {
         });
 
         if (toggleSettings) {
-            console.log("--> hiding quick access and settings");
+            //console.log("--> hiding quick access and settings");
             hide("#settings");
             hide("#infoContainer");
         }
