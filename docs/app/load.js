@@ -209,64 +209,41 @@ let textElements = g.labels.selectAll("text"),
 const reloadNetwork = () => {
     loading('reloadNetwork called...')
 
-    // TODO: Rewrite the following node section according to d3's `join` method
     nodeElements = g.nodes
         .selectAll("circle")
-        .data(graph.nodes, (node) => node.node_id);
+        .data(graph.nodes, (node) => node.node_id)
+        .join(
+            enter => enter.append("circle")
+                            .attr("r", 0)
+                            .attr("id", (node) => node.node_id)
+                            .attr("class", (node) => getNodeClass(node)),
+            update => update,
+            exit => exit.transition(750).attr("r", 0).remove()
+        );
 
     textElements = g.labels
         .selectAll("text")
-        .data(graph.nodes, (node) => node.node_id);
+        .data(graph.nodes, (node) => node.node_id)
+        .join(
+            enter => enter.append("text")
+                            .text((node) => displayOrID(node))
+                            .attr("class", node => getTextClass(node))
+                            .attr("style", "pointer-events: none;")
+                            .attr("opacity", 0),
+            update => update,
+            exit => exit.transition(750).attr("opacity", 0).remove()
+        );
 
     edgeElements = g.edges
         .selectAll("line")
-        .data(graph.edges, (edge) => edge.edge_id);
+        .data(graph.edges, (edge) => edge.edge_id).join(
+            enter => enter.append("line")
+                            .attr("id", edge => edge.edge_id)
+                            .attr("stroke-opacity", 0.3),
+            update => update,
+            exit => exit.transition(750).attr("stroke-opacity", 0).remove()
+        );
 
-
-    // NODES
-    let newNode = nodeElements
-        .enter()
-        .append("circle")
-        .attr("r", 0)
-        .attr("id", (node) => node.node_id)
-        .attr("class", (node) => getNodeClass(node));
-
-    nodeElements.exit().transition(750).attr("r", 0).remove();
-    
-    nodeElements = nodeElements.merge(newNode);
-    
-    /*
-    nodeElements
-        .transition(750)
-        .attr("r", (node) => getSize(node));
-    */
-
-    // LABELS
-    let newText = textElements
-        .enter()
-        .append("text")
-        .text((node) => displayOrID(node))
-        .attr("class", node => getTextClass(node))
-        .attr("style", "pointer-events: none;")
-        .attr("opacity", 0);
-    
-    textElements.exit().transition(750).attr("opacity", 0).remove();
-    
-    textElements = textElements.merge(newText);
-
-
-    // TODO: Rewrite the following edge section according to d3's `join` method
-    
-    let newEdge = edgeElements
-        .enter()
-        .append("line")
-        .attr("id", edge => edge.edge_id)
-        .attr("stroke-opacity", 0.3)
-        
-    edgeElements.exit().transition(750).attr("stroke-opacity", 0).remove();
-        
-    edgeElements = edgeElements.merge(newEdge);
-        
     setupInteractivity();
     modifySimulation();
 
