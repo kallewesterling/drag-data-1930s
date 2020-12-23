@@ -115,24 +115,10 @@ const loadNetwork = () => {
             });
         });
 
-        transformToWindow();
-
         // set up handlers
         setupKeyHandlers();
         setupSettingInteractivity();
         setupMiscInteractivity();
-
-        /* // TODO #10: This does not work!
-        let transformSettings = loadSettings("transform");
-        if (transformSettings) {
-            console.log("transform recorded");
-            k = transformSettings.k;
-            graph.plot.transition(750).call(zoom.scaleTo, transformSettings.k);
-            graph.plot.transition(750).call(zoom.translateTo, transformSettings.x, transformSettings.y);
-        } else {
-            graph.plot.transition(750).call(zoom.scaleTo, AUTO_ZOOM);
-        }
-        */
 
         // send us on to filter()
         filter();
@@ -240,12 +226,12 @@ let textElements = g.labels.selectAll("text"),
     edgeElements = g.edges.selectAll("line");
 
 /**
- * reloadNetwork takes no arguments.
+ * updateElements takes no arguments.
  * The return value is always true.
  * @returns {boolean} - true
  */
-const reloadNetwork = () => {
-    loading("reloadNetwork called...");
+const updateElements = () => {
+    loading("updateElements called...");
 
     nodeElements = g.nodes
         .selectAll("circle")

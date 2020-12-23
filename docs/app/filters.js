@@ -185,7 +185,7 @@ const filter = (nodeList = [], edgeList = [], change = true) => {
         filterNodesWithoutEdge();
     }
     
-    reloadNetwork();
+    updateElements();
 
     // TODO: I am using JLevain here. Are there other community detectors out there? Learn more about algorithms...
     // See invention of Louvain method here https://arxiv.org/pdf/0803.0476.pdf
@@ -309,7 +309,7 @@ const egoNetworkOn = async (node) => {
     d3.select('#egoNetwork > #node').html(node.id);
     let egoNetwork = getEgoNetwork(node);
     const result = await filter(egoNetwork);
-    //reloadNetwork();
+    //updateElements();
     restartSimulation();
     resetDraw();
     
@@ -324,7 +324,7 @@ const egoNetworkOff = async (node) => {
     loading('egoNetworkOff called...')
     d3.select('#egoNetwork').classed('d-none', true);
     const result = await filter();
-    //reloadNetwork();
+    //updateElements();
     restartSimulation();
     resetDraw();
     
@@ -341,7 +341,7 @@ const toggleEgoNetwork = async (node, toggleSettings = true, force = undefined) 
     if (window.egoNetwork || force === "off") {
         console.log("ego network already active - resetting network view...");
         await egoNetworkOff();
-        reloadNetwork();
+        updateElements();
         resetGraphElements();
 
         if (toggleSettings) {
@@ -352,7 +352,7 @@ const toggleEgoNetwork = async (node, toggleSettings = true, force = undefined) 
     } else {
         console.log("filtering out an ego network based on " + node.node_id);
         await egoNetworkOn(node);
-        reloadNetwork();
+        updateElements();
         resetGraphElements();
 
         d3.select("#main").on("click", () => {
@@ -426,8 +426,8 @@ const filterNodesWithoutEdge = () => {
 
     if (returnObject.dropped.length > 0) {
         troubleshoot(true); // ensures that all nodes are correctly represented in
-        // console.log('running reloadNetwork in filterNodesWithoutEdge')
-        // reloadNetwork();
+        // console.log('running updateElements in filterNodesWithoutEdge')
+        // updateElements();
         updateInfo();
     }
 

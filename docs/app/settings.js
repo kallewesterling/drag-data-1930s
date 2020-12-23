@@ -39,16 +39,6 @@ const UIToggleAllSettingBoxes = () => {
     return true;
 };
 
-/**
- * transformToWindow takes no arguments but sets the `transform` attribute on the `plot` property in the `g` object to the height and width of the user's viewport.
- * The return value is true in all cases.
- * @returns {boolean} - true
- */
-const transformToWindow = () => {
-    graph.plot.attr("width", window.innerWidth);
-    graph.plot.attr("height", window.innerHeight);
-    return true;
-};
 
 /**
  * updateLabel takes one required argument, the name of any given label to update. Depending on checkboxes, it may disable slider UI elements.
@@ -72,6 +62,8 @@ const updateLabel = (name) => {
         value = value * 100 + "%";
     } else if (name === 'charge') {
         value = (+value + 1000);
+    } else if (name === 'edgeMultiplier') {
+        value = value * 100 + "%";
     }
     d3.select(`#${name}_label`).html(`${name} (${value})`);
     return true;
@@ -84,7 +76,7 @@ const updateLabel = (name) => {
  */
 const saveSettings = () => {
     if (d3.event && d3.event.transform) {
-        console.log('saveSettings called - for zoom data...')
+        // console.log('saveSettings called - for zoom data...')
         localStorage.setItem("transform", JSON.stringify(d3.event.transform));
         return true;
     }
@@ -142,7 +134,8 @@ const getSettings = () => {
     let collide = +d3.select("#collide").node().value;
     let linkStrength = +d3.select("#linkStrength").node().value;
     let minDegree = +d3.select("#minDegree").node().value;
-    let multiplier = +d3.select("#multiplier").node().value;
+    let nodeMultiplier = +d3.select("#nodeMultiplier").node().value;
+    let edgeMultiplier = +d3.select("#edgeMultiplier").node().value;
     let minWeight = +d3.select("#minWeight").node().value;
     let startYear = +d3.select("#startYear").node().value;
     let endYear = +d3.select("#endYear").node().value;
@@ -164,20 +157,21 @@ const getSettings = () => {
         endYear = _autoSettings.edges.endYear;
     }
 
-    ["collide", "charge", "minDegree", "multiplier", "minWeight", "linkStrength"].forEach((label) =>
+    ["collide", "charge", "minDegree", "nodeMultiplier", "edgeMultiplier", "minWeight", "linkStrength"].forEach((label) =>
         updateLabel(label)
     );
 
     return {
         nodes: {
             minDegree: minDegree,
-            multiplier: multiplier,
+            nodeMultiplier: nodeMultiplier,
             autoClearNodes: autoClearNodes,
             stickyNodes: stickyNodes,
             nodeSizeFromCurrent: nodeSizeFromCurrent,
         },
         edges: {
             minWeight: minWeight,
+            edgeMultiplier: edgeMultiplier,
             startYear: startYear,
             endYear: endYear,
             weightFromCurrent: weightFromCurrent,
@@ -213,10 +207,15 @@ const setupSettings = () => {
     d3.select("#minWeight").node().max = d3.max(store.ranges.edgeWidth);
     d3.select("#minDegree").node().max = d3.max(store.ranges.nodeDegree);
 
-    // set range for multiplier
-    d3.select("#multiplier").node().min = 1;
-    d3.select("#multiplier").node().max = 5;
-    d3.select("#multiplier").node().step = 0.25;
+    // set range for nodeMultiplier
+    d3.select("#nodeMultiplier").node().min = 1;
+    d3.select("#nodeMultiplier").node().max = 5;
+    d3.select("#nodeMultiplier").node().step = 0.25;
+
+    // set range for edgeMultiplier
+    d3.select("#edgeMultiplier").node().min = 0.05;
+    d3.select("#edgeMultiplier").node().max = 5;
+    d3.select("#edgeMultiplier").node().step = 0.05;
 
     var options = [];
     store.ranges.years.array.forEach((year) => {
@@ -250,7 +249,7 @@ const setupSettings = () => {
 
     // set auto values
     d3.select("#minDegree").node().value = settings.nodes.minDegree;
-    d3.select("#multiplier").node().value = settings.nodes.multiplier;
+    d3.select("#nodeMultiplier").node().value = settings.nodes.nodeMultiplier;
     d3.select("#minWeight").node().value = settings.edges.minWeight;
     d3.select("#startYear").node().value = settings.edges.startYear; // set up in the d3 load of the JSON
     d3.select("#endYear").node().value = settings.edges.endYear; // set up in the d3 load of the JSON
@@ -341,7 +340,7 @@ const changeSetting = (
         });
         d3.select(selector).node().value = setTo;
         if (_filter === true) filter();
-        reloadNetwork();
+        updateElements();
         resetGraphElements();
         restartSimulation();
         saveSettings();
@@ -383,8 +382,11 @@ const setupSettingInteractivity = () => {
         changeSetting("#minWeight", "force", true, "slider");
     });
 
-    d3.select("#multiplier").on("input", () => {
-        changeSetting("#multiplier", "force", false, "slider");
+    d3.select("#nodeMultiplier").on("input", () => {
+        changeSetting("#nodeMultiplier", "force", false, "slider");
+    });
+    d3.select("#edgeMultiplier").on("input", () => {
+        changeSetting("#edgeMultiplier", "force", false, "slider");
     });
     d3.select("#collide").on("input", () => {
         changeSetting("#collide", "force", false, "slider");
@@ -538,9 +540,9 @@ const setupKeyHandlers = () => {
                 !getSettings().nodes.autoClearNodes
             );
         } else if (e.key === "+") {
-            changeSetting({selector: "#multiplier", type: "slider", setTo: getSettings().nodes.multiplier+0.25});
+            changeSetting({selector: "#nodeMultiplier", type: "slider", setTo: getSettings().nodes.nodeMultiplier+0.25});
         } else if (e.key === "-") {
-            changeSetting({selector: "#multiplier", type: "slider", setTo: getSettings().nodes.multiplier-0.25});
+            changeSetting({selector: "#nodeMultiplier", type: "slider", setTo: getSettings().nodes.nodeMultiplier-0.25});
         }
         if (
             ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"].includes(

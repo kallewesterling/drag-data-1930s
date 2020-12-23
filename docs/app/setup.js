@@ -3,13 +3,14 @@
 const _autoSettings = {
     nodes: {
         minDegree: 6,
-        multiplier: 1,
+        nodeMultiplier: 1,
         autoClearNodes: true,
         stickyNodes: true,
         nodeSizeFromCurrent: true,
     },
     edges: {
         minWeight: 0,
+        edgeMultiplier: 1,
         startYear: 1920,
         endYear: 1940,
         weightFromCurrent: true,
@@ -88,7 +89,6 @@ const graph = {
     k: 1,
 };
 
-graph.svg.attr("viewBox", [-window.innerWidth/2, -window.innerHeight/2, window.innerWidth, window.innerHeight]);
 graph.plot = graph.svg.append("g").attr("id", "plot");
 
 // place links underneath nodes, and labels on top of everything

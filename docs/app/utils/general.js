@@ -556,7 +556,7 @@ const getEdgeStrokeWidth = (edge) => {
     let evalWeight = settings.edges.weightFromCurrent
         ? edge.calibrated_weight
         : edge.weight;
-    return weightScale(evalWeight) + "px";
+    return weightScale(evalWeight) * +settings.edges.edgeMultiplier + "px";
 }
 
 /**
@@ -583,20 +583,20 @@ const getSize = (node, type = "r") => {
     let yScale = nodeScale(settings);
     let val = 0;
     if (window.toggledCommentedElements === true) {
-        return 5 * settings.nodes.multiplier;
+        return 5 * settings.nodes.nodeMultiplier;
     }
     
     if (type === "r") {
         if (settings.nodes.nodeSizeFromCurrent === true) {
-            val = yScale(node.currentDegree) * settings.nodes.multiplier;
+            val = yScale(node.currentDegree) * settings.nodes.nodeMultiplier;
         } else {
-            val = yScale(node.degree) * settings.nodes.multiplier;
+            val = yScale(node.degree) * settings.nodes.nodeMultiplier;
         }
     } else if (type === "text") {
         if (settings.nodes.nodeSizeFromCurrent === true) {
-            val = (yScale(node.currentDegree) * settings.nodes.multiplier) * 1.5;
+            val = (yScale(node.currentDegree) * settings.nodes.nodeMultiplier) * 1.5;
         } else {
-            val = (yScale(node.degree) * settings.nodes.multiplier) * 1.5;
+            val = (yScale(node.degree) * settings.nodes.nodeMultiplier) * 1.5;
         }
     }
     if (val < 0) {
