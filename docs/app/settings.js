@@ -45,10 +45,8 @@ const UIToggleAllSettingBoxes = () => {
  * @returns {boolean} - true
  */
 const transformToWindow = () => {
-    graph.plot.attr(
-        "transform",
-        `translate(${window.innerWidth / 2}, ${window.innerHeight / 2})`
-    );
+    graph.plot.attr("width", window.innerWidth);
+    graph.plot.attr("height", window.innerHeight);
     return true;
 };
 
@@ -86,7 +84,9 @@ const updateLabel = (name) => {
  */
 const saveSettings = () => {
     if (d3.event && d3.event.transform) {
+        console.log('saveSettings called - for zoom data...')
         localStorage.setItem("transform", JSON.stringify(d3.event.transform));
+        return true;
     }
     let settings = getSettings();
     localStorage.setItem("settings", JSON.stringify(settings));
@@ -210,8 +210,8 @@ const setupSettings = () => {
     let _settings = loadSettings("settings")
     let settings = _settings ? _settings : _autoSettings;
 
-    d3.select("#minWeight").node().max = store.ranges.edgeWidth[1];
-    d3.select("#minDegree").node().max = store.ranges.nodeDegree[1];
+    d3.select("#minWeight").node().max = d3.max(store.ranges.edgeWidth);
+    d3.select("#minDegree").node().max = d3.max(store.ranges.nodeDegree);
 
     // set range for multiplier
     d3.select("#multiplier").node().min = 1;

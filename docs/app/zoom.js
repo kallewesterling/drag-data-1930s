@@ -1,18 +1,18 @@
 "use strict";
 
-// TODO: Continue clean-up here... + add docstring.
-let zoomed = () => {
-    graph.k = Math.round(d3.event.transform.k * 10) / 10;
+const zoom = d3.zoom().extent([[0.25, 7], [window.innerWidth, window.innerHeight]]);
+
+const zoomedActions = () => {
     saveSettings();
-    let windowWidth = window.innerWidth,
-        windowHeight = window.innerHeight;
-    let xValue = windowWidth / 2 + d3.event.transform.x;
-    let yValue = windowHeight / 2 + d3.event.transform.y;
-    graph.plot.attr(
-        "transform",
-        `translate(${xValue}, ${yValue}) scale(${d3.event.transform.k})`
-    );
-    updateInfo();
+    graph.k = d3.event.transform.k;
+    graph.x = d3.event.transform.x;
+    graph.y = d3.event.transform.y;
+    updateInfo();    
+    graph.plot.attr("transform", d3.event.transform);
 };
 
-const zoom = d3.zoom().scaleExtent([0.25, 7]).on("zoom", zoomed);
+zoom.on("zoom", zoomedActions);
+
+// first time, load the settings from the saved data, if they exist!
+if (loadSettings('transform'))
+    graph.svg.call(zoom.transform, d3.zoomIdentity.translate(loadSettings('transform').x, loadSettings('transform').y).scale(loadSettings('transform').k))

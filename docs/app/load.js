@@ -5,7 +5,7 @@
  * The return value is true in all cases.
  */
 const loadNetwork = () => {
-    loading('loadNetwork called...');
+    loading("loadNetwork called...");
     d3.json(DATAFILE).then((data) => {
         // for debug purposes (TODO can be removed)
         store.raw = data;
@@ -56,8 +56,10 @@ const loadNetwork = () => {
             );
         });
         store.edges.forEach((e) => {
-            e.found = e.found.filter((found) => found != null && found != "" && found != "" ? true : false);
-            e.found = [...new Set(e.found)]
+            e.found = e.found.filter((found) =>
+                found != null && found != "" && found != "" ? true : false
+            );
+            e.found = [...new Set(e.found)];
             e.found.forEach((source) => {
                 let date = dateParser(source);
                 if (date && date.iso !== undefined) {
@@ -93,16 +95,25 @@ const loadNetwork = () => {
             1
         );
 
-        store.nodes.forEach(node => {
-            node.allEdges = store.edges.filter(e=>e.source.node_id === node.node_id || e.target.node_id === node.node_id)
+        store.nodes.forEach((node) => {
+            node.allEdges = store.edges.filter(
+                (e) =>
+                    e.source.node_id === node.node_id ||
+                    e.target.node_id === node.node_id
+            );
 
-            node.allEdges.forEach(edge => {
-                let startYear = edge.range.start ? +edge.range.start.slice(0,4) : undefined;
-                let endYear = edge.range.end ? +edge.range.end.slice(0,4) : undefined;
+            node.allEdges.forEach((edge) => {
+                let startYear = edge.range.start
+                    ? +edge.range.start.slice(0, 4)
+                    : undefined;
+                let endYear = edge.range.end
+                    ? +edge.range.end.slice(0, 4)
+                    : undefined;
                 // console.log(startYear, endYear)
-                node.sourceRange = (startYear && endYear) ? range(startYear, endYear, 1) : [];
-            })
-        })
+                node.sourceRange =
+                    startYear && endYear ? range(startYear, endYear, 1) : [];
+            });
+        });
 
         transformToWindow();
 
@@ -137,14 +148,15 @@ const loadNetwork = () => {
  * The return value is ...
  */
 const setupInteractivity = () => {
-    loading('setupInteractivity called...');
+    loading("setupInteractivity called...");
 
     let settings = getSettings();
     nodeElements.call(
         d3
             .drag()
             .on("start", (node) => {
-                if (!d3.event.active) graph.simulation.alphaTarget(0.3).restart(); // avoid restarting except on the first drag start event
+                if (!d3.event.active)
+                    graph.simulation.alphaTarget(0.3).restart(); // avoid restarting except on the first drag start event
                 node.fx = node.x;
                 node.fy = node.y;
             })
@@ -165,14 +177,14 @@ const setupInteractivity = () => {
             })
     );
 
-    nodeElements.on("click", (node) => {
+    nodeElements.on("click", (node, xY) => {
         d3.event.stopPropagation();
         if (d3.event.metaKey === true) {
             if (nodeIsSelected(node)) {
                 hide("#nodeEdgeInfo");
                 resetGraphElements();
             }
-            loading('starting egoNetwork...')
+            loading("starting egoNetwork...");
             toggleEgoNetwork(node);
             node.fx = null;
             node.fy = null;
@@ -181,12 +193,25 @@ const setupInteractivity = () => {
             d3.select("#popup-info")
                 .html(generateCommentHTML(node))
                 .classed("d-none", false)
-                .attr('node-id', node.node_id)
+                .attr("node-id", node.node_id)
                 .attr(
                     "style",
                     `top: ${d3.event.y}px !important; left: ${d3.event.x}px !important;`
                 );
         } else {
+            // testing zoom into node
+            console.log(d3.mouse(graph.svg.node()));
+            graph.svg.transition()
+                .duration(750)
+                .call(
+                    zoom.transform,
+                    d3.zoomIdentity
+                        .translate(0, 0)
+                        .scale(4)
+                        .translate(-node.x, -node.y),
+                    d3.mouse(graph.svg.node())
+                );
+
             selectNode(node);
         }
     });
@@ -198,7 +223,7 @@ const setupInteractivity = () => {
                 d3.select("#popup-info")
                     .html(generateCommentHTML(edge))
                     .classed("d-none", false)
-                    .attr('edge-id', edge.edge_id)
+                    .attr("edge-id", edge.edge_id)
                     .attr(
                         "style",
                         `top: ${d3.event.y}px !important; left: ${d3.event.x}px !important;`
@@ -220,42 +245,49 @@ let textElements = g.labels.selectAll("text"),
  * @returns {boolean} - true
  */
 const reloadNetwork = () => {
-    loading('reloadNetwork called...')
+    loading("reloadNetwork called...");
 
     nodeElements = g.nodes
         .selectAll("circle")
         .data(graph.nodes, (node) => node.node_id)
         .join(
-            enter => enter.append("circle")
-                            .attr("r", 0)
-                            .attr("id", (node) => node.node_id)
-                            .attr("class", (node) => getNodeClass(node)),
-            update => update,
-            exit => exit.transition(750).attr("r", 0).remove()
+            (enter) =>
+                enter
+                    .append("circle")
+                    .attr("r", 0)
+                    .attr("id", (node) => node.node_id)
+                    .attr("class", (node) => getNodeClass(node)),
+            (update) => update,
+            (exit) => exit.transition(750).attr("r", 0).remove()
         );
 
     textElements = g.labels
         .selectAll("text")
         .data(graph.nodes, (node) => node.node_id)
         .join(
-            enter => enter.append("text")
-                            .text((node) => displayOrID(node))
-                            .attr("class", node => getTextClass(node))
-                            .attr("style", "pointer-events: none;")
-                            .attr("opacity", 0)
-                            .attr("data-node", (node) => node.node_id),
-            update => update,
-            exit => exit.transition(750).attr("opacity", 0).remove()
+            (enter) =>
+                enter
+                    .append("text")
+                    .text((node) => displayOrID(node))
+                    .attr("class", (node) => getTextClass(node))
+                    .attr("style", "pointer-events: none;")
+                    .attr("opacity", 0)
+                    .attr("data-node", (node) => node.node_id),
+            (update) => update,
+            (exit) => exit.transition(750).attr("opacity", 0).remove()
         );
 
     edgeElements = g.edges
         .selectAll("line")
-        .data(graph.edges, (edge) => edge.edge_id).join(
-            enter => enter.append("line")
-                            .attr("id", edge => edge.edge_id)
-                            .attr("stroke-opacity", 0.3),
-            update => update,
-            exit => exit.transition(750).attr("stroke-opacity", 0).remove()
+        .data(graph.edges, (edge) => edge.edge_id)
+        .join(
+            (enter) =>
+                enter
+                    .append("line")
+                    .attr("id", (edge) => edge.edge_id)
+                    .attr("stroke-opacity", 0.3),
+            (update) => update,
+            (exit) => exit.transition(750).attr("stroke-opacity", 0).remove()
         );
 
     setupInteractivity();

@@ -22,7 +22,7 @@ const _autoSettings = {
         layoutCollide: true,
         layoutForceX: true,
         layoutForceY: true,
-        linkStrength: 0.05,
+        linkStrength: 0.40,
     },
     zoom: 1.25,
     zoomMin: 0.75,
@@ -88,6 +88,7 @@ const graph = {
     k: 1,
 };
 
+graph.svg.attr("viewBox", [-window.innerWidth/2, -window.innerHeight/2, window.innerWidth, window.innerHeight]);
 graph.plot = graph.svg.append("g").attr("id", "plot");
 
 // place links underneath nodes, and labels on top of everything
