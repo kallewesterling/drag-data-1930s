@@ -12,7 +12,8 @@ const getInfoHTML = () => {
         <hr />
         <p>Unconnected nodes: ${getUnconnectedNodes().length}</p>
         <hr />
-        <p>Current zoom: ${graph.k}</p>`;
+        <p>Current zoom: ${graph.k}</p>
+        <p>Current x, y: ${graph.x}, ${graph.y}</p>`;
     return html;
 };
 

@@ -27,5 +27,5 @@
     // Immediately invoked function to set the theme on initial load
     window.egoNetwork = false;
     loadNetwork();
-    graph.svg.call(zoom); // only call zoom on the graph.svg object at the start
+    graph.svg.call(zoom);
 })();
