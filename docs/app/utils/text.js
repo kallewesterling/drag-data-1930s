@@ -35,11 +35,12 @@ const displayOrID = (o) => {
  * @return {string} html - raw HTML
  */
 const generateNodeInfoHTML = (node) => {
+    console.log(node)
     let html = `<p><strong>${displayOrID(node)}</strong></p>
         <p>degree: ${node.degree}</p>
         <p>—> in: ${node.indegree}</p>
         <p>—> out: ${node.outdegree}</p>
-        <p>current network degree: ${nodeHasEdges(node.node_id, true)}</p>
+        <p>current network degree: ${node.currentDegree}</p>
         <p class="mt-2"><strong>Centrality measures (across network)</strong></p>
         <p>Betweenness (1000x): ${
             Math.round(node["1000x-betweenness-centrality"] * 100) / 100
@@ -52,10 +53,10 @@ const generateNodeInfoHTML = (node) => {
         }</p>
         <p>Eigenvector (1000x): ${
             Math.round(node["1000x-eigenvector-centrality"] * 100) / 100
-        }</p>
+        }</p>`;
+        // TODO: Do something interactive with these?
+        /*
         <p class="mt-2"><strong>Related nodes</strong></p>`;
-    // TODO: Do something interactive with these?
-    /*
         let related = getRelated(node.node_id);
             <p>Secondary: ${related.secondaryNodeIDs}</p>
             <p>Tertiary: ${related.tertiaryNodeIDS}</p>

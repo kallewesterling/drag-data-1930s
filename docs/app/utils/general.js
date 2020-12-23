@@ -1,5 +1,13 @@
 "use strict";
 
+// set up store.ranges
+const range = (start, stop, step) => {
+    return Array.from(
+        { length: (stop - start) / step + 1 },
+        (x, i) => start + i * step
+    );
+}
+
 /**
  * nodeHasEdges takes two arguments, the first of which defines a node_id and the second whether a count should be provided.
  * The return value depends on whether the count parameter was set to true or false. If it's true, it will return the number
@@ -302,12 +310,12 @@ const getRelated = (node) => {
  */
 const resetGraphElements = () => {
     loading('resetGraphElements called...')
+    
     if (window.egoNetwork != undefined) console.log(`window.egoNetwork: ${window.egoNetwork}`)
     if (window.toggledCommentedElements != undefined) console.log(`window.toggledCommentedElements: ${window.toggledCommentedElements}`)
     if (window.nodeSelected != undefined) console.log(`window.nodeSelected: ${window.nodeSelected}`)
 
     nodeElements
-        .classed("d-none", false) // show all of them circles
         .attr("class", (node) => getNodeClass(node))
         .transition()
         .attr("r", (node) => getSize(node));
@@ -366,11 +374,11 @@ const selectNode = (node) => {
  */
 const selectEdge = (edge) => {
     if (edgeIsSelected(edge)) {
-        window.edge_selected = undefined;
+        window.edgeSelected = undefined;
         hide("#nodeEdgeInfo");
         resetGraphElements();
     } else {
-        window.edge_selected = true;    
+        window.edgeSelected = true;    
         deselectEdges(edge);
         setNodeEdgeInfo(edge);
     }
@@ -379,13 +387,13 @@ const selectEdge = (edge) => {
 
 
 /**
- * modifyNodeDegrees takes no arguments and just makes sure that each node in the current graph has a `current_degree` set to match its number of edges.
+ * modifyNodeDegrees takes no arguments and just makes sure that each node in the current graph has a `currentDegree` set to match its number of edges.
  * The return value is always true.
  * @returns {boolean} - true
  */
 const modifyNodeDegrees = () => {
     graph.nodes.forEach((n) => {
-        n.current_degree = nodeHasEdges(n, true)
+        n.currentDegree = nodeHasEdges(n, true)
     });
     return true;
 };
@@ -447,6 +455,7 @@ const modifySimulation = () => {
     if (settings.layoutCollide) {
         graph.simulation.force("collide", d3.forceCollide());
         graph.simulation.force("collide").strength(settings.collide);
+        graph.simulation.force("collide").radius(n => getSize(n));
     } else {
         graph.simulation.force("collide", null);
     }
@@ -480,8 +489,14 @@ const modifySimulation = () => {
  * @returns {string} - The string of classes to return to the node.
  */
 const getNodeClass = (node) => {
-    let classes = "node " + node.category;
-    classes += node.has_comments ? " has-comments" : "";
+    let classes = "";
+    if (window.toggledCommentedElements) {
+        classes = "node"
+        classes += node.has_comments ? ` ${node.category} has-comments` : " disabled";
+    } else {
+        classes = "node " + node.category;
+        classes += node.has_comments ? " has-comments" : "";
+    }
     return classes;
 };
 
@@ -539,16 +554,19 @@ const getSize = (node, type = "r") => {
     let settings = getSettings();
     let yScale = nodeScale(settings);
     let val = 0;
+    if (window.toggledCommentedElements === true) {
+        return 5 * settings.nodes.multiplier;
+    }
     
     if (type === "r") {
         if (settings.nodes.nodeSizeFromCurrent === true) {
-            val = yScale(node.current_degree) * settings.nodes.multiplier;
+            val = yScale(node.currentDegree) * settings.nodes.multiplier;
         } else {
             val = yScale(node.degree) * settings.nodes.multiplier;
         }
     } else if (type === "text") {
         if (settings.nodes.nodeSizeFromCurrent === true) {
-            val = (yScale(node.current_degree) * settings.nodes.multiplier) * 1.5;
+            val = (yScale(node.currentDegree) * settings.nodes.multiplier) * 1.5;
         } else {
             val = (yScale(node.degree) * settings.nodes.multiplier) * 1.5;
         }

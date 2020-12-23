@@ -12,7 +12,7 @@
             minDegree = 
             but if current degree is different = 
 
-        size of nodes: ("node size from current graph" is clicked) the nodes are scaled in relation to the other nodes on the chart. current_degree is used instead of degree.
+        size of nodes: ("node size from current graph" is clicked) the nodes are scaled in relation to the other nodes on the chart. currentDegree is used instead of degree.
 
         If you click each node, you will see the centrality measures. Those are counted (and described here at 1000x) across the entire network, and are not generated dynamically, depending on the graph that you see in front of you.
             - betweenness

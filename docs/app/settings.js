@@ -68,6 +68,13 @@ const updateLabel = (name) => {
         d3.select(`#${d[2]}`).classed("text-muted", disable);
     });
     let value = d3.select(`#${name}`).node().value;
+    
+    // special handling
+    if (name === 'collide') {
+        value = value * 100 + "%";
+    } else if (name === 'charge') {
+        value = (+value + 1000);
+    }
     d3.select(`#${name}_label`).html(`${name} (${value})`);
     return true;
 };
@@ -218,13 +225,14 @@ const setupSettings = () => {
     d3.select("#endYear").node().innerHTML = options;
 
     // set range for charge
-    d3.select("#charge").node().min = -500;
+    d3.select("#charge").node().min = -1000;
     d3.select("#charge").node().max = 0;
+    d3.select("#charge").node().step = 100;
 
     // set range for collide
-    d3.select("#collide").node().min = 0;
+    d3.select("#collide").node().min = 0.05;
     d3.select("#collide").node().max = 1;
-    d3.select("#collide").node().step = 0.1;
+    d3.select("#collide").node().step = 0.05;
 
     // set range for minWeight
     d3.select("#minDegree").node().min = 0;
@@ -355,13 +363,21 @@ const setupSettingInteractivity = () => {
 
     // slider interactivity
     d3.select("#minDegree").on("input", () => {
+        updateLabel("minDegree");
+        console.log(filterNodes([], false), "possible nodes?")
+    });
+    d3.select("#minDegree").on("change", () => {
         changeSetting("#minDegree", "force", true, "slider");
     });
+    d3.select("#minWeight").on("input", () => {
+        updateLabel('minWeight');
+    });
+    d3.select("#minWeight").on("change", () => {
+        changeSetting("#minWeight", "force", true, "slider");
+    });
+
     d3.select("#multiplier").on("input", () => {
         changeSetting("#multiplier", "force", true, "slider");
-    });
-    d3.select("#minWeight").on("input", () => {
-        changeSetting("#minWeight", "force", true, "slider");
     });
     d3.select("#collide").on("input", () => {
         changeSetting("#collide", "force", false, "slider");
@@ -486,13 +502,12 @@ const setupKeyHandlers = () => {
 
     d3.select("html").on("keydown", () => {
         let e = d3.event;
+        
         if (e.key === "Meta" || e.key === "Shift") {
             show(".metaShow");
-        }
-        if (e.key === "Alt") {
+        } else if (e.key === "Alt") {
             toggleCommentedElements();
-        }
-        if (e.key === "Escape" && isVisible("#popup-info")) {
+        } else if (e.key === "Escape" && isVisible("#popup-info")) {
             //console.log("Escape 1 called!");
             hide("#popup-info");
         } else if (e.key === "Escape" && isVisible("#nodeEdgeInfo")) {
@@ -507,9 +522,15 @@ const setupKeyHandlers = () => {
                 "#autoClearNodes",
                 !getSettings().nodes.autoClearNodes
             );
+        } else if (e.key === "+") {
+            console.log('add multiplier')
+            changeSetting({selector: "#multiplier", type: "slider", setTo: getSettings().nodes.multiplier+0.25});
+        } else if (e.key === "-") {
+            console.log('subtract multiplier')
+            changeSetting({selector: "#multiplier", type: "slider", setTo: getSettings().nodes.multiplier-0.25});
         }
         if (
-            ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-"].includes(
+            ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"].includes(
                 e.key
             )
         ) {

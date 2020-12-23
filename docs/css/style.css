@@ -10,6 +10,9 @@ body, html {
     background-color: var(--background-settings) !important;
     max-width: 300px;
     overflow: hidden;
+    z-index: 400;
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
 }
 
 #settings, #infoContainer {
@@ -60,6 +63,8 @@ body, html {
     max-width: 250px;
     overflow: hidden;
     z-index: 400;
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
 }
 
 #infoContainer > p,
@@ -78,6 +83,8 @@ body, html {
     max-width: 400px;
     overflow: hidden;
     overflow-y: scroll;
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
 }
 
 body {
@@ -216,9 +223,8 @@ svg#main {
 }
 
 #settingsContainer {
-    background-color: var(--background-settings);
+    background-color: var(--background-settings) !important;
     transition: display 0s, opacity 0.5s linear;
-    z-index: 400;
 }
 
 #wrapToasters {
@@ -279,6 +285,8 @@ svg#main {
     width: 100%;
     height: 100%;
     background-color: rgba(255,255,255,0.9);
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
 }
 
 #info-box #dashboard {
@@ -313,6 +321,8 @@ svg#main {
     max-height: 600px;
     background-color: rgba(255,255,255,0.9);
     z-index: 500;
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
 }
 
 #popup-info > h1 {
@@ -332,6 +342,11 @@ svg#main {
     font-size: 0.8em;
 }
 
+#egoNetwork {
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+}
+
 #egoNetwork > #node {
     font-weight: bold;
 }
@@ -341,5 +356,11 @@ svg#main {
 }
 
 #loading {
+    
+}
+
+#loadingContainer {
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
     z-index: 500;
 }

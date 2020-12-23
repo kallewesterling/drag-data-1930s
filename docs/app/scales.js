@@ -9,7 +9,7 @@ const nodeScale = (settings) => {
         return d3
             .scaleLinear()
             .range([1, 10])
-            .domain(d3.extent(graph.nodes, (d) => d.current_degree));
+            .domain(d3.extent(graph.nodes, (d) => d.currentDegree));
     } else {
         return d3
             .scaleLinear()

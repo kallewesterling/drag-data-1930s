@@ -1,15 +1,15 @@
 "use strict";
 
 const dropNode = (node) => {
-    graph.nodes.forEach((o, i) => {
-        if (node.node_id === o.node_id) {
-            loading(`dropping node ${o.node_id}...`)
-            //console.log(`   graph.nodes length before: ${graph.nodes.length}`);
-            graph.nodes.splice(i, 1);
-            node.inGraph = false;
-            //console.log(`   graph.nodes length after: ${graph.nodes.length}`);
-        }
-    });
+    if (node.inGraph) {
+        graph.nodes.forEach((o, i) => {
+            if (node.node_id === o.node_id) {
+                loading(`dropping node ${o.node_id}...`)
+                graph.nodes.splice(i, 1);
+                node.inGraph = false;
+            }
+        });
+    };
 }
 
 
@@ -17,12 +17,24 @@ const dropEdge = (edge) => {
     graph.edges.forEach((o, i) => {
         if (edge.edge_id === o.edge_id) {
             loading(`dropping edge ${o.edge_id}...`)
-            //console.log(`   graph.edges length before: ${graph.edges.length}`);
             graph.edges.splice(i, 1);
             edge.inGraph = false;
-            //console.log(`   graph.edges length after: ${graph.edges.length}`);
         }
     });
+}
+
+
+const addNode = (node) => {
+    if (!node.inGraph) {
+        graph.nodes.push(node);
+        node.inGraph = true;
+    }
+}
+
+
+const addEdge = (edge) => {
+    edge.inGraph = true;
+    graph.edges.push(edge);
 }
 
 
@@ -36,48 +48,64 @@ const filterNodes = (nodeList = []) => {
     if (!nodeList.length) {
         let settings = getSettings().nodes;
         store.nodes.forEach((node) => {
-            if (node.degree >= settings.minDegree && !node.inGraph) {
-                // console.log('should not be filtered but is not in graph so add it!')
-                graph.nodes.push(node); // console.log(node);
-                node.inGraph = true;
-            } else if (node.degree >= settings.minDegree && node.inGraph) {
-                // console.log('node is already in graph and has the correct mark...')
-            } else if (node.degree < settings.minDegree && node.inGraph) {
-                // console.log('should be filtered but is in graph');
-                dropNode(node);
+            if (node.degree >= settings.minDegree) {
+                addNode(node);
+            /* potential to add more filters here...*/
             } else {
-                // console.log('should be dropped');
                 dropNode(node);
             }
         });
     } else {
         store.nodes.forEach(node => {
-            if (nodeList.includes(node)) {
-                if (!node.inGraph) {
-                    // console.log('node is not in graph, so add it...')
-                    node.inGraph = true;
-                    graph.nodes.push(node);
-                } else {
-                    // console.log('node is already in graph and has the correct mark...')
-                }
-            } else {
-                if (node.inGraph) {
-                    // console.log(`drop node ${node.node_id}`)
-                    dropNode(node);
-                }
-            }
+            nodeList.includes(node) ? addNode(node) : dropNode(node);
         })
     }
     return true;
 };
+
+const filterEdgeIDs = (edgeList = store.edges) => {
+    let list = store.edges.map(n=>n.edge_id);
+    let settings = getSettings().edges;
+
+    console.log(`${list.length} before`);
+
+    edgeList.forEach((edge) => {
+        let edgeWeight = settings.weightFromCurrent === true ? edge.found.length : edge.weight;
+        
+        let startYear = undefined,
+            endYear = undefined;
+        
+        if (edge.range.start) { startYear = +edge.range.start.substring(0, 4); }
+        if (edge.range.end) { endYear = +edge.range.end.substring(0, 4); }
+
+        if (
+            (startYear && startYear >= settings.startYear) &&
+            (endYear && endYear <= settings.endYear) &&
+            (edgeWeight < settings.minWeight)
+        ) {
+            console.log('keep!');
+        } else {
+            if (edge.source.inGraph && edge.target.inGraph) {
+                console.log('keep!');
+            } else {
+                list = list.filter(d=>d != edge.edge_id);
+            }
+        }
+    });
+    
+    list = [...new Set(list)]
+    
+    return list;
+}
 
 /**
  * filterEdges takes one optional argument // TODO: Fix this //, and serves to run through all of the store.edges and adding/removing edges from graph.edges, depending on filter values.
  * The return value is always true.
  * @returns {boolean} - true
  */
-const filterEdges = (edgeList = []) => {
+const filterEdges = (edgeList = [], change = true) => {
     loading('filterEdges called...');
+    let list = store.edges.map(n=>n.edge_id);
     if (!edgeList.length) {
         let settings = getSettings().edges;
         store.edges.forEach((edge) => {
@@ -90,53 +118,61 @@ const filterEdges = (edgeList = []) => {
 
             if (compareWeightVal < settings.minWeight && !edge.inGraph) {
                 // edge is lower than minWeight and not inGraph so leave it out
-                edge.inGraph = false;
+                if (change) edge.inGraph = false;
+                if (!change) list.pop(edge.edge_id)
             } else if (compareWeightVal < settings.minWeight && edge.inGraph) {
                 // edge is lower than minWeight and in graph so remove it!
-                dropEdge(edge);
+                if (change) dropEdge(edge);
+                if (!change) list.pop(edge.edge_id)
             } else if (
                 edge.range.start &&
                 +edge.range.start.substring(0, 4) <= settings.startYear &&
                 !edge.inGraph
             ) {
-                // edge is earlier than startYear and not inGraph so leave it out"
-                edge.inGraph = false;
+                // edge is earlier than startYear and not inGraph so leave it out
+                if (change) edge.inGraph = false;
+                if (!change) list.pop(edge.edge_id)
             } else if (
                 edge.range.start &&
                 +edge.range.start.substring(0, 4) <= settings.startYear &&
                 edge.inGraph
             ) {
                 // edge is earlier than startYear and inGraph so drop it
-                dropEdge(edge);
+                if (change) dropEdge(edge);
+                if (!change) list.pop(edge.edge_id)
             } else if (
                 edge.range.end &&
                 +edge.range.end.substring(0, 4) >= settings.endYear &&
                 !edge.inGraph
             ) {
                 // range end is higher than endYear and not inGraph so leave it out
-                edge.inGraph = false;
+                if (change) edge.inGraph = false;
+                if (!change) list.pop(edge.edge_id)
             } else if (
                 edge.range.end &&
                 +edge.range.end.substring(0, 4) >= settings.endYear &&
                 edge.inGraph
             ) {
                 // edge has later range than endYear and inGraph so drop it"
-                dropEdge(edge);
+                if (change) dropEdge(edge);
+                if (!change) list.pop(edge.edge_id)
             } else {
                 if (edge.source.inGraph && edge.target.inGraph && !edge.inGraph) {
                     // should not be filtered but is not in graph so add it!
-                    edge.inGraph = true;
-                    graph.edges.push(edge);
+                    if (change) addEdge(edge)
                 } else if (edge.source.inGraph && edge.target.inGraph && edge.inGraph) {
                     // should not be filtered but is already in graph so no need to do anything
                 } else if ((edge.source.inGraph || edge.target.inGraph) && edge.inGraph) {
                     // in graph but should not be
-                    dropEdge(edge);
+                    if (change) dropEdge(edge);
+                    if (!change) list.pop(edge.edge_id)
                 } else {
-                    dropEdge(edge);
+                    if (change) dropEdge(edge);
+                    if (!change) list.pop(edge.edge_id)
                 }
             }
         });
+        console.log(`${graph.edges.length} after`)
     } else {
         // console.log('have edgeList');
         // console.log(edgeList);
@@ -144,20 +180,19 @@ const filterEdges = (edgeList = []) => {
             if (edgeList.includes(edge)) {
                 if (!edge.inGraph) {
                     // console.log('edge is not in graph, so add it...')
-                    edge.inGraph = true;
-                    graph.edges.push(edge);
+                    if (change) addEdge(edge)
                 } else {
                     // console.log('edge is already in graph and has the correct mark...')
                 }
             } else {
-                if (edge.inGraph) {
-                    // console.log(`drop edge ${edge.edge_id}`)
-                    dropEdge(edge);
-                }
+                // console.log(`drop edge ${edge.edge_id}`)
+                if (change) dropEdge(edge);
+                if (!change) list.pop(edge.edge_id)
             }
         })
     }
-    return true;
+    if (change) return true;
+    if (!change) return list;
 };
 
 /**
@@ -165,13 +200,13 @@ const filterEdges = (edgeList = []) => {
  * The return value is always true.
  * @returns {boolean} - true
  */
-const filter = (nodeList = [], edgeList = []) => {
+const filter = (nodeList = [], edgeList = [], change = true) => {
     loading('filter called...')
 
     hide("#nodeEdgeInfo");
     
     filterNodes(nodeList);
-    filterEdges(edgeList);
+    filterEdges(edgeList, change);
     
     modifyNodeDegrees();
     
@@ -360,11 +395,12 @@ const toggleEgoNetwork = async (node, toggleSettings = true) => {
  */
 const toggleCommentedElements = (force = undefined) => {
     if (window.toggledCommentedElements || force === 'off') {
+        window.toggledCommentedElements = false;
         filter();
         d3.select('#popup-info').classed('d-none', true);
         restartSimulation()
-        window.toggledCommentedElements = false;
     } else if (!window.toggledCommentedElements || force === 'on') {
+        window.toggledCommentedElements = true;
         let nodesWithComments = graph.nodes.filter(n => n.has_comments);
         let edgesWithComments = [...graph.edges.filter(e => e.has_comments), ...graph.edges.filter(e => e.has_general_comments)]
         edgesWithComments.forEach(edge => {
@@ -373,7 +409,6 @@ const toggleCommentedElements = (force = undefined) => {
         })
         filter(nodesWithComments, edgesWithComments);
         restartSimulation()
-        window.toggledCommentedElements = true;
     }
     return true;
 };

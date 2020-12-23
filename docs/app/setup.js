@@ -63,7 +63,7 @@ const keyMapping = {
     ArrowDown: {
         noMeta:
             'changeSetting({selector: "#charge", type: "slider", setTo: getSettings().force.charge-10})',
-    },
+    }
 };
 
 let DATAFILE = "drag-data.json";

@@ -56,9 +56,8 @@ const loadNetwork = () => {
             );
         });
         store.edges.forEach((e) => {
-            e.source = store.nodes.find((node) => node.id === e.source); // set up as object
-            e.target = store.nodes.find((node) => node.id === e.target); // set up as object
             e.found = e.found.filter((found) => found != null && found != "" && found != "" ? true : false);
+            e.found = [...new Set(e.found)]
             e.found.forEach((source) => {
                 let date = dateParser(source);
                 if (date && date.iso !== undefined) {
@@ -74,14 +73,13 @@ const loadNetwork = () => {
                     end: e.dates[e.dates.length - 1],
                 };
             }
-        });
 
-        // set up store.ranges
-        let range = (start, stop, step) =>
-            Array.from(
-                { length: (stop - start) / step + 1 },
-                (x, i) => start + i * step
-            );
+            e.source = store.nodes.find((node) => node.id === e.source); // set up as object
+            e.target = store.nodes.find((node) => node.id === e.target); // set up as object
+
+            // fix weight... TODO: Should really fix this in the Python script!
+            e.weight = e.found.length;
+        });
 
         store.ranges.nodeDegree = d3.extent(store.nodes, (d) => d.degree);
         store.ranges.edgeWidth = d3.extent(store.edges, (d) => d.weight);
