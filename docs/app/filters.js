@@ -51,6 +51,8 @@ const filterNodes = (nodeList = []) => {
             if (node.degree >= settings.minDegree) {
                 addNode(node);
             /* potential to add more filters here...*/
+            } else if (getSettings().edges.startYear > d3.min(node.sourceRange) && getSettings().edges.endYear < d3.max(node.sourceRange)) {
+                addNode(node);
             } else {
                 dropNode(node);
             }
@@ -63,40 +65,6 @@ const filterNodes = (nodeList = []) => {
     return true;
 };
 
-const filterEdgeIDs = (edgeList = store.edges) => {
-    let list = store.edges.map(n=>n.edge_id);
-    let settings = getSettings().edges;
-
-    console.log(`${list.length} before`);
-
-    edgeList.forEach((edge) => {
-        let edgeWeight = settings.weightFromCurrent === true ? edge.found.length : edge.weight;
-        
-        let startYear = undefined,
-            endYear = undefined;
-        
-        if (edge.range.start) { startYear = +edge.range.start.substring(0, 4); }
-        if (edge.range.end) { endYear = +edge.range.end.substring(0, 4); }
-
-        if (
-            (startYear && startYear >= settings.startYear) &&
-            (endYear && endYear <= settings.endYear) &&
-            (edgeWeight < settings.minWeight)
-        ) {
-            console.log('keep!');
-        } else {
-            if (edge.source.inGraph && edge.target.inGraph) {
-                console.log('keep!');
-            } else {
-                list = list.filter(d=>d != edge.edge_id);
-            }
-        }
-    });
-    
-    list = [...new Set(list)]
-    
-    return list;
-}
 
 /**
  * filterEdges takes one optional argument // TODO: Fix this //, and serves to run through all of the store.edges and adding/removing edges from graph.edges, depending on filter values.
@@ -116,14 +84,16 @@ const filterEdges = (edgeList = [], change = true) => {
                     ? edge.calibrated_weight
                     : edge.weight;
 
-            if (compareWeightVal < settings.minWeight && !edge.inGraph) {
-                // edge is lower than minWeight and not inGraph so leave it out
-                if (change) edge.inGraph = false;
-                if (!change) list.pop(edge.edge_id)
-            } else if (compareWeightVal < settings.minWeight && edge.inGraph) {
-                // edge is lower than minWeight and in graph so remove it!
-                if (change) dropEdge(edge);
-                if (!change) list.pop(edge.edge_id)
+            if (settings.minDegree) {
+                if (compareWeightVal < settings.minWeight && !edge.inGraph) {
+                    // edge is lower than minWeight and not inGraph so leave it out
+                    if (change) edge.inGraph = false;
+                    if (!change) list.pop(edge.edge_id)
+                } else if (compareWeightVal < settings.minWeight && edge.inGraph) {
+                    // edge is lower than minWeight and in graph so remove it!
+                    if (change) dropEdge(edge);
+                    if (!change) list.pop(edge.edge_id)
+                }
             } else if (
                 edge.range.start &&
                 +edge.range.start.substring(0, 4) <= settings.startYear &&
@@ -195,6 +165,7 @@ const filterEdges = (edgeList = [], change = true) => {
     if (!change) return list;
 };
 
+const clusters = {};
 /**
  * filter takes two optional arguments // TODO: Fix this!! //, and serves to run subordinate functions in the correct order when filtering the entire network visualization.
  * The return value is always true.
@@ -215,10 +186,24 @@ const filter = (nodeList = [], edgeList = [], change = true) => {
     }
     
     reloadNetwork();
+
+    // TODO: I am using JLevain here. Are there other community detectors out there? Learn more about algorithms...
+    // See invention of Louvain method here https://arxiv.org/pdf/0803.0476.pdf
+    var nodeData = graph.nodes.map((d) => d.node_id);
+    var linkData = graph.edges.map((d) => {return {source: d.source.node_id, target: d.target.node_id, weight: d.weight}; });
+
+    var community = jLouvain()
+        .nodes(nodeData)
+        .edges(linkData);
+
+    var result  = community();
+    graph.nodes.forEach(node => {
+        node.cluster = result[node.node_id];
+    })
     
     resetGraphElements();
     updateInfo();
-    
+
     return true;
 };
 
@@ -321,7 +306,7 @@ const getEgoNetwork = (node, limit=10000) => { // limit automatically set to 10,
 const egoNetworkOn = async (node) => {
     loading('egoNetworkOn called...')
     d3.select('#egoNetwork').classed('d-none', false);
-    d3.select('#egoNetwork > #node').html(node.id)
+    d3.select('#egoNetwork > #node').html(node.id);
     let egoNetwork = getEgoNetwork(node);
     const result = await filter(egoNetwork);
     //reloadNetwork();
@@ -350,10 +335,10 @@ const egoNetworkOff = async (node) => {
  * toggleEgoNetwork takes X argument/s... TODO: Finish this.
  * The return value is ...
  */
-const toggleEgoNetwork = async (node, toggleSettings = true) => {
+const toggleEgoNetwork = async (node, toggleSettings = true, force = undefined) => {
     loading('toggleEgoNetwork called...')
     // filter nodes based on a given node
-    if (window.egoNetwork) {
+    if (window.egoNetwork || force === "off") {
         console.log("ego network already active - resetting network view...");
         await egoNetworkOff();
         reloadNetwork();
@@ -364,7 +349,7 @@ const toggleEgoNetwork = async (node, toggleSettings = true) => {
             show("#settings");
             show("#infoContainer");
         }
-    } else {        
+    } else {
         console.log("filtering out an ego network based on " + node.node_id);
         await egoNetworkOn(node);
         reloadNetwork();

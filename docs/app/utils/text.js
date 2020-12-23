@@ -41,6 +41,8 @@ const generateNodeInfoHTML = (node) => {
         <p>—> in: ${node.indegree}</p>
         <p>—> out: ${node.outdegree}</p>
         <p>current network degree: ${node.currentDegree}</p>
+        <p class="mt-2"><strong>Source range</strong></p>
+        <p>${d3.min(node.sourceRange)}-${d3.max(node.sourceRange)}</p>
         <p class="mt-2"><strong>Centrality measures (across network)</strong></p>
         <p>Betweenness (1000x): ${
             Math.round(node["1000x-betweenness-centrality"] * 100) / 100

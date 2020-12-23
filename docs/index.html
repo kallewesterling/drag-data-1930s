@@ -9,6 +9,7 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha3/dist/js/bootstrap.min.js" integrity="sha384-t6I8D5dJmMXjCsRLhSzCltuhNZg6P10kE0m0nAncLUjH6GeYLhRU1zfLoW3QNQDF" crossorigin="anonymous"></script>
         <link rel="stylesheet" href="css/themes.css">
         <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="css/bootstrap-icons.css">
         <title>U.S. Drag in the 1930s</title>
     </head>
     <body>
@@ -110,6 +111,10 @@
                         <input class="p-0 m-0" type="range" id="collide" name="collide" min="1" max="40" value="1" step="1">
                         <label class="small p-0 m-0" for="collide" id="collide_label">collide</label>
                     </div>
+                    <div class="mb-2" id="linkStrengthContainer">
+                        <input class="p-0 m-0" type="range" id="linkStrength" name="linkStrength" min="1" max="40" value="1" step="1">
+                        <label class="small p-0 m-0" for="linkStrength" id="linkStrength_label">linkStrength</label>
+                    </div>
                 </li>
 
                 <li class="list-group-item">
@@ -190,7 +195,7 @@
         <svg id="main" width="100%" height="100%"></svg>
 
         <div id="popup-info" class="d-none shadow"></div>
-        <div id="egoNetwork" class="d-none shadow p-2 text-center bg-warning">Ego network for node <span id="node">NODE</span>.</div>
+        <div id="egoNetwork" class="d-none shadow p-2 text-center bg-warning">Ego network for node <span id="node">NODE</span>.<i id="closeEgoNetwork" class="ml-3 bi bi-stop-circle"></i></div>
     
         <div id="loading" class="h-100 d-flex justify-content-center">
             <div id="loadingContainer" class="my-auto p-4 bg-white rounded shadow d-flex flex-column">
@@ -216,6 +221,7 @@
         <script src="app/zoom.js"></script>
         <script src="app/app.js"></script>
         
+        <script src="app/jlouvain/jlouvain.js"></script>
         <script src="app/tour.js"></script>
 
         <!-- TODO: a different app... so another project. Maybe it should just be a different page altogether -->

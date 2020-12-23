@@ -93,6 +93,17 @@ const loadNetwork = () => {
             1
         );
 
+        store.nodes.forEach(node => {
+            node.allEdges = store.edges.filter(e=>e.source.node_id === node.node_id || e.target.node_id === node.node_id)
+
+            node.allEdges.forEach(edge => {
+                let startYear = edge.range.start ? +edge.range.start.slice(0,4) : undefined;
+                let endYear = edge.range.end ? +edge.range.end.slice(0,4) : undefined;
+                // console.log(startYear, endYear)
+                node.sourceRange = (startYear && endYear) ? range(startYear, endYear, 1) : [];
+            })
+        })
+
         transformToWindow();
 
         // set up handlers
@@ -163,11 +174,14 @@ const setupInteractivity = () => {
             }
             loading('starting egoNetwork...')
             toggleEgoNetwork(node);
+            node.fx = null;
+            node.fy = null;
             // return true;
         } else if (d3.event.altKey === true && node.has_comments) {
             d3.select("#popup-info")
                 .html(generateCommentHTML(node))
                 .classed("d-none", false)
+                .attr('node-id', node.node_id)
                 .attr(
                     "style",
                     `top: ${d3.event.y}px !important; left: ${d3.event.x}px !important;`
@@ -177,20 +191,21 @@ const setupInteractivity = () => {
         }
     });
 
-    edgeElements.on("click", (e) => {
+    edgeElements.on("click", (edge) => {
         d3.event.stopPropagation();
         if (d3.event.altKey === true) {
-            if (e.has_comments || e.has_general_comments) {
+            if (edge.has_comments || edge.has_general_comments) {
                 d3.select("#popup-info")
-                    .html(generateCommentHTML(e))
+                    .html(generateCommentHTML(edge))
                     .classed("d-none", false)
+                    .attr('edge-id', edge.edge_id)
                     .attr(
                         "style",
                         `top: ${d3.event.y}px !important; left: ${d3.event.x}px !important;`
                     );
             }
         } else {
-            selectEdge(e);
+            selectEdge(edge);
         }
     });
 };
@@ -227,7 +242,8 @@ const reloadNetwork = () => {
                             .text((node) => displayOrID(node))
                             .attr("class", node => getTextClass(node))
                             .attr("style", "pointer-events: none;")
-                            .attr("opacity", 0),
+                            .attr("opacity", 0)
+                            .attr("data-node", (node) => node.node_id),
             update => update,
             exit => exit.transition(750).attr("opacity", 0).remove()
         );

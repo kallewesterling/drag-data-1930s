@@ -364,3 +364,80 @@ svg#main {
     backdrop-filter: blur(2px);
     z-index: 500;
 }
+
+
+.cluster-0 {
+    fill: #EBBAB9 !important;
+}
+
+.cluster-1 {
+    fill: #C9C5BA !important;
+}
+
+.cluster-2 {
+    fill: #B5BDB2 !important;
+}
+
+.cluster-3 {
+    fill: #ABB9AE !important;
+}
+
+.cluster-4 {
+    fill: #A1B5AA !important;
+}
+
+.cluster-5 {
+    fill: #97B1A6 !important;
+}
+
+.cluster-6 {
+    fill: #809D9E !important;
+}
+
+.cluster-7 {
+    fill: #698996 !important;
+}
+
+.cluster-8 {
+    fill: #557D86 !important;
+}
+
+.cluster-9 {
+    fill: #407076 !important;
+}
+
+.cluster-10 {
+    fill: #EBBAB9 !important;
+}
+
+.cluster-11 {
+    fill: #EBBAB9 !important;
+}
+
+.cluster-12 {
+    fill: #EBBAB9;
+}
+
+.cluster-13 {
+    fill: #EBBAB9;
+}
+
+.cluster-14 {
+    fill: #EBBAB9;
+}
+
+.cluster-15 {
+    fill: #EBBAB9;
+}
+
+.cluster-16 {
+    fill: #EBBAB9;
+}
+
+.cluster-17 {
+    fill: #EBBAB9;
+}
+
+.cluster-18 {
+    fill: #EBBAB9;
+}

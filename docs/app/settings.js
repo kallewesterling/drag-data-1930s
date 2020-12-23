@@ -140,6 +140,7 @@ const getSettings = () => {
 
     let charge = +d3.select("#charge").node().value;
     let collide = +d3.select("#collide").node().value;
+    let linkStrength = +d3.select("#linkStrength").node().value;
     let minDegree = +d3.select("#minDegree").node().value;
     let multiplier = +d3.select("#multiplier").node().value;
     let minWeight = +d3.select("#minWeight").node().value;
@@ -163,7 +164,7 @@ const getSettings = () => {
         endYear = _autoSettings.edges.endYear;
     }
 
-    ["collide", "charge", "minDegree", "multiplier", "minWeight"].forEach((label) =>
+    ["collide", "charge", "minDegree", "multiplier", "minWeight", "linkStrength"].forEach((label) =>
         updateLabel(label)
     );
 
@@ -187,6 +188,7 @@ const getSettings = () => {
             layoutForceY: layoutForceY,
             layoutCharge: layoutCharge,
             layoutCollide: layoutCollide,
+            linkStrength: linkStrength,
             charge: charge,
             collide: collide,
         },
@@ -205,9 +207,8 @@ const getSettings = () => {
  * @returns {boolean} - true
  */
 const setupSettings = () => {
-    let settings = loadSettings("settings")
-        ? loadSettings("settings")
-        : _autoSettings;
+    let _settings = loadSettings("settings")
+    let settings = _settings ? _settings : _autoSettings;
 
     d3.select("#minWeight").node().max = store.ranges.edgeWidth[1];
     d3.select("#minDegree").node().max = store.ranges.nodeDegree[1];
@@ -234,6 +235,11 @@ const setupSettings = () => {
     d3.select("#collide").node().max = 1;
     d3.select("#collide").node().step = 0.05;
 
+    // set range for collide
+    d3.select("#linkStrength").node().min = 0.05;
+    d3.select("#linkStrength").node().max = 1;
+    d3.select("#linkStrength").node().step = 0.05;
+
     // set range for minWeight
     d3.select("#minDegree").node().min = 0;
     d3.select("#minDegree").node().step = 1;
@@ -255,6 +261,7 @@ const setupSettings = () => {
         settings.edges.weightFromCurrent;
     d3.select("#charge").node().value = settings.force.charge;
     d3.select("#collide").node().value = settings.force.collide;
+    d3.select("#linkStrength").node().value = settings.force.linkStrength;
     d3.select("#layoutCenter").node().checked = settings.force.layoutCenter;
     d3.select("#layoutForceX").node().checked = settings.force.layoutForceX;
     d3.select("#layoutForceY").node().checked = settings.force.layoutForceY;
@@ -377,10 +384,13 @@ const setupSettingInteractivity = () => {
     });
 
     d3.select("#multiplier").on("input", () => {
-        changeSetting("#multiplier", "force", true, "slider");
+        changeSetting("#multiplier", "force", false, "slider");
     });
     d3.select("#collide").on("input", () => {
         changeSetting("#collide", "force", false, "slider");
+    });
+    d3.select("#linkStrength").on("input", () => {
+        changeSetting("#linkStrength", "force", false, "slider");
     });
     d3.select("#charge").on("input", () => {
         changeSetting("#charge", "force", false, "slider");
@@ -507,14 +517,19 @@ const setupKeyHandlers = () => {
             show(".metaShow");
         } else if (e.key === "Alt") {
             toggleCommentedElements();
-        } else if (e.key === "Escape" && isVisible("#popup-info")) {
+        } else if (e.key === "Escape" && window.egoNetwork) {
             //console.log("Escape 1 called!");
+            egoNetworkOff();
+            show("#settings");
+            show("#infoContainer");
+        } else if (e.key === "Escape" && isVisible("#popup-info")) {
+            //console.log("Escape 2 called!");
             hide("#popup-info");
         } else if (e.key === "Escape" && isVisible("#nodeEdgeInfo")) {
-            //console.log("Escape 2 called!");
+            //console.log("Escape 3 called!");
             resetDraw();
         } else if (e.key === "Escape" || e.key === " ") {
-            //console.log("Escape 3 called!");
+            //console.log("Escape 4 called!");
             UIToggleAllSettingBoxes();
         } else if (e.key === "c" && e.metaKey) {
             //console.log("command+c called");
@@ -523,10 +538,8 @@ const setupKeyHandlers = () => {
                 !getSettings().nodes.autoClearNodes
             );
         } else if (e.key === "+") {
-            console.log('add multiplier')
             changeSetting({selector: "#multiplier", type: "slider", setTo: getSettings().nodes.multiplier+0.25});
         } else if (e.key === "-") {
-            console.log('subtract multiplier')
             changeSetting({selector: "#multiplier", type: "slider", setTo: getSettings().nodes.multiplier-0.25});
         }
         if (

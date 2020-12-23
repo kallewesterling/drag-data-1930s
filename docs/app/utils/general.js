@@ -311,9 +311,9 @@ const getRelated = (node) => {
 const resetGraphElements = () => {
     loading('resetGraphElements called...')
     
-    if (window.egoNetwork != undefined) console.log(`window.egoNetwork: ${window.egoNetwork}`)
-    if (window.toggledCommentedElements != undefined) console.log(`window.toggledCommentedElements: ${window.toggledCommentedElements}`)
-    if (window.nodeSelected != undefined) console.log(`window.nodeSelected: ${window.nodeSelected}`)
+    //if (window.egoNetwork != undefined) console.log(`window.egoNetwork: ${window.egoNetwork}`)
+    //if (window.toggledCommentedElements != undefined) console.log(`window.toggledCommentedElements: ${window.toggledCommentedElements}`)
+    //if (window.nodeSelected != undefined) console.log(`window.nodeSelected: ${window.nodeSelected}`)
 
     nodeElements
         .attr("class", (node) => getNodeClass(node))
@@ -327,7 +327,6 @@ const resetGraphElements = () => {
 
     if (!getSettings().nodes.stickyNodes) {
         textElements
-            .attr("class", "label")
             .attr("", (node) => {
                 node.fx = null;
                 node.fy = null;
@@ -335,6 +334,7 @@ const resetGraphElements = () => {
     }
 
     textElements
+        .attr("class", (node) => { return `label cluster-${node.cluster}`; })
         .transition()
         .duration(750)
         .attr("opacity", 1)
@@ -455,12 +455,39 @@ const modifySimulation = () => {
     if (settings.layoutCollide) {
         graph.simulation.force("collide", d3.forceCollide());
         graph.simulation.force("collide").strength(settings.collide);
-        graph.simulation.force("collide").radius(n => getSize(n));
+        graph.simulation.force("collide").radius(node => {
+            // our radius here is based on the text label's bounding box!
+            // let r = getSize(node);
+            let selector = `text[data-node="${node.node_id}"]`;
+            let textBBox = d3.select(selector).node().getBBox()
+            return textBBox.width / 2;
+        });
     } else {
         graph.simulation.force("collide", null);
     }
 
-    graph.simulation.force("link").strength(0.4);
+    // if settings.layoutClustering... TODO: implement node clustering via jLouvain and then set up a setting for this!
+    /*
+    graph.simulation.force('cluster', (alpha) => {
+        nodeElements.data().forEach((d) => {
+            const cluster = clusters[d.cluster];
+            if (cluster === d) return;
+            let x = d.x - cluster.x;
+            let y = d.y - cluster.y;
+            let l = Math.sqrt((x * x) + (y * y));
+            const r = d.r + cluster.r;
+            if (l !== r) {
+                l = ((l - r) / l) * alpha;
+                d.x -= x *= l;
+                d.y -= y *= l;
+                cluster.x += x;
+                cluster.y += y;
+            }
+          });
+    })
+    */
+
+    graph.simulation.force("link").strength(settings.linkStrength);
 
     graph.simulation.on("tick", function () {
         nodeElements.attr("cx", (n) => n.x);
@@ -497,6 +524,7 @@ const getNodeClass = (node) => {
         classes = "node " + node.category;
         classes += node.has_comments ? " has-comments" : "";
     }
+    if (node.cluster) classes = `node cluster-${node.cluster}`
     return classes;
 };
 
@@ -581,4 +609,9 @@ const getSize = (node, type = "r") => {
 
 const lookupNode = (node_id, store=graph.nodes) => {
     return store.find((node) => node.node_id === node_id);
+}
+
+
+const hasFixedNodes = () => {
+    return graph.nodes.map(n=>n.fx).every(d=>d === null);
 }
