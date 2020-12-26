@@ -1,12 +1,12 @@
 "use strict";
 
-const zoom = d3.zoom().extent([[0.25, 7], [window.innerWidth, window.innerHeight]]);
+const zoom = d3.zoom().extent([[_autoSettings.zoomMin, _autoSettings.zoomMax], [window.innerWidth, window.innerHeight]]);
 
 const zoomedActions = () => {
     saveSettings();
-    graph.k = d3.event.transform.k;
-    graph.x = d3.event.transform.x;
-    graph.y = d3.event.transform.y;
+    graph.k = Math.round(d3.event.transform.k * 10) / 10;
+    graph.x = Math.round(d3.event.transform.x * 10) / 10;
+    graph.y = Math.round(d3.event.transform.y * 10) / 10;
     updateInfo();    
     graph.plot.attr("transform", d3.event.transform);
 };
@@ -23,7 +23,7 @@ const transformToWindow = () => {
     graph.plot.attr("width", window.innerWidth);
     graph.plot.attr("height", window.innerHeight);
     graph.svg.attr("viewBox", [-window.innerWidth/2, -window.innerHeight/2, window.innerWidth, window.innerHeight]);
-    zoom.extent([[0.25, 7], [window.innerWidth, window.innerHeight]]);
+    zoom.extent([[_autoSettings.zoomMin, _autoSettings.zoomMax], [window.innerWidth, window.innerHeight]]);
     return true;
 };
 

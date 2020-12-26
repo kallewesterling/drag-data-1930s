@@ -29,4 +29,6 @@
     loadNetwork();
     transformToWindow();
     graph.svg.call(zoom);
+    //graph.simulation.alphaTarget(0.3).restart();
+    //graph.simulation.alphaTarget(1).restart();
 })();

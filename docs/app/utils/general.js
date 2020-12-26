@@ -304,12 +304,12 @@ const getRelated = (node) => {
 
 
 /**
- * resetGraphElements takes no arguments but resets all the different graph elements (nodes, edges, labels) to their original settings.
+ * updateGraphElements takes no arguments but resets all the different graph elements (nodes, edges, labels) to their original settings.
  * The return value is always true.
  * @returns {boolean} - true
  */
-const resetGraphElements = () => {
-    loading('resetGraphElements called...')
+const updateGraphElements = () => {
+    loading('updateGraphElements called...')
     
     //if (window.egoNetwork != undefined) console.log(`window.egoNetwork: ${window.egoNetwork}`)
     //if (window.toggledCommentedElements != undefined) console.log(`window.toggledCommentedElements: ${window.toggledCommentedElements}`)
@@ -318,7 +318,14 @@ const resetGraphElements = () => {
     nodeElements
         .attr("class", (node) => getNodeClass(node))
         .transition()
-        .attr("r", (node) => getSize(node));
+        .attr("r", (node) => getSize(node))
+        .attr("style", (node) => {
+            if (node.cluster) {
+                return "fill: " + d3.interpolateSinebow(1/node.cluster) + ' !important;';
+            } else {
+                return "";
+            }
+        });
 
     edgeElements
         .attr("class", (e) => getEdgeClass(e))
@@ -334,7 +341,7 @@ const resetGraphElements = () => {
     }
 
     textElements
-        .attr("class", (node) => { return `label cluster-${node.cluster}`; })
+        .attr("class", (node) => { if (getSettings().nodes.communityDetection) { return `label cluster-${node.cluster}`; } else { return `label`; } })
         .transition()
         .duration(750)
         .attr("opacity", 1)
@@ -354,10 +361,10 @@ const selectNode = (node) => {
     if (nodeIsSelected(node)) {
         window.nodeSelected = undefined;
         hide("#nodeEdgeInfo");
-        resetGraphElements();
+        updateGraphElements();
     } else {
         window.nodeSelected = true;
-        resetGraphElements();
+        updateGraphElements();
         deselectNodes(node);
         selectRelatedEdges(node);
         setNodeEdgeInfo(node);
@@ -376,7 +383,7 @@ const selectEdge = (edge) => {
     if (edgeIsSelected(edge)) {
         window.edgeSelected = undefined;
         hide("#nodeEdgeInfo");
-        resetGraphElements();
+        updateGraphElements();
     } else {
         window.edgeSelected = true;    
         deselectEdges(edge);
@@ -517,6 +524,7 @@ const modifySimulation = () => {
  */
 const getNodeClass = (node) => {
     let classes = "";
+    let settings = getSettings().nodes;
     if (window.toggledCommentedElements) {
         classes = "node"
         classes += node.has_comments ? ` ${node.category} has-comments` : " disabled";
@@ -524,9 +532,15 @@ const getNodeClass = (node) => {
         classes = "node " + node.category;
         classes += node.has_comments ? " has-comments" : "";
     }
-    if (node.cluster) classes = `node cluster-${node.cluster}`
+    // if (settings.communityDetection && node.cluster) classes = `node cluster-${node.cluster}` // move this to a fill instead (see `getClusterColor`)
     return classes;
 };
+
+const getClusterColor = (node) => {
+    if (node.cluster) {
+        console.log(node.cluster)
+    }
+}
 
 
 /**

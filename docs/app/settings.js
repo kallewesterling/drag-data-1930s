@@ -8,7 +8,7 @@
 const resetDraw = () => {
     hide("#nodeEdgeInfo");
     deselectNodes();
-    resetGraphElements();
+    updateGraphElements();
     return true;
 };
 
@@ -141,6 +141,7 @@ const getSettings = () => {
     let endYear = +d3.select("#endYear").node().value;
     let autoClearNodes = d3.select("#autoClearNodes").node().checked;
     let nodeSizeFromCurrent = d3.select("#nodeSizeFromCurrent").node().checked;
+    let communityDetection = d3.select("#communityDetection").node().checked;
     let weightFromCurrent = d3.select("#weightFromCurrent").node().checked;
     let layoutCenter = d3.select("#layoutCenter").node().checked;
     let layoutForceX = d3.select("#layoutForceX").node().checked;
@@ -168,6 +169,7 @@ const getSettings = () => {
             autoClearNodes: autoClearNodes,
             stickyNodes: stickyNodes,
             nodeSizeFromCurrent: nodeSizeFromCurrent,
+            communityDetection: communityDetection
         },
         edges: {
             minWeight: minWeight,
@@ -201,8 +203,7 @@ const getSettings = () => {
  * @returns {boolean} - true
  */
 const setupSettings = () => {
-    let _settings = loadSettings("settings")
-    let settings = _settings ? _settings : _autoSettings;
+    let settings = loadSettings("settings") ? loadSettings("settings") : _autoSettings;
 
     d3.select("#minWeight").node().max = d3.max(store.ranges.edgeWidth);
     d3.select("#minDegree").node().max = d3.max(store.ranges.nodeDegree);
@@ -256,6 +257,8 @@ const setupSettings = () => {
     d3.select("#autoClearNodes").node().checked = settings.nodes.autoClearNodes;
     d3.select("#nodeSizeFromCurrent").node().checked =
         settings.nodes.nodeSizeFromCurrent;
+    d3.select("#communityDetection").node().checked =
+        settings.nodes.communityDetection;
     d3.select("#weightFromCurrent").node().checked =
         settings.edges.weightFromCurrent;
     d3.select("#charge").node().value = settings.force.charge;
@@ -341,11 +344,11 @@ const changeSetting = (
         d3.select(selector).node().value = setTo;
         if (_filter === true) filter();
         updateElements();
-        resetGraphElements();
+        updateGraphElements();
         restartSimulation();
         saveSettings();
         additionalPostFunctions.forEach((func) => {
-            runFunction(func)();
+            Function(func)();
         });
     } else {
         console.log("already correctly set.");
@@ -407,6 +410,9 @@ const setupSettingInteractivity = () => {
     });
     d3.select("#nodeSizeFromCurrent").on("change", () => {
         changeSetting("#nodeSizeFromCurrent", "force", true);
+    });
+    d3.select("#communityDetection").on("change", () => {
+        changeSetting("#communityDetection", "force", true, "checkbox", [], [updateGraphElements]);
     });
     d3.select("#layoutCenter").on("change", () => {
         changeSetting("#layoutCenter", "force", false);

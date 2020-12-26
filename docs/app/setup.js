@@ -2,27 +2,27 @@
 
 const _autoSettings = {
     nodes: {
-        minDegree: 6,
-        nodeMultiplier: 1,
         autoClearNodes: true,
         stickyNodes: true,
         nodeSizeFromCurrent: true,
+        minDegree: 6,
+        nodeMultiplier: 1,
     },
     edges: {
+        weightFromCurrent: true,
         minWeight: 0,
         edgeMultiplier: 1,
         startYear: 1920,
         endYear: 1940,
-        weightFromCurrent: true,
     },
     force: {
-        charge: -320,
-        collide: 1,
         layoutCenter: true,
         layoutCharge: true,
         layoutCollide: true,
         layoutForceX: true,
         layoutForceY: true,
+        charge: -320,
+        collide: 0.5,
         linkStrength: 0.40,
     },
     zoom: 1.25,
@@ -76,7 +76,13 @@ const store = {
     nodes: [],
     edges: [],
     count: {},
-    ranges: {},
+    ranges: {
+        edgeWidth: 0,
+        nodeDegree: 0,
+        years: {
+            array: []
+        }
+    },
     toasterCounter: 1,
     settingsFinished: false,
 };

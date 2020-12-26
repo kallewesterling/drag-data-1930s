@@ -163,18 +163,25 @@ const setupInteractivity = () => {
             })
     );
 
-    nodeElements.on("click", (node, xY) => {
+    nodeElements.on("click", (node) => {
         d3.event.stopPropagation();
+        if (window.restoreTransform) {
+            // we are in a zoomed position, let's go back to where we were!
+            console.log('zoom out to:', window.restoreTransform)
+            graph.svg.call(zoom.transform, d3.zoomIdentity.translate(window.restoreTransform.x, window.restoreTransform.y).scale(window.restoreTransform.k))
+            window.restoreTransform = undefined;
+            return true;
+        }
         if (d3.event.metaKey === true) {
             if (nodeIsSelected(node)) {
                 hide("#nodeEdgeInfo");
-                resetGraphElements();
+                updateGraphElements();
             }
             loading("starting egoNetwork...");
             toggleEgoNetwork(node);
             node.fx = null;
             node.fy = null;
-            // return true;
+            return true;
         } else if (d3.event.altKey === true && node.has_comments) {
             d3.select("#popup-info")
                 .html(generateCommentHTML(node))
@@ -184,9 +191,11 @@ const setupInteractivity = () => {
                     "style",
                     `top: ${d3.event.y}px !important; left: ${d3.event.x}px !important;`
                 );
+            return true;
         } else {
             // testing zoom into node
-            console.log(d3.mouse(graph.svg.node()));
+            window.restoreTransform = {x: graph.x, y: graph.y, k: graph.k}
+
             graph.svg.transition()
                 .duration(750)
                 .call(
@@ -199,6 +208,7 @@ const setupInteractivity = () => {
                 );
 
             selectNode(node);
+            return true;
         }
     });
 
@@ -242,7 +252,7 @@ const updateElements = () => {
                     .append("circle")
                     .attr("r", 0)
                     .attr("id", (node) => node.node_id)
-                    .attr("class", (node) => getNodeClass(node)),
+                    .attr("class", getNodeClass(node)),
             (update) => update,
             (exit) => exit.transition(750).attr("r", 0).remove()
         );

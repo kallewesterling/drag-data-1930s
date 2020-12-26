@@ -10,10 +10,13 @@ const getInfoHTML = () => {
         <p>Graph nodes: ${graph.nodes.length}/${store.nodes.length}</p>
         <p>Graph edges: ${graph.edges.length}/${store.edges.length}</p>
         <hr />
-        <p>Unconnected nodes: ${getUnconnectedNodes().length}</p>
+        <p>Unconnected nodes: ${hasUnconnectedNodes()? getUnconnectedNodes().length: 0}</p>
         <hr />
         <p>Current zoom: ${graph.k}</p>
         <p>Current x, y: ${graph.x}, ${graph.y}</p>`;
+    if (getSettings().nodes.communityDetection && graph.communities)
+        html += `<hr />
+                <p>Communities: ${graph.communities}</p>`;
     return html;
 };
 

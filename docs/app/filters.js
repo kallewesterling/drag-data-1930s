@@ -142,7 +142,7 @@ const filterEdges = (edgeList = [], change = true) => {
                 }
             }
         });
-        console.log(`${graph.edges.length} after`)
+        //console.log(`${graph.edges.length} after`)
     } else {
         // console.log('have edgeList');
         // console.log(edgeList);
@@ -173,6 +173,7 @@ const clusters = {};
  */
 const filter = (nodeList = [], edgeList = [], change = true) => {
     loading('filter called...')
+    let settings = getSettings()
 
     hide("#nodeEdgeInfo");
     
@@ -181,27 +182,33 @@ const filter = (nodeList = [], edgeList = [], change = true) => {
     
     modifyNodeDegrees();
     
-    if (getSettings().nodes.autoClearNodes) {
+    if (settings.nodes.autoClearNodes) {
         filterNodesWithoutEdge();
     }
     
     updateElements();
 
-    // TODO: I am using JLevain here. Are there other community detectors out there? Learn more about algorithms...
-    // See invention of Louvain method here https://arxiv.org/pdf/0803.0476.pdf
-    var nodeData = graph.nodes.map((d) => d.node_id);
-    var linkData = graph.edges.map((d) => {return {source: d.source.node_id, target: d.target.node_id, weight: d.weight}; });
+    if (settings.nodes.communityDetection) {
+        // TODO: I am using JLevain here. Are there other community detectors out there? Learn more about algorithms...
+        // See invention of Louvain method here https://arxiv.org/pdf/0803.0476.pdf
+        var nodeData = graph.nodes.map((d) => d.node_id);
+        var linkData = graph.edges.map((d) => {return {source: d.source.node_id, target: d.target.node_id, weight: d.weight}; });
 
-    var community = jLouvain()
-        .nodes(nodeData)
-        .edges(linkData);
+        var community = jLouvain()
+            .nodes(nodeData)
+            .edges(linkData);
 
-    var result  = community();
-    graph.nodes.forEach(node => {
-        node.cluster = result[node.node_id];
-    })
+        let result  = community();
+        graph.communities = [];
+        graph.nodes.forEach(node => {
+            node.cluster = result[node.node_id];
+            if (!graph.communities.includes(node.cluster))
+                graph.communities.push(node.cluster)
+        })
+        if (graph.communities) graph.communities = graph.communities.length;
+    }
     
-    resetGraphElements();
+    updateGraphElements();
     updateInfo();
 
     return true;
@@ -342,7 +349,7 @@ const toggleEgoNetwork = async (node, toggleSettings = true, force = undefined) 
         console.log("ego network already active - resetting network view...");
         await egoNetworkOff();
         updateElements();
-        resetGraphElements();
+        updateGraphElements();
 
         if (toggleSettings) {
             //console.log("--> show quick access and settings");
@@ -353,7 +360,7 @@ const toggleEgoNetwork = async (node, toggleSettings = true, force = undefined) 
         console.log("filtering out an ego network based on " + node.node_id);
         await egoNetworkOn(node);
         updateElements();
-        resetGraphElements();
+        updateGraphElements();
 
         d3.select("#main").on("click", () => {
             if (d3.event.metaKey && window.egoNetwork) {
