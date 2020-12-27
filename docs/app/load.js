@@ -17,41 +17,45 @@ const loadNetwork = () => {
         store.count = Object.assign({}, data.count);
 
         // set up store.nodes
-        data.nodes.forEach((d) => {
+        data.nodes.forEach((node) => {
+            let prohibitedID = {match: false}
+            if (node.node_id.charAt(0).match(/[_—–—.]/)) prohibitedID = Object.assign({match: true, node_id: node.node_id}, node.node_id.charAt(0).match(/[_—–—.]/));
+            if (prohibitedID.match) console.log(prohibitedID)
+            
             if (
-                d.node_id === "" ||
-                d.node_id === "-" ||
-                d.node_id === "–" ||
-                d.node_id === "—"
+                node.node_id === "" ||
+                node.node_id === "-" ||
+                node.node_id === "–" ||
+                node.node_id === "—"
             ) {
                 console.error("found an erroneous data point:");
-                console.log(d);
+                console.log(node);
             } else {
                 store.nodes.push(
                     Object.assign(
                         {
                             inGraph: false,
-                            has_comments: d.comments.length > 0 ? true : false,
+                            has_comments: node.comments.length > 0 ? true : false,
                         },
-                        d
+                        node
                     )
                 );
             }
         });
 
         // set up store.edges
-        data.links.forEach((e) => {
+        data.links.forEach((edge) => {
             store.edges.push(
                 Object.assign(
                     {
-                        has_comments: e.comments.length > 0 ? true : false,
+                        has_comments: edge.comments.length > 0 ? true : false,
                         has_general_comments:
-                            e.general_comments.length > 0 ? true : false,
+                        edge.general_comments.length > 0 ? true : false,
                         inGraph: false,
                         dates: [],
                         range: { start: undefined, end: undefined },
                     },
-                    e
+                    edge
                 )
             );
         });
@@ -165,6 +169,7 @@ const setupInteractivity = () => {
 
     nodeElements.on("click", (node) => {
         d3.event.stopPropagation();
+        /*
         if (window.restoreTransform) {
             // we are in a zoomed position, let's go back to where we were!
             console.log('zoom out to:', window.restoreTransform)
@@ -172,6 +177,7 @@ const setupInteractivity = () => {
             window.restoreTransform = undefined;
             return true;
         }
+        */
         if (d3.event.metaKey === true) {
             if (nodeIsSelected(node)) {
                 hide("#nodeEdgeInfo");
@@ -193,6 +199,7 @@ const setupInteractivity = () => {
                 );
             return true;
         } else {
+            /*
             // testing zoom into node
             window.restoreTransform = {x: graph.x, y: graph.y, k: graph.k}
 
@@ -206,7 +213,7 @@ const setupInteractivity = () => {
                         .translate(-node.x, -node.y),
                     d3.mouse(graph.svg.node())
                 );
-
+            */
             selectNode(node);
             return true;
         }

@@ -208,103 +208,82 @@ const filter = (nodeList = [], edgeList = [], change = true) => {
         if (graph.communities) graph.communities = graph.communities.length;
     }
     
+    graph.networkCount = getUniqueNetworks(undefined, 'counter');
+
     updateGraphElements();
     updateInfo();
 
     return true;
 };
 
-/**
- * getUniqueNetworks takes X argument/s... TODO: Finish this.
- * The return value is ...
- * // TODO: This function is _extremely_ heavy at this time.
- */
-const getUniqueNetworks = (nodeList = graph.nodes) => {
-    loading('getUniqueNetworks called...')
-    let networks = []
-    let processed = []
-    nodeList.forEach(node => {
-        if (processed.includes(node.node_id)) {
-
-        } else {
-            let network = getEgoNetwork(node).sort((a, b) => (a.node_id > b.node_id) ? 1 : -1);
-            if (network.length) {
-                let listOfIDs = network.map(d=>{
-                    if (d != undefined) { return d.node_id } else { return {}; }
-                }).join(',')
-                if (!networks.includes(listOfIDs)) {
-                    networks.push(listOfIDs);
-                }
-                processed.push([...listOfIDs])
-            }
-        };
-    })
-    networks.forEach((list, i) => {
-        let nodes = list.split(',')
-        nodes.forEach((node_id, i) => {nodes[i] = lookupNode(node_id);})
-        networks[i] = nodes;
-    })
-    return networks;
+// TODO: Needs docstring
+const findNearestNeighbors = (node) => {
+    return [...new Set([...node.allEdges.filter(n=>n.inGraph).map(e=>e.source), ...node.allEdges.filter(n=>n.inGraph).map(e=>e.target)])].filter(n=>n!==node)
 }
 
-/**
- * getEgoNetwork takes X argument/s... TODO: Finish this.
- * The return value is ...
- */
-const getEgoNetwork = (node, limit=10000) => { // limit automatically set to 10,000
-    loading('getEgoNetwork called...')
+
+// TODO: Needs docstring
+const getEgoNetwork = (node, maxIterations = 1000) => {
     if (typeof(node) === "string") {
         node = lookupNode(node);
     }
 
-    if (typeof(node) !== "object") {
-        console.error(`node is of the wrong type (${typeof(node)})`)
-        return false;
+    let nearestNeighbors = findNearestNeighbors(node);
+    let allNeighbors = nearestNeighbors
+    let stop = false;
+    let i = 0;
+
+    while (!stop) {
+        i += 1;
+        if (i >= maxIterations) { stop = true; }
+
+        let lengthBefore = allNeighbors.length;
+        let currentNeighbors = [...allNeighbors]
+        currentNeighbors.forEach(node => {
+            if (!allNeighbors.includes(node))
+            allNeighbors.push(node);
+            allNeighbors = [...new Set([...allNeighbors, ...findNearestNeighbors(node)])]
+        });
+        //console.log(`iteration ${i}`, currentNeighbors)
+
+        if (allNeighbors.length - lengthBefore === 0)
+            stop = true;
     }
 
-    if (limit===undefined) {
-        console.warn('Warning: running getEgoNetwork with no limit can cause browser issues. Set a high limit instead')
-    }
-
-    // recursive search for related nodes sprawling from original node
-    let nodeIDs = getRelated(node).secondaryNodeIDs;
-    let cont = true;
-    let iteration = 0;
-    let newNodes = []
-    while (cont) {
-        iteration += 1;
-        if (limit && iteration >= limit || limit === 0) {
-            //console.log('hit limit')
-            cont = false;
-        } else if (limit && iteration < limit+1 || !limit) { //run one extra...
-            //console.log('searching...')
-            newNodes = []
-            let startVal = nodeIDs.length;
-            let nextNodes = []
-            nodeIDs.forEach(n=>{
-                nextNodes = getRelated(n).secondaryNodeIDs;
-                nextNodes.forEach(nextNode => { 
-                    newNodes.push(nextNode);
-                });
-            })
-            newNodes.forEach(n=>{if (!nodeIDs.includes(n)) { nodeIDs.push(n); }})
-            let endVal = nodeIDs.length;
-            if (endVal - startVal > 0) {
-                // console.log(`--> iteration ${iteration} found ${newNodes.length} connected nodes (${endVal - startVal} unique)`)
-                cont = true;
-            } else {
-                cont = false
-            }
-        }
-    }
-
-    let nodes = []
-    nodeIDs.forEach(node_id=> {
-        nodes.push(lookupNode(node_id));
-    })
-
-    return nodes;
+    return allNeighbors;
 }
+
+
+// TODO: Needs docstring
+const getUniqueNetworks = (nodeList, returnVal = 'nodes') => {
+    if (!nodeList)
+        nodeList = graph.nodes;
+
+    let networks = []
+
+    nodeList.forEach(node => {
+        let network = JSON.stringify(getEgoNetwork(node).map(d=>d.node_id).sort());
+        if (!networks.includes(network))
+            networks.push(network);
+    })
+    
+    networks = networks.map(JSON.parse);
+
+    if (returnVal === 'nodeList')
+        return networks;
+
+    if (returnVal === 'counter')
+        return networks.length;
+
+    if (returnVal === 'nodes') {
+        networks.forEach((network, i) => {
+            networks[i] = network.map(node => lookupNode(node, graph.nodes))
+        });
+        
+        return networks;
+    }
+}
+
 
 /**
  * egoNetworkOn takes X argument/s... TODO: Finish this.

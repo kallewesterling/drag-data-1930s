@@ -67,7 +67,41 @@ for row in df.fillna('').itertuples():
     # Clean up of variables
     category, performer, club, _city, city, revue_name, normalized_revue_name, unsure_drag, legal_name, source, newspapers_search, fulton_search, former_archive, comment, exclude, quote, comment_performer, comment_club, comment_city, comment_revue = category.strip(), performer.strip(), club.strip(), _city.strip(), city.strip(), revue_name.strip(), normalized_revue_name.strip(), unsure_drag.strip(), legal_name.strip(), source.strip(), newspapers_search.strip(), fulton_search.strip(), former_archive.strip(), comment.strip(), exclude.strip(), quote.strip(), comment_performer.strip(), comment_club.strip(), comment_city.strip(), comment_revue.strip()
 
-    if performer == "-" or performer == "–" or performer == "—" or performer == "———":
+    # if performer, club, revue contains "_" or "—"
+    g = re.search(r'^[-–—_.]', performer)
+    if g:
+        print('performer:', performer)
+        performer = re.sub(r'^[-–—_.]*', '', performer).strip()
+        if performer == "?":
+            performer = None
+        if performer: print('--> after fix:', performer)
+    g = re.search(r'^[-–—_.]', club)
+    if g:
+        print('club:', club)
+        club = re.sub(r'^[-–—_.]*', '', club).strip()
+        if club == "?":
+            club = None
+        if club: print('--> after fix:', club)
+    g = re.search(r'^[-–—_.]', revue_name)
+    if g:
+        print('revue name:', revue_name)
+        revue_name = re.sub(r'^[-–—_.]*', '', revue_name).strip()
+        if revue_name == "?":
+            revue_name = None
+        if revue_name: print('--> after fix:', revue_name)
+    g = re.search(r'^[-–—_.]', normalized_revue_name)
+    if g:
+        print('normalized revue name before:', normalized_revue_name)
+        normalized_revue_name = re.sub(r'^[-–—_.]*', '', normalized_revue_name).strip()
+        if normalized_revue_name == "?":
+            normalized_revue_name = None
+        if normalized_revue_name: print('--> after fix:', normalized_revue_name)
+
+    # if any of the categories above contains ?
+    if "?" in performer:
+        print(performer)
+
+    if performer == "" or performer == "-" or performer == "–" or performer == "—" or performer == "———":
         performer = None
 
     # Revert to city if there is no normalized city

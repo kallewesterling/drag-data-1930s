@@ -11,6 +11,7 @@ const getInfoHTML = () => {
         <p>Graph edges: ${graph.edges.length}/${store.edges.length}</p>
         <hr />
         <p>Unconnected nodes: ${hasUnconnectedNodes()? getUnconnectedNodes().length: 0}</p>
+        <p>Disconnected networks: ${graph.networkCount}</p>
         <hr />
         <p>Current zoom: ${graph.k}</p>
         <p>Current x, y: ${graph.x}, ${graph.y}</p>`;

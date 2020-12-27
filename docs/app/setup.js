@@ -93,6 +93,7 @@ const graph = {
     simulation: d3.forceSimulation().force("link", d3.forceLink()),
     svg: d3.select("svg#main"),
     k: 1,
+    networkCount: 0
 };
 
 graph.plot = graph.svg.append("g").attr("id", "plot");

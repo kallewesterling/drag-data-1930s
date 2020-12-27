@@ -216,6 +216,7 @@ const isSourceOrTarget = (node, edgeList = graph.edges) => {
  * @param {boolean} [asTarget] - Specifies whether to look for edges where the given node is the source
  * @returns {Array} - List of all the edges that are connected to the given node
  */
+/*
 const getRelatedEdges = (node, asSource = true, asTarget = true) => {
     if (typeof node === "string")
         node = lookupNode(node);
@@ -237,7 +238,31 @@ const getRelatedEdges = (node, asSource = true, asTarget = true) => {
     }
     return allRelatedEdges;
 };
+*/
+const getRelatedEdges = (node, asSource = true, asTarget = true, edgeList = undefined, returnVal = 'nodelist') => {
+    if (!edgeList)
+        edgeList = store.edges
 
+    let nodeList = undefined;
+    
+    if (typeof node === "string")
+        node = lookupNode(node);
+
+    if (asSource && asTarget) {
+        nodeList = edgeList.filter(edge => edge.source === node || edge.target === node)
+    } else if (asSource) {
+        nodeList = edgeList.filter(edge => edge.source === node)
+    } else if (asTarget) {
+        nodeList = edgeList.filter(edge => edge.target === node)
+    }
+    if (returnVal === 'nodelist' && nodeList) {
+        return nodeList;
+    } else if (nodeList) {
+        return nodeList.length;
+    } else {
+        return [];
+    }
+}
 
 /**
  * selectRelatedEdges takes one required argument, a node (which can either be a d3 node selection or a string denoting a `node_id`).
@@ -621,8 +646,8 @@ const getSize = (node, type = "r") => {
 };
 
 
-const lookupNode = (node_id, store=graph.nodes) => {
-    return store.find((node) => node.node_id === node_id);
+const lookupNode = (node_id, nodeList=store.nodes) => {
+    return nodeList.find((node) => node.node_id === node_id);
 }
 
 
