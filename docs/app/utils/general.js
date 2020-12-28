@@ -600,7 +600,7 @@ const getEdgeStrokeWidth = (edge) => {
 
 /**
  * getNodeClass takes one required argument, the d3 selector for a given node. It is the function that provides the class for any given node in the visualization.
- * The return value is ...
+ * The return value is ... // TODO
  * @param {Object} node - d3 selector for a given node.
  * @returns {string} - The string of classes to return to the node.
  */
@@ -622,7 +622,11 @@ const getSize = (node, type = "r") => {
     let yScale = nodeScale(settings);
     let val = 0;
     if (window.toggledCommentedElements === true) {
-        return 5 * settings.nodes.nodeMultiplier;
+        if (node.has_comments) {
+            return 10 * settings.nodes.nodeMultiplier;
+        } else {
+            return 5 * settings.nodes.nodeMultiplier;
+        }
     }
     
     if (type === "r") {

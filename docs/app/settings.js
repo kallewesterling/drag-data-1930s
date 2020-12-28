@@ -373,7 +373,7 @@ const setupSettingInteractivity = () => {
     // slider interactivity
     d3.select("#minDegree").on("input", () => {
         updateLabel("minDegree");
-        console.log(filterNodes([], false), "possible nodes?")
+        //console.log(filterNodes([], false), "possible nodes?")
     });
     d3.select("#minDegree").on("change", () => {
         changeSetting("#minDegree", "force", true, "slider");
@@ -507,7 +507,7 @@ const setupKeyHandlers = () => {
             hide(".metaShow");
         }
         if (d3.event.key === "Alt") {
-            toggleCommentedElements();
+            // toggleCommentedElements(); // moved to button instead
         }
     });
 
@@ -524,7 +524,7 @@ const setupKeyHandlers = () => {
         if (e.key === "Meta" || e.key === "Shift") {
             show(".metaShow");
         } else if (e.key === "Alt") {
-            toggleCommentedElements();
+            //toggleCommentedElements(); // moved to button instead
         } else if (e.key === "Escape" && window.egoNetwork) {
             //console.log("Escape 1 called!");
             egoNetworkOff();
@@ -627,6 +627,7 @@ const setupKeyHandlers = () => {
     });
     return true;
 };
+
 
 /**
  * setupMiscInteractivity takes no arguments but sets up the miscellaneous interaction with elements in the network visualization, and those UI elements that belong to it.

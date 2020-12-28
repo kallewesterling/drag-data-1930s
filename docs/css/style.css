@@ -1,3 +1,7 @@
+* {
+    font-family: 'Open Sans', sans-serif;
+}
+
 body, html {
     height: 100% !important;
     z-index: -1000;
@@ -146,6 +150,7 @@ svg#main {
     stroke-width: 0.1;
     stroke: var(--node-stroke);
     cursor: context-menu;
+    font-weight: 300;
     /* pointer-events: none; */
 }
 
@@ -440,4 +445,8 @@ svg#main {
 
 .cluster-18 {
     fill: #EBBAB9;
+}
+
+#colorNetworks, #commentedNodes {
+    cursor: pointer;
 }

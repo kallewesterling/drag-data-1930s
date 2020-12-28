@@ -90,8 +90,8 @@ const loadNetwork = () => {
         store.ranges.nodeDegree = d3.extent(store.nodes, (d) => d.degree);
         store.ranges.edgeWidth = d3.extent(store.edges, (d) => d.weight);
         store.ranges.years = {
-            min: d3.min(store.edges.map((d) => +d.range.start.substring(0, 4))),
-            max: d3.max(store.edges.map((d) => +d.range.end.substring(0, 4))),
+            min: d3.min(store.edges.map((d) => d.range.start? +d.range.start.substring(0, 4):1930)),
+            max: d3.max(store.edges.map((d) => d.range.end? +d.range.end.substring(0, 4):1930 )),
         };
         store.ranges.years.array = range(
             store.ranges.years.min,
@@ -188,7 +188,7 @@ const setupInteractivity = () => {
             node.fx = null;
             node.fy = null;
             return true;
-        } else if (d3.event.altKey === true && node.has_comments) {
+        } else if (window.toggledCommentedElements && node.has_comments) {
             d3.select("#popup-info")
                 .html(generateCommentHTML(node))
                 .classed("d-none", false)
@@ -221,7 +221,7 @@ const setupInteractivity = () => {
 
     edgeElements.on("click", (edge) => {
         d3.event.stopPropagation();
-        if (d3.event.altKey === true) {
+        if (window.toggledCommentedElements) {
             if (edge.has_comments || edge.has_general_comments) {
                 d3.select("#popup-info")
                     .html(generateCommentHTML(edge))

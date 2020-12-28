@@ -86,6 +86,21 @@ const setNodeEdgeInfo = (elem) => {
     show(selector);
 };
 
+const toggleColorNetworks = () => {
+    console.log('toggleColorNetworks called...')
+    if (graph.nodes.length > 300) {
+        alert(`Processing ${graph.nodes.length} nodes is a heavy operation and can take some time...`)
+    }
+    if (!window.coloredNetworks) {
+        window.coloredNetworks = true;
+        colorNetworks();
+    } else {
+        window.coloredNetworks = false;
+        resetDraw();
+    }
+    d3.select('#colorNetworks').classed('bg-light', !window.coloredNetworks).classed('bg-warning', window.coloredNetworks);
+}
+
 /**
  * updateInfo takes no arguments acts as a quick access point for functions that need to update the information about the visualization.
  * The return value is always true.
@@ -94,5 +109,7 @@ const setNodeEdgeInfo = (elem) => {
 const updateInfo = () => {
     show("#info");
     d3.select("#info").html(getInfoHTML());
+    d3.select('#colorNetworks').on("click", toggleColorNetworks);
+    d3.select('#commentedNodes').on("click", toggleCommentedElements);
     return true;
 };

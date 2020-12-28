@@ -1,4 +1,6 @@
 const clearAll = (e) => {
+    /*
+    // moved to button instead
     if (!e.altKey && window.toggledCommentedElements) {
         toggleCommentedElements('true');
     }
@@ -6,6 +8,7 @@ const clearAll = (e) => {
     if (d3.select('#popup-info').classed('d-none')) {
         d3.select('#popup-info').classed('d-none', true);
     }
+    */
 }
 
 const loading = (message) => {
@@ -106,3 +109,27 @@ const debugMessage = (message, header = "Warning") => {
 };
 
 
+const colorNetworks = () => {
+    let networks = getUniqueNetworks()
+    networkNoByID = {};
+
+    networks.forEach((list, i) => {
+        // console.log(i);
+        list.map((d) => d.node_id).forEach((id) => {
+            networkNoByID[id] = i + 1;
+        });
+    });
+
+    nodeElements.attr('style', node => {
+        networkID = networkNoByID[node.node_id];
+        console.log(networkID/100);
+        return 'fill: ' + d3.interpolateRainbow(networkID/networks.length*5) + '!important;';
+    });
+
+    if (graph.nodes.length > 300 && !graph.networkCount) {
+        graph.networkCount = networks.length;
+        d3.select('#colorNetworks').html(`Network count: ${networks.length}`);
+    } else if (graph.nodes.length > 300 && graph.networkCount) {
+        d3.select('#colorNetworks').html(`Network count: ${graph.networkCount}`);
+    }
+}

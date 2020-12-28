@@ -208,7 +208,8 @@ const filter = (nodeList = [], edgeList = [], change = true) => {
         if (graph.communities) graph.communities = graph.communities.length;
     }
     
-    graph.networkCount = getUniqueNetworks(undefined, 'counter');
+    if (graph.nodes.length < 300)
+        graph.networkCount = getUniqueNetworks(undefined, 'counter');
 
     updateGraphElements();
     updateInfo();
@@ -381,6 +382,7 @@ const toggleCommentedElements = (force = undefined) => {
         filter(nodesWithComments, edgesWithComments);
         restartSimulation()
     }
+    d3.select('#commentedNodes').classed('bg-light', !window.toggledCommentedElements).classed('bg-warning', window.toggledCommentedElements);
     return true;
 };
 

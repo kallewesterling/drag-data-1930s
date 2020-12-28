@@ -9,10 +9,22 @@ const getInfoHTML = () => {
     let html = `
         <p>Graph nodes: ${graph.nodes.length}/${store.nodes.length}</p>
         <p>Graph edges: ${graph.edges.length}/${store.edges.length}</p>
-        <hr />
+        <hr />`
+    if (graph.nodes.length < 300) {
+        html += `
+            <p>Unconnected nodes: ${hasUnconnectedNodes()? getUnconnectedNodes().length: 0}</p>
+            <p id="colorNetworks" class="btn-sm ${window.coloredNetworks ? 'bg-warning' : 'bg-light'}">Network count: ${graph.networkCount}</p>
+            <p id="commentedNodes" class="btn-sm ${window.toggledCommentedElements ? 'bg-warning' : 'bg-light'}">Nodes with comments: ${graph.nodes.filter(n=>n.has_comments).length}</p>
+            <hr />`
+    } else {
+        html += `
         <p>Unconnected nodes: ${hasUnconnectedNodes()? getUnconnectedNodes().length: 0}</p>
-        <p>Disconnected networks: ${graph.networkCount}</p>
-        <hr />
+        <p id="colorNetworks" class="btn-sm ${window.coloredNetworks ? 'bg-warning' : 'bg-light'}">Count networks${graph.networkCount ? ' ('+graph.networkCount+ ')' : ''}</p>
+        <p id="commentedNodes" class="btn-sm ${window.toggledCommentedElements ? 'bg-warning' : 'bg-light'}">Show nodes with comments</p>
+        `
+        
+    }
+    html += `
         <p>Current zoom: ${graph.k}</p>
         <p>Current x, y: ${graph.x}, ${graph.y}</p>`;
     if (getSettings().nodes.communityDetection && graph.communities)
