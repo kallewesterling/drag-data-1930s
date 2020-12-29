@@ -30,6 +30,8 @@ comment_sources = {
     'nodes': {}
 }
 
+collected = {}
+
 PRINT_WARNINGS = False
 
 for row in df.fillna('').itertuples():
@@ -104,6 +106,10 @@ for row in df.fillna('').itertuples():
     if performer == "" or performer == "-" or performer == "–" or performer == "—" or performer == "———":
         performer = None
 
+    if not category and not performer and not club and not _city and not city and not revue_name and not normalized_revue_name and not unsure_drag and not legal_name:
+        print('no data... exiting...')
+        continue
+
     # Revert to city if there is no normalized city
     if not city and _city:
         city = _city
@@ -128,6 +134,18 @@ for row in df.fillna('').itertuples():
             for search, replace in CLEANING[cat].items():
                 if club_display != None:
                     club_display = club_display.replace(search, replace)
+    
+    # check if it already exists!
+    if f"""{date}{performer}{club}{city}{revue_name}{normalized_revue_name}""" in collected.keys():
+        if source in collected[f"""{date}{performer}{club}{city}{revue_name}{normalized_revue_name}"""]:
+            print('warning: data point looks like it has duplicates')
+            print(source)
+            collected[f"""{date}{performer}{club}{city}{revue_name}{normalized_revue_name}"""]
+        else:
+            collected[f"""{date}{performer}{club}{city}{revue_name}{normalized_revue_name}"""].append(source)
+    else:
+        collected[f"""{date}{performer}{club}{city}{revue_name}{normalized_revue_name}"""] = [source]
+
 
     # process comment_sources
     if comment_city:

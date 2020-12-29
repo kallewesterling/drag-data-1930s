@@ -7,6 +7,7 @@ const _autoSettings = {
         nodeSizeFromCurrent: true,
         minDegree: 6,
         nodeMultiplier: 1,
+        communityDetection: true,
     },
     edges: {
         weightFromCurrent: true,
@@ -17,6 +18,7 @@ const _autoSettings = {
     },
     force: {
         layoutCenter: true,
+        layoutClustering: true,
         layoutCharge: true,
         layoutCollide: true,
         layoutForceX: true,
@@ -93,7 +95,9 @@ const graph = {
     simulation: d3.forceSimulation().force("link", d3.forceLink()),
     svg: d3.select("svg#main"),
     k: 1,
-    networkCount: 0
+    networkCount: 0,
+    communities: [],
+    clusters: {},
 };
 
 graph.plot = graph.svg.append("g").attr("id", "plot");

@@ -6,7 +6,7 @@ const range = (start, stop, step) => {
         { length: (stop - start) / step + 1 },
         (x, i) => start + i * step
     );
-}
+};
 
 /**
  * nodeHasEdges takes two arguments, the first of which defines a node_id and the second whether a count should be provided.
@@ -34,7 +34,6 @@ const nodeHasEdges = (node, count = false) => {
     return count === true ? counted : returnValue;
 };
 
-
 /**
  * getUnconnectedNodes takes no arguments but looks through graph.nodes in the current viz for any unconnected nodes.
  * The return value is a list of all the node objects that are currently unconnected.
@@ -50,7 +49,6 @@ const getUnconnectedNodes = () => {
     return unConnectedNodes;
 };
 
-
 /**
  * hasUnconnectedNodes takes no arguments but checks whether the current graph.nodes contains unconnected nodes.
  * The return value is a boolean of whether the graph has unconnected nodes.
@@ -60,22 +58,20 @@ const hasUnconnectedNodes = () => {
     return getUnconnectedNodes().length > 0;
 };
 
-
 /**
  * restartSimulation takes no arguments but simply runs the three commends that restarts the movement in the visualization. It is used when a setting is changed, to ensure that the simulation keeps rendering correctly.
  * The return value is always true.
  * @returns {boolean} - true
  */
 const restartSimulation = () => {
-    graph.nodes.forEach(node => {
+    graph.nodes.forEach((node) => {
         // console.log(node.vx); // TODO: reset stickyness here too...?
-    })
+    });
     graph.simulation.stop();
     graph.simulation.alpha(1);
     graph.simulation.restart();
     return true;
 };
-
 
 /**
  * nodeIsSelected takes one argument and determines whether the provided node is selected or not, by checking whether it has been classed with `selected`.
@@ -87,7 +83,6 @@ const nodeIsSelected = (node) => {
     return d3.select(`#${node.node_id}`).classed("selected");
 };
 
-
 /**
  * edgeIsSelected takes one argument and determines whether the provided edge is selected or not, by checking whether it has been classed with `selected`.
  * The return value is a boolean, whether it is selected (`true`) or not (`false`).
@@ -97,7 +92,6 @@ const nodeIsSelected = (node) => {
 const edgeIsSelected = (edge) => {
     return d3.select(`#${edge.edge_id}`).classed("selected");
 };
-
 
 /**
  * deselectNodes takes one optional argument of a d3 selected node to be excluded from the "deselection" process (in reality, the removal of the `selected` class from the DOM elements).
@@ -158,7 +152,6 @@ const deselectNodes = (excludeNode = undefined) => {
     return true;
 };
 
-
 /**
  * deselectEdges takes one optional argument of a d3 selected edge to be excluded from the "deselection" process (in reality, the removal of the `selected` class from the DOM elements).
  * The return value is always true;
@@ -185,7 +178,6 @@ const deselectEdges = (excludeEdge = undefined) => {
     });
 };
 
-
 /**
  * isSourceOrTarget takes one required argument, a node (which can either be a d3 node selection or a string denoting a `node_id`), and one optional argument, which specifies // TODO
  * The return value is a list of all the related edges, depending on the parameters.
@@ -195,18 +187,12 @@ const deselectEdges = (excludeEdge = undefined) => {
  */
 // TODO: This function essentially doubles with nodeHasEdges...
 const isSourceOrTarget = (node, edgeList = graph.edges) => {
-    if (typeof node === "string")
-        node = lookupNode(node);
+    if (typeof node === "string") node = lookupNode(node);
 
-    let isSource = edgeList
-        .map((d) => d.source.node_id)
-        .includes(node.node_id);
-    let isTarget = edgeList
-        .map((d) => d.target.node_id)
-        .includes(node.node_id);
+    let isSource = edgeList.map((d) => d.source.node_id).includes(node.node_id);
+    let isTarget = edgeList.map((d) => d.target.node_id).includes(node.node_id);
     return isSource || isTarget;
 };
-
 
 /**
  * getRelatedEdges takes one required argument, a node (which can either be a d3 node selection or a string denoting a `node_id`), and two optional arguments, which specifies if you want to get a list of related edges, where the node is the target (`asTarget`), the source (`asSource`) or both (set both to `true`).
@@ -239,30 +225,36 @@ const getRelatedEdges = (node, asSource = true, asTarget = true) => {
     return allRelatedEdges;
 };
 */
-const getRelatedEdges = (node, asSource = true, asTarget = true, edgeList = undefined, returnVal = 'nodelist') => {
-    if (!edgeList)
-        edgeList = store.edges
+const getRelatedEdges = (
+    node,
+    asSource = true,
+    asTarget = true,
+    edgeList = undefined,
+    returnVal = "nodelist"
+) => {
+    if (!edgeList) edgeList = store.edges;
 
     let nodeList = undefined;
-    
-    if (typeof node === "string")
-        node = lookupNode(node);
+
+    if (typeof node === "string") node = lookupNode(node);
 
     if (asSource && asTarget) {
-        nodeList = edgeList.filter(edge => edge.source === node || edge.target === node)
+        nodeList = edgeList.filter(
+            (edge) => edge.source === node || edge.target === node
+        );
     } else if (asSource) {
-        nodeList = edgeList.filter(edge => edge.source === node)
+        nodeList = edgeList.filter((edge) => edge.source === node);
     } else if (asTarget) {
-        nodeList = edgeList.filter(edge => edge.target === node)
+        nodeList = edgeList.filter((edge) => edge.target === node);
     }
-    if (returnVal === 'nodelist' && nodeList) {
+    if (returnVal === "nodelist" && nodeList) {
         return nodeList;
     } else if (nodeList) {
         return nodeList.length;
     } else {
         return [];
     }
-}
+};
 
 /**
  * selectRelatedEdges takes one required argument, a node (which can either be a d3 node selection or a string denoting a `node_id`).
@@ -282,7 +274,6 @@ const selectRelatedEdges = (node) => {
     return true;
 };
 
-
 /**
  * getRelated takes one required argument, a node (which can either be a d3 node selection or a string denoting a `node_id`). Then it loops through the related edges and nodes for each of its children,
  * The return value is an object, which contains a number of properties: `primary` which is the original node, `secondaryNodeIDs` and `secondaryEdges` which have lists of all the respective secondary objects, and `tertiaryNodeIDs` and `tertiaryEdges` for all the respective tertiary objects.
@@ -290,8 +281,7 @@ const selectRelatedEdges = (node) => {
  * @returns {Object} - Object that contains all the information about the nodes and edges (2nd and 3rd removed) from the provided node
  */
 const getRelated = (node) => {
-    if (typeof node === "string")
-        node = lookupNode(node);
+    if (typeof node === "string") node = lookupNode(node);
 
     let secondaryEdges = getRelatedEdges(node);
     let secondaryNodeIDs = [
@@ -327,15 +317,14 @@ const getRelated = (node) => {
     return returnValue;
 };
 
-
 /**
  * updateGraphElements takes no arguments but resets all the different graph elements (nodes, edges, labels) to their original settings.
  * The return value is always true.
  * @returns {boolean} - true
  */
 const updateGraphElements = () => {
-    loading('updateGraphElements called...')
-    
+    loading("updateGraphElements called...");
+
     //if (window.egoNetwork != undefined) console.log(`window.egoNetwork: ${window.egoNetwork}`)
     //if (window.toggledCommentedElements != undefined) console.log(`window.toggledCommentedElements: ${window.toggledCommentedElements}`)
     //if (window.nodeSelected != undefined) console.log(`window.nodeSelected: ${window.nodeSelected}`)
@@ -343,10 +332,14 @@ const updateGraphElements = () => {
     nodeElements
         .attr("class", (node) => getNodeClass(node))
         .transition()
-        .attr("r", (node) => getSize(node))
+        .attr("r", (node) => node.r)
         .attr("style", (node) => {
             if (node.cluster) {
-                return "fill: " + d3.interpolateSinebow(1/node.cluster) + ' !important;';
+                return (
+                    "fill: " +
+                    d3.interpolateSinebow(1 / node.cluster) +
+                    " !important;"
+                );
             } else {
                 return "";
             }
@@ -358,15 +351,20 @@ const updateGraphElements = () => {
         .style("stroke-width", (e) => getEdgeStrokeWidth(e));
 
     if (!getSettings().nodes.stickyNodes) {
-        textElements
-            .attr("", (node) => {
-                node.fx = null;
-                node.fy = null;
-            });
+        textElements.attr("", (node) => {
+            node.fx = null;
+            node.fy = null;
+        });
     }
 
     textElements
-        .attr("class", (node) => { if (getSettings().nodes.communityDetection) { return `label cluster-${node.cluster}`; } else { return `label`; } })
+        .attr("class", (node) => {
+            if (getSettings().nodes.communityDetection) {
+                return `label cluster-${node.cluster}`;
+            } else {
+                return `label`;
+            }
+        })
         .transition()
         .duration(750)
         .attr("opacity", 1)
@@ -374,7 +372,6 @@ const updateGraphElements = () => {
 
     return true;
 };
-
 
 /**
  * selectNode takes one required argument, the d3 selector for a given node. This is the function that handles the "click" event on the node.
@@ -397,7 +394,6 @@ const selectNode = (node) => {
     return true;
 };
 
-
 /**
  * selectEdge takes one required argument, the d3 selector for a given edge. This is the function that handles the "click" event on the edge.
  * The return value is always true.
@@ -410,13 +406,12 @@ const selectEdge = (edge) => {
         hide("#nodeEdgeInfo");
         updateGraphElements();
     } else {
-        window.edgeSelected = true;    
+        window.edgeSelected = true;
         deselectEdges(edge);
         setNodeEdgeInfo(edge);
     }
     return true;
 };
-
 
 /**
  * modifyNodeDegrees takes no arguments and just makes sure that each node in the current graph has a `currentDegree` set to match its number of edges.
@@ -425,11 +420,10 @@ const selectEdge = (edge) => {
  */
 const modifyNodeDegrees = () => {
     graph.nodes.forEach((n) => {
-        n.currentDegree = nodeHasEdges(n, true)
+        n.currentDegree = nodeHasEdges(n, true);
     });
     return true;
 };
-
 
 /**
  * graphNodesContains takes one required argument, the d3 selector for a given node.
@@ -441,7 +435,6 @@ const graphNodesContains = (node_id) => {
     return [...graph.nodes.map((n) => n.node_id)].includes(node_id);
 };
 
-
 /**
  * graphEdgesContains takes one required argument, the d3 selector for a given node.
  * The return value provides an answer to whether the edge is represented in the current visualization or not.
@@ -451,7 +444,6 @@ const graphNodesContains = (node_id) => {
 const graphEdgesContains = (edge_id) => {
     return [...graph.edges.map((e) => e.edge_id)].includes(edge_id);
 };
-
 
 /**
  * modifySimulation takes no arguments but is the function that runs every time that the d3 network simulation is initiated or started.
@@ -487,15 +479,35 @@ const modifySimulation = () => {
     if (settings.layoutCollide) {
         graph.simulation.force("collide", d3.forceCollide());
         graph.simulation.force("collide").strength(settings.collide);
-        graph.simulation.force("collide").radius(node => {
+        graph.simulation.force("collide").radius((node) => {
             // our radius here is based on the text label's bounding box!
             // let r = getSize(node);
             let selector = `text[data-node="${node.node_id}"]`;
-            let textBBox = d3.select(selector).node().getBBox()
+            let textBBox = d3.select(selector).node().getBBox();
             return textBBox.width / 2;
         });
     } else {
         graph.simulation.force("collide", null);
+    }
+    if (settings.layoutClustering && getSettings().nodes.communityDetection) {
+        function clustering(alpha) {
+            graph.nodes.forEach((d) => {
+                const cluster = graph.clusters[d.cluster];
+                if (cluster === d) return;
+                let x = d.x - cluster.x;
+                let y = d.y - cluster.y;
+                let l = Math.sqrt(x * x + y * y);
+                const r = d.r + cluster.r;
+                if (l !== r) {
+                    l = ((l - r) / l) * alpha;
+                    d.x -= x *= l;
+                    d.y -= y *= l;
+                    cluster.x += x;
+                    cluster.y += y;
+                }
+            });
+        }
+        graph.simulation.force('cluster', clustering);
     }
 
     // if settings.layoutClustering... TODO: implement node clustering via jLouvain and then set up a setting for this!
@@ -540,7 +552,6 @@ const modifySimulation = () => {
     return true;
 };
 
-
 /**
  * getNodeClass takes one required argument, the d3 selector for a given node. It is the function that provides the class for any given node in the visualization.
  * The return value is a string of classes.
@@ -551,8 +562,10 @@ const getNodeClass = (node) => {
     let classes = "";
     let settings = getSettings().nodes;
     if (window.toggledCommentedElements) {
-        classes = "node"
-        classes += node.has_comments ? ` ${node.category} has-comments` : " disabled";
+        classes = "node";
+        classes += node.has_comments
+            ? ` ${node.category} has-comments`
+            : " disabled";
     } else {
         classes = "node " + node.category;
         classes += node.has_comments ? " has-comments" : "";
@@ -563,10 +576,9 @@ const getNodeClass = (node) => {
 
 const getClusterColor = (node) => {
     if (node.cluster) {
-        console.log(node.cluster)
+        console.log(node.cluster);
     }
-}
-
+};
 
 /**
  * getEdgeClass takes one required argument, the d3 selector for a given edge. It is the function that provides the class for any given edge in the visualization.
@@ -596,7 +608,7 @@ const getEdgeStrokeWidth = (edge) => {
         ? edge.calibrated_weight
         : edge.weight;
     return weightScale(evalWeight) * +settings.edges.edgeMultiplier + "px";
-}
+};
 
 /**
  * getNodeClass takes one required argument, the d3 selector for a given node. It is the function that provides the class for any given node in the visualization.
@@ -628,7 +640,7 @@ const getSize = (node, type = "r") => {
             return 5 * settings.nodes.nodeMultiplier;
         }
     }
-    
+
     if (type === "r") {
         if (settings.nodes.nodeSizeFromCurrent === true) {
             val = yScale(node.currentDegree) * settings.nodes.nodeMultiplier;
@@ -637,9 +649,12 @@ const getSize = (node, type = "r") => {
         }
     } else if (type === "text") {
         if (settings.nodes.nodeSizeFromCurrent === true) {
-            val = (yScale(node.currentDegree) * settings.nodes.nodeMultiplier) * 1.5;
+            val =
+                yScale(node.currentDegree) *
+                settings.nodes.nodeMultiplier *
+                1.5;
         } else {
-            val = (yScale(node.degree) * settings.nodes.nodeMultiplier) * 1.5;
+            val = yScale(node.degree) * settings.nodes.nodeMultiplier * 1.5;
         }
     }
     if (val < 0) {
@@ -649,12 +664,10 @@ const getSize = (node, type = "r") => {
     return val;
 };
 
-
-const lookupNode = (node_id, nodeList=store.nodes) => {
+const lookupNode = (node_id, nodeList = store.nodes) => {
     return nodeList.find((node) => node.node_id === node_id);
-}
-
+};
 
 const hasFixedNodes = () => {
-    return graph.nodes.map(n=>n.fx).every(d=>d === null);
-}
+    return graph.nodes.map((n) => n.fx).every((d) => d === null);
+};

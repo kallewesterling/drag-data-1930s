@@ -4,39 +4,35 @@ const dropNode = (node) => {
     if (node.inGraph) {
         graph.nodes.forEach((o, i) => {
             if (node.node_id === o.node_id) {
-                loading(`dropping node ${o.node_id}...`)
+                loading(`dropping node ${o.node_id}...`);
                 graph.nodes.splice(i, 1);
                 node.inGraph = false;
             }
         });
-    };
-}
-
+    }
+};
 
 const dropEdge = (edge) => {
     graph.edges.forEach((o, i) => {
         if (edge.edge_id === o.edge_id) {
-            loading(`dropping edge ${o.edge_id}...`)
+            loading(`dropping edge ${o.edge_id}...`);
             graph.edges.splice(i, 1);
             edge.inGraph = false;
         }
     });
-}
-
+};
 
 const addNode = (node) => {
     if (!node.inGraph) {
         graph.nodes.push(node);
         node.inGraph = true;
     }
-}
-
+};
 
 const addEdge = (edge) => {
     edge.inGraph = true;
     graph.edges.push(edge);
-}
-
+};
 
 /**
  * filterNodes takes one optional argument, which is a list of nodes to keep in the graph.nodes list. The function serves to run through all of the store.nodes and adding/removing nodes from graph.nodes, depending on filter values.
@@ -44,27 +40,29 @@ const addEdge = (edge) => {
  * @returns {boolean} - true
  */
 const filterNodes = (nodeList = []) => {
-    loading('filterNodes called...');
+    loading("filterNodes called...");
     if (!nodeList.length) {
         let settings = getSettings().nodes;
         store.nodes.forEach((node) => {
             if (node.degree >= settings.minDegree) {
                 addNode(node);
-            /* potential to add more filters here...*/
-            } else if (getSettings().edges.startYear > d3.min(node.sourceRange) && getSettings().edges.endYear < d3.max(node.sourceRange)) {
+                /* potential to add more filters here...*/
+            } else if (
+                getSettings().edges.startYear > d3.min(node.sourceRange) &&
+                getSettings().edges.endYear < d3.max(node.sourceRange)
+            ) {
                 addNode(node);
             } else {
                 dropNode(node);
             }
         });
     } else {
-        store.nodes.forEach(node => {
+        store.nodes.forEach((node) => {
             nodeList.includes(node) ? addNode(node) : dropNode(node);
-        })
+        });
     }
     return true;
 };
-
 
 /**
  * filterEdges takes one optional argument // TODO: Fix this //, and serves to run through all of the store.edges and adding/removing edges from graph.edges, depending on filter values.
@@ -72,8 +70,8 @@ const filterNodes = (nodeList = []) => {
  * @returns {boolean} - true
  */
 const filterEdges = (edgeList = [], change = true) => {
-    loading('filterEdges called...');
-    let list = store.edges.map(n=>n.edge_id);
+    loading("filterEdges called...");
+    let list = store.edges.map((n) => n.edge_id);
     if (!edgeList.length) {
         let settings = getSettings().edges;
         store.edges.forEach((edge) => {
@@ -88,11 +86,14 @@ const filterEdges = (edgeList = [], change = true) => {
                 if (compareWeightVal < settings.minWeight && !edge.inGraph) {
                     // edge is lower than minWeight and not inGraph so leave it out
                     if (change) edge.inGraph = false;
-                    if (!change) list.pop(edge.edge_id)
-                } else if (compareWeightVal < settings.minWeight && edge.inGraph) {
+                    if (!change) list.pop(edge.edge_id);
+                } else if (
+                    compareWeightVal < settings.minWeight &&
+                    edge.inGraph
+                ) {
                     // edge is lower than minWeight and in graph so remove it!
                     if (change) dropEdge(edge);
-                    if (!change) list.pop(edge.edge_id)
+                    if (!change) list.pop(edge.edge_id);
                 }
             } else if (
                 edge.range.start &&
@@ -101,7 +102,7 @@ const filterEdges = (edgeList = [], change = true) => {
             ) {
                 // edge is earlier than startYear and not inGraph so leave it out
                 if (change) edge.inGraph = false;
-                if (!change) list.pop(edge.edge_id)
+                if (!change) list.pop(edge.edge_id);
             } else if (
                 edge.range.start &&
                 +edge.range.start.substring(0, 4) <= settings.startYear &&
@@ -109,7 +110,7 @@ const filterEdges = (edgeList = [], change = true) => {
             ) {
                 // edge is earlier than startYear and inGraph so drop it
                 if (change) dropEdge(edge);
-                if (!change) list.pop(edge.edge_id)
+                if (!change) list.pop(edge.edge_id);
             } else if (
                 edge.range.end &&
                 +edge.range.end.substring(0, 4) >= settings.endYear &&
@@ -117,7 +118,7 @@ const filterEdges = (edgeList = [], change = true) => {
             ) {
                 // range end is higher than endYear and not inGraph so leave it out
                 if (change) edge.inGraph = false;
-                if (!change) list.pop(edge.edge_id)
+                if (!change) list.pop(edge.edge_id);
             } else if (
                 edge.range.end &&
                 +edge.range.end.substring(0, 4) >= settings.endYear &&
@@ -125,20 +126,31 @@ const filterEdges = (edgeList = [], change = true) => {
             ) {
                 // edge has later range than endYear and inGraph so drop it"
                 if (change) dropEdge(edge);
-                if (!change) list.pop(edge.edge_id)
+                if (!change) list.pop(edge.edge_id);
             } else {
-                if (edge.source.inGraph && edge.target.inGraph && !edge.inGraph) {
+                if (
+                    edge.source.inGraph &&
+                    edge.target.inGraph &&
+                    !edge.inGraph
+                ) {
                     // should not be filtered but is not in graph so add it!
-                    if (change) addEdge(edge)
-                } else if (edge.source.inGraph && edge.target.inGraph && edge.inGraph) {
+                    if (change) addEdge(edge);
+                } else if (
+                    edge.source.inGraph &&
+                    edge.target.inGraph &&
+                    edge.inGraph
+                ) {
                     // should not be filtered but is already in graph so no need to do anything
-                } else if ((edge.source.inGraph || edge.target.inGraph) && edge.inGraph) {
+                } else if (
+                    (edge.source.inGraph || edge.target.inGraph) &&
+                    edge.inGraph
+                ) {
                     // in graph but should not be
                     if (change) dropEdge(edge);
-                    if (!change) list.pop(edge.edge_id)
+                    if (!change) list.pop(edge.edge_id);
                 } else {
                     if (change) dropEdge(edge);
-                    if (!change) list.pop(edge.edge_id)
+                    if (!change) list.pop(edge.edge_id);
                 }
             }
         });
@@ -146,20 +158,20 @@ const filterEdges = (edgeList = [], change = true) => {
     } else {
         // console.log('have edgeList');
         // console.log(edgeList);
-        store.edges.forEach(edge => {
+        store.edges.forEach((edge) => {
             if (edgeList.includes(edge)) {
                 if (!edge.inGraph) {
                     // console.log('edge is not in graph, so add it...')
-                    if (change) addEdge(edge)
+                    if (change) addEdge(edge);
                 } else {
                     // console.log('edge is already in graph and has the correct mark...')
                 }
             } else {
                 // console.log(`drop edge ${edge.edge_id}`)
                 if (change) dropEdge(edge);
-                if (!change) list.pop(edge.edge_id)
+                if (!change) list.pop(edge.edge_id);
             }
-        })
+        });
     }
     if (change) return true;
     if (!change) return list;
@@ -172,44 +184,62 @@ const clusters = {};
  * @returns {boolean} - true
  */
 const filter = (nodeList = [], edgeList = [], change = true) => {
-    loading('filter called...')
-    let settings = getSettings()
+    loading("filter called...");
+    let settings = getSettings();
 
     hide("#nodeEdgeInfo");
-    
+
     filterNodes(nodeList);
     filterEdges(edgeList, change);
-    
+
     modifyNodeDegrees();
-    
+
     if (settings.nodes.autoClearNodes) {
         filterNodesWithoutEdge();
     }
-    
+
     updateElements();
 
     if (settings.nodes.communityDetection) {
         // TODO: I am using JLevain here. Are there other community detectors out there? Learn more about algorithms...
         // See invention of Louvain method here https://arxiv.org/pdf/0803.0476.pdf
-        var nodeData = graph.nodes.map((d) => d.node_id);
-        var linkData = graph.edges.map((d) => {return {source: d.source.node_id, target: d.target.node_id, weight: d.weight}; });
+        var allNodes = graph.nodes.map((d) => d.node_id);
+        var allEdges = graph.edges.map((d) => {
+            return {
+                source: d.source.node_id,
+                target: d.target.node_id,
+                weight: d.weight,
+            };
+        });
 
-        var community = jLouvain()
-            .nodes(nodeData)
-            .edges(linkData);
+        var community = jLouvain().nodes(allNodes).edges(allEdges);
 
-        let result  = community();
-        graph.communities = [];
-        graph.nodes.forEach(node => {
-            node.cluster = result[node.node_id];
-            if (!graph.communities.includes(node.cluster))
-                graph.communities.push(node.cluster)
-        })
-        if (graph.communities) graph.communities = graph.communities.length;
+        let result = community();
+
+        graph.nodes.forEach((node) => {
+            node.cluster = result[node.node_id] + 1;
+
+            node.r = getSize(node);
+            const clusterID = node.cluster;
+            if (
+                !graph.clusters[clusterID] ||
+                node.r > graph.clusters[clusterID].r
+            ) {
+                graph.clusters[clusterID] = node;
+            }
+        });
+
+        console.log("clusters", graph.clusters);
+
+        textElements.text((node)=>`${node.cluster}. ${displayOrID(node)}`);
+    } else {
+        graph.nodes.forEach((node) => {
+            node.r = getSize(node);
+        });
     }
-    
+
     if (graph.nodes.length < 300)
-        graph.networkCount = getUniqueNetworks(undefined, 'counter');
+        graph.networkCount = getUniqueNetworks(undefined, "counter");
 
     updateGraphElements();
     updateInfo();
@@ -219,111 +249,119 @@ const filter = (nodeList = [], edgeList = [], change = true) => {
 
 // TODO: Needs docstring
 const findNearestNeighbors = (node) => {
-    return [...new Set([...node.allEdges.filter(n=>n.inGraph).map(e=>e.source), ...node.allEdges.filter(n=>n.inGraph).map(e=>e.target)])].filter(n=>n!==node)
-}
-
+    return [
+        ...new Set([
+            ...node.allEdges.filter((n) => n.inGraph).map((e) => e.source),
+            ...node.allEdges.filter((n) => n.inGraph).map((e) => e.target),
+        ]),
+    ].filter((n) => n !== node);
+};
 
 // TODO: Needs docstring
 const getEgoNetwork = (node, maxIterations = 1000) => {
-    if (typeof(node) === "string") {
+    if (typeof node === "string") {
         node = lookupNode(node);
     }
 
     let nearestNeighbors = findNearestNeighbors(node);
-    let allNeighbors = nearestNeighbors
+    let allNeighbors = nearestNeighbors;
     let stop = false;
     let i = 0;
 
     while (!stop) {
         i += 1;
-        if (i >= maxIterations) { stop = true; }
+        if (i >= maxIterations) {
+            stop = true;
+        }
 
         let lengthBefore = allNeighbors.length;
-        let currentNeighbors = [...allNeighbors]
-        currentNeighbors.forEach(node => {
-            if (!allNeighbors.includes(node))
-            allNeighbors.push(node);
-            allNeighbors = [...new Set([...allNeighbors, ...findNearestNeighbors(node)])]
+        let currentNeighbors = [...allNeighbors];
+        currentNeighbors.forEach((node) => {
+            if (!allNeighbors.includes(node)) allNeighbors.push(node);
+            allNeighbors = [
+                ...new Set([...allNeighbors, ...findNearestNeighbors(node)]),
+            ];
         });
         //console.log(`iteration ${i}`, currentNeighbors)
 
-        if (allNeighbors.length - lengthBefore === 0)
-            stop = true;
+        if (allNeighbors.length - lengthBefore === 0) stop = true;
     }
 
     return allNeighbors;
-}
-
+};
 
 // TODO: Needs docstring
-const getUniqueNetworks = (nodeList, returnVal = 'nodes') => {
-    if (!nodeList)
-        nodeList = graph.nodes;
+const getUniqueNetworks = (nodeList, returnVal = "nodes") => {
+    if (!nodeList) nodeList = graph.nodes;
 
-    let networks = []
+    let networks = [];
 
-    nodeList.forEach(node => {
-        let network = JSON.stringify(getEgoNetwork(node).map(d=>d.node_id).sort());
-        if (!networks.includes(network))
-            networks.push(network);
-    })
-    
+    nodeList.forEach((node) => {
+        let network = JSON.stringify(
+            getEgoNetwork(node)
+                .map((d) => d.node_id)
+                .sort()
+        );
+        if (!networks.includes(network)) networks.push(network);
+    });
+
     networks = networks.map(JSON.parse);
 
-    if (returnVal === 'nodeList')
-        return networks;
+    if (returnVal === "nodeList") return networks;
 
-    if (returnVal === 'counter')
-        return networks.length;
+    if (returnVal === "counter") return networks.length;
 
-    if (returnVal === 'nodes') {
+    if (returnVal === "nodes") {
         networks.forEach((network, i) => {
-            networks[i] = network.map(node => lookupNode(node, graph.nodes))
+            networks[i] = network.map((node) => lookupNode(node, graph.nodes));
         });
-        
+
         return networks;
     }
-}
-
+};
 
 /**
  * egoNetworkOn takes X argument/s... TODO: Finish this.
  * The return value is ...
  */
 const egoNetworkOn = async (node) => {
-    loading('egoNetworkOn called...')
-    d3.select('#egoNetwork').classed('d-none', false);
-    d3.select('#egoNetwork > #node').html(node.id);
+    loading("egoNetworkOn called...");
+    d3.select("#egoNetwork").classed("d-none", false);
+    d3.select("#egoNetwork > #node").html(node.id);
     let egoNetwork = getEgoNetwork(node);
     const result = await filter(egoNetwork);
     //updateElements();
     restartSimulation();
     resetDraw();
-    
+
     window.egoNetwork = true;
-}
+};
 
 /**
  * egoNetworkOff takes X argument/s... TODO: Finish this.
  * The return value is ...
  */
 const egoNetworkOff = async (node) => {
-    loading('egoNetworkOff called...')
-    d3.select('#egoNetwork').classed('d-none', true);
+    loading("egoNetworkOff called...");
+    d3.select("#egoNetwork").classed("d-none", true);
     const result = await filter();
     //updateElements();
     restartSimulation();
     resetDraw();
-    
+
     window.egoNetwork = undefined;
-}
+};
 
 /**
  * toggleEgoNetwork takes X argument/s... TODO: Finish this.
  * The return value is ...
  */
-const toggleEgoNetwork = async (node, toggleSettings = true, force = undefined) => {
-    loading('toggleEgoNetwork called...')
+const toggleEgoNetwork = async (
+    node,
+    toggleSettings = true,
+    force = undefined
+) => {
+    loading("toggleEgoNetwork called...");
     // filter nodes based on a given node
     if (window.egoNetwork || force === "off") {
         console.log("ego network already active - resetting network view...");
@@ -359,33 +397,36 @@ const toggleEgoNetwork = async (node, toggleSettings = true, force = undefined) 
     }
 };
 
-
 /**
  * toggleCommentedElements takes 0 arguments but changes the "view" of the network to show the "comments" behind edges and nodes.
  * The return value is always true.
  * @returns {boolean} - true
  */
 const toggleCommentedElements = (force = undefined) => {
-    if (window.toggledCommentedElements || force === 'off') {
+    if (window.toggledCommentedElements || force === "off") {
         window.toggledCommentedElements = false;
         filter();
-        d3.select('#popup-info').classed('d-none', true);
-        restartSimulation()
-    } else if (!window.toggledCommentedElements || force === 'on') {
+        d3.select("#popup-info").classed("d-none", true);
+        restartSimulation();
+    } else if (!window.toggledCommentedElements || force === "on") {
         window.toggledCommentedElements = true;
-        let nodesWithComments = graph.nodes.filter(n => n.has_comments);
-        let edgesWithComments = [...graph.edges.filter(e => e.has_comments), ...graph.edges.filter(e => e.has_general_comments)]
-        edgesWithComments.forEach(edge => {
+        let nodesWithComments = graph.nodes.filter((n) => n.has_comments);
+        let edgesWithComments = [
+            ...graph.edges.filter((e) => e.has_comments),
+            ...graph.edges.filter((e) => e.has_general_comments),
+        ];
+        edgesWithComments.forEach((edge) => {
             nodesWithComments.push(edge.source);
             nodesWithComments.push(edge.target);
-        })
+        });
         filter(nodesWithComments, edgesWithComments);
-        restartSimulation()
+        restartSimulation();
     }
-    d3.select('#commentedNodes').classed('bg-light', !window.toggledCommentedElements).classed('bg-warning', window.toggledCommentedElements);
+    d3.select("#commentedNodes")
+        .classed("bg-light", !window.toggledCommentedElements)
+        .classed("bg-warning", window.toggledCommentedElements);
     return true;
 };
-
 
 /**
  * filterNodesWithoutEdge takes no arguments but loops through the visualization, looking for unconnected nodes.

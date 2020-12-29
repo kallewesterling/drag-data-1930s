@@ -27,9 +27,9 @@ const getInfoHTML = () => {
     html += `
         <p>Current zoom: ${graph.k}</p>
         <p>Current x, y: ${graph.x}, ${graph.y}</p>`;
-    if (getSettings().nodes.communityDetection && graph.communities)
+    if (getSettings().nodes.communityDetection && Object.keys(graph.clusters).length)
         html += `<hr />
-                <p>Communities: ${graph.communities}</p>`;
+                <p>Communities: ${Object.keys(graph.clusters).length}</p>`;
     return html;
 };
 

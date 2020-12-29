@@ -144,6 +144,7 @@ const getSettings = () => {
     let communityDetection = d3.select("#communityDetection").node().checked;
     let weightFromCurrent = d3.select("#weightFromCurrent").node().checked;
     let layoutCenter = d3.select("#layoutCenter").node().checked;
+    let layoutClustering = d3.select("#layoutClustering").node().checked;
     let layoutForceX = d3.select("#layoutForceX").node().checked;
     let layoutForceY = d3.select("#layoutForceY").node().checked;
     let layoutCollide = d3.select("#layoutCollide").node().checked;
@@ -180,6 +181,7 @@ const getSettings = () => {
         },
         force: {
             layoutCenter: layoutCenter,
+            layoutClustering: layoutClustering,
             layoutForceX: layoutForceX,
             layoutForceY: layoutForceY,
             layoutCharge: layoutCharge,
@@ -265,6 +267,7 @@ const setupSettings = () => {
     d3.select("#collide").node().value = settings.force.collide;
     d3.select("#linkStrength").node().value = settings.force.linkStrength;
     d3.select("#layoutCenter").node().checked = settings.force.layoutCenter;
+    d3.select("#layoutClustering").node().checked = settings.force.layoutClustering;
     d3.select("#layoutForceX").node().checked = settings.force.layoutForceX;
     d3.select("#layoutForceY").node().checked = settings.force.layoutForceY;
     d3.select("#layoutCharge").node().checked = settings.force.layoutCharge;
@@ -416,6 +419,9 @@ const setupSettingInteractivity = () => {
     });
     d3.select("#layoutCenter").on("change", () => {
         changeSetting("#layoutCenter", "force", false);
+    });
+    d3.select("#layoutClustering").on("change", () => {
+        changeSetting("#layoutClustering", "force", false);
     });
     d3.select("#layoutForceX").on("change", () => {
         changeSetting("#layoutForceX", "force", false);

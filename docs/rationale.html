@@ -28,7 +28,7 @@
         <div class="d-flex justify-content-center">
             <div class="col-8 mt-5">
                 <h1>Rationale</h1>
-                
+
                 <h2>Performers with comments</h2>
                 <table class="table mt-5" id="performers-with-comments"></table>
             </div>
@@ -36,10 +36,14 @@
 
         <!-- We share setup with the visualization -->
         <script src="app/setup.js"></script>
-        
+
         <!-- Build a table -->
         <script>
-            const tabulate = (data, columns, table_id = 'performers-with-comments') => {
+            const tabulate = (
+                data,
+                columns,
+                table_id = "performers-with-comments"
+            ) => {
                 var table = d3.select(`#${table_id}`);
                 var thead = table.append("thead");
                 var tbody = table.append("tbody");
@@ -73,7 +77,7 @@
                     .enter()
                     .append("td")
                     .text(function (d) {
-                        if (d.column === 'comments') {
+                        if (d.column === "comments") {
                             return d.value[0].comment;
                         } else {
                             return d.value;
@@ -112,7 +116,7 @@
                         comments: n.comments,
                     });
                 });
-                tabulate(filtered_data, ['name', 'comments', 'outdegree']);
+                tabulate(filtered_data, ["name", "comments", "outdegree"]);
             };
         </script>
     </body>
