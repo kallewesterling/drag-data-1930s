@@ -27,10 +27,22 @@
     <body>
         <div class="d-flex justify-content-center">
             <div class="col-8 mt-5">
-                <h1>Rationale</h1>
+                <div class="row">
+                    <h1>Rationale</h1>
+                </div>
 
-                <h2>Performers with comments</h2>
-                <table class="table mt-5" id="performers-with-comments"></table>
+                <div class="row">
+                    <div class="col-6">
+                        <h2>All performers by degree <select class="ml-4 form-select-sm" id="minDegree"></select></h2>
+                        <table class="table mt-5" id="performers-by-degree"></table>
+                    </div>
+
+                    <div class="col-6">
+                        <h2>Performers with comments</h2>
+                        <table class="table mt-5" id="performers-with-comments"></table>
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -42,12 +54,12 @@
             const tabulate = (
                 data,
                 columns,
-                table_id = "performers-with-comments"
+                table_id
             ) => {
                 var table = d3.select(`#${table_id}`);
                 var thead = table.append("thead");
                 var tbody = table.append("tbody");
-
+                console.log(table)
                 // append the header row
                 thead
                     .append("tr")
@@ -96,6 +108,20 @@
                 doThingsWithData();
             });
 
+
+            const loadSettings = (item) => {
+                    let rawSetting = localStorage.getItem(item);
+                    if (rawSetting) {
+                        if (rawSetting.includes("{")) {
+                            return JSON.parse(rawSetting);
+                        } else {
+                            return rawSetting;
+                        }
+                    } else {
+                        return undefined;
+                    }
+                };
+
             const doThingsWithData = () => {
                 let table = d3.select("table");
                 let tbody = table.append("tbody");
@@ -103,6 +129,17 @@
                 filtered_nodes = nodes.filter(
                     (d) => d["category"] === "performer"
                 );
+                filtered_performers = []
+                filtered_nodes.forEach((n)=> {
+                    filtered_performers.push({
+                        'name': n.id,
+                        'outdegree': n.outdegree,
+                        'indegree': n.indegree,
+                        'degree': n.degree
+                    })
+                })
+                filtered_performers.sort((a, b) => (a.degree > b.degree) ? 1 : -1).reverse()
+
                 filtered_nodes = filtered_nodes.filter(
                     (d) => d.comments.length
                 );
@@ -116,7 +153,21 @@
                         comments: n.comments,
                     });
                 });
-                tabulate(filtered_data, ["name", "comments", "outdegree"]);
+                tabulate(filtered_data, ["name", "comments", "outdegree"], "performers-with-comments");
+
+                var options = [];
+                new Set(filtered_performers.map(d=>d.degree)).forEach(d=>{
+                    if (d==loadSettings('settings').nodes.minDegree) {
+                        options.push(`<option value="${d}" selected>${d}</option>`);
+                    } else {
+                        options.push(`<option value="${d}">${d}</option>`);
+                    }
+                });
+                d3.select("#minDegree").node().innerHTML = options;
+
+                filtered_performers = filtered_performers.filter(d=>d.degree >= +d3.select('#minDegree').node().value)
+
+                tabulate(filtered_performers, ["name", "outdegree", "indegree", "degree"], 'performers-by-degree');
             };
         </script>
     </body>
