@@ -19,6 +19,10 @@ const loadNetwork = () => {
         // set up store.nodes
         data.nodes.forEach((node) => {
             let prohibitedID = {match: false}
+            if (!node.node_id) {
+                console.error('node_id required!');
+                return false;
+            }
             if (node.node_id.charAt(0).match(/[_—–—.]/)) prohibitedID = Object.assign({match: true, node_id: node.node_id}, node.node_id.charAt(0).match(/[_—–—.]/));
             if (prohibitedID.match) console.log(prohibitedID)
             
@@ -45,21 +49,37 @@ const loadNetwork = () => {
 
         // set up store.edges
         data.links.forEach((edge) => {
-            store.edges.push(
-                Object.assign(
+            let newEdge = undefined
+            if (BIPARTITE) {
+                newEdge = Object.assign(
                     {
-                        has_comments: edge.comments.length > 0 ? true : false,
-                        has_general_comments:
-                        edge.general_comments.length > 0 ? true : false,
+                        has_revue_comments: edge.revue_comments.length > 0 ? true : false,
+                        has_venue_comments: edge.venue_comments.length > 0 ? true : false,
                         inGraph: false,
                         dates: [],
                         range: { start: undefined, end: undefined },
                     },
                     edge
-                )
-            );
+                    );
+            } else {
+                newEdge = Object.assign(
+                {
+                    has_comments: edge.comments.length > 0 ? true : false,
+                    has_general_comments:
+                    edge.general_comments.length > 0 ? true : false,
+                    inGraph: false,
+                    dates: [],
+                    range: { start: undefined, end: undefined },
+                },
+                edge
+                );
+            }
+            store.edges.push(newEdge);
         });
         store.edges.forEach((e) => {
+            if (BIPARTITE) {
+                e.found = e.sources;
+            }
             e.found = e.found.filter((found) =>
                 found != null && found != "" && found != "" ? true : false
             );
