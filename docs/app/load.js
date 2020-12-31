@@ -6,7 +6,9 @@
  */
 const loadNetwork = () => {
     loading("loadNetwork called...");
-    d3.json(store.datafile.filename).then((data) => {
+    let settings = getSettings();
+    
+    d3.json(settings.datafile).then((data) => {
         // for debug purposes (TODO can be removed)
         store.raw = data;
 
@@ -50,7 +52,7 @@ const loadNetwork = () => {
         // set up store.edges
         data.links.forEach((edge) => {
             let newEdge = undefined
-            if (store.datafile.bipartite) {
+            if (settings.datafile == 'drag-data-bipartite.json') {
                 newEdge = Object.assign(
                     {
                         has_revue_comments: edge.revue_comments.length > 0 ? true : false,
@@ -77,7 +79,7 @@ const loadNetwork = () => {
             store.edges.push(newEdge);
         });
         store.edges.forEach((e) => {
-            if (store.datafile.bipartite) {
+            if (settings.datafile == 'drag-data-bipartite.json') {
                 e.found = e.sources;
             }
             e.found = e.found.filter((found) =>
@@ -133,7 +135,7 @@ const loadNetwork = () => {
                 let endYear = edge.range.end
                     ? +edge.range.end.slice(0, 4)
                     : undefined;
-                // console.log(startYear, endYear)
+
                 node.sourceRange =
                     startYear && endYear ? range(startYear, endYear, 1) : [];
             });

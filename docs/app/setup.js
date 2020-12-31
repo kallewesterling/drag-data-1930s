@@ -33,6 +33,7 @@ const _autoSettings = {
     edgeMinStroke: 1,
     edgeMaxStroke: 7,
     debugMessages: false,
+    datafile: 'drag-data.json'
 };
 
 const keyMapping = {

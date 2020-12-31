@@ -137,6 +137,7 @@ const getSettings = () => {
     let nodeMultiplier = +d3.select("#nodeMultiplier").node().value;
     let edgeMultiplier = +d3.select("#edgeMultiplier").node().value;
     let minWeight = +d3.select("#minWeight").node().value;
+    let datafile = d3.select("#datafile").node().value;
     let startYear = +d3.select("#startYear").node().value;
     let endYear = +d3.select("#endYear").node().value;
     let autoClearNodes = d3.select("#autoClearNodes").node().checked;
@@ -196,6 +197,7 @@ const getSettings = () => {
         edgeMinStroke: _autoSettings.edgeMinStroke,
         edgeMaxStroke: _autoSettings.edgeMaxStroke,
         debugMessages: debugMessages,
+        datafile: datafile
     };
 };
 
@@ -275,6 +277,7 @@ const setupSettings = () => {
 
     d3.select("#stickyNodes").node().checked = settings.nodes.stickyNodes;
     d3.select("#debugMessages").node().checked = settings.debugMessages;
+    d3.select("#datafile").node().value = settings.datafile;
 
     return true;
 };
@@ -371,6 +374,9 @@ const setupSettingInteractivity = () => {
     });
     d3.select("#endYear").on("change", () => {
         changeSetting("#endYear", "force", true, "dropdown");
+    });
+    d3.select("#datafile").on("change", () => {
+        changeSetting("#datafile", "force", true, "dropdown", [], [location.reload()]);
     });
 
     // slider interactivity
