@@ -72,8 +72,8 @@ const keyMapping = {
 
 const store = {
     datafile: {
-        filename: "drag-data-bipartite.json",
-        bipartite: true
+        filename: "drag-data.json",
+        bipartite: false
     },
     raw: {},
     nodes: [],
