@@ -100,7 +100,7 @@
             };
 
             var nodes = [];
-            d3.json(DATAFILE).then((data) => {
+            d3.json(store.datafile.filename).then((data) => {
                 data.nodes.forEach((n) => {
                     nodes.push(n);
                 });

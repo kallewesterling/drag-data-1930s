@@ -70,11 +70,11 @@ const keyMapping = {
     }
 };
 
-let DATAFILE = "drag-data-bipartite.json";
-let BIPARTITE = true;
-let AUTO_ZOOM = 1.25; // TODO: #10 This will not work
-
 const store = {
+    datafile: {
+        filename: "drag-data-bipartite.json",
+        bipartite: true
+    },
     raw: {},
     nodes: [],
     edges: [],

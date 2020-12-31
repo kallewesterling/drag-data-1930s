@@ -6,7 +6,7 @@
  */
 const loadNetwork = () => {
     loading("loadNetwork called...");
-    d3.json(DATAFILE).then((data) => {
+    d3.json(store.datafile.filename).then((data) => {
         // for debug purposes (TODO can be removed)
         store.raw = data;
 
@@ -50,7 +50,7 @@ const loadNetwork = () => {
         // set up store.edges
         data.links.forEach((edge) => {
             let newEdge = undefined
-            if (BIPARTITE) {
+            if (store.datafile.bipartite) {
                 newEdge = Object.assign(
                     {
                         has_revue_comments: edge.revue_comments.length > 0 ? true : false,
@@ -77,7 +77,7 @@ const loadNetwork = () => {
             store.edges.push(newEdge);
         });
         store.edges.forEach((e) => {
-            if (BIPARTITE) {
+            if (store.datafile.bipartite) {
                 e.found = e.sources;
             }
             e.found = e.found.filter((found) =>
