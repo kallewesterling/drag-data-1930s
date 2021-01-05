@@ -98,7 +98,7 @@ const toggleColorNetworks = () => {
         window.coloredNetworks = false;
         resetDraw();
     }
-    d3.select('#colorNetworks').classed('bg-light', !window.coloredNetworks).classed('bg-warning', window.coloredNetworks);
+    d3.select('#colorNetworks').classed('btn-outline-secondary', !window.coloredNetworks).classed('btn-warning', window.coloredNetworks);
 }
 
 /**

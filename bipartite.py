@@ -167,10 +167,12 @@ def get_id(text):
 
 comments = {}
 
+multipartite_graph = nx.DiGraph()
 bipartite_graph = nx.DiGraph()
 
 with alive_bar(len(df)) as bar:
     for row in df.fillna('').itertuples():
+        bar()
         data = parse_row(row)
         data = fix_data(data)
         data = filter_data(data)
@@ -181,7 +183,9 @@ with alive_bar(len(df)) as bar:
         if not dataline in collected:
             collected.append(dump_data)
         else:
-            print("Row looks like duplicate:", json.loads(dataline))
+            if ERROR_LEVEL > 1: print("Row looks like duplicate:", json.loads(dataline))
+
+        # MULTI-PARTITE GRAPH
 
 
         # BIPARTITE GRAPH
@@ -234,7 +238,7 @@ with alive_bar(len(df)) as bar:
 # Double check weight v. number of sources
 for edge in bipartite_graph.edges:
     d = bipartite_graph.get_edge_data(*edge)
-    print(d.get('edge_id'))
+    #print(d.get('edge_id'))
     num_sources = len(d.get('sources', []))
     weight = d.get('weight')
     if not num_sources == weight:

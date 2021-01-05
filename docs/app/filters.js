@@ -423,8 +423,8 @@ const toggleCommentedElements = (force = undefined) => {
         restartSimulation();
     }
     d3.select("#commentedNodes")
-        .classed("bg-light", !window.toggledCommentedElements)
-        .classed("bg-warning", window.toggledCommentedElements);
+        .classed("btn-outline-secondary", !window.toggledCommentedElements)
+        .classed("btn-warning", window.toggledCommentedElements);
     return true;
 };
 

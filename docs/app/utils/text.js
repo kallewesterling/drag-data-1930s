@@ -13,14 +13,14 @@ const getInfoHTML = () => {
     if (graph.nodes.length < 300) {
         html += `
             <p>Unconnected nodes: ${hasUnconnectedNodes()? getUnconnectedNodes().length: 0}</p>
-            <p id="colorNetworks" class="btn-sm ${window.coloredNetworks ? 'bg-warning' : 'bg-light'}">Network count: ${graph.networkCount}</p>
-            <p id="commentedNodes" class="btn-sm ${window.toggledCommentedElements ? 'bg-warning' : 'bg-light'}">Nodes with comments: ${graph.nodes.filter(n=>n.has_comments).length}</p>
+            <p id="colorNetworks" class="btn btn-sm ${window.coloredNetworks ? 'btn-warning' : 'btn-outline-secondary'}">Network count: ${graph.networkCount}</p>
+            <p id="commentedNodes" class="btn btn-sm ${window.toggledCommentedElements ? 'btn-warning' : 'btn-outline-secondary'}">Nodes with comments: ${graph.nodes.filter(n=>n.has_comments).length}</p>
             <hr />`
     } else {
         html += `
         <p>Unconnected nodes: ${hasUnconnectedNodes()? getUnconnectedNodes().length: 0}</p>
-        <p id="colorNetworks" class="btn-sm ${window.coloredNetworks ? 'bg-warning' : 'bg-light'}">Count networks${graph.networkCount ? ' ('+graph.networkCount+ ')' : ''}</p>
-        <p id="commentedNodes" class="btn-sm ${window.toggledCommentedElements ? 'bg-warning' : 'bg-light'}">Show nodes with comments</p>
+        <p id="colorNetworks" class="btn btn-sm ${window.coloredNetworks ? 'btn-warning' : 'btn-outline-secondary'}">Count networks${graph.networkCount ? ' ('+graph.networkCount+ ')' : ''}</p>
+        <p id="commentedNodes" class="btn btn-sm ${window.toggledCommentedElements ? 'btn-warning' : 'btn-outline-secondary'}">Show nodes with comments</p>
         `
         
     }
