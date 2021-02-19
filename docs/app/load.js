@@ -7,8 +7,9 @@
 const loadNetwork = () => {
     loading("loadNetwork called...");
     let settings = getSettings();
+    console.log(settings);
     
-    d3.json(settings.datafile).then((data) => {
+    d3.json(settings.datafile.filename).then((data) => {
         // for debug purposes (TODO can be removed)
         store.raw = data;
 

@@ -164,6 +164,10 @@ const getSettings = () => {
         updateLabel(label)
     );
 
+    if (!datafile) {
+        datafile = _autoSettings.datafile.filename;
+    }
+
     return {
         nodes: {
             minDegree: minDegree,
@@ -197,7 +201,10 @@ const getSettings = () => {
         edgeMinStroke: _autoSettings.edgeMinStroke,
         edgeMaxStroke: _autoSettings.edgeMaxStroke,
         debugMessages: debugMessages,
-        datafile: datafile
+        datafile: {
+            'filename': datafile,
+            'bipartite': false
+        }
     };
 };
 

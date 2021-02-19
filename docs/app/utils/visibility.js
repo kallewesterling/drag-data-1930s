@@ -113,3 +113,38 @@ const updateInfo = () => {
     d3.select('#commentedNodes').on("click", toggleCommentedElements);
     return true;
 };
+
+let original = {
+    fill: {},
+    classList: {},
+    r: {}
+};
+
+const showCities = () => {
+    graph.nodes.forEach(n => {
+        let node = d3.select(`#${n.node_id}`)
+        original.fill[n.node_id] = node.style('fill');
+        original.classList[n.node_id] = node.attr('class');
+        original.r[n.node_id] = +node.attr('r');
+
+        node.transition()
+            .attr('class', null)
+            .transition().duration(500)
+            .style('fill', n => {
+                if (n.category === 'city') {
+                    return 'red';
+                } else {
+                    return 'gray';
+                }
+            })
+            .transition().delay(1000).duration(500)
+            .attr('r', n => {
+                if (n.category === 'city') {
+                    return original.r[n.node_id] * 3;
+                } else {
+                    return 1;
+                }
+            });
+    });
+    
+}
