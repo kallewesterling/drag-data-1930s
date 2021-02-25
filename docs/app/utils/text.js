@@ -8,11 +8,11 @@ const minify = (s) => {
 }
   
 /**
- * getInfoHTML takes no arguments but generates the HTML for the viz information.
+ * getCurrentGraphInfo takes no arguments but generates the HTML for the viz information.
  * The return value is always the HTML itself.
  * @return {string} html - raw HTML
  */
-const getInfoHTML = () => {
+const getCurrentGraphInfo = () => {
     let _return = {
         'numNodes': {'class': [], 'content': `<strong>${graph.nodes.length}</strong><span class="text-muted">/${store.nodes.length}</span>`},
         'numEdges': {'class': [], 'content': `<strong>${graph.edges.length}</strong><span class="text-muted">/${store.edges.length}</span>`},

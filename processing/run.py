@@ -489,5 +489,5 @@ for node, attrs in G_multi.nodes.items():
     G_multi.nodes[node]['1000x-eigenvector-centrality'] = "{:.15f}".format(attrs['centrality-eigenvector']*1000).rstrip('0')
     G_multi.nodes[node]['1000x-degree-centrality'] = "{:.15f}".format(attrs['centrality-degree']*1000).rstrip('0')
 
-with open('./docs/data/drag-data-new.json', 'w+') as f:
+with open('./docs/data/multipartite-data.json', 'w+') as f:
     json.dump(nx.node_link_data(G_multi), f)

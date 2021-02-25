@@ -34,7 +34,7 @@ const _autoSettings = {
     edgeMaxStroke: 7,
     debugMessages: false,
     datafile: {
-        filename: 'data/drag-data-new.json',
+        filename: 'data/multipartite-data.json',
         bipartite: false
     }
 };

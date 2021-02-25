@@ -124,8 +124,8 @@ const updateInfo = () => {
     d3.select('#colorNetworks').on("click", toggleColorNetworks);
     d3.select('#commentedNodes').on("click", toggleCommentedElements);
 
-    // getInfoHTML()
-    let updateValues = getInfoHTML()
+    // getCurrentGraphInfo()
+    let updateValues = getCurrentGraphInfo()
     document.querySelector('#numNodes').innerHTML = '<i class="mr-1 small bi bi-record-fill"></i>' + updateValues.numNodes.content;
     document.querySelector('#numEdges').innerHTML = '<i class="mr-1 small bi bi-share-fill"></i>' + updateValues.numEdges.content;
     document.querySelector('#unconnectedNodes').innerHTML = '<i class="mr-1 bi bi-node-minus"></i>' + updateValues.unconnectedNodes.content;
@@ -135,11 +135,9 @@ const updateInfo = () => {
     document.querySelector('#commentedNodes').innerHTML = '' + updateValues.commentedNodes.content;
     
     updateValues.colorNetworks.class.forEach(c => {
-        console.log(c);
         document.querySelector('#colorNetworks').classList.add(c);
     });
     updateValues.commentedNodes.class.forEach(c => {
-        console.log(c);
         document.querySelector('#commentedNodes').classList.add(c);
     });
 
