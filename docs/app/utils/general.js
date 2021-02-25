@@ -68,8 +68,8 @@ const restartSimulation = () => {
         // console.log(node.vx); // TODO: reset stickyness here too...?
     });
     graph.simulation.stop();
-    graph.simulation.alpha(1);
-    graph.simulation.restart();
+    // graph.simulation;
+    graph.simulation.restart().alpha(0.75);
     return true;
 };
 
@@ -179,7 +179,7 @@ const deselectEdges = (excludeEdge = undefined) => {
 };
 
 /**
- * isSourceOrTarget takes one required argument, a node (which can either be a d3 node selection or a string denoting a `node_id`), and one optional argument, which specifies // TODO
+ * isSourceOrTarget takes one required argument, a node (which can either be a d3 node selection or a string denoting a `node_id`), and one optional argument, which specifies // TODO: Needs docstring
  * The return value is a list of all the related edges, depending on the parameters.
  * @param {Object|string} node - A d3 selection for a node, or a string denoting a node's identification name
  * @param {boolean} [edgeList] - A list with all the edges that you want to check against.
@@ -593,7 +593,7 @@ const getEdgeStrokeWidth = (edge) => {
 
 /**
  * getNodeClass takes one required argument, the d3 selector for a given node. It is the function that provides the class for any given node in the visualization.
- * The return value is ... // TODO
+ * The return value is ... // TODO: Needs docstring
  * @param {Object} node - d3 selector for a given node.
  * @returns {string} - The string of classes to return to the node.
  */

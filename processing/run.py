@@ -149,7 +149,7 @@ class Row(PropertyMap):
             data['revue_name'] = data['_revue_name']
             data['_revue_name'] = ''
         
-        ##### TODO: add filtering for names like —/-/–/"n/a"/etc
+        ##### Filter names
         data['performer'] = data['performer'].replace(' & ', ' and ').replace('/', ' aka ').strip()
         
         for char in ['-', '–', '—', '?', '[', ']']:

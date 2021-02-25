@@ -1,7 +1,7 @@
 "use strict";
 
 /**
- * nodeScale takes X argument/s... TODO: Finish this.
+ * nodeScale takes X argument/s... TODO: Needs docstring
  * The return value is ...
  */
 const nodeScale = (settings) => {
@@ -19,7 +19,7 @@ const nodeScale = (settings) => {
 };
 
 /**
- * edgeScale takes X argument/s... TODO: Finish this.
+ * edgeScale takes X argument/s... TODO: Needs docstring
  * The return value is ...
  */
 const edgeScale = (settings) => {

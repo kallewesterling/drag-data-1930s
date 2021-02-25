@@ -312,7 +312,6 @@ const setupSettings = () => {
 };
 
 const loadStoreRanges = () => {
-    console.info('loadStoreRanges called');
     store.ranges.nodeDegree = d3.extent(store.nodes, (d) => d.degree);
     store.ranges.edgeWidth = d3.extent(store.edges, (d) => d.weight);
 
@@ -456,9 +455,11 @@ const setupSettingInteractivity = () => {
 
     d3.select("#nodeMultiplier").on("input", () => {
         changeSetting("#nodeMultiplier", "force", false, "slider", [], [], false);
+        graph.simulation.restart().alpha(0.05) // just a nudge
     });
     d3.select("#edgeMultiplier").on("input", () => {
         changeSetting("#edgeMultiplier", "force", false, "slider", [], [], false);
+        graph.simulation.restart().alpha(0.05) // just a nudge
     });
     d3.select("#collide").on("input", () => {
         changeSetting("#collide", "force", false, "slider");
@@ -520,21 +521,16 @@ const setupSettingInteractivity = () => {
     d3.select("#switchMode").on("click", function (d) {
         toggleTheme();
     });
+    d3.select("#nudgeNodes").on("click", function (d) {
+        graph.simulation.restart().alpha(0.15);
+    });
     d3.select("#resetLocalStorage").on("click", function (d) {
         resetLocalStorage();
     });
     d3.select("#clearUnconnected").on("click", function (d) {
         filterNodesWithoutEdge();
     });
-    d3.select("#showAllPotentialNodes").on("click", function (d) {
-        d3.select("#startYear").node().value = store.ranges.years.min;
-        d3.select("#endYear").node().value = store.ranges.years.max;
-        d3.select("#minWeight").node().value = d3
-            .select("#minWeight")
-            .node().min;
-        changeSetting({ selector: "#autoClearNodes", setTo: false });
-    });
-
+    
     // set up settings containers
     d3.select("#settingsToggle").on("click", () => {
         toggle("#settingsContainer");
@@ -714,6 +710,7 @@ const setupMiscInteractivity = () => {
         } else {
             d3.event.target.classList.add("toggled");
         }
+        console.log(d3.event.target);
         toggle("#" + d3.event.target.dataset.toggle);
     });
 

@@ -300,7 +300,7 @@ const getUniqueNetworks = (nodeList, returnVal = "nodes") => {
 };
 
 /**
- * egoNetworkOn takes X argument/s... TODO: Finish this.
+ * egoNetworkOn takes X argument/s... TODO: Needs docstring
  * The return value is ...
  */
 const egoNetworkOn = async (node) => {
@@ -317,7 +317,7 @@ const egoNetworkOn = async (node) => {
 };
 
 /**
- * egoNetworkOff takes X argument/s... TODO: Finish this.
+ * egoNetworkOff takes X argument/s... TODO: Needs docstring
  * The return value is ...
  */
 const egoNetworkOff = async (node) => {
@@ -332,7 +332,7 @@ const egoNetworkOff = async (node) => {
 };
 
 /**
- * toggleEgoNetwork takes X argument/s... TODO: Finish this.
+ * toggleEgoNetwork takes X argument/s... TODO: Needs docstring
  * The return value is ...
  */
 const toggleEgoNetwork = async (

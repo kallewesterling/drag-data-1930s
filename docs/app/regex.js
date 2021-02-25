@@ -1,7 +1,7 @@
 "use strict";
 
 /**
- * fixMonth takes X argument/s... TODO: Finish this.
+ * fixMonth takes X argument/s... TODO: Needs docstring
  * The return value is ...
  */
 const fixMonth = (month_string) => {

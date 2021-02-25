@@ -13,27 +13,37 @@ const minify = (s) => {
  * @return {string} html - raw HTML
  */
 const getInfoHTML = () => {
-    let html = `
-        <span id="numNodes" class="small mr-2" data-bs-toggle="popover"><i class="mr-1 small bi bi-record-fill"></i><strong>${graph.nodes.length}</strong><span class="text-muted">/${store.nodes.length}</span></span>
-        <span id="numEdges" class="small mr-2" data-bs-toggle="popover"><i class="mr-1 small bi bi-share-fill"></i><strong>${graph.edges.length}</strong><span class="text-muted">/${store.edges.length}</span></span>
-        <span id="unconnectedNodes" class="small mr-2" data-bs-toggle="popover"><i class="mr-1 bi bi-node-minus"></i>${hasUnconnectedNodes()? getUnconnectedNodes().length: 0}</span>
-        `
-    if (graph.nodes.length < 300) {
-        html += `
-            <span id="colorNetworks" data-bs-toggle="popover" class="mr-2 m-0 badge ${window.coloredNetworks ? 'bg-warning' : 'bg-dark'}">${graph.networkCount} networks</span>
-            <span id="commentedNodes" data-bs-toggle="popover" class="mr-2 m-0 badge ${window.toggledCommentedElements ? 'bg-warning' : 'bg-dark'}">${graph.nodes.filter(n=>n.has_comments).length} commented <i class="bi bi-record-fill"></i></span>
-            `
-    } else {
-        html += `
-        <span id="colorNetworks" data-bs-toggle="popover" class="mr-2 badge ${window.coloredNetworks ? 'bg-warning' : 'bg-dark'}">${graph.networkCount ? graph.networkCount : ''} networks</span>
-        <span id="commentedNodes" data-bs-toggle="popover" class="mr-2 badge ${window.toggledCommentedElements ? 'bg-warning' : 'bg-dark'}">Show nodes with comments</span>
-        `
+    let _return = {
+        'numNodes': {'class': [], 'content': `<strong>${graph.nodes.length}</strong><span class="text-muted">/${store.nodes.length}</span>`},
+        'numEdges': {'class': [], 'content': `<strong>${graph.edges.length}</strong><span class="text-muted">/${store.edges.length}</span>`},
+        'unconnectedNodes': {'class': [], 'content': hasUnconnectedNodes()? getUnconnectedNodes().length: 0},
+        'currentZoom': {'class': [], 'content': (graph.k*100).toFixed(0) + '%'},
+        'colorNetworks': {
+            'class': [window.coloredNetworks ? 'bg-warning' : 'bg-dark'],
+            'content': (graph.networkCount ? graph.networkCount : '') + ' networks'
+        },
+        'commentedNodes': {
+            'class': [window.toggledCommentedElements ? 'bg-warning' : 'bg-dark'],
+            'content': 'Show nodes with comments'
+        },
+        'numCommunities': {'class': [], 'content': ''}
     }
-    html += `
-        <span id="currentZoom" class="small mr-2" data-bs-toggle="popover"><i class="mr-1 bi bi-search"></i>${(graph.k*100).toFixed(0)}%</span>`;
+    if (graph.nodes.length < 300) {
+        _return[''] = {
+            'class': [window.coloredNetworks ? 'bg-warning' : 'bg-dark'],
+            'content': graph.networkCount + ' networks',
+        }
+        _return['commentedNodes'] = {
+            'class': [window.toggledCommentedElements ? 'bg-warning' : 'bg-dark'],
+            'content': graph.nodes.filter(n=>n.has_comments).length + ' commented'
+        }
+    }
     if (Object.keys(graph.clusters).length)
-        html += `<span id="numCommunities" class="small mr-2" data-bs-toggle="popover"><i class="mr-1 bi bi-heart-fill"></i>${Object.keys(graph.clusters).length}</span>`;
-    return html;
+        _return['numCommunities'] = {'content': Object.keys(graph.clusters).length}
+        // html += `<span id="numCommunities" class="small mr-2" data-bs-toggle="popover"><i class="mr-1 bi bi-heart-fill"></i>${Object.keys(graph.clusters).length}</span>`;
+    
+
+    return _return;
 };
 
 /**
@@ -93,8 +103,7 @@ const generateNodeInfoHTML = (node) => {
  */
 const generateEdgeInfoHTML = (edge) => {
     let settings = getSettings();
-    console.log(edge);
-
+    
     let html = `
         <li class="list-group-item"><strong>ID</strong> ${edge.source.display} - ${edge.target.display}</li>
         <li class="list-group-item">

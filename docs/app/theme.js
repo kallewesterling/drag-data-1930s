@@ -1,7 +1,7 @@
 "use strict";
 
 /**
- * setTheme takes X argument/s... TODO: Finish this.
+ * setTheme takes X argument/s... TODO: Needs docstring
  * The return value is ...
  */
 // function to set a given theme/color-scheme
@@ -11,7 +11,7 @@ function setTheme(themeName) {
 }
 
 /**
- * toggleTheme takes X argument/s... TODO: Finish this.
+ * toggleTheme takes X argument/s... TODO: Needs docstring
  * The return value is ...
  */
 // function to toggle between light and dark theme

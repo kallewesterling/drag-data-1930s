@@ -121,37 +121,28 @@ const toggleColorNetworks = () => {
  */
 const updateInfo = () => {
     show("#info");
-    d3.select("#info").html(getInfoHTML());
     d3.select('#colorNetworks').on("click", toggleColorNetworks);
     d3.select('#commentedNodes').on("click", toggleCommentedElements);
-    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
-    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
-        let options = {'placement': 'bottom', 'trigger': 'hover'}
 
-        if (popoverTriggerEl.id == "numNodes") {
-            options['content'] = 'Number of nodes'; // TODO: write these...
-        } else if (popoverTriggerEl.id === "numEdges") {
-            options['content'] = 'Number of edges'; // TODO: write these...
-        } else if (popoverTriggerEl.id === "unconnectedNodes") {
-            options['content'] = 'Number of unconnected nodes'; // TODO: write these...
-        } else if (popoverTriggerEl.id === "currentZoom") {
-            options['content'] = 'Current zoom'; // TODO: write these...
-        } else if (popoverTriggerEl.id === "numCommunities") {
-            options['content'] = 'Current number of communities'; // TODO: write these...
-        } else if (popoverTriggerEl.id === "colorNetworks") {
-            options['content'] = 'Number of networks (activated)'; // TODO: write these...
-        } else if (popoverTriggerEl.id === "commentedNodes") {
-            options['content'] = 'Number of commented nodes'; // TODO: write these...
-        } else {
-            console.error('Not catching the id', popoverTriggerEl); // TODO: write these...
-        }
-        if (bootstrap.Popover.getInstance(popoverTriggerEl)) {
-            console.log('already exists'); // TODO: write these...
-            return false;
-        } else {
-            return new bootstrap.Popover(popoverTriggerEl, options);
-        }
-    })
+    // getInfoHTML()
+    let updateValues = getInfoHTML()
+    document.querySelector('#numNodes').innerHTML = '<i class="mr-1 small bi bi-record-fill"></i>' + updateValues.numNodes.content;
+    document.querySelector('#numEdges').innerHTML = '<i class="mr-1 small bi bi-share-fill"></i>' + updateValues.numEdges.content;
+    document.querySelector('#unconnectedNodes').innerHTML = '<i class="mr-1 bi bi-node-minus"></i>' + updateValues.unconnectedNodes.content;
+    document.querySelector('#currentZoom').innerHTML = '<i class="mr-1 bi bi-search"></i>' + updateValues.currentZoom.content;
+    document.querySelector('#numCommunities').innerHTML = '<i class="mr-1 bi bi-heart-fill"></i>' + updateValues.numCommunities.content;
+    document.querySelector('#colorNetworks').innerHTML = '' + updateValues.colorNetworks.content;
+    document.querySelector('#commentedNodes').innerHTML = '' + updateValues.commentedNodes.content;
+    
+    updateValues.colorNetworks.class.forEach(c => {
+        console.log(c);
+        document.querySelector('#colorNetworks').classList.add(c);
+    });
+    updateValues.commentedNodes.class.forEach(c => {
+        console.log(c);
+        document.querySelector('#commentedNodes').classList.add(c);
+    });
+
     return true;
 };
 

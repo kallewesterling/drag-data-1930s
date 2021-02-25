@@ -14,13 +14,22 @@
     <body>
         <nav class="px-3 navbar navbar-expand-xl navbar-light justify-content-between shadow-sm border-bottom">
             <section>
-                <a data-bs-toggle="modal" data-bs-target="#rationale" data-bs-keyboard="true" type="button" class="btn btn-sm btn-outline-success pr-2"><i class="bi bi-patch-question-fill mr-1"></i>Rationale</a>
-                <a id="showEntireDataset" class="btn btn-sm btn-outline-success pr-2" href="https://docs.google.com/spreadsheets/d/1UlpFQ9WWA6_6X-RuMJ3vHdIbyqhCZ1VRYgcQYjXprAg/edit#gid=0" target="_blank"><i class="bi bi-cloud-arrow-down-fill mr-1"></i>Dataset</a>
-                <a id="switchMode" class="btn btn-sm btn-outline-secondary pr-2"></a>
-                <a id="resetLocalStorage" class="btn btn-sm btn-outline-secondary pr-2"><i class="bi bi-cloud-slash-fill mr-1"></i>Reset settings</a>
+                <a data-bs-toggle="modal" data-bs-target="#rationale" data-bs-keyboard="true" type="button" class="btn btn-sm btn-outline-success mr-3"><i class="bi bi-patch-question-fill mr-1"></i>Rationale</a>
+                <a id="showEntireDataset" class="btn btn-sm btn-outline-success mr-3" href="https://docs.google.com/spreadsheets/d/1UlpFQ9WWA6_6X-RuMJ3vHdIbyqhCZ1VRYgcQYjXprAg/edit#gid=0" target="_blank"><i class="bi bi-cloud-arrow-down-fill mr-1"></i>Dataset</a>
+                <a id="switchMode" class="btn btn-sm btn-outline-secondary mr-3"></a>
+                <a id="nudgeNodes" class="btn btn-sm btn-outline-secondary mr-3"><i class="bi bi-unlock-fill"></i> Fix stuck nodes</a>
+                <a id="resetLocalStorage" class="btn btn-sm btn-outline-secondary"><i class="bi bi-cloud-slash-fill mr-1"></i>Reset settings</a>
             </section>
             <div class="collapse navbar-collapse" id="navbarSupportedContent" style="width:auto; max-width:100%">
-                <div id="info" class="d-flex align-items-center"></div>
+                <div id="info" class="d-flex align-items-center">
+                    <span id="numNodes" class="small mr-3" data-bs-toggle="popover"><i class="mr-1 small bi bi-record-fill"></i></span>
+                    <span id="numEdges" class="small mr-3" data-bs-toggle="popover"><i class="mr-1 small bi bi-share-fill"></i></span>
+                    <span id="unconnectedNodes" class="small mr-3" data-bs-toggle="popover"><i class="mr-1 bi bi-node-minus"></i></span>
+                    <span id="currentZoom" class="small mr-3" data-bs-toggle="popover"></span>
+                    <span id="numCommunities" class="small mr-3" data-bs-toggle="popover"></span>
+                    <span id="colorNetworks" data-bs-toggle="popover" class="mr-3 m-0 badge"></span>
+                    <span id="commentedNodes" data-bs-toggle="popover" class="m-0 badge"></span>        
+                </div>
             </div>
         </nav>
         <div class="modal" id="numberModal">
@@ -67,7 +76,7 @@
                             <div class="col-12 col-md-3 d-flex flex-column" id="dashboard">
                                 <h1 class="h3">Dashboard</h1>
                                 <div class="rounded border mb-2 p-1">
-                                    <p><strong>Number of nodes</strong></p>
+                                    <p class="fw-bold">Number of nodes</p>
                                     <p class="mb-2">257</p>
                                     <p><small class="text-muted">Explanation here</small></p>
                                 </div>
@@ -82,13 +91,14 @@
         <div id="settings" class="small card shadow-sm border rounded-lg">
             <div class="card-header d-flex justify-content-between align-items-center" id="settingsToggle">
                 <span><i class="bi bi-gear mr-2"></i>Settings</span>
+                <span id="toggledSettings"></i></span>
             </div>
             <ul id="settingsContainer" class="list-group list-group-flush">
                 <li class="list-group-item" id="datafileContainer">
                     <div class="mb-2">
-                        <p class="small text-muted p-0 m-0"><strong>Data file</strong></p>
+                        <p class="small text-muted p-0 m-0 fw-bold" data-toggle="datafileToggle">Data file</p>
                     </div>
-                    <div class="mb-2">
+                    <div class="mb-2 d-none" id="datafileToggle">
                         <select id="datafile">
                             <option value="data/drag-data-new.json">multi-partite graph</option>
                             <option value="data/drag-data-bipartite.json">bipartite graph</option>
@@ -97,7 +107,7 @@
                 </li>
                 <li class="list-group-item">
                     <div class="mb-2">
-                        <p class="small text-muted p-0 m-0"><strong>Node filtering</strong></p>
+                        <p class="small text-muted p-0 m-0 fw-bold">Node filtering</p>
                     </div>
                     <div class="mb-2">
                         <input class="p-0 m-0" type="range" id="minDegree" name="minDegree" min="1" max="40" value="1" step="1">
@@ -105,7 +115,7 @@
                         <span class="text-nowrap small metaShow d-none"><key class="small rounded ml-1 bg-success text-white p-1 fw-bold">&#8592;</key><key class="rounded small ml-1 bg-success text-white p-1 fw-bold">&#8594;</key></span>
                     </div>
                     <div class="mb-2">
-                        <p class="small text-muted p-0 m-0"><strong>view</strong></p>
+                        <p class="small text-muted p-0 m-0 fw-bold">view</p>
                     </div>
                     <div class="mb-2">
                         <input class="p-0 m-0" type="range" id="nodeMultiplier" name="nodeMultiplier" min="1" max="40" value="1" step="1">
@@ -113,7 +123,7 @@
                         <span class="text-nowrap small metaShow d-none"><key class="rounded small ml-1 bg-success text-white p-1 fw-bold">+</key><key class="rounded small ml-1 bg-success text-white p-1 fw-bold">-</key></span>
                     </div>
                     <div class="mt-3 mb-2">
-                        <p class="mb-1 text-muted small"><strong>behavior</strong></p>
+                        <p class="mb-1 text-muted small fw-bold">behavior</p>
                     </div>
                     <div class="mb-2">
                         <p class="m-0">
@@ -135,7 +145,7 @@
 
                 <li class="list-group-item">
                     <div class="mb-2">
-                        <p class="small text-muted p-0 m-0"><strong>Edge filtering</strong></p>
+                        <p class="small text-muted p-0 m-0 fw-bold">Edge filtering</p>
                     </div>
                     <div class="mb-2">
                         <input class="p-0 m-0" type="range" id="minWeight" name="minWeight" min="0" max="40" value="1" step="1">
@@ -143,7 +153,7 @@
                         <span class="text-nowrap small metaShow d-none"><key class="rounded small ml-1 bg-success text-white p-1 fw-bold">&#8679; + &#8592;</key><key class="rounded small ml-1 bg-success text-white p-1 fw-bold">&#8679; + &#8594;</key></span>
                     </div>
                     <div class="mb-2">
-                        <p class="small text-muted p-0 m-0"><strong>view</strong></p>
+                        <p class="small text-muted p-0 m-0 fw-bold">view</p>
                     </div>
                     <div class="mb-2">
                         <input class="p-0 m-0" type="range" id="edgeMultiplier" name="edgeMultiplier" min="1" max="40" value="1" step="1">
@@ -157,7 +167,7 @@
                         <select id="endYear"></select>
                     </div>
                     <div class="mt-3 mb-2">
-                        <p class="mb-1 text-muted small"><strong>behavior</strong></p>
+                        <p class="mb-1 text-muted small fw-bold">behavior</p>
                     </div>
                     <div class="mb-2">
                         <label class="mr-1" for="weightFromCurrent"><input type="checkbox" id="weightFromCurrent"> determine weight from current graph</label>
@@ -166,36 +176,38 @@
 
                 <li class="list-group-item">
                     <div class="mb-2">
-                        <p class="small text-muted p-0 m-0"><strong>Force settings</strong></p>
+                        <p class="small text-muted p-0 m-0 fw-bold" data-toggle="forceToggle">Force settings</p>
                     </div>
-                    <div class="mb-2">
-                        <p class="m-0">
-                            <label class="mr-1" for="layoutCenter"><input type="checkbox" id="layoutCenter"> center</label>
-                            <label class="mr-1" for="layoutForceX"><input type="checkbox" id="layoutForceX"> forceX</label>
-                            <label class="mr-1" for="layoutForceY"><input type="checkbox" id="layoutForceY"> forceY</label>
-                        </p>
-                        <p class="m-0">
-                            <label class="mr-1" for="layoutCollide"><input type="checkbox" id="layoutCollide"> collide</label>
-                            <label class="mr-1" for="layoutCharge"><input type="checkbox" id="layoutCharge"> charge</label>
-                        </p>
-                    </div>
-                    <div class="mb-2" id="chargeContainer">
-                        <input class="p-0 m-0" type="range" id="charge" name="charge" min="1" max="40" value="1" step="1">
-                        <label class="small p-0 m-0" for="charge" id="charge_label">charge</label>
-                        <span class="text-nowrap small metaShow d-none"><key class="small rounded ml-1 bg-success text-white p-1 fw-bold">&#8593;</key><key class="rounded small ml-1 bg-success text-white p-1 fw-bold">&#8595;</key></span>
-                    </div>
-                    <div class="mb-2" id="collideContainer">
-                        <input class="p-0 m-0" type="range" id="collide" name="collide" min="1" max="40" value="1" step="1">
-                        <label class="small p-0 m-0" for="collide" id="collide_label">collide</label>
-                    </div>
-                    <div class="mb-2" id="linkStrengthContainer">
-                        <input class="p-0 m-0" type="range" id="linkStrength" name="linkStrength" min="1" max="40" value="1" step="1">
-                        <label class="small p-0 m-0" for="linkStrength" id="linkStrength_label">linkStrength</label>
-                    </div>
-                    <div class="mb-2">
-                        <p class="m-0">
-                            <label class="mr-1" for="layoutClustering"><input type="checkbox" id="layoutClustering"> clustering</label>
-                        </p>
+                    <div class="mb-2 d-none" id="forceToggle">
+                        <div class="mb-2">
+                            <p class="m-0">
+                                <label class="mr-1" for="layoutCenter"><input type="checkbox" id="layoutCenter"> center</label>
+                                <label class="mr-1" for="layoutForceX"><input type="checkbox" id="layoutForceX"> forceX</label>
+                                <label class="mr-1" for="layoutForceY"><input type="checkbox" id="layoutForceY"> forceY</label>
+                            </p>
+                            <p class="m-0">
+                                <label class="mr-1" for="layoutCollide"><input type="checkbox" id="layoutCollide"> collide</label>
+                                <label class="mr-1" for="layoutCharge"><input type="checkbox" id="layoutCharge"> charge</label>
+                            </p>
+                        </div>
+                        <div class="mb-2" id="chargeContainer">
+                            <input class="p-0 m-0" type="range" id="charge" name="charge" min="1" max="40" value="1" step="1">
+                            <label class="small p-0 m-0" for="charge" id="charge_label">charge</label>
+                            <span class="text-nowrap small metaShow d-none"><key class="small rounded ml-1 bg-success text-white p-1 fw-bold">&#8593;</key><key class="rounded small ml-1 bg-success text-white p-1 fw-bold">&#8595;</key></span>
+                        </div>
+                        <div class="mb-2" id="collideContainer">
+                            <input class="p-0 m-0" type="range" id="collide" name="collide" min="1" max="40" value="1" step="1">
+                            <label class="small p-0 m-0" for="collide" id="collide_label">collide</label>
+                        </div>
+                        <div class="mb-2" id="linkStrengthContainer">
+                            <input class="p-0 m-0" type="range" id="linkStrength" name="linkStrength" min="1" max="40" value="1" step="1">
+                            <label class="small p-0 m-0" for="linkStrength" id="linkStrength_label">linkStrength</label>
+                        </div>
+                        <div class="mb-2">
+                            <p class="m-0">
+                                <label class="mr-1" for="layoutClustering"><input type="checkbox" id="layoutClustering"> clustering</label>
+                            </p>
+                        </div>
                     </div>
                 </li>
 
@@ -258,5 +270,45 @@
 
         <!-- JavaScript Bundle with Popper -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
+
+        <script>
+            var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+            var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+                let options = {'placement': 'bottom', 'trigger': 'hover'}
+
+                // TODO: Move these into static content on the page, and then dynamically update them?
+                if (popoverTriggerEl.id == "numNodes") {
+                    options['content'] = 'The numbers here show <strong>number of current nodes</strong>/number of all nodes in the graph. It is an indicator of how much the graph you are seeing has been filtered. You can change the filtering of the edges under the "Node filtering" section in the "Settings" below.';
+                } else if (popoverTriggerEl.id === "numEdges") {
+                    options['content'] = 'The numbers here show <strong>number of current edges</strong>/number of all edges in the graph. It is an indicator of how much the graph you are seeing has been filtered. You can change the filtering of the edges under the "Edge filtering" section in the "Settings" below.';
+                } else if (popoverTriggerEl.id === "unconnectedNodes") {
+                    options['content'] = 'The number here shows how many nodes are present in the current graph you are seeing that are unconnected from one another. If you have "auto-clear unconnected nodes" turned on in the "Node filtering" settings, this number should always stay at 0 since any lingering unconnected nodes are removed on rendering.';
+                } else if (popoverTriggerEl.id === "currentZoom") {
+                    options['content'] = 'This number shows you how scaled the current graph is, between 60–400%.';
+                } else if (popoverTriggerEl.id === "numCommunities") {
+                    options['content'] = 'The number that you see here shows how many number of communities have been identified in the graph you are currently seeing. The algorithm used is the Levain clustering algorithm, which you can read more about under the "Rationale". Click the button furthest to the left in the menubar if you are more interested.'; // TODO: write these...
+                } else if (popoverTriggerEl.id === "colorNetworks") {
+                    options['content'] = 'The number here shows how many disconnected networks are present in the current graph. The fewer the networks, the higher degree of connection between all the nodes. Click the button to color the nodes after which network they belong to. When the coloring is activated, this button will be yellow.';
+                } else if (popoverTriggerEl.id === "commentedNodes") {
+                    options['content'] = 'The number of nodes in the current graph that has a comment assigned to them. If you want to show only the nodes that have comments assigned to them and see how they relate to one another, click this button. When this view is activated, this button will be yellow.';
+                } else {
+                    console.error('Not catching the id', popoverTriggerEl); // TODO: write these...
+                }
+                try {
+                    if (bootstrap.Popover.getInstance(popoverTriggerEl)) {
+                        // console.log('already exists'); // TODO?: needs any action?
+                        return false;
+                    } else {
+                        return new bootstrap.Popover(popoverTriggerEl, options);
+                    }
+                } catch(e) {
+                    if (e instanceof ReferenceError) {
+                        // bootstrap missing...
+                    } else {
+                        console.error(e)
+                    }
+                }
+            })
+        </script>
     </body>
 </html>

@@ -167,6 +167,7 @@ const loadNetwork = () => {
         setupSettingInteractivity();
         setupMiscInteractivity();
         disableSettings(['datafile']);
+        toggle('#datafileToggle');
         document.querySelector('#datafileContainer').setAttribute('style', 'background-color: #ffc107 !important;'); // makes the datafileContainer look like "warning"
         error(`<strong>Data file could not be found.</strong><p class="m-0 small text-muted">${settings.datafile.filename}</p><p class="mt-3 mb-0">Select a different datafile in the "data file" dropdown.</p>`);
         zoom.on("zoom", null);
@@ -175,7 +176,7 @@ const loadNetwork = () => {
 };
 
 /**
- * setupInteractivity takes X argument/s... TODO: Finish this.
+ * setupInteractivity takes X argument/s... TODO: Needs docstring
  * The return value is ...
  */
 const setupInteractivity = () => {

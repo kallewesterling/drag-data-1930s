@@ -24,5 +24,5 @@ const communityDetection = () => {
         }
     });
 
-    console.log("clusters", graph.clusters);
+    // console.log("clusters", graph.clusters);
 }
