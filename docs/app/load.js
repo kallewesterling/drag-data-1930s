@@ -1,16 +1,5 @@
 "use strict";
 
-// TODO: Test load here...
-const datafileExists = (url) => {
-    d3.json(url).then((data) => {
-        console.log(data);
-    });
-    var http = new XMLHttpRequest();
-    http.open('HEAD', url, false);
-    http.send();
-    return http.status!=404;
-}
-
 /**
  * loadNetwork takes no arguments, but loads the entire network, and runs the other appropriate functions at the start of the script.
  * The return value is true if the network file is loaded correctly and all data is set up appropriately.
@@ -18,7 +7,7 @@ const datafileExists = (url) => {
 const loadNetwork = () => {
     loading("loadNetwork called...");
     let settings = getSettings();
-    console.log(settings);
+    // console.log(settings);
     
     enableSettings();
     document.querySelector('#datafileContainer').removeAttribute('style');
@@ -44,7 +33,7 @@ const loadNetwork = () => {
                 return false;
             }
             if (node.node_id.charAt(0).match(/[_—–—.]/)) prohibitedID = Object.assign({match: true, node_id: node.node_id}, node.node_id.charAt(0).match(/[_—–—.]/));
-            if (prohibitedID.match) console.log(prohibitedID)
+            if (prohibitedID.match) console.error(prohibitedID)
             
             if (
                 !node.node_id ||
@@ -54,7 +43,7 @@ const loadNetwork = () => {
                 node.node_id === "—"
             ) {
                 console.error("found an erroneous data point:");
-                console.log(node);
+                console.error(node);
             } else {
                 let has_comments = node.comments !== undefined && node.comments.length > 0 ? true : false;
                 store.nodes.push(
@@ -240,6 +229,7 @@ const setupInteractivity = () => {
             node.fx = null;
             node.fy = null;
             return true;
+        /* // This clause is no longer effective since I have moved things around in the latest version.
         } else if (window.toggledCommentedElements && node.has_comments) {
             d3.select("#popup-info")
                 .html(generateCommentHTML(node))
@@ -250,6 +240,7 @@ const setupInteractivity = () => {
                     `top: ${d3.event.y}px !important; left: ${d3.event.x}px !important;`
                 );
             return true;
+        */
         } else {
             /*
             // testing zoom into node

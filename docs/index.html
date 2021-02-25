@@ -6,20 +6,18 @@
         <link rel="preconnect" href="https://fonts.gstatic.com">
         <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-CuOF+2SnTUfTwSZjCXf01h7uYhfOBuxIhGKPbfEJ3+FqH/s6cIFN9bGr1HmAg4fQ" crossorigin="anonymous">
-        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha3/dist/js/bootstrap.min.js" integrity="sha384-t6I8D5dJmMXjCsRLhSzCltuhNZg6P10kE0m0nAncLUjH6GeYLhRU1zfLoW3QNQDF" crossorigin="anonymous"></script>
         <link rel="stylesheet" href="css/themes.css">
         <link rel="stylesheet" href="css/style.css">
-        <link rel="stylesheet" href="css/bootstrap-icons.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.0/font/bootstrap-icons.css">
         <title>U.S. Drag in the 1930s</title>
     </head>
     <body>
         <nav class="px-3 navbar navbar-expand-xl navbar-light justify-content-between shadow-sm border-bottom">
             <section>
-                <a id="toggleInfoBox" class="btn btn-sm btn-outline-success pr-2">Rationale</a>
-                <a id="showEntireDataset" class="btn btn-sm btn-outline-success pr-2" href="https://docs.google.com/spreadsheets/d/1UlpFQ9WWA6_6X-RuMJ3vHdIbyqhCZ1VRYgcQYjXprAg/edit#gid=0" target="_blank">Dataset</a>
+                <a data-bs-toggle="modal" data-bs-target="#rationale" data-bs-keyboard="true" type="button" class="btn btn-sm btn-outline-success pr-2"><i class="bi bi-patch-question-fill mr-1"></i>Rationale</a>
+                <a id="showEntireDataset" class="btn btn-sm btn-outline-success pr-2" href="https://docs.google.com/spreadsheets/d/1UlpFQ9WWA6_6X-RuMJ3vHdIbyqhCZ1VRYgcQYjXprAg/edit#gid=0" target="_blank"><i class="bi bi-cloud-arrow-down-fill mr-1"></i>Dataset</a>
                 <a id="switchMode" class="btn btn-sm btn-outline-secondary pr-2"></a>
-                <a id="resetLocalStorage" class="btn btn-sm btn-outline-secondary pr-2">Reset saved settings</a>
+                <a id="resetLocalStorage" class="btn btn-sm btn-outline-secondary pr-2"><i class="bi bi-cloud-slash-fill mr-1"></i>Reset settings</a>
             </section>
             <div class="collapse navbar-collapse" id="navbarSupportedContent" style="width:auto; max-width:100%">
                 <div id="info" class="d-flex align-items-center"></div>
@@ -35,6 +33,51 @@
                 </div>
             </div>
         </div>
+        <div id="rationale" class="modal">
+            <div class="modal-dialog modal-xl modal-fullscreen-xxl-down">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Rationale</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-12 col-md">
+                                <h1 class="h3">Header</h1>
+                                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Sint impedit tenetur vel provident! Minima ratione repellat voluptates, quisquam, assumenda error voluptatem quidem, tenetur saepe itaque repellendus possimus optio alias ut?</p>
+
+                                <h2 class="h5">Keyboard Shortcuts</h2>
+                                <div class="row">
+                                    <div class="col-1">
+                                        <kbd>esc</kbd>
+                                    </div>
+                                    <div class="col">
+                                        <p>Hide the frontmost element. When this information window (which you're currently looking at) is showing, it will hide this window. If you're in the network visualization screen, it will toggle the visibility of the setting boxes.</p>
+                                    </div>
+                                    <div class="col-1 border-left">
+                                        <kbd>&#8679;</kbd><kbd>&#8592;</kbd> or<br />
+                                        <kbd>&#8679;</kbd><kbd>&#8594;</kbd>
+                                    </div>
+                                    <div class="col">
+                                        <p>Adjust edge's minimum weight up and down. <strong>What does that mean?</strong></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-3 d-flex flex-column" id="dashboard">
+                                <h1 class="h3">Dashboard</h1>
+                                <div class="rounded border mb-2 p-1">
+                                    <p><strong>Number of nodes</strong></p>
+                                    <p class="mb-2">257</p>
+                                    <p><small class="text-muted">Explanation here</small></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div id="wrapToasters"></div>
         <div id="settings" class="small card shadow-sm border rounded-lg">
             <div class="card-header d-flex justify-content-between align-items-center" id="settingsToggle">
@@ -168,7 +211,7 @@
         </div>
         <div id="infoContainer"></div>
         <div id="nodeEdgeInfo" class="card small shadow-sm border rounded-lg d-none">
-            <div class="card-header d-flex justify-content-between align-items-center" id="settingsToggle">
+            <div class="card-header d-flex justify-content-between align-items-center" id="infoToggleDiv">
                 <span><i class="bi bi-share-fill mr-2"></i>Node/Edge information</span>
             </div>
             <div id="nodeEdgeInfoContainer" class="">
@@ -176,40 +219,6 @@
             </div>
         </div>
         <div id="previewData" class="small shadow-sm border p-3 rounded-lg d-none"><svg id="preview"></svg></div>
-
-        <div id="info-box" class="d-none">
-            <div class="row">
-                <div class="col-12 col-md">
-                    <h1 class="h3">Header</h1>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Sint impedit tenetur vel provident! Minima ratione repellat voluptates, quisquam, assumenda error voluptatem quidem, tenetur saepe itaque repellendus possimus optio alias ut?</p>
-
-                    <h2 class="h5">Keyboard Shortcuts</h2>
-                    <div class="row">
-                        <div class="col-1">
-                            <kbd>esc</kbd>
-                        </div>
-                        <div class="col">
-                            <p>Hide the frontmost element. When this information window (which you're currently looking at) is showing, it will hide this window. If you're in the network visualization screen, it will toggle the visibility of the setting boxes.</p>
-                        </div>
-                        <div class="col-1 border-left">
-                            <kbd>&#8679;</kbd><kbd>&#8592;</kbd> or<br />
-                            <kbd>&#8679;</kbd><kbd>&#8594;</kbd>
-                        </div>
-                        <div class="col">
-                            <p>Adjust edge's minimum weight up and down. <strong>What does that mean?</strong></p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 col-md-3 d-flex flex-column" id="dashboard">
-                    <h1 class="h3">Dashboard</h1>
-                    <div class="rounded border mb-2 p-1">
-                        <p><strong>Number of nodes</strong></p>
-                        <p class="mb-2">257</p>
-                        <p><small class="text-muted">Explanation here</small></p>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <div id="loading" class="h-100 d-flex justify-content-center">
             <div id="loadingContainer" class="my-auto p-4 bg-white rounded shadow-lg d-flex flex-column">
@@ -246,5 +255,8 @@
 
         <!-- TODO: a different app... so another project. Maybe it should just be a different page altogether -->
         <script src="preview-app/previewData.js"></script>
+
+        <!-- JavaScript Bundle with Popper -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
     </body>
 </html>

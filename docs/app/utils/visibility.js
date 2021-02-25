@@ -7,7 +7,13 @@
  * @returns {boolean} - Whether the selector is currently visible or not
  */
 const isVisible = (selector) => {
-    return d3.select(selector).classed("d-none") === false;
+    try {
+        return d3.select(selector).classed("d-none") === false;
+    } catch {
+        console.error('Selector cannot be found');
+        console.error(selector)
+        return false;
+    }
 };
 
 /**
@@ -17,20 +23,26 @@ const isVisible = (selector) => {
  * @returns {boolean} - true
  */
 const toggle = (selector) => {
-    if (typeof selector === "object") {
-        selector.classed("d-none", isVisible(selector));
-    } else {
-        d3.select(selector).classed("d-none", isVisible(selector));
-    }
+    try {
+        if (typeof selector === "object") {
+            selector.classed("d-none", isVisible(selector));
+        } else {
+            d3.select(selector).classed("d-none", isVisible(selector));
+        }
 
-    // special rules
-    if (selector === "#settingsContainer") {
-        d3.select("#settingsToggle").classed("toggled", !isVisible(selector));
-    } else if (selector === "#infoToggleDiv") {
-        d3.select("#infoToggle").classed("toggled", !isVisible(selector));
-    }
+        // special rules
+        if (selector === "#settingsContainer") {
+            d3.select("#settingsToggle").classed("toggled", !isVisible(selector));
+        } else if (selector === "#infoToggleDiv") {
+            d3.select("#infoToggle").classed("toggled", !isVisible(selector));
+        }
 
-    return true;
+        return true;
+    } catch {
+        console.error('Selector cannot be found');
+        console.error(selector)
+        return false;
+    }
 };
 
 /**

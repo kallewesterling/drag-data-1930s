@@ -68,7 +68,8 @@ const generateNodeInfoHTML = (node) => {
             <p class="m-0 small">${d3.min(node.sourceRange)}-${d3.max(node.sourceRange)}</p>
         </li>
         <li class="list-group-item">
-            <strong class="mb-1">Centrality measures (across entire network)</strong>
+            <strong>Centrality measures</strong>
+            <p class="m-0 mb-1 small text-muted">Note: Across entire network</p>
             <p class="m-0 mb-1 small">Betweenness (1000x): ${Math.round(node["1000x-betweenness-centrality"] * 100) / 100}</p>
             <p class="m-0 mb-1 small">Closeness (1000x): ${Math.round(node["1000x-closeness-centrality"] * 100) / 100}</p>
             <p class="m-0 mb-1 small">Degree (1000x): ${Math.round(node["1000x-degree-centrality"] * 100) / 100}</p>
