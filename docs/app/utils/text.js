@@ -77,7 +77,7 @@ const generateNodeInfoHTML = (node) => {
     if (node.has_comments) {
         html += `<li class="list-group-item"><strong>Comments</strong>`
         node.comments.forEach(obj => {
-            html += `<p class="m-0 mb-1 small">${obj.comment} (${obj.source})</p>`
+            html += `<p class="m-0 mb-1 small">${obj.comment} <span class="text-muted">(${obj.source})</span></p>`
         })
         html += `</li>`
     }
