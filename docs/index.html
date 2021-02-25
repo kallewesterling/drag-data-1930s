@@ -22,13 +22,13 @@
             </section>
             <div class="collapse navbar-collapse" id="navbarSupportedContent" style="width:auto; max-width:100%">
                 <div id="info" class="d-flex align-items-center">
-                    <span id="numNodes" class="small mr-3" data-bs-toggle="popover"><i class="mr-1 small bi bi-record-fill"></i></span>
-                    <span id="numEdges" class="small mr-3" data-bs-toggle="popover"><i class="mr-1 small bi bi-share-fill"></i></span>
-                    <span id="unconnectedNodes" class="small mr-3" data-bs-toggle="popover"><i class="mr-1 bi bi-node-minus"></i></span>
-                    <span id="currentZoom" class="small mr-3" data-bs-toggle="popover"></span>
-                    <span id="numCommunities" class="small mr-3" data-bs-toggle="popover"></span>
-                    <span id="colorNetworks" data-bs-toggle="popover" class="mr-3 m-0 badge"></span>
-                    <span id="commentedNodes" data-bs-toggle="popover" class="m-0 badge"></span>        
+                    <span id="numNodes" class="small mr-3" data-bs-toggle="popover" title="Number of nodes"><i class="mr-1 small bi bi-record-fill"></i></span>
+                    <span id="numEdges" class="small mr-3" data-bs-toggle="popover" title="Number of edges"><i class="mr-1 small bi bi-share-fill"></i></span>
+                    <span id="unconnectedNodes" class="small mr-3" data-bs-toggle="popover" title="Number of unconnected nodes"><i class="mr-1 bi bi-node-minus"></i></span>
+                    <span id="currentZoom" class="small mr-3" data-bs-toggle="popover" title="Current zoom level"></span>
+                    <span id="numCommunities" class="small mr-3" data-bs-toggle="popover" title="Number of communities"></span>
+                    <span id="colorNetworks" data-bs-toggle="popover" class="mr-3 m-0 badge" title="Number of networks"></span>
+                    <span id="commentedNodes" data-bs-toggle="popover" class="m-0 badge" title="Number of commented nodes"></span>
                 </div>
             </div>
         </nav>
@@ -100,7 +100,7 @@
                     </div>
                     <div class="mb-2 d-none" id="datafileToggle">
                         <select id="datafile">
-                            <option value="data/drag-data-new.json">multi-partite graph</option>
+                            <option value="data/multipartite-data.json">multi-partite graph</option>
                             <option value="data/drag-data-bipartite.json">bipartite graph</option>
                         </select>
                     </div>
@@ -246,7 +246,7 @@
         <div id="popup-info" class="d-none shadow-lg"></div>
         <div id="egoNetwork" class="d-none shadow-lg p-2 text-center bg-warning">Ego network for node <span id="node">NODE</span>.<i id="closeEgoNetwork" class="ml-3 bi bi-stop-circle"></i></div>
     
-        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+        <!--<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>-->
         <script src="app/utils/debug.js"></script>
         <script src="app/settings.js"></script>
         <script src="app/regex.js"></script>
@@ -272,43 +272,11 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
 
         <script>
-            var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+            var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
             var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
                 let options = {'placement': 'bottom', 'trigger': 'hover'}
-
-                // TODO: Move these into static content on the page, and then dynamically update them?
-                if (popoverTriggerEl.id == "numNodes") {
-                    options['content'] = 'The numbers here show <strong>number of current nodes</strong>/number of all nodes in the graph. It is an indicator of how much the graph you are seeing has been filtered. You can change the filtering of the edges under the "Node filtering" section in the "Settings" below.';
-                } else if (popoverTriggerEl.id === "numEdges") {
-                    options['content'] = 'The numbers here show <strong>number of current edges</strong>/number of all edges in the graph. It is an indicator of how much the graph you are seeing has been filtered. You can change the filtering of the edges under the "Edge filtering" section in the "Settings" below.';
-                } else if (popoverTriggerEl.id === "unconnectedNodes") {
-                    options['content'] = 'The number here shows how many nodes are present in the current graph you are seeing that are unconnected from one another. If you have "auto-clear unconnected nodes" turned on in the "Node filtering" settings, this number should always stay at 0 since any lingering unconnected nodes are removed on rendering.';
-                } else if (popoverTriggerEl.id === "currentZoom") {
-                    options['content'] = 'This number shows you how scaled the current graph is, between 60–400%.';
-                } else if (popoverTriggerEl.id === "numCommunities") {
-                    options['content'] = 'The number that you see here shows how many number of communities have been identified in the graph you are currently seeing. The algorithm used is the Levain clustering algorithm, which you can read more about under the "Rationale". Click the button furthest to the left in the menubar if you are more interested.'; // TODO: write these...
-                } else if (popoverTriggerEl.id === "colorNetworks") {
-                    options['content'] = 'The number here shows how many disconnected networks are present in the current graph. The fewer the networks, the higher degree of connection between all the nodes. Click the button to color the nodes after which network they belong to. When the coloring is activated, this button will be yellow.';
-                } else if (popoverTriggerEl.id === "commentedNodes") {
-                    options['content'] = 'The number of nodes in the current graph that has a comment assigned to them. If you want to show only the nodes that have comments assigned to them and see how they relate to one another, click this button. When this view is activated, this button will be yellow.';
-                } else {
-                    console.error('Not catching the id', popoverTriggerEl); // TODO: write these...
-                }
-                try {
-                    if (bootstrap.Popover.getInstance(popoverTriggerEl)) {
-                        // console.log('already exists'); // TODO?: needs any action?
-                        return false;
-                    } else {
-                        return new bootstrap.Popover(popoverTriggerEl, options);
-                    }
-                } catch(e) {
-                    if (e instanceof ReferenceError) {
-                        // bootstrap missing...
-                    } else {
-                        console.error(e)
-                    }
-                }
-            })
+                new bootstrap.Popover(popoverTriggerEl, options);
+            });
         </script>
     </body>
 </html>
