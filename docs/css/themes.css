@@ -1,7 +1,7 @@
 .theme-dark {
     --background: rgba(0, 0, 0, 1);
 
-    --background-settings: rgba(0, 0, 0, 0.75);
+    --background-settings: rgba(0, 0, 0, 0.50);
     --settings-label: rgba(255, 255, 255, 1);
 
     --text-color: rgba(255, 255, 255, 1);
@@ -20,11 +20,11 @@
     --link-revue: rgba(61, 90, 128);
     --link-norevue: rgba(199, 199, 199);
 
-    --club: rgba(61, 90, 128, 1);
-    --club-selected-primary: rgb(217, 0, 0);
-    --club-selected-secondary: rgb(218, 162, 162);
-    --club-selected-tertiary: rgb(218, 162, 162);
-    --club-deselected: rgb(107, 107, 107);
+    --venue: rgba(61, 90, 128, 1);
+    --venue-selected-primary: rgb(217, 0, 0);
+    --venue-selected-secondary: rgb(218, 162, 162);
+    --venue-selected-tertiary: rgb(218, 162, 162);
+    --venue-deselected: rgb(107, 107, 107);
 
     --city: rgb(124, 124, 124);
     --city-selected-primary: rgb(200, 0, 0);
@@ -35,12 +35,15 @@
     --empty-node: rgba(255, 255, 255, 0.5);
     --disabled-node: rgba(255, 255, 255, 0.05);
     --node-stroke: rgba(255, 255, 255, 0.5);
+
+    --border-color: rgba(255,255,255,.125);
+    --header-color: rgba(255,255,255,.075);
 }
 
 .theme-light {
     --background: rgba(0, 0, 0, 0.009);
 
-    --background-settings: rgba(255, 255, 255, 0.75);
+    --background-settings: rgba(255, 255, 255, 0.50);
     --settings-label: rgba(0, 0, 0, 1);
 
     --text-color: rgba(0, 0, 0, 1);
@@ -59,11 +62,11 @@
     --link-revue: rgba(61, 90, 128, 0.5);
     --link-norevue: rgba(0, 0, 0, 0.15);
 
-    --club: rgba(61, 90, 128, 1);
-    --club-selected-primary: #ff0000;
-    --club-selected-secondary: #ffb0b0;
-    --club-selected-tertiary: #ffdfdf;
-    --club-deselected: rgba(245, 245, 245, 1);
+    --venue: rgba(61, 90, 128, 1);
+    --venue-selected-primary: #ff0000;
+    --venue-selected-secondary: #ffb0b0;
+    --venue-selected-tertiary: #ffdfdf;
+    --venue-deselected: rgba(245, 245, 245, 1);
 
     --city: rgba(238, 238, 238, 1);
     --city-selected-primary: #ff0000;
@@ -74,4 +77,7 @@
     --empty-node: rgba(0, 0, 0, 0.5);
     --disabled-node: rgba(0, 0, 0, 0.05);
     --node-stroke: rgba(255, 255, 255, 1);
+
+    --border-color: rgba(0,0,0,.125);
+    --header-color: rgba(255,255,255,.45);
 }

@@ -1,3 +1,5 @@
+window.ERROR_LEVEL = 1;
+
 const clearAll = (e) => {
     /*
     // moved to button instead
@@ -11,14 +13,33 @@ const clearAll = (e) => {
     */
 }
 
-const loading = (message) => {
-    // console.log(message);
-    d3.select("#loading").classed('d-none', false);
+const loading = (message, log_output=false) => {
+    d3.select("#loadingContainer").classed('bg-white', true);
+    d3.select("#loadingContainer").classed('bg-danger', false);
+    d3.select("#loadingContainer").classed('text-white', false);
     d3.select("#loadingMessage").html(message);
-    setTimeout(() => {
+    d3.select("#loading").classed('d-none', false);
+    window.loadingTimeout = setTimeout(() => {
         d3.select("#loading").classed('d-none', true);
     }, 1000);
-    // console.log(message);
+    if (log_output || window.ERROR_LEVEL > 0) {
+        console.log(`[${new Date().toLocaleString()}]`, message)
+    }
+}
+
+const error = (message, hide=false, clear_timeout=true) => {
+    if (hide) {
+        d3.select("#loading").classed('d-none', true);
+    } else {
+        d3.select("#loadingSpinner").classed('d-none', true);
+        d3.select("#loadingContainer").classed('bg-white', false);
+        d3.select("#loadingContainer").classed('bg-danger', true);
+        d3.select("#loadingContainer").classed('text-white', true);
+        d3.select("#loadingMessage").html(message);
+        d3.select("#loading").classed('d-none', false);
+        if (clear_timeout)
+            window.clearTimeout(window.loadingTimeout);
+    }
 }
 
 window.onmousemove = (e) => {

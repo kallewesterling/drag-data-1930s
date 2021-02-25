@@ -1,14 +1,27 @@
 "use strict";
 
+// TODO: Test load here...
+const datafileExists = (url) => {
+    d3.json(url).then((data) => {
+        console.log(data);
+    });
+    var http = new XMLHttpRequest();
+    http.open('HEAD', url, false);
+    http.send();
+    return http.status!=404;
+}
+
 /**
  * loadNetwork takes no arguments, but loads the entire network, and runs the other appropriate functions at the start of the script.
- * The return value is true in all cases.
+ * The return value is true if the network file is loaded correctly and all data is set up appropriately.
  */
 const loadNetwork = () => {
     loading("loadNetwork called...");
     let settings = getSettings();
     console.log(settings);
     
+    enableSettings();
+    document.querySelector('#datafileContainer').removeAttribute('style');
     d3.json(settings.datafile.filename).then((data) => {
         // for debug purposes (TODO can be removed)
         store.raw = data;
@@ -20,16 +33,21 @@ const loadNetwork = () => {
         store.count = Object.assign({}, data.count);
 
         // set up store.nodes
+        let counter = 1;
         data.nodes.forEach((node) => {
             let prohibitedID = {match: false}
             if (!node.node_id) {
-                console.error('node_id required!');
+                let newNode = `unidentifiedNode${counter}`;
+                counter++;
+                console.error(`Unable to find node_id (will set to ${newNode})`, node);
+                node.node_id = newNode;
                 return false;
             }
             if (node.node_id.charAt(0).match(/[_—–—.]/)) prohibitedID = Object.assign({match: true, node_id: node.node_id}, node.node_id.charAt(0).match(/[_—–—.]/));
             if (prohibitedID.match) console.log(prohibitedID)
             
             if (
+                !node.node_id ||
                 node.node_id === "" ||
                 node.node_id === "-" ||
                 node.node_id === "–" ||
@@ -38,11 +56,12 @@ const loadNetwork = () => {
                 console.error("found an erroneous data point:");
                 console.log(node);
             } else {
+                let has_comments = node.comments !== undefined && node.comments.length > 0 ? true : false;
                 store.nodes.push(
                     Object.assign(
                         {
                             inGraph: false,
-                            has_comments: node.comments.length > 0 ? true : false,
+                            has_comments: has_comments,
                         },
                         node
                     )
@@ -91,8 +110,16 @@ const loadNetwork = () => {
                 let date = dateParser(source);
                 if (date && date.iso !== undefined) {
                     e.dates.push(date.iso);
-                } else {
-                    console.error(`Could not interpret date in ${source}`);
+                } else if (date.iso === undefined) {
+                    let testDate = dateParser(e.date);
+                    if (testDate && testDate.iso !== undefined) {
+                        if (window.ERROR_LEVEL > 1) {
+                            console.info(`Could not interpret date in source. Adding date associated with edge (${testDate.iso}) instead:`);
+                            console.error(source);
+                        }
+                    } else {
+                        console.error(`Could not interpret date in ${source}. Backup solution failed too.`);
+                    }
                 }
             });
             if (e.dates) {
@@ -110,17 +137,7 @@ const loadNetwork = () => {
             e.weight = e.found.length;
         });
 
-        store.ranges.nodeDegree = d3.extent(store.nodes, (d) => d.degree);
-        store.ranges.edgeWidth = d3.extent(store.edges, (d) => d.weight);
-        store.ranges.years = {
-            min: d3.min(store.edges.map((d) => d.range.start? +d.range.start.substring(0, 4):1930)),
-            max: d3.max(store.edges.map((d) => d.range.end? +d.range.end.substring(0, 4):1930 )),
-        };
-        store.ranges.years.array = range(
-            store.ranges.years.min,
-            store.ranges.years.max,
-            1
-        );
+        loadStoreRanges();
 
         store.nodes.forEach((node) => {
             node.allEdges = store.edges.filter(
@@ -142,6 +159,8 @@ const loadNetwork = () => {
             });
         });
 
+        settingsSetupYearRange(undefined, undefined, false);
+
         // set up handlers
         setupKeyHandlers();
         setupSettingInteractivity();
@@ -152,8 +171,18 @@ const loadNetwork = () => {
 
         // setup preview TODO: This is currently disabled
         // preview(store);
+        
+        return true;
+    }).catch(e=> {
+        console.error(e);
+        setupSettingInteractivity();
+        setupMiscInteractivity();
+        disableSettings(['datafile']);
+        document.querySelector('#datafileContainer').setAttribute('style', 'background-color: #ffc107 !important;'); // makes the datafileContainer look like "warning"
+        error(`<strong>Data file could not be found.</strong><p class="m-0 small text-muted">${settings.datafile.filename}</p><p class="mt-3 mb-0">Select a different datafile in the "data file" dropdown.</p>`);
+        zoom.on("zoom", null);
+        return false;
     });
-    return true;
 };
 
 /**
@@ -294,7 +323,7 @@ const updateElements = () => {
             (enter) =>
                 enter
                     .append("text")
-                    .text((node) => displayOrID(node))
+                    .text(node => node.display)
                     .attr("class", (node) => getTextClass(node))
                     .attr("style", "pointer-events: none;")
                     .attr("opacity", 0)

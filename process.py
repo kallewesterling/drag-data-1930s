@@ -46,6 +46,7 @@ for row in df.fillna('').itertuples():
         continue
 
     # Clean up date and see if it falls outside our range; if so, skip this row
+    date = date.replace('?', '').strip()
     try:
         date = datetime.strptime(date, '%Y-%m-%d')
     except:
@@ -62,9 +63,10 @@ for row in df.fillna('').itertuples():
             continue
 
     # Provide warning in case there are column present that we are not able to process here
-    for x in _ and PRINT_WARNINGS:
-        print(
-            f'warning: could not handle {x} -- make sure all columns are properly assigned in script')
+    if PRINT_WARNINGS:
+        for x in _:
+            print(
+                f'warning: could not handle {x} -- make sure all columns are properly assigned in script')
 
     # Clean up of variables
     category, performer, club, _city, city, revue_name, normalized_revue_name, unsure_drag, legal_name, source, newspapers_search, fulton_search, former_archive, comment, exclude, quote, comment_performer, comment_club, comment_city, comment_revue = category.strip(), performer.strip(), club.strip(), _city.strip(), city.strip(), revue_name.strip(), normalized_revue_name.strip(), unsure_drag.strip(), legal_name.strip(), source.strip(), newspapers_search.strip(), fulton_search.strip(), former_archive.strip(), comment.strip(), exclude.strip(), quote.strip(), comment_performer.strip(), comment_club.strip(), comment_city.strip(), comment_revue.strip()
@@ -613,5 +615,5 @@ json_data['count'] = count
 json_data['comments'] = all_comments
 
 # write file
-Path('./docs/drag-data.json').write_text(json.dumps(json_data))
+Path('./docs/data/drag-data.json').write_text(json.dumps(json_data))
 # Path('../testing-d3-v4/data_drag.json').write_text(json.dumps(json_data))

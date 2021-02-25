@@ -77,13 +77,14 @@ const show = (selector) => {
  * @returns {boolean} - true
  */
 const setNodeEdgeInfo = (elem) => {
-    let selector = d3.select("#nodeEdgeInfo");
+    let selector = d3.select("#nodeEdgeInfoContainer .list-group");
     if (elem.node_id) {
-        selector.html(generateNodeInfoHTML(elem));
+        selector.html(elem.html_info);
     } else if (elem.edge_id) {
-        selector.html(generateEdgeInfoHTML(elem));
+        selector.html(elem.html_info);
     }
-    show(selector);
+    let container = d3.select("#nodeEdgeInfo");
+    show(container);
 };
 
 const toggleColorNetworks = () => {
@@ -98,7 +99,7 @@ const toggleColorNetworks = () => {
         window.coloredNetworks = false;
         resetDraw();
     }
-    d3.select('#colorNetworks').classed('btn-outline-secondary', !window.coloredNetworks).classed('btn-warning', window.coloredNetworks);
+    d3.select('#colorNetworks').classed('bg-dark', !window.coloredNetworks).classed('bg-warning', window.coloredNetworks);
 }
 
 /**
@@ -111,6 +112,34 @@ const updateInfo = () => {
     d3.select("#info").html(getInfoHTML());
     d3.select('#colorNetworks').on("click", toggleColorNetworks);
     d3.select('#commentedNodes').on("click", toggleCommentedElements);
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+        let options = {'placement': 'bottom', 'trigger': 'hover'}
+
+        if (popoverTriggerEl.id == "numNodes") {
+            options['content'] = 'Number of nodes'; // TODO: write these...
+        } else if (popoverTriggerEl.id === "numEdges") {
+            options['content'] = 'Number of edges'; // TODO: write these...
+        } else if (popoverTriggerEl.id === "unconnectedNodes") {
+            options['content'] = 'Number of unconnected nodes'; // TODO: write these...
+        } else if (popoverTriggerEl.id === "currentZoom") {
+            options['content'] = 'Current zoom'; // TODO: write these...
+        } else if (popoverTriggerEl.id === "numCommunities") {
+            options['content'] = 'Current number of communities'; // TODO: write these...
+        } else if (popoverTriggerEl.id === "colorNetworks") {
+            options['content'] = 'Number of networks (activated)'; // TODO: write these...
+        } else if (popoverTriggerEl.id === "commentedNodes") {
+            options['content'] = 'Number of commented nodes'; // TODO: write these...
+        } else {
+            console.error('Not catching the id', popoverTriggerEl); // TODO: write these...
+        }
+        if (bootstrap.Popover.getInstance(popoverTriggerEl)) {
+            console.log('already exists'); // TODO: write these...
+            return false;
+        } else {
+            return new bootstrap.Popover(popoverTriggerEl, options);
+        }
+    })
     return true;
 };
 

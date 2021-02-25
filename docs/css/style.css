@@ -9,14 +9,16 @@ body, html {
 
 #settings {
     position: absolute;
-    top: 1em;
+    top: 4.5em;
     left: 1em;
     background-color: var(--background-settings) !important;
+    max-height: 91%;
+    z-index: 400;
     max-width: 300px;
     overflow: hidden;
-    z-index: 400;
-    -webkit-backdrop-filter: blur(2px);
-    backdrop-filter: blur(2px);
+    overflow-y: scroll;
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
 }
 
 #settings, #infoContainer {
@@ -58,17 +60,25 @@ body, html {
     color: var(--text-color);
 }
 
-#infoContainer {
-    position: absolute;
-    top: 1em;
-    right: 1em;
-    background-color: var(--background-settings);
-    min-width: 250px;
-    max-width: 250px;
-    overflow: hidden;
+nav {
+    background-color: var(--header-color);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
     z-index: 400;
-    -webkit-backdrop-filter: blur(2px);
-    backdrop-filter: blur(2px);
+    height: 3em;
+    color: var(--text-color);
+}
+
+nav .btn {
+    color: var(--text-color);
+}
+
+.theme-dark nav #switchMode::after {
+    content: 'Light mode' !important;
+}
+
+.theme-light nav #switchMode::after {
+    content: 'Dark mode' !important;
 }
 
 #infoContainer > p,
@@ -79,16 +89,28 @@ body, html {
 }
 
 #nodeEdgeInfo {
+    color: var(--text-color) !important;
     position: absolute;
-    bottom: 1em;
-    left: 1em;
+    right: 1em;
+    top: 4.5em;
     background-color: var(--background-settings);
-    max-height: 30%;
-    max-width: 400px;
+    max-height: 91%;
+    z-index: 400;
+    width: 300px;
+    max-width: 300px;
     overflow: hidden;
     overflow-y: scroll;
-    -webkit-backdrop-filter: blur(2px);
-    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+}
+
+.list-group-item {
+    border: 1px solid var(--border-color);
+}
+
+.card-header {
+    background-color: var(--header-color);
+    border-bottom: 1px solid var(--border-color);
 }
 
 body {
@@ -146,7 +168,7 @@ svg#main {
 }
 
 .node {
-    fill: var(--empty-node) !important;
+    fill: var(--empty-node);
     stroke-width: 0.1;
     stroke: var(--node-stroke);
     cursor: context-menu;
@@ -155,13 +177,13 @@ svg#main {
 }
 
 .disabled {
-    fill: var(--disabled-node) !important;
+    fill: var(--disabled-node);
     pointer-events: none !important;
     cursor: not-allowed !important;
 }
 
 .node.city {
-    fill: var(--city) !important;
+    fill: var(--city);
 }
 
 .node.city.selected {
@@ -178,25 +200,25 @@ svg#main {
     fill: var(--city-deselected) !important;
 }
 
-.node.club {
-    fill: var(--club) !important;
+.node.venue {
+    fill: var(--venue);
 }
 
-.node.club.selected {
-    fill: var(--club-selected-primary) !important;
+.node.venue.selected {
+    fill: var(--venue-selected-primary) !important;
     stroke-width: 10px;
     stroke: rgba(255, 0, 0, 0.3);
 }
-.node.club.selected-secondary {
-    fill: var(--club-selected-secondary) !important;
+.node.venue.selected-secondary {
+    fill: var(--venue-selected-secondary) !important;
 }
 
-.node.club.deselected {
-    fill: var(--club-deselected) !important;
+.node.venue.deselected {
+    fill: var(--venue-deselected) !important;
 }
 
 .node.performer {
-    fill: var(--performer) !important;
+    fill: var(--performer);
 }
 
 .node.performer.selected {
@@ -235,7 +257,7 @@ svg#main {
 #wrapToasters {
     position: absolute;
     left: calc(50% - 175px);
-    top: 0;
+    top: 4.5em;
     width: 400px;
     padding-top: 1em;
 }
@@ -245,8 +267,8 @@ svg#main {
     font-size: 0.675rem !important;
 }
 
-.node.club.selected-tertiary {
-    fill: var(--club-selected-tertiary) !important;
+.node.venue.selected-tertiary {
+    fill: var(--venue-selected-tertiary) !important;
 }
 .node.city.selected-tertiary {
     fill: var(--city-selected-tertiary) !important;
@@ -290,8 +312,8 @@ svg#main {
     width: 100%;
     height: 100%;
     background-color: rgba(255,255,255,0.9);
-    -webkit-backdrop-filter: blur(2px);
-    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
 }
 
 #info-box #dashboard {
@@ -326,8 +348,8 @@ svg#main {
     max-height: 600px;
     background-color: rgba(255,255,255,0.9);
     z-index: 500;
-    -webkit-backdrop-filter: blur(2px);
-    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
 }
 
 #popup-info > h1 {
@@ -348,8 +370,8 @@ svg#main {
 }
 
 #egoNetwork {
-    -webkit-backdrop-filter: blur(2px);
-    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
 }
 
 #egoNetwork > #node {
@@ -361,12 +383,12 @@ svg#main {
 }
 
 #loading {
-    
+    margin-top: -5em !important;
 }
 
 #loadingContainer {
-    -webkit-backdrop-filter: blur(2px);
-    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
     z-index: 500;
 }
 
@@ -450,3 +472,13 @@ svg#main {
 #colorNetworks, #commentedNodes {
     cursor: pointer;
 }
+
+.text-muted {
+    opacity: 40%;
+    color: inherit !important;
+}
+
+[class^="bi-"]::before, [class*=" bi-"]::before {
+    padding-bottom: 2.5px !important;
+}
+

@@ -208,6 +208,38 @@ const getSettings = () => {
     };
 };
 
+const settingsSetupYearRange = (startYear=undefined, endYear=undefined, do_filter=true) => {
+    if (!store.ranges.years.array.length) {
+        console.error('Node store ranges need to be loaded before setupSettings is run.');
+    } else {
+        var options = [];
+        store.ranges.years.array.forEach((year) => {
+            options.push(`<option value="${year}">${year}</option>`);
+        });
+    }
+    d3.select("#startYear").node().innerHTML = options;
+    d3.select("#endYear").node().innerHTML = options;
+
+    if (!startYear)
+        startYear = _autoSettings.edges.startYear;
+
+    if (!endYear)
+        endYear = _autoSettings.edges.endYear;
+    
+    let startVal = +d3.select("#startYear").node().value
+    let endVal = +d3.select("#endYear").node().value
+
+    d3.select("#startYear").node().value = startYear;
+    d3.select("#endYear").node().value = endYear;
+    
+    if (do_filter && (startVal !== startYear || endVal !== endYear)) {
+        filter();
+        updateElements();
+        updateGraphElements();
+        restartSimulation();
+    }
+}
+
 /**
  * setupSettings takes no arguments but sets up the settings box correctly, with all the max, min, and step values for UI elements,
  * The return value is true in all cases.
@@ -228,13 +260,6 @@ const setupSettings = () => {
     d3.select("#edgeMultiplier").node().min = 0.05;
     d3.select("#edgeMultiplier").node().max = 5;
     d3.select("#edgeMultiplier").node().step = 0.05;
-
-    var options = [];
-    store.ranges.years.array.forEach((year) => {
-        options.push(`<option value="${year}">${year}</option>`);
-    });
-    d3.select("#startYear").node().innerHTML = options;
-    d3.select("#endYear").node().innerHTML = options;
 
     // set range for charge
     d3.select("#charge").node().min = -1000;
@@ -284,10 +309,38 @@ const setupSettings = () => {
 
     d3.select("#stickyNodes").node().checked = settings.nodes.stickyNodes;
     d3.select("#debugMessages").node().checked = settings.debugMessages;
-    d3.select("#datafile").node().value = settings.datafile;
+    d3.select("#datafile").node().value = settings.datafile.filename;
 
     return true;
 };
+
+const loadStoreRanges = () => {
+    console.info('loadStoreRanges called');
+    store.ranges.nodeDegree = d3.extent(store.nodes, (d) => d.degree);
+    store.ranges.edgeWidth = d3.extent(store.edges, (d) => d.weight);
+
+    store.ranges.years = {
+        min: d3.min(store.edges.map((d) => d.range.start? +d.range.start.substring(0, 4):1930)),
+        max: d3.max(store.edges.map((d) => d.range.end? +d.range.end.substring(0, 4):1930 )),
+    };
+    
+    store.ranges.years.array = range(
+        store.ranges.years.min,
+        store.ranges.years.max,
+        1
+    );
+    
+    if (!store.ranges.years.array) {
+        console.error('Node store ranges need to be loaded before setupSettings is run.');
+    } else {
+        var options = [];
+        store.ranges.years.array.forEach((year) => {
+            options.push(`<option value="${year}">${year}</option>`);
+        });
+    }
+
+    return store.ranges;
+}
 
 /**
  * changeSetting is a complex function that can change any given setting, and also makes sure to change the UI representation of that value in the settings box. It is also the function that is run every time a setting UI element is changed in the settings box.
@@ -298,6 +351,7 @@ const setupSettings = () => {
  * @param {string} [type] - "checkbox" (default), "slider", "dropdown" are valid types.
  * @param {Array} additionalPreFunctions - Array of executables that you want to run _before_ the setting is changed.
  * @param {Array} additionalPostFunctions - Array of executables that you want to run _after_ the setting is changed.
+ * @param {boolean} restartSim - Set to `true` (default) if you want to restart the simulation after the setting is updated.
  * @returns {boolean} - true
  */
 const changeSetting = (
@@ -306,7 +360,8 @@ const changeSetting = (
     _filter = true,
     type = "checkbox",
     additionalPreFunctions = [],
-    additionalPostFunctions = []
+    additionalPostFunctions = [],
+    restartSim = true
 ) => {
     loading("changeSetting called...");
     if (typeof selector === "object") {
@@ -358,13 +413,14 @@ const changeSetting = (
         if (_filter === true) filter();
         updateElements();
         updateGraphElements();
-        restartSimulation();
+        if (restartSim) restartSimulation();
         saveSettings();
         additionalPostFunctions.forEach((func) => {
             Function(func)();
         });
     } else {
         console.log("already correctly set.");
+        console.log(type);
     }
     return true;
 };
@@ -383,7 +439,7 @@ const setupSettingInteractivity = () => {
         changeSetting("#endYear", "force", true, "dropdown");
     });
     d3.select("#datafile").on("change", () => {
-        changeSetting("#datafile", "force", true, "dropdown", [], [location.reload()]);
+        TODO: changeSetting("#datafile", "force", true, "dropdown", [], [location.reload()]);
     });
 
     // slider interactivity
@@ -402,10 +458,10 @@ const setupSettingInteractivity = () => {
     });
 
     d3.select("#nodeMultiplier").on("input", () => {
-        changeSetting("#nodeMultiplier", "force", false, "slider");
+        changeSetting("#nodeMultiplier", "force", false, "slider", [], [], false);
     });
     d3.select("#edgeMultiplier").on("input", () => {
-        changeSetting("#edgeMultiplier", "force", false, "slider");
+        changeSetting("#edgeMultiplier", "force", false, "slider", [], [], false);
     });
     d3.select("#collide").on("input", () => {
         changeSetting("#collide", "force", false, "slider");
@@ -422,13 +478,13 @@ const setupSettingInteractivity = () => {
         changeSetting("#autoClearNodes", "force", true);
     });
     d3.select("#weightFromCurrent").on("change", () => {
-        changeSetting("#weightFromCurrent", "force", true);
+        changeSetting("#weightFromCurrent", "force", true, "checkbox", [], [], false);
     });
     d3.select("#nodeSizeFromCurrent").on("change", () => {
-        changeSetting("#nodeSizeFromCurrent", "force", true);
+        changeSetting("#nodeSizeFromCurrent", "force", true, "checkbox", [], [], false);
     });
     d3.select("#communityDetection").on("change", () => {
-        changeSetting("#communityDetection", "force", true, "checkbox", [], [updateGraphElements]);
+        changeSetting("#communityDetection", "force", true, "checkbox", [], [updateGraphElements], false);
     });
     d3.select("#layoutCenter").on("change", () => {
         changeSetting("#layoutCenter", "force", false);
@@ -686,3 +742,36 @@ const setupMiscInteractivity = () => {
 
     return true;
 };
+
+const allSettingsElements = [...document.querySelector('#settings').querySelectorAll('input, select, .btn')].concat([...document.querySelector('#infoContainer').querySelectorAll('input, select, .btn')])
+
+/**
+ * disableSettings is called to disable settings.
+ * The return value is always true.
+ * @param {Array} exclude - identifiers (#ID) for settings to exclude from disabling can be included.
+ * @returns {boolean} - true
+ */
+const disableSettings = (exclude=[]) => {
+    allSettingsElements.forEach(elem => {
+        console.log(`processing element ${elem.id}`)
+        if (exclude.includes(elem.id)) {
+            // do nothing
+            console.info(`** Skipped ${elem.tagName} element with id ${elem.id}.`)
+        } else {
+            elem.disabled = true;
+            elem.classList.add('disabled');
+            console.info(`disabled ${elem.tagName} element with id ${elem.id}.`)
+        }
+    })
+}
+
+const enableSettings = (exclude=[]) => {
+    allSettingsElements.forEach(elem => {
+        if (exclude.includes(elem.id)) {
+            // do nothing
+        } else {
+            elem.disabled = false;
+            elem.classList.remove('disabled');
+        }
+    })
+}

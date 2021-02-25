@@ -140,12 +140,12 @@ let month_MMM_regex =
     "(January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)";
 let month_MM_regex = "(0[1-9]|1[0-2])";
 let month_M_regex = "([1-9]|1[0-2])";
-let year_YYYY_regex = "(1[0-9][0-9][0-9])"; // since we are only looking for 1900s
+let year_YYYY_regex = "(1[8-9][0-9][0-9])[-,\\s\\]\\)\\.]"; // since we are only looking for 1800s-1900s (and followed by `whitespace` or `-`)
 let year_YY_regex = "([0-9]{2})"; // since we are only looking for 1900s
 
 /**
- * dateParser takes X argument/s... TODO: Finish this.
- * The return value is ...
+ * dateParser takes a string and extracts an ISO date from it.
+ * @returns object The return value is an object with only one property (`iso`) containing the ISO-formatted date.
  */
 const dateParser = (test_string) => {
     if (!test_string) {
@@ -220,7 +220,7 @@ const dateParser = (test_string) => {
         } else if (!found && dateObj) {
             console.error("weird");
         } else if (!found && !dateObj) {
-            console.error("date could not be found in `" + test_string + "`.");
+            // console.error("date could not be found in `" + test_string + "`.");
         }
     }
     return { iso: undefined };

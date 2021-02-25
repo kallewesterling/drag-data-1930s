@@ -329,16 +329,17 @@ const updateGraphElements = () => {
     //if (window.toggledCommentedElements != undefined) console.log(`window.toggledCommentedElements: ${window.toggledCommentedElements}`)
     //if (window.nodeSelected != undefined) console.log(`window.nodeSelected: ${window.nodeSelected}`)
 
+    let settings = getSettings();
     nodeElements
         .attr("class", (node) => getNodeClass(node))
         .transition()
-        .attr("r", (node) => node.r)
+        .attr("r", (node) => getSize(node))
         .attr("style", (node) => {
-            if (node.cluster) {
+            if (node.cluster && settings.nodes.communityDetection) {
                 return (
                     "fill: " +
                     d3.interpolateSinebow(1 / node.cluster) +
-                    " !important;"
+                    " ;" //!important
                 );
             } else {
                 return "";
@@ -350,7 +351,7 @@ const updateGraphElements = () => {
         .transition()
         .style("stroke-width", (e) => getEdgeStrokeWidth(e));
 
-    if (!getSettings().nodes.stickyNodes) {
+    if (!settings.nodes.stickyNodes) {
         textElements.attr("", (node) => {
             node.fx = null;
             node.fy = null;
@@ -359,7 +360,7 @@ const updateGraphElements = () => {
 
     textElements
         .attr("class", (node) => {
-            if (getSettings().nodes.communityDetection) {
+            if (settings.nodes.communityDetection) {
                 return `label cluster-${node.cluster}`;
             } else {
                 return `label`;
@@ -451,6 +452,27 @@ const graphEdgesContains = (edge_id) => {
  */
 const modifySimulation = () => {
     let settings = getSettings().force;
+    
+    if (settings.layoutClustering && getSettings().nodes.communityDetection) {
+        function clustering(alpha) {
+            graph.nodes.forEach((d) => {
+                const cluster = graph.clusters[d.cluster];
+                if (cluster === d) return;
+                let x = d.x - cluster.x;
+                let y = d.y - cluster.y;
+                let l = Math.sqrt(x * x + y * y);
+                const r = d.r + cluster.r;
+                if (l !== r) {
+                    l = ((l - r) / l) * alpha;
+                    d.x -= x *= l;
+                    d.y -= y *= l;
+                    cluster.x += x;
+                    cluster.y += y;
+                }
+            });
+        }
+        graph.simulation.force('cluster', clustering);
+    }
 
     graph.simulation.force("link").links(graph.edges);
     graph.simulation.nodes(graph.nodes);
@@ -489,47 +511,6 @@ const modifySimulation = () => {
     } else {
         graph.simulation.force("collide", null);
     }
-    if (settings.layoutClustering && getSettings().nodes.communityDetection) {
-        function clustering(alpha) {
-            graph.nodes.forEach((d) => {
-                const cluster = graph.clusters[d.cluster];
-                if (cluster === d) return;
-                let x = d.x - cluster.x;
-                let y = d.y - cluster.y;
-                let l = Math.sqrt(x * x + y * y);
-                const r = d.r + cluster.r;
-                if (l !== r) {
-                    l = ((l - r) / l) * alpha;
-                    d.x -= x *= l;
-                    d.y -= y *= l;
-                    cluster.x += x;
-                    cluster.y += y;
-                }
-            });
-        }
-        graph.simulation.force('cluster', clustering);
-    }
-
-    // if settings.layoutClustering... TODO: implement node clustering via jLouvain and then set up a setting for this!
-    /*
-    graph.simulation.force('cluster', (alpha) => {
-        nodeElements.data().forEach((d) => {
-            const cluster = clusters[d.cluster];
-            if (cluster === d) return;
-            let x = d.x - cluster.x;
-            let y = d.y - cluster.y;
-            let l = Math.sqrt((x * x) + (y * y));
-            const r = d.r + cluster.r;
-            if (l !== r) {
-                l = ((l - r) / l) * alpha;
-                d.x -= x *= l;
-                d.y -= y *= l;
-                cluster.x += x;
-                cluster.y += y;
-            }
-          });
-    })
-    */
 
     graph.simulation.force("link").strength(settings.linkStrength);
 

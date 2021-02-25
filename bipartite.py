@@ -35,6 +35,8 @@ def parse_row(row):
 
 
 def fix_date(date):
+    date = date.replace('?', '').strip()
+
     try:
         date = datetime.strptime(date, '%Y-%m-%d')
     except ValueError as e:
@@ -185,15 +187,8 @@ with alive_bar(len(df)) as bar:
         else:
             if ERROR_LEVEL > 1: print("Row looks like duplicate:", json.loads(dataline))
 
-        # MULTI-PARTITE GRAPH
-
-
-        # BIPARTITE GRAPH
-
-        # do things with nodes
-        if data['performer'] and data['city']:
-            # add edge between data['performer'] and data['city']
-            edge_data = get_edge_data(bipartite_graph, data['performer'], data['city'])
+        def get_data(g, data, col1, col2):
+            edge_data = get_edge_data(g, data[col1], data[col2])
             if data['comment_revue']:
                 edge_data['revue_comments'].append({'comment': data['comment_revue'], 'source': data['source']})
             if data['comment_venue']:
@@ -201,12 +196,36 @@ with alive_bar(len(df)) as bar:
             if not data['source'] in edge_data['sources']:
                 edge_data['sources'].append(data['source'])
                 edge_data['weight'] += 1
+            return edge_data
+
+        # MULTI-PARTITE GRAPH
+        if data['performer'] and data['venue']:
+            # add edge between data['performer'] and data['venue']
+            edge_data = get_data(multipartite_graph, data, 'performer', 'venue')
+            print(edge_data.get('date'))
+
+            multipartite_graph.add_weighted_edges_from(
+                [data['performer'], data['venue'], edge_data['weight']],
+                sources = edge_data['sources'],
+                revue_name = edge_data.get('revue_name'),
+                # date = edge_data.get('date').strftime('%Y-%m-%d'),
+                revue_comments = edge_data['revue_comments'],
+                venue_comments = edge_data['venue_comments'],
+                edge_id = get_id(data['performer']+'-'+data['venue'])
+            )
+
+        # BIPARTITE GRAPH
+
+        # do things with nodes
+        if data['performer'] and data['city']:
+            # add edge between data['performer'] and data['city']
+            edge_data = get_data(bipartite_graph, data, 'performer', 'city')
             
             bipartite_graph.add_weighted_edges_from(
                 [(data['performer'], data['city'], edge_data['weight'])],
                 sources=edge_data['sources'],
                 venue=data['venue'],
-                revue_name=data['revue_name'],
+                revue_name=data.get('revue_name'),
                 date=data['date'].strftime("%Y-%m-%d"),
                 revue_comments=edge_data['revue_comments'],
                 venue_comments=edge_data['venue_comments'],

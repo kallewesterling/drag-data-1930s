@@ -28,13 +28,13 @@ const _autoSettings = {
         linkStrength: 0.40,
     },
     zoom: 1.25,
-    zoomMin: 0.75,
-    zoomMax: 8,
+    zoomMin: 0.60,
+    zoomMax: 4,
     edgeMinStroke: 1,
     edgeMaxStroke: 7,
     debugMessages: false,
     datafile: {
-        filename: 'drag-data.json',
+        filename: 'data/drag-data-new.json',
         bipartite: false
     }
 };
@@ -75,10 +75,6 @@ const keyMapping = {
 };
 
 const store = {
-    datafile: {
-        filename: "drag-data.json",
-        bipartite: false
-    },
     raw: {},
     nodes: [],
     edges: [],

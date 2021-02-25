@@ -1,5 +1,12 @@
 "use strict";
 
+const minify = (s) => {
+    return s
+        .replace(/\>[\r\n ]+\</g, "><")
+        .replace(/(<.*?>)|\s+/g, (m, $1) => $1 ? $1 : ' ')
+        .trim()
+}
+  
 /**
  * getInfoHTML takes no arguments but generates the HTML for the viz information.
  * The return value is always the HTML itself.
@@ -7,29 +14,25 @@
  */
 const getInfoHTML = () => {
     let html = `
-        <p>Graph nodes: ${graph.nodes.length}/${store.nodes.length}</p>
-        <p>Graph edges: ${graph.edges.length}/${store.edges.length}</p>
-        <hr />`
+        <span id="numNodes" class="small mr-2" data-bs-toggle="popover"><i class="mr-1 small bi bi-record-fill"></i><strong>${graph.nodes.length}</strong><span class="text-muted">/${store.nodes.length}</span></span>
+        <span id="numEdges" class="small mr-2" data-bs-toggle="popover"><i class="mr-1 small bi bi-share-fill"></i><strong>${graph.edges.length}</strong><span class="text-muted">/${store.edges.length}</span></span>
+        <span id="unconnectedNodes" class="small mr-2" data-bs-toggle="popover"><i class="mr-1 bi bi-node-minus"></i>${hasUnconnectedNodes()? getUnconnectedNodes().length: 0}</span>
+        `
     if (graph.nodes.length < 300) {
         html += `
-            <p>Unconnected nodes: ${hasUnconnectedNodes()? getUnconnectedNodes().length: 0}</p>
-            <p id="colorNetworks" class="btn btn-sm ${window.coloredNetworks ? 'btn-warning' : 'btn-outline-secondary'}">Network count: ${graph.networkCount}</p>
-            <p id="commentedNodes" class="btn btn-sm ${window.toggledCommentedElements ? 'btn-warning' : 'btn-outline-secondary'}">Nodes with comments: ${graph.nodes.filter(n=>n.has_comments).length}</p>
-            <hr />`
+            <span id="colorNetworks" data-bs-toggle="popover" class="mr-2 m-0 badge ${window.coloredNetworks ? 'bg-warning' : 'bg-dark'}">${graph.networkCount} networks</span>
+            <span id="commentedNodes" data-bs-toggle="popover" class="mr-2 m-0 badge ${window.toggledCommentedElements ? 'bg-warning' : 'bg-dark'}">${graph.nodes.filter(n=>n.has_comments).length} commented <i class="bi bi-record-fill"></i></span>
+            `
     } else {
         html += `
-        <p>Unconnected nodes: ${hasUnconnectedNodes()? getUnconnectedNodes().length: 0}</p>
-        <p id="colorNetworks" class="btn btn-sm ${window.coloredNetworks ? 'btn-warning' : 'btn-outline-secondary'}">Count networks${graph.networkCount ? ' ('+graph.networkCount+ ')' : ''}</p>
-        <p id="commentedNodes" class="btn btn-sm ${window.toggledCommentedElements ? 'btn-warning' : 'btn-outline-secondary'}">Show nodes with comments</p>
+        <span id="colorNetworks" data-bs-toggle="popover" class="mr-2 badge ${window.coloredNetworks ? 'bg-warning' : 'bg-dark'}">${graph.networkCount ? graph.networkCount : ''} networks</span>
+        <span id="commentedNodes" data-bs-toggle="popover" class="mr-2 badge ${window.toggledCommentedElements ? 'bg-warning' : 'bg-dark'}">Show nodes with comments</span>
         `
-        
     }
     html += `
-        <p>Current zoom: ${graph.k}</p>
-        <p>Current x, y: ${graph.x}, ${graph.y}</p>`;
-    if (getSettings().nodes.communityDetection && Object.keys(graph.clusters).length)
-        html += `<hr />
-                <p>Communities: ${Object.keys(graph.clusters).length}</p>`;
+        <span id="currentZoom" class="small mr-2" data-bs-toggle="popover"><i class="mr-1 bi bi-search"></i>${(graph.k*100).toFixed(0)}%</span>`;
+    if (Object.keys(graph.clusters).length)
+        html += `<span id="numCommunities" class="small mr-2" data-bs-toggle="popover"><i class="mr-1 bi bi-heart-fill"></i>${Object.keys(graph.clusters).length}</span>`;
     return html;
 };
 
@@ -52,35 +55,33 @@ const displayOrID = (o) => {
  * @return {string} html - raw HTML
  */
 const generateNodeInfoHTML = (node) => {
-    console.log(node)
-    let html = `<p><strong>${displayOrID(node)}</strong></p>
-        <p>degree: ${node.degree}</p>
-        <p>—> in: ${node.indegree}</p>
-        <p>—> out: ${node.outdegree}</p>
-        <p>current network degree: ${node.currentDegree}</p>
-        <p class="mt-2"><strong>Source range</strong></p>
-        <p>${d3.min(node.sourceRange)}-${d3.max(node.sourceRange)}</p>
-        <p class="mt-2"><strong>Centrality measures (across network)</strong></p>
-        <p>Betweenness (1000x): ${
-            Math.round(node["1000x-betweenness-centrality"] * 100) / 100
-        }</p>
-        <p>Closeness (1000x): ${
-            Math.round(node["1000x-closeness-centrality"] * 100) / 100
-        }</p>
-        <p>Degree (1000x): ${
-            Math.round(node["1000x-degree-centrality"] * 100) / 100
-        }</p>
-        <p>Eigenvector (1000x): ${
-            Math.round(node["1000x-eigenvector-centrality"] * 100) / 100
-        }</p>`;
-        // TODO: Do something interactive with these?
-        /*
-        <p class="mt-2"><strong>Related nodes</strong></p>`;
-        let related = getRelated(node.node_id);
-            <p>Secondary: ${related.secondaryNodeIDs}</p>
-            <p>Tertiary: ${related.tertiaryNodeIDS}</p>
-        */
-    return html;
+    let html = `
+        <li class="list-group-item"><strong>ID</strong> ${node.display}</li>
+        <li class="list-group-item">
+            <strong class="mb-1">Degree</strong> ${node.degree}
+            <p class="m-0 mb-1 small">In: ${node.indegree}</p>
+            <p class="m-0 mb-1 small">Out: ${node.outdegree}</p>
+            <p class="m-0 small">Current in network: ${node.currentDegree}</p>
+        </li>
+        <li class="list-group-item">
+            <strong class="mb-1">Source range</strong>
+            <p class="m-0 small">${d3.min(node.sourceRange)}-${d3.max(node.sourceRange)}</p>
+        </li>
+        <li class="list-group-item">
+            <strong class="mb-1">Centrality measures (across entire network)</strong>
+            <p class="m-0 mb-1 small">Betweenness (1000x): ${Math.round(node["1000x-betweenness-centrality"] * 100) / 100}</p>
+            <p class="m-0 mb-1 small">Closeness (1000x): ${Math.round(node["1000x-closeness-centrality"] * 100) / 100}</p>
+            <p class="m-0 mb-1 small">Degree (1000x): ${Math.round(node["1000x-degree-centrality"] * 100) / 100}</p>
+            <p class="m-0 small">Eigenvector (1000x): ${Math.round(node["1000x-eigenvector-centrality"] * 100) / 100}</p>
+        </li>`
+    if (node.has_comments) {
+        html += `<li class="list-group-item"><strong>Comments</strong>`
+        node.comments.forEach(obj => {
+            html += `<p class="m-0 mb-1 small">${obj.comment} (${obj.source})</p>`
+        })
+        html += `</li>`
+    }
+    return minify(html);
 };
 
 /**
@@ -91,51 +92,53 @@ const generateNodeInfoHTML = (node) => {
  */
 const generateEdgeInfoHTML = (edge) => {
     let settings = getSettings();
-    let strongCurrent =
-        settings.edges.weightFromCurrent === true
-            ? ["<strong>", "</strong>"]
-            : ["", ""];
-    let strongGlobal =
-        settings.edges.weightFromCurrent === false
-            ? ["<strong>", "</strong>"]
-            : ["", ""];
+    console.log(edge);
 
-    let html = `<p><strong>${displayOrID(edge.source)} - ${displayOrID(
-        edge.target
-    )}</strong></p>
-                <table class="table"><tbody>
-                <tr><td>${strongGlobal[0]}Weight:${strongGlobal[1]}</td><td>${
-        strongGlobal[0]
-    }${edge.weight}${strongGlobal[1]}</td></tr>
-                <tr><td>${strongCurrent[0]}Current weight:${
-        strongCurrent[1]
-    }</td><td>${strongCurrent[0]}${edge.calibrated_weight}${
-        strongCurrent[1]
-    }</td></tr>`;
+    let html = `
+        <li class="list-group-item"><strong>ID</strong> ${edge.source.display} - ${edge.target.display}</li>
+        <li class="list-group-item">
+            <strong class="mb-1">Weight</strong>
+            <p class="m-0 mb-1 small ${settings.edges.weightFromCurrent ? '' : 'fw-bold'}">In entire network: ${edge.weight}</p>
+            <p class="m-0 small ${settings.edges.weightFromCurrent ? 'fw-bold' : ''}">In current network: ${edge.calibrated_weight}</p>
+        </li>
+        `
     if (edge.revue) {
-        _html += `<tr><td>Revue mentioned:</td><td>${edge.revue_name}</td></tr>`;
+        html += `
+        <li class="list-group-item"><strong>Revue mentioned</strong> ${edge.revue_name}</li>
+        `;
     }
-    if (edge.range.start && edge.range.end) {
-        html += `<tr><td>Range:</td><td>${edge.range.start}–${edge.range.end}</td></tr>`;
-    } else if (edge.range.start) {
-        html += `<tr><td>Range:</td><td>${edge.range.start}–</td></tr>`;
+
+    if (edge.range.start) {
+        html += `
+        <li class="list-group-item"><strong>Range</strong> ${edge.range.start}${edge.range.end ? ' – ' + edge.range.end : ''}</li>
+        `;
     }
-    if (edge.comment) {
-        html += `<tr><td>Comment:</td><td>${edge.comment}</td></tr>`;
+
+    if (edge.has_general_comments) {
+        html += `<li class="list-group-item"><strong class="mb-1">General comments</strong>`;
+        edge.general_comments.forEach(obj => {
+            html += `<p class="m-0 mb-1 small">${obj.comment} <span class="text-muted">(${obj.source})</span></p>`;
+        })
+        html += `</li>`;
     }
+
+    if (edge.has_comments) {
+        html += `<li class="list-group-item"><strong class="mb-1">Comments on revue</strong>`;
+        edge.comments.forEach(obj => {
+            html += `<p class="m-0 mb-1 small">${obj.comment} <span class="text-muted">(${obj.source})</span></p>`;
+        })
+        html += `</li>`;
+    }
+
     if (edge.found) {
-        let plural = edge.found.length > 1 ? "s" : "";
-        html += `<tr><td>Found in:</td><td>${edge.found.length} source${plural}</td></tr>
-        <tr><td colspan="2">
-        <ul>`;
-        edge.found.forEach((source) => {
-            html += `<li>${source}</li>`;
-        });
-        html += `</ul></td></tr>`;
+        html += `<li class="list-group-item"><strong class="mb-1">Found in sources:</strong>`;
+        edge.found.forEach(source => {
+            html += `<p class="m-0 mb-1 small">${source}</p>`;
+        })
+        html += `</li>`;
     }
-    html += `<tr><td>Edge ID:</td><td>${edge.edge_id}</td></tr>`;
-    html += `</table>`;
-    return html;
+
+    return minify(html);
 };
 
 /**
@@ -168,7 +171,7 @@ const generateCommentHTML = (elem) => {
     let html = "";
     if (elem.node_id) {
         // we have a node!
-        html += `<h1>${displayOrID(elem)}</h1>`;
+        html += `<h1>${elem.display}</h1>`;
         if (elem.has_comments) {
             html += "<h2>Comments</h2>";
             elem.comments.forEach((c) => {
@@ -179,13 +182,9 @@ const generateCommentHTML = (elem) => {
         // we have an edge!
         if (elem.revue_name) {
             html += `<h1>${elem.revue_name}</h1>`;
-            html += `<h2>${displayOrID(elem.source)} - ${displayOrID(
-                elem.target
-            )}</h2>`;
+            html += `<h2>${elem.source.display} - ${elem.target.display}</h2>`;
         } else {
-            html += `<h1>${displayOrID(elem.source)} - ${displayOrID(
-                elem.target
-            )}</h1>`;
+            html += `<h1>${elem.source.display} - ${elem.target.display}</h1>`;
         }
 
         if (elem.has_comments) {

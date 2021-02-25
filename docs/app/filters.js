@@ -7,6 +7,7 @@ const dropNode = (node) => {
                 loading(`dropping node ${o.node_id}...`);
                 graph.nodes.splice(i, 1);
                 node.inGraph = false;
+                return true;
             }
         });
     }
@@ -18,6 +19,7 @@ const dropEdge = (edge) => {
             loading(`dropping edge ${o.edge_id}...`);
             graph.edges.splice(i, 1);
             edge.inGraph = false;
+            return true;
         }
     });
 };
@@ -184,7 +186,7 @@ const clusters = {};
  * @returns {boolean} - true
  */
 const filter = (nodeList = [], edgeList = [], change = true) => {
-    loading("filter called...");
+    loading("Filtering nodes...");
     let settings = getSettings();
 
     hide("#nodeEdgeInfo");
@@ -201,45 +203,22 @@ const filter = (nodeList = [], edgeList = [], change = true) => {
     updateElements();
 
     if (settings.nodes.communityDetection) {
-        // TODO: I am using JLevain here. Are there other community detectors out there? Learn more about algorithms...
-        // See invention of Louvain method here https://arxiv.org/pdf/0803.0476.pdf
-        var allNodes = graph.nodes.map((d) => d.node_id);
-        var allEdges = graph.edges.map((d) => {
-            return {
-                source: d.source.node_id,
-                target: d.target.node_id,
-                weight: d.weight,
-            };
-        });
-
-        var community = jLouvain().nodes(allNodes).edges(allEdges);
-
-        let result = community();
-
-        graph.nodes.forEach((node) => {
-            node.cluster = result[node.node_id] + 1;
-
-            node.r = getSize(node);
-            const clusterID = node.cluster;
-            if (
-                !graph.clusters[clusterID] ||
-                node.r > graph.clusters[clusterID].r
-            ) {
-                graph.clusters[clusterID] = node;
-            }
-        });
-
-        console.log("clusters", graph.clusters);
-
-        textElements.text((node)=>`${node.cluster}. ${displayOrID(node)}`);
-    } else {
-        graph.nodes.forEach((node) => {
-            node.r = getSize(node);
-        });
+        communityDetection();
+        textElements.text((node)=>`${node.cluster}. ${node.display}`);
     }
+    graph.nodes.forEach((node) => {
+        node.r = getSize(node);
+    });
 
     if (graph.nodes.length < 300)
         graph.networkCount = getUniqueNetworks(undefined, "counter");
+
+    graph.nodes.forEach(node=>{
+        node.html_info = generateNodeInfoHTML(node);
+    })
+    graph.edges.forEach(edge=>{
+        edge.html_info = generateEdgeInfoHTML(edge);
+    })
 
     updateGraphElements();
     updateInfo();
@@ -423,8 +402,8 @@ const toggleCommentedElements = (force = undefined) => {
         restartSimulation();
     }
     d3.select("#commentedNodes")
-        .classed("btn-outline-secondary", !window.toggledCommentedElements)
-        .classed("btn-warning", window.toggledCommentedElements);
+        .classed("bg-dark", !window.toggledCommentedElements)
+        .classed("bg-warning", window.toggledCommentedElements);
     return true;
 };
 

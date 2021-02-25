@@ -1,7 +1,7 @@
 "use strict";
 
 const zoom = d3.zoom().extent([[_autoSettings.zoomMin, _autoSettings.zoomMax], [window.innerWidth, window.innerHeight]]);
-zoom.scaleExtent([0.75, 4])
+zoom.scaleExtent([_autoSettings.zoomMin, _autoSettings.zoomMax])
 
 const zoomedActions = () => {
     saveSettings();
