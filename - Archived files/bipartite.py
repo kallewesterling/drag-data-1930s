@@ -288,6 +288,7 @@ for node, all_comments in comments.items():
     else:
         pass # TODO: add comments here
 
+''' # This file no longer exists
 with open('app/drag-data-bipartite.json', 'w+') as f:
     json.dump(obj=nx.node_link_data(bipartite_graph), fp=f)
-
+'''
