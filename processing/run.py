@@ -1,6 +1,8 @@
+import os
 import networkx as nx
 from collections import Counter
 import json
+import progressbar
 from helpers import Row, Place, load_spreadsheet, get_revue_comments, get_general_comments
 
 nodes = Counter()
@@ -20,10 +22,23 @@ venue_comments = []
 revue_comments = []
 places = {}
 
+
+
 SPREADSHEET = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT0E0Y7txIa2pfBuusA1cd8X5OVhQ_D0qZC8D40KhTU3xB7McsPR2kuB7GH6ncmNT3nfjEYGbscOPp0/pub?gid=0&single=true&output=csv'
+data_dir = './docs/data/'
+
+if not os.path.exists(data_dir):
+    os.makedirs(data_dir, exist_ok=True)
+
+
+print('Loading dataset from Google Sheets...')
+
 df = load_spreadsheet(SPREADSHEET)
 
-for row in df.fillna('').itertuples():
+bar = progressbar.ProgressBar(max_value=len(df), widgets=[' [Processing dataset] ', progressbar.Bar()])
+
+for i, row in enumerate(df.fillna('').itertuples()):
+    bar.update(i)
     row = Row(row)
     
     if not row.has_basic_data:
@@ -147,6 +162,8 @@ for row in df.fillna('').itertuples():
         if not edge_data[edge]['date']:
             exit('no date')
 
+bar.finish()
+
 
 if not len(multi_edges):
     exit('No multipartite graph found!')
@@ -159,7 +176,10 @@ graphs = {
     'bipartite': []
 }
 
-for edge in multi_edges:
+bar = progressbar.ProgressBar(max_value=len(multi_edges), widgets=[' [Processing multi-edges] ', progressbar.Bar()])
+
+for i, edge in enumerate(multi_edges):
+    bar.update(i)
     source, target, edge_id = edge
     weight = multi_edges[edge]
     revue_name = edge_data[edge].get('revue_name')
@@ -170,11 +190,15 @@ for edge in multi_edges:
 
     graphs['multipartite'].add_edge(source, target, weight=weight, date=date, revue_name=revue_name, comments=comments, found=found[edge], edge_id=edge_id, general_comments=general_comments, row_num=row_num)
 
+bar.finish()
 
 
-for network in bipartite_edges:
+bar = progressbar.ProgressBar(max_value=len(bipartite_edges), widgets=[' [Processing bi-edges] ', progressbar.Bar()])
+
+for i, network in enumerate(bipartite_edges):
+    bar.update(i)
     bipartite_graph = {}
-    bipartite_graph['filename'] = f'app/data/bipartite-data-{network}.json'
+    bipartite_graph['filename'] = f'{data_dir}/bipartite-data-{network}.json'
 
     bipartite_graph['G'] = nx.DiGraph()
 
@@ -191,11 +215,24 @@ for network in bipartite_edges:
 
     graphs['bipartite'].append(bipartite_graph)
 
+bar.finish()
 
 
+bar = progressbar.ProgressBar(max_value=len(nodes), widgets=[' [Processing nodes] ', progressbar.Bar()])
 
-for d in nodes:
+for i, d in enumerate(nodes):
+    bar.update(i)
     node, category, node_id, display = d
+
+    if display in places:
+        geodata = {
+            'lat': places[display].lat,
+            'lon': places[display].lon,
+            'importance': places[display].importance,
+            'display_name': places[display].display_name
+        }
+    else:
+        geodata = None
     
     if not node_id:
         print("HAS NO ID")
@@ -230,7 +267,7 @@ for d in nodes:
     if node in assumed_birth_years:
         nx.set_node_attributes(graphs['multipartite'], {node: {'assumed_birth_year': assumed_birth_years[node]}})
 
-    nx.set_node_attributes(graphs['multipartite'], {node: {'display': display, 'category': category, 'node_id': node_id}})
+    nx.set_node_attributes(graphs['multipartite'], {node: {'display': display, 'category': category, 'node_id': node_id, 'geodata': geodata}})
 
     for graph in graphs['bipartite']:
         if comments:
@@ -242,7 +279,7 @@ for d in nodes:
         if node in assumed_birth_years:
             nx.set_node_attributes(graph['G'], {node: {'assumed_birth_year': assumed_birth_years[node]}})
 
-        nx.set_node_attributes(graph['G'], {node: {'display': display, 'category': category, 'node_id': node_id}})
+        nx.set_node_attributes(graph['G'], {node: {'display': display, 'category': category, 'node_id': node_id, 'geodata': geodata}})
 
 # Set degrees on all nodes
 nx.set_node_attributes(graphs['multipartite'], dict(graphs['multipartite'].in_degree()), 'indegree')
@@ -262,7 +299,15 @@ for node, attrs in graphs['multipartite'].nodes.items():
     graphs['multipartite'].nodes[node]['1000x-eigenvector-centrality'] = "{:.15f}".format(attrs['centrality-eigenvector']*1000).rstrip('0')
     graphs['multipartite'].nodes[node]['1000x-degree-centrality'] = "{:.15f}".format(attrs['centrality-degree']*1000).rstrip('0')
 
-for graph in graphs['bipartite']:
+bar.finish()
+
+
+
+bar = progressbar.ProgressBar(max_value=len(graphs['bipartite']), widgets=[' [Processing bi-graph nodes] ', progressbar.Bar()])
+
+for i, graph in enumerate(graphs['bipartite']):
+    bar.update(i)
+
     # Set degrees on all nodes
     nx.set_node_attributes(graph['G'], dict(graph['G'].in_degree()), 'indegree')
     nx.set_node_attributes(graph['G'], dict(graph['G'].out_degree()), 'outdegree')
@@ -281,8 +326,11 @@ for graph in graphs['bipartite']:
         graph['G'].nodes[node]['1000x-eigenvector-centrality'] = "{:.15f}".format(attrs['centrality-eigenvector']*1000).rstrip('0')
         graph['G'].nodes[node]['1000x-degree-centrality'] = "{:.15f}".format(attrs['centrality-degree']*1000).rstrip('0')
 
+bar.finish()
+
+
 # Time to save!
-with open('./app/data/multipartite-data.json', 'w+') as f:
+with open(f'{data_dir}/multipartite-data.json', 'w+') as f:
     json.dump(nx.node_link_data(graphs['multipartite']), f)
 
 for graph in graphs['bipartite']:
