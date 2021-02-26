@@ -99,29 +99,27 @@ const generateNodeInfoHTML = (node) => {
  * generateEdgeInfoHTML takes one required argument, the d3 selector for a given edge.
  * The return value is always the HTML with the selected information about the edge.
  * @param {Object} edge - d3 selector for a given edge.
- * @return {string} html - raw HTML
+ * @return {string} html - raw minified HTML
  */
 const generateEdgeInfoHTML = (edge) => {
     let settings = getSettings();
     
-    let html = `
-        <li class="list-group-item"><strong>ID</strong> ${edge.source.display} - ${edge.target.display}</li>
-        <li class="list-group-item">
-            <strong class="mb-1">Weight</strong>
-            <p class="m-0 mb-1 small ${settings.edges.weightFromCurrent ? '' : 'fw-bold'}">In entire network: ${edge.weight}</p>
-            <p class="m-0 small ${settings.edges.weightFromCurrent ? 'fw-bold' : ''}">In current network: ${edge.calibrated_weight}</p>
-        </li>
-        `
-    if (edge.revue) {
-        html += `
-        <li class="list-group-item"><strong>Revue mentioned</strong> ${edge.revue_name}</li>
-        `;
+    let html = `<li class="list-group-item"><strong>ID</strong> ${edge.source.display} - ${edge.target.display}</li>`;
+
+    if (edge.revue_name) {
+        console.log(edge.revue_name);
+        html += `<li class="list-group-item"><strong>Revue mentioned</strong> ${edge.revue_name}</li>`;
     }
+    
+    html += `<li class="list-group-item">
+        <strong class="mb-1">Weight</strong>
+        <p class="m-0 mb-1 small ${settings.edges.weightFromCurrent ? '' : 'fw-bold'}">In entire network: ${edge.weight}</p>
+        <p class="m-0 small ${settings.edges.weightFromCurrent ? 'fw-bold' : ''}">In current network: ${edge.calibrated_weight}</p>
+        </li>
+        `;
 
     if (edge.range.start) {
-        html += `
-        <li class="list-group-item"><strong>Range</strong> ${edge.range.start}${edge.range.end ? ' – ' + edge.range.end : ''}</li>
-        `;
+        html += `<li class="list-group-item"><strong>Range</strong> ${edge.range.start}${edge.range.end ? ' – ' + edge.range.end : ''}</li>`;
     }
 
     if (edge.has_general_comments) {
