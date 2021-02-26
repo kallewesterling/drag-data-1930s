@@ -174,7 +174,7 @@ for edge in multi_edges:
 
 for network in bipartite_edges:
     bipartite_graph = {}
-    bipartite_graph['filename'] = f'docs/data/bipartite-data-{network}.json'
+    bipartite_graph['filename'] = f'app/data/bipartite-data-{network}.json'
 
     bipartite_graph['G'] = nx.DiGraph()
 
@@ -282,7 +282,7 @@ for graph in graphs['bipartite']:
         graph['G'].nodes[node]['1000x-degree-centrality'] = "{:.15f}".format(attrs['centrality-degree']*1000).rstrip('0')
 
 # Time to save!
-with open('./docs/data/multipartite-data.json', 'w+') as f:
+with open('./app/data/multipartite-data.json', 'w+') as f:
     json.dump(nx.node_link_data(graphs['multipartite']), f)
 
 for graph in graphs['bipartite']:

@@ -494,7 +494,7 @@ def find_similar(name, list_of_names, threshold=0.75):
 
 
 def load_G():
-    with open('/Users/kallewesterling/Google Drive/Dropbox (snapshot)/dev/dev-dissertation/Drag data for 1930s/docs/drag-data.json', 'r') as f:
+    with open('/Users/kallewesterling/Google Drive/Dropbox (snapshot)/dev/dev-dissertation/Drag data for 1930s/app/drag-data.json', 'r') as f:
         return nx.json_graph.node_link_graph(json.load(f))
 
 
@@ -615,5 +615,5 @@ json_data['count'] = count
 json_data['comments'] = all_comments
 
 # write file
-Path('./docs/data/drag-data.json').write_text(json.dumps(json_data))
+Path('./app/data/drag-data.json').write_text(json.dumps(json_data))
 # Path('../testing-d3-v4/data_drag.json').write_text(json.dumps(json_data))
