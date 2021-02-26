@@ -134,23 +134,25 @@ const colorNetworks = () => {
     let networks = getUniqueNetworks()
     networkNoByID = {};
 
+    console.log('looping through networks...')
     networks.forEach((list, i) => {
         // console.log(i);
         list.map((d) => d.node_id).forEach((id) => {
             networkNoByID[id] = i + 1;
         });
     });
+    console.log(`${networks.length} networks found`)
 
     nodeElements.attr('style', node => {
         networkID = networkNoByID[node.node_id];
-        console.log(networkID/100);
+        console.log(networkID*20);
         return 'fill: ' + d3.interpolateRainbow(networkID/networks.length*5) + '!important;';
     });
 
     if (graph.nodes.length > 300 && !graph.networkCount) {
         graph.networkCount = networks.length;
-        d3.select('#colorNetworks').html(`Network count: ${networks.length}`);
+        d3.select('.colorNetworks').html(`Network count: ${networks.length}`);
     } else if (graph.nodes.length > 300 && graph.networkCount) {
-        d3.select('#colorNetworks').html(`Network count: ${graph.networkCount}`);
+        d3.select('.colorNetworks').html(`Network count: ${graph.networkCount}`);
     }
 }

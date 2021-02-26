@@ -439,7 +439,7 @@ svg#main {
     fill: #EBBAB9;
 }
 
-#colorNetworks, #commentedNodes {
+.colorNetworks, .commentedNodes {
     cursor: pointer;
 }
 
@@ -487,4 +487,27 @@ svg#main {
 
 #info span, section {
     white-space: nowrap!important;
+}
+@media (max-width: 1199.98px) {
+    #floatingInfo {
+        background-color: var(--background-settings) !important;
+        position: absolute !important;
+        top: 4em !important;
+        right: 1em !important;
+        width: auto;
+        -webkit-backdrop-filter: blur(4px);
+        backdrop-filter: blur(4px);
+        z-index: 400;
+    }
+
+    #floatingInfo span {
+        margin-bottom: 0.25em !important;
+        text-align: right;
+    }
+
+}
+@media (min-width: 1200px) {
+    #floatingInfo {
+        display: none !important;
+    }
 }

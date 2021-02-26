@@ -13,25 +13,32 @@
     </head>
     <body>
         <nav class="px-3 navbar navbar-expand-xl navbar-light justify-content-between shadow-sm border-bottom">
-            <section>
-                <a data-bs-toggle="modal" data-bs-target="#rationale" data-bs-keyboard="true" type="button" class="btn btn-sm btn-outline-success mr-3"><i class="bi bi-patch-question-fill mr-1"></i>Rationale</a>
-                <a id="showEntireDataset" class="btn btn-sm btn-outline-success mr-3" href="https://docs.google.com/spreadsheets/d/1UlpFQ9WWA6_6X-RuMJ3vHdIbyqhCZ1VRYgcQYjXprAg/edit#gid=0" target="_blank"><i class="bi bi-cloud-arrow-down-fill mr-1"></i>Dataset</a>
-                <a id="switchMode" class="btn btn-sm btn-outline-secondary mr-3"></a>
-                <a id="nudgeNodes" class="btn btn-sm btn-outline-secondary mr-3"><i class="bi bi-unlock-fill"></i> Fix stuck nodes</a>
-                <a id="resetLocalStorage" class="btn btn-sm btn-outline-secondary"><i class="bi bi-cloud-slash-fill mr-1"></i>Reset settings</a>
+            <section class="d-flex">
+                <a data-bs-toggle="modal" data-bs-target="#rationale" data-bs-keyboard="true" type="button" class="order-1 btn btn-sm btn-outline-success mr-3"><i class="bi bi-patch-question-fill mr-md-1"></i><span class="d-none d-md-inline-block">Rationale</span></a>
+                <a id="showEntireDataset" class="order-2 btn btn-sm btn-outline-success mr-3" href="https://docs.google.com/spreadsheets/d/1UlpFQ9WWA6_6X-RuMJ3vHdIbyqhCZ1VRYgcQYjXprAg/edit#gid=0" target="_blank"><i class="bi bi-file-earmark-spreadsheet-fill mr-md-1"></i><span class="d-none d-md-inline-block">Dataset</span></a>
+                <a id="switchMode" class="order-md-3 order-0 btn btn-sm btn-outline-secondary mr-3"></a>
+                <a id="nudgeNodes" class="order-4 btn btn-sm btn-outline-secondary mr-3"><i class="bi bi-unlock-fill mr-md-1"></i><span class="d-none d-md-inline-block">Fix stuck nodes</span></a>
+                <a id="resetLocalStorage" class="order-5 btn btn-sm btn-outline-secondary"><i class="bi bi-cloud-slash-fill mr-md-1"></i><span class="d-none d-md-inline-block">Reset settings</span></a>
             </section>
             <div class="collapse navbar-collapse" id="navbarSupportedContent" style="width:auto; max-width:100%">
                 <div id="info" class="d-flex align-items-center">
-                    <span id="numNodes" class="small mr-3" data-bs-toggle="popover" title="Number of nodes"><i class="mr-1 small bi bi-record-fill"></i></span>
-                    <span id="numEdges" class="small mr-3" data-bs-toggle="popover" title="Number of edges"><i class="mr-1 small bi bi-share-fill"></i></span>
-                    <span id="unconnectedNodes" class="small mr-3" data-bs-toggle="popover" title="Number of unconnected nodes"><i class="mr-1 bi bi-node-minus"></i></span>
-                    <span id="currentZoom" class="small mr-3" data-bs-toggle="popover" title="Current zoom level"></span>
-                    <span id="numCommunities" class="small mr-3" data-bs-toggle="popover" title="Number of communities"></span>
-                    <span id="colorNetworks" data-bs-toggle="popover" class="mr-3 m-0 badge" title="Number of networks"></span>
-                    <span id="commentedNodes" data-bs-toggle="popover" class="m-0 badge" title="Number of commented nodes"></span>
+                    <span id="" class="numNodes small mr-3" data-bs-trigger="click" data-bs-toggle="popover" title="Number of nodes" data-bs-content='The numbers here show <strong>number of current nodes</strong>/number of all nodes in the graph. It is an indicator of how much the graph you are seeing has been filtered. You can change the filtering of the edges under the "Node filtering" section in the "Settings" below.'><i class="mr-1 small bi bi-record-fill"></i></span>
+                    <span id="" class="numEdges small mr-3" data-bs-trigger="click" data-bs-toggle="popover" title="Number of edges" data-bs-content='The numbers here show <strong>number of current edges</strong>/number of all edges in the graph. It is an indicator of how much the graph you are seeing has been filtered. You can change the filtering of the edges under the "Edge filtering" section in the "Settings" below.'><i class="mr-1 small bi bi-share-fill"></i></span>
+                    <span id="" class="unconnectedNodes small mr-3" data-bs-trigger="click" data-bs-toggle="popover" title="Number of unconnected nodes" data-bs-content='The number here shows how many nodes are present in the current graph you are seeing that are unconnected from one another. If you have "auto-clear unconnected nodes" turned on in the "Node filtering" settings, this number should always stay at 0 since any lingering unconnected nodes are removed on rendering.'><i class="mr-1 bi bi-node-minus"></i></span>
+                    <span id="" class="currentZoom small mr-3" data-bs-trigger="click" data-bs-toggle="popover" title="Current zoom level" data-bs-content='This number shows you how scaled the current graph is, between 60–400%.'></span>
+                    <span id="" class="numCommunities small mr-3" data-bs-trigger="click" data-bs-toggle="popover" title="Number of communities" data-bs-content='The number that you see here shows how many number of communities have been identified in the graph you are currently seeing. The algorithm used is the Levain clustering algorithm, which you can read more about under the "Rationale". Click the button furthest to the left in the menubar if you are more interested.'></span>
+                    <span id="" class="colorNetworks mr-3 m-0 badge" data-bs-trigger="hover" data-bs-toggle="popover" title="Number of networks" data-bs-content='The number here shows how many disconnected networks are present in the current graph. The fewer the networks, the higher degree of connection between all the nodes. Click the button to color the nodes after which network they belong to. When the coloring is activated, this button will be yellow.'></span>
+                    <span id="" class="commentedNodes m-0 badge" data-bs-trigger="hover" data-bs-toggle="popover" title="Number of commented nodes" data-bs-content='The number of nodes in the current graph that has a comment assigned to them. If you want to show only the nodes that have comments assigned to them and see how they relate to one another, click this button. When this view is activated, this button will be yellow.'></span>
                 </div>
             </div>
         </nav>
+        <div id="floatingInfo" class="d-flex flex-column p-2 rounded-3 border">
+            <span id="" class="numNodes small mr-3 text-muted" data-bs-trigger="click" data-bs-toggle="popover" title="Number of nodes" data-bs-content='The numbers here show <strong>number of current nodes</strong>/number of all nodes in the graph. It is an indicator of how much the graph you are seeing has been filtered. You can change the filtering of the edges under the "Node filtering" section in the "Settings" below.'><i class="mr-1 small bi bi-record-fill"></i></span>
+            <span id="" class="numEdges small mr-3 text-muted" data-bs-trigger="click" data-bs-toggle="popover" title="Number of edges" data-bs-content='The numbers here show <strong>number of current edges</strong>/number of all edges in the graph. It is an indicator of how much the graph you are seeing has been filtered. You can change the filtering of the edges under the "Edge filtering" section in the "Settings" below.'><i class="mr-1 small bi bi-share-fill"></i></span>
+            <span id="" class="unconnectedNodes small mr-3 text-muted" data-bs-trigger="click" data-bs-toggle="popover" title="Number of unconnected nodes" data-bs-content='The number here shows how many nodes are present in the current graph you are seeing that are unconnected from one another. If you have "auto-clear unconnected nodes" turned on in the "Node filtering" settings, this number should always stay at 0 since any lingering unconnected nodes are removed on rendering.'><i class="mr-1 bi bi-node-minus"></i></span>
+            <span id="" class="currentZoom small mr-3 text-muted" data-bs-trigger="click" data-bs-toggle="popover" title="Current zoom level" data-bs-content='This number shows you how scaled the current graph is, between 60–400%.'></span>
+            <span id="" class="numCommunities small mr-3 text-muted" data-bs-trigger="click" data-bs-toggle="popover" title="Number of communities" data-bs-content='The number that you see here shows how many number of communities have been identified in the graph you are currently seeing. The algorithm used is the Levain clustering algorithm, which you can read more about under the "Rationale". Click the button furthest to the left in the menubar if you are more interested.'></span>
+        </div>
         <div class="modal" id="numberModal">
             <div class="modal-dialog modal-dialog-centered justify-content-center">
                 <div class="modal-content w-auto shadow-lg">
@@ -88,7 +95,7 @@
         </div>
 
         <div id="wrapToasters"></div>
-        <div id="settings" class="small card shadow-sm border rounded-lg">
+        <div id="settings" class="small card shadow-sm border rounded-3">
             <div class="card-header d-flex justify-content-between align-items-center" id="settingsToggle">
                 <span><i class="bi bi-gear mr-2"></i>Settings</span>
                 <span id="toggledSettings"></i></span>
@@ -115,7 +122,7 @@
                         <span class="text-nowrap small metaShow d-none"><key class="small rounded ml-1 bg-success text-white p-1 fw-bold">&#8592;</key><key class="rounded small ml-1 bg-success text-white p-1 fw-bold">&#8594;</key></span>
                     </div>
                     <div class="mb-2">
-                        <p class="small text-muted p-0 m-0 fw-bold">view</p>
+                        <p class="small text-muted p-0 m-0 fw-bold">sizing</p>
                     </div>
                     <div class="mb-2">
                         <input class="p-0 m-0" type="range" id="nodeMultiplier" name="nodeMultiplier" min="1" max="40" value="1" step="1">
@@ -153,7 +160,7 @@
                         <span class="text-nowrap small metaShow d-none"><key class="rounded small ml-1 bg-success text-white p-1 fw-bold">&#8679; + &#8592;</key><key class="rounded small ml-1 bg-success text-white p-1 fw-bold">&#8679; + &#8594;</key></span>
                     </div>
                     <div class="mb-2">
-                        <p class="small text-muted p-0 m-0 fw-bold">view</p>
+                        <p class="small text-muted p-0 m-0 fw-bold">sizing</p>
                     </div>
                     <div class="mb-2">
                         <input class="p-0 m-0" type="range" id="edgeMultiplier" name="edgeMultiplier" min="1" max="40" value="1" step="1">
@@ -222,7 +229,7 @@
             </ul>
         </div>
         <div id="infoContainer"></div>
-        <div id="nodeEdgeInfo" class="card small shadow-sm border rounded-lg d-none">
+        <div id="nodeEdgeInfo" class="card small shadow-sm border rounded-3 d-none">
             <div class="card-header d-flex justify-content-between align-items-center" id="infoToggleDiv">
                 <span><i class="bi bi-share-fill mr-2"></i>Node/Edge information</span>
             </div>
@@ -230,7 +237,7 @@
                 <ul class="list-group list-group-flush"></ul>
             </div>
         </div>
-        <div id="previewData" class="small shadow-sm border p-3 rounded-lg d-none"><svg id="preview"></svg></div>
+        <div id="previewData" class="small shadow-sm border p-3 rounded-3 d-none"><svg id="preview"></svg></div>
 
         <div id="loading" class="h-100 d-flex justify-content-center">
             <div id="loadingContainer" class="my-auto p-4 bg-white rounded shadow-lg d-flex flex-column">
@@ -274,7 +281,7 @@
         <script>
             var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
             var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
-                let options = {'placement': 'bottom', 'trigger': 'hover'}
+                let options = {'placement': 'bottom', 'html': true};
                 new bootstrap.Popover(popoverTriggerEl, options);
             });
         </script>

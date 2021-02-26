@@ -69,7 +69,7 @@ const restartSimulation = () => {
     });
     graph.simulation.stop();
     // graph.simulation;
-    graph.simulation.restart().alpha(0.75);
+    graph.simulation.restart().alpha(0.2);
     return true;
 };
 

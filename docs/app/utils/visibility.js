@@ -100,10 +100,11 @@ const setNodeEdgeInfo = (elem) => {
 };
 
 const toggleColorNetworks = () => {
-    console.log('toggleColorNetworks called...')
-    if (graph.nodes.length > 300) {
-        alert(`Processing ${graph.nodes.length} nodes is a heavy operation and can take some time...`)
+    if (graph.nodes.length > 300 && !window.confirm(`Processing ${graph.nodes.length} nodes is a heavy operation and can take some time...`)) {
+        console.log('toggleColorNetworks rejected.')
+        return false;
     }
+    loading('Coloring networks...');
     if (!window.coloredNetworks) {
         window.coloredNetworks = true;
         colorNetworks();
@@ -111,7 +112,7 @@ const toggleColorNetworks = () => {
         window.coloredNetworks = false;
         resetDraw();
     }
-    d3.select('#colorNetworks').classed('bg-dark', !window.coloredNetworks).classed('bg-warning', window.coloredNetworks);
+    d3.select('.colorNetworks').classed('bg-dark', !window.coloredNetworks).classed('bg-warning', window.coloredNetworks);
 }
 
 /**
@@ -121,24 +122,24 @@ const toggleColorNetworks = () => {
  */
 const updateInfo = () => {
     show("#info");
-    d3.select('#colorNetworks').on("click", toggleColorNetworks);
-    d3.select('#commentedNodes').on("click", toggleCommentedElements);
+    d3.select('.colorNetworks').on("click", toggleColorNetworks);
+    d3.select('.commentedNodes').on("click", toggleCommentedElements);
 
     // getCurrentGraphInfo()
     let updateValues = getCurrentGraphInfo()
-    document.querySelector('#numNodes').innerHTML = '<i class="mr-1 small bi bi-record-fill"></i>' + updateValues.numNodes.content;
-    document.querySelector('#numEdges').innerHTML = '<i class="mr-1 small bi bi-share-fill"></i>' + updateValues.numEdges.content;
-    document.querySelector('#unconnectedNodes').innerHTML = '<i class="mr-1 bi bi-node-minus"></i>' + updateValues.unconnectedNodes.content;
-    document.querySelector('#currentZoom').innerHTML = '<i class="mr-1 bi bi-search"></i>' + updateValues.currentZoom.content;
-    document.querySelector('#numCommunities').innerHTML = '<i class="mr-1 bi bi-heart-fill"></i>' + updateValues.numCommunities.content;
-    document.querySelector('#colorNetworks').innerHTML = '' + updateValues.colorNetworks.content;
-    document.querySelector('#commentedNodes').innerHTML = '' + updateValues.commentedNodes.content;
+    document.querySelectorAll('.numNodes').forEach(elem=>{elem.innerHTML = '<i class="mr-1 small bi bi-record-fill"></i>' + updateValues.numNodes.content;});
+    document.querySelectorAll('.numEdges').forEach(elem=>{elem.innerHTML = '<i class="mr-1 small bi bi-share-fill"></i>' + updateValues.numEdges.content;});
+    document.querySelectorAll('.unconnectedNodes').forEach(elem=>{elem.innerHTML = '<i class="mr-1 bi bi-node-minus"></i>' + updateValues.unconnectedNodes.content;});
+    document.querySelectorAll('.currentZoom').forEach(elem=>{elem.innerHTML = '<i class="mr-1 bi bi-search"></i>' + updateValues.currentZoom.content;});
+    document.querySelectorAll('.numCommunities').forEach(elem=>{elem.innerHTML = '<i class="mr-1 bi bi-heart-fill"></i>' + updateValues.numCommunities.content;});
+    document.querySelectorAll('.colorNetworks').forEach(elem=>{elem.innerHTML = '' + updateValues.colorNetworks.content;});
+    document.querySelectorAll('.commentedNodes').forEach(elem=>{elem.innerHTML = '' + updateValues.commentedNodes.content;});
     
     updateValues.colorNetworks.class.forEach(c => {
-        document.querySelector('#colorNetworks').classList.add(c);
+        document.querySelectorAll('.colorNetworks').forEach(elem=>{elem.classList.add(c);});
     });
     updateValues.commentedNodes.class.forEach(c => {
-        document.querySelector('#commentedNodes').classList.add(c);
+        document.querySelectorAll('.commentedNodes').forEach(elem=>{elem.classList.add(c);});
     });
 
     return true;

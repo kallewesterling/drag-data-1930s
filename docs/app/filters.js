@@ -4,7 +4,7 @@ const dropNode = (node) => {
     if (node.inGraph) {
         graph.nodes.forEach((o, i) => {
             if (node.node_id === o.node_id) {
-                loading(`dropping node ${o.node_id}...`);
+                if (ERROR_LEVEL > 1) loading(`dropping node ${o.node_id}...`);
                 graph.nodes.splice(i, 1);
                 node.inGraph = false;
                 return true;
@@ -16,7 +16,7 @@ const dropNode = (node) => {
 const dropEdge = (edge) => {
     graph.edges.forEach((o, i) => {
         if (edge.edge_id === o.edge_id) {
-            loading(`dropping edge ${o.edge_id}...`);
+            if (ERROR_LEVEL > 1) loading(`dropping edge ${o.edge_id}...`);
             graph.edges.splice(i, 1);
             edge.inGraph = false;
             return true;
@@ -44,14 +44,14 @@ const addEdge = (edge) => {
 const filterNodes = (nodeList = []) => {
     loading("filterNodes called...");
     if (!nodeList.length) {
-        let settings = getSettings().nodes;
+        let settings = getSettings();
         store.nodes.forEach((node) => {
-            if (node.degree >= settings.minDegree) {
+            if (node.degree >= settings.nodes.minDegree) {
                 addNode(node);
                 /* potential to add more filters here...*/
             } else if (
-                getSettings().edges.startYear > d3.min(node.sourceRange) &&
-                getSettings().edges.endYear < d3.max(node.sourceRange)
+                settings.edges.startYear > d3.min(node.sourceRange) &&
+                settings.edges.endYear < d3.max(node.sourceRange)
             ) {
                 addNode(node);
             } else {
@@ -186,7 +186,7 @@ const clusters = {};
  * @returns {boolean} - true
  */
 const filter = (nodeList = [], edgeList = [], change = true) => {
-    loading("Filtering nodes...");
+    loading("Filter called...");
     let settings = getSettings();
 
     hide("#nodeEdgeInfo");
@@ -269,7 +269,7 @@ const getEgoNetwork = (node, maxIterations = 1000) => {
     return allNeighbors;
 };
 
-// TODO: Needs docstring
+// TODO: Needs docstring and I think there is an easier/faster way to do this...
 const getUniqueNetworks = (nodeList, returnVal = "nodes") => {
     if (!nodeList) nodeList = graph.nodes;
 

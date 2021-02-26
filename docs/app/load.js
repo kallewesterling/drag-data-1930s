@@ -12,6 +12,7 @@ const loadNetwork = () => {
     enableSettings();
     document.querySelector('#datafileContainer').removeAttribute('style');
     d3.json(settings.datafile.filename).then((data) => {
+        loading("file loaded...");
         // for debug purposes (TODO can be removed)
         store.raw = data;
 
