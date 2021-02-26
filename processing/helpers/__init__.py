@@ -310,7 +310,7 @@ class Place():
             self.name = self.name + ', United States'
 
         if not os.path.exists(cache_dir):
-            os.mkdir(cache_dir, exist_ok=True)
+            os.makedirs(cache_dir, exist_ok=True)
 
         if not os.path.exists(self.cache_file) or (os.path.exists(self.cache_file) and os.stat(self.cache_file).st_size < 5):
             g = self.geolocator.geocode(self.name)
