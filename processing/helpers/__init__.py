@@ -304,7 +304,7 @@ class Place():
 
         if 'UK' in self.name:
             self.name.replace('UK', 'United Kingdom')
-        elif 'Geneva' in self.name or 'Cuba' in self.name or 'Switzerland' in self.name:
+        elif 'geneva' in self.name.lower() or 'cuba' in self.name.lower() or 'switzerland' in self.name.lower() or 'kursaal' in self.name.lower():
             pass
         else:
             self.name = self.name + ', United States'
@@ -312,7 +312,7 @@ class Place():
         if not os.path.exists(cache_dir):
             os.mkdir(cache_dir, exist_ok=True)
 
-        if not os.path.exists(self.cache_file):
+        if not os.path.exists(self.cache_file) or (os.path.exists(self.cache_file) and os.stat(self.cache_file).st_size < 5):
             g = self.geolocator.geocode(self.name)
             with open(self.cache_file, 'w+') as f:
                 if g:
