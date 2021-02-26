@@ -107,7 +107,6 @@ const generateEdgeInfoHTML = (edge) => {
     let html = `<li class="list-group-item"><strong>ID</strong> ${edge.source.display} - ${edge.target.display}</li>`;
 
     if (edge.revue_name) {
-        console.log(edge.revue_name);
         html += `<li class="list-group-item"><strong>Revue mentioned</strong> ${edge.revue_name}</li>`;
     }
     

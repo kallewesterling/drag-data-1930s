@@ -9,6 +9,7 @@
         <link rel="stylesheet" href="css/themes.css">
         <link rel="stylesheet" href="css/style.css">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.0/font/bootstrap-icons.css">
+        <script src="https://unpkg.com/topojson@3"></script>
         <title>U.S. Drag in the 1930s</title>
     </head>
     <body>
@@ -252,6 +253,7 @@
         <svg id="main" width="100%" height="100%">
             <g id="background"><rect x="-100%" y="-100%" width="200%" height="200%" fill="rgba(0, 0, 0, 0.009)"></rect></g>
         </svg>
+        
 
         <div id="popup-info" class="d-none shadow-lg"></div>
         <div id="egoNetwork" class="d-none shadow-lg p-2 text-center bg-warning">Ego network for node <span id="node">NODE</span>.<i id="closeEgoNetwork" class="ml-3 bi bi-stop-circle"></i></div>
@@ -273,6 +275,7 @@
         <script src="core/zoom.js"></script>
         <script src="core/app.js"></script>
         
+        <script src="core/geo.js"></script>
         <script src="core/tour.js"></script>
 
         <!-- TODO: a different app... so another project. Maybe it should just be a different page altogether -->
