@@ -331,8 +331,14 @@ bar.finish()
 
 # Time to save!
 with open(f'{data_dir}/multipartite-data.json', 'w+') as f:
-    json.dump(nx.node_link_data(graphs['multipartite']), f)
+    data = nx.node_link_data(graphs['multipartite'])
+    data['dataset'] = SPREADSHEET
+    data['bipartite'] = False
+    json.dump(data, f)
 
 for graph in graphs['bipartite']:
     with open(graph['filename'], 'w+') as f:
-        json.dump(nx.node_link_data(graph['G']), f)
+        data = nx.node_link_data(graph['G'])
+        data['dataset'] = SPREADSHEET
+        data['bipartite'] = True
+        json.dump(data, f)
