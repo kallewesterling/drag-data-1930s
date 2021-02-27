@@ -126,7 +126,7 @@ class Row(PropertyMap):
 
     def parse_row(self, row):
         data = {}
-        data['row_num'], data['date'], data['category'], data['performer'], data['venue'], data['_city'], data['city'], data['_revue_name'], data['revue_name'], data['unsure_drag'], data['legal_name'], data['alleged_age'], data['assumed_birth_year'], data['source'], data['eima'], data['newspapers_search'], data['fulton_search'], data['former_archive'], data['comment'], data['exclude'], data['quote'], data['comment_performer'], data['comment_venue'], data['comment_city'], data['comment_revue'], *_ = row
+        data['row_num'], data['date'], data['category'], data['performer'], data['venue'], data['_city'], data['city'], data['_revue_name'], data['revue_name'], data['unsure_drag'], data['legal_name'], data['alleged_age'], data['assumed_birth_year'], data['_source'], data['source'], data['eima'], data['newspapers_search'], data['fulton_search'], data['former_archive'], data['comment'], data['exclude'], data['quote'], data['comment_performer'], data['comment_venue'], data['comment_city'], data['comment_revue'], *_ = row
 
         ##### Fix date
         data['date'] = data['date'].replace('?', '').strip()

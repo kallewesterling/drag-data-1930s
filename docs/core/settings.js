@@ -165,6 +165,18 @@ const getSettings = () => {
         datafile = _autoSettings.datafile.filename;
     }
 
+    store.edges.forEach(e=>{
+        e.passes = {}
+        e.passes.startYear = e.range.startYear > startYear ? true : false;
+        e.passes.endYear = e.range.endYear < endYear ? true : false;
+        e.passes.minWeight = e.weight >= minWeight ? true : false;
+    });
+
+    store.nodes.forEach(n=>{
+        n.passes = {}
+        n.passes.minDegree = n.degree > minDegree ? true : false;
+    });
+
     return {
         nodes: {
             minDegree: minDegree,

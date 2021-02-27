@@ -1,5 +1,100 @@
 "use strict";
 
+const setupStoreNodes = (nodeList) => {
+    let storeNodes = [];
+    let counter = 1;
+    nodeList.forEach((node) => {
+        let prohibitedID = {match: false}
+        if (!node.node_id) {
+            let newNode = `unidentifiedNode${counter}`;
+            counter++;
+            console.error(`Unable to find node_id (will set to ${newNode})`, node);
+            node.node_id = newNode;
+            return false;
+        }
+        if (node.node_id.charAt(0).match(/[_—–—.]/)) prohibitedID = Object.assign({match: true, node_id: node.node_id}, node.node_id.charAt(0).match(/[_—–—.]/));
+        if (prohibitedID.match) console.error(prohibitedID)
+        
+        if (
+            !node.node_id ||
+            node.node_id === "" ||
+            node.node_id === "-" ||
+            node.node_id === "–" ||
+            node.node_id === "—"
+        ) {
+            console.error("found an erroneous data point:");
+            console.error(node);
+        } else {
+            let has_comments = node.comments !== undefined && node.comments.length > 0 ? true : false;
+            storeNodes.push(
+                Object.assign(
+                    {
+                        inGraph: false,
+                        has_comments: has_comments,
+                    },
+                    node
+                )
+            );
+        }
+    });
+    return storeNodes;
+}
+
+const setupStoreEdges = (edgeList) => {
+    let storeEdges = [];
+    edgeList.forEach((edge) => {
+        let newEdge = Object.assign({
+                has_comments: edge.comments.length > 0 ? true : false,
+                has_general_comments:
+                edge.general_comments.length > 0 ? true : false,
+                inGraph: false,
+                dates: [],
+                range: { start: undefined, end: undefined },
+            }, edge);
+        storeEdges.push(newEdge);
+    });
+    storeEdges.forEach((e) => {
+        let testDate = dateParser(e.date);
+        if (testDate && testDate.iso !== undefined) {
+            e.dates.push(testDate.iso);
+        }
+        e.found = e.found.filter((found) =>
+            found != null && found != "" && found != "" ? true : false
+        );
+        e.found = [...new Set(e.found)];
+        e.found.forEach((source) => {
+            let date = dateParser(source);
+            if (date && date.iso !== undefined) {
+                e.dates.push(date.iso);
+            } else if (date.iso === undefined) {
+                let testDate = dateParser(e.date);
+                if (testDate && testDate.iso !== undefined) {
+                    if (window.ERROR_LEVEL > 1) {
+                        console.info(`Could not interpret date in source. Adding date associated with edge (${testDate.iso}) instead:`);
+                        console.error(source);
+                        e.dates.push(testDate.iso);
+                    }
+                } else {
+                    console.error(`Could not interpret date in ${source}. Backup solution failed too.`);
+                }
+            }
+        });
+        if (e.dates) {
+            e.dates = [...new Set(e.dates)].sort();
+            e.range = {
+                start: e.dates[0],
+                end: e.dates[e.dates.length - 1],
+            };
+            e.range['startYear'] = +e.range.start.substring(0, 4);
+            e.range['endYear'] = +e.range.end.substring(0, 4);
+        }
+
+        // fix weight... TODO: Should really fix this in the Python script!
+        e.weight = e.found.length;
+    });
+    return storeEdges;
+}
+
 /**
  * loadNetwork takes no arguments, but loads the entire network, and runs the other appropriate functions at the start of the script.
  * The return value is true if the network file is loaded correctly and all data is set up appropriately.
@@ -16,118 +111,19 @@ const loadNetwork = () => {
         // for debug purposes (TODO can be removed)
         store.raw = data;
 
-        // set up store.comments
+        // set up store
         store.comments = Object.assign({}, data.comments);
-
-        // set up store.count
         store.count = Object.assign({}, data.count);
-
-        // set up store.nodes
-        let counter = 1;
-        data.nodes.forEach((node) => {
-            let prohibitedID = {match: false}
-            if (!node.node_id) {
-                let newNode = `unidentifiedNode${counter}`;
-                counter++;
-                console.error(`Unable to find node_id (will set to ${newNode})`, node);
-                node.node_id = newNode;
-                return false;
-            }
-            if (node.node_id.charAt(0).match(/[_—–—.]/)) prohibitedID = Object.assign({match: true, node_id: node.node_id}, node.node_id.charAt(0).match(/[_—–—.]/));
-            if (prohibitedID.match) console.error(prohibitedID)
-            
-            if (
-                !node.node_id ||
-                node.node_id === "" ||
-                node.node_id === "-" ||
-                node.node_id === "–" ||
-                node.node_id === "—"
-            ) {
-                console.error("found an erroneous data point:");
-                console.error(node);
-            } else {
-                let has_comments = node.comments !== undefined && node.comments.length > 0 ? true : false;
-                store.nodes.push(
-                    Object.assign(
-                        {
-                            inGraph: false,
-                            has_comments: has_comments,
-                        },
-                        node
-                    )
-                );
-            }
-        });
-
-        // set up store.edges
-        data.links.forEach((edge) => {
-            let newEdge = undefined
-            if (settings.datafile == 'drag-data-bipartite.json') {
-                newEdge = Object.assign(
-                    {
-                        has_revue_comments: edge.revue_comments.length > 0 ? true : false,
-                        has_venue_comments: edge.venue_comments.length > 0 ? true : false,
-                        inGraph: false,
-                        dates: [],
-                        range: { start: undefined, end: undefined },
-                    },
-                    edge
-                    );
-            } else {
-                newEdge = Object.assign(
-                {
-                    has_comments: edge.comments.length > 0 ? true : false,
-                    has_general_comments:
-                    edge.general_comments.length > 0 ? true : false,
-                    inGraph: false,
-                    dates: [],
-                    range: { start: undefined, end: undefined },
-                },
-                edge
-                );
-            }
-            store.edges.push(newEdge);
-        });
-        store.edges.forEach((e) => {
-            if (settings.datafile == 'drag-data-bipartite.json') {
-                e.found = e.sources;
-            }
-            e.found = e.found.filter((found) =>
-                found != null && found != "" && found != "" ? true : false
-            );
-            e.found = [...new Set(e.found)];
-            e.found.forEach((source) => {
-                let date = dateParser(source);
-                if (date && date.iso !== undefined) {
-                    e.dates.push(date.iso);
-                } else if (date.iso === undefined) {
-                    let testDate = dateParser(e.date);
-                    if (testDate && testDate.iso !== undefined) {
-                        if (window.ERROR_LEVEL > 1) {
-                            console.info(`Could not interpret date in source. Adding date associated with edge (${testDate.iso}) instead:`);
-                            console.error(source);
-                        }
-                    } else {
-                        console.error(`Could not interpret date in ${source}. Backup solution failed too.`);
-                    }
-                }
-            });
-            if (e.dates) {
-                e.dates = [...new Set(e.dates)].sort();
-                e.range = {
-                    start: e.dates[0],
-                    end: e.dates[e.dates.length - 1],
-                };
-            }
-
-            e.source = store.nodes.find((node) => node.id === e.source); // set up as object
-            e.target = store.nodes.find((node) => node.id === e.target); // set up as object
-
-            // fix weight... TODO: Should really fix this in the Python script!
-            e.weight = e.found.length;
-        });
+        store.nodes = setupStoreNodes(data.nodes);
+        store.edges = setupStoreEdges(data.links);
 
         loadStoreRanges();
+
+        // Link up store edges with nodes, and vice versa
+        store.edges.forEach(e => {
+            e.source = store.nodes.find((node) => node.id === e.source);
+            e.target = store.nodes.find((node) => node.id === e.target);
+        })
 
         store.nodes.forEach((node) => {
             node.allEdges = store.edges.filter(
@@ -184,31 +180,6 @@ const setupInteractivity = () => {
     loading("setupInteractivity called...");
 
     let settings = getSettings();
-    nodeElements.call(
-        d3
-            .drag()
-            .on("start", (node) => {
-                if (!d3.event.active)
-                    graph.simulation.alphaTarget(0.3).restart(); // avoid restarting except on the first drag start event
-                node.fx = node.x;
-                node.fy = node.y;
-            })
-            .on("drag", (node) => {
-                node.fx = d3.event.x;
-                node.fy = d3.event.y;
-            })
-            .on("end", (node) => {
-                if (!d3.event.active) graph.simulation.alphaTarget(0); // restore alphaTarget to normal value
-
-                if (settings.nodes.stickyNodes) {
-                    node.fx = node.x;
-                    node.fy = node.y;
-                } else {
-                    node.fx = null;
-                    node.fy = null;
-                }
-            })
-    );
 
     nodeElements.on("click", (node) => {
         d3.event.stopPropagation();
@@ -281,6 +252,32 @@ const setupInteractivity = () => {
             selectEdge(edge);
         }
     });
+
+    nodeElements.call(
+        d3
+            .drag()
+            .on("start", (node) => {
+                if (!d3.event.active)
+                    graph.simulation.alphaTarget(0.3).restart(); // avoid restarting except on the first drag start event
+                node.fx = node.x;
+                node.fy = node.y;
+            })
+            .on("drag", (node) => {
+                node.fx = d3.event.x;
+                node.fy = d3.event.y;
+            })
+            .on("end", (node) => {
+                if (!d3.event.active) graph.simulation.alphaTarget(0); // restore alphaTarget to normal value
+
+                if (settings.nodes.stickyNodes) {
+                    node.fx = node.x;
+                    node.fy = node.y;
+                } else {
+                    node.fx = null;
+                    node.fy = null;
+                }
+            })
+    );
 };
 
 let textElements = g.labels.selectAll("text"),

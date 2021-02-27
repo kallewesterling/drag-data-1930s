@@ -67,13 +67,49 @@ const filterNodes = (nodeList = []) => {
 };
 
 /**
+ * Returns whether a node exists in the current graph or not.
+ */
+const nodeInGraph = (node) => {
+    return graph.nodes.includes(node);
+}
+
+const getValidEdges = (inGraph=false) => {
+    return store.edges.filter(e=>e.passes.startYear && e.passes.endYear && e.passes.minWeight && nodeInGraph(e.source) && nodeInGraph(e.target) && e.inGraph === inGraph);
+}
+
+const getInvalidEdges = (inGraph=true) => {
+    return store.edges.filter(e=>(!e.passes.startYear && !e.passes.endYear && !e.passes.minWeight) && nodeInGraph(e.source) && nodeInGraph(e.target) && e.inGraph === inGraph);
+}
+
+/**
  * filterEdges takes one optional argument // TODO: Fix this //, and serves to run through all of the store.edges and adding/removing edges from graph.edges, depending on filter values.
  * The return value is always true.
  * @returns {boolean} - true
  */
 const filterEdges = (edgeList = [], change = true) => {
     loading("filterEdges called...");
-    let list = store.edges.map((n) => n.edge_id);
+
+    if (edgeList.length) {
+        console.error('filtering using lists is not implemented.')
+        return true;
+    }
+
+    getValidEdges().forEach(e=>{
+        addEdge(e);
+    })
+
+    getInvalidEdges().forEach(e=>{
+        dropEdge(e);
+    })
+
+    return true;
+
+    store.edges.filter(e=>e.passes.startYear && e.passes.endYear && e.passes.minWeight && !e.inGraph).forEach(e=>addEdge(e));
+    store.edges.filter(e=>(!e.passes.startYear || !e.passes.endYear || !e.passes.minWeight) && e.inGraph).forEach(e=>dropEdge(e));
+    console.log(store.edges);
+
+    return true;
+
     if (!edgeList.length) {
         let settings = getSettings().edges;
         store.edges.forEach((edge) => {
@@ -84,18 +120,18 @@ const filterEdges = (edgeList = [], change = true) => {
                     ? edge.calibrated_weight
                     : edge.weight;
 
-            if (settings.minDegree) {
+            if (settings.minWeight) {
                 if (compareWeightVal < settings.minWeight && !edge.inGraph) {
                     // edge is lower than minWeight and not inGraph so leave it out
                     if (change) edge.inGraph = false;
-                    if (!change) list.pop(edge.edge_id);
+                    if (!change) edgeIDList.pop(edge.edge_id);
                 } else if (
                     compareWeightVal < settings.minWeight &&
                     edge.inGraph
                 ) {
                     // edge is lower than minWeight and in graph so remove it!
                     if (change) dropEdge(edge);
-                    if (!change) list.pop(edge.edge_id);
+                    if (!change) edgeIDList.pop(edge.edge_id);
                 }
             } else if (
                 edge.range.start &&
@@ -104,7 +140,7 @@ const filterEdges = (edgeList = [], change = true) => {
             ) {
                 // edge is earlier than startYear and not inGraph so leave it out
                 if (change) edge.inGraph = false;
-                if (!change) list.pop(edge.edge_id);
+                if (!change) edgeIDList.pop(edge.edge_id);
             } else if (
                 edge.range.start &&
                 +edge.range.start.substring(0, 4) <= settings.startYear &&
@@ -112,7 +148,7 @@ const filterEdges = (edgeList = [], change = true) => {
             ) {
                 // edge is earlier than startYear and inGraph so drop it
                 if (change) dropEdge(edge);
-                if (!change) list.pop(edge.edge_id);
+                if (!change) edgeIDList.pop(edge.edge_id);
             } else if (
                 edge.range.end &&
                 +edge.range.end.substring(0, 4) >= settings.endYear &&
@@ -120,7 +156,7 @@ const filterEdges = (edgeList = [], change = true) => {
             ) {
                 // range end is higher than endYear and not inGraph so leave it out
                 if (change) edge.inGraph = false;
-                if (!change) list.pop(edge.edge_id);
+                if (!change) edgeIDList.pop(edge.edge_id);
             } else if (
                 edge.range.end &&
                 +edge.range.end.substring(0, 4) >= settings.endYear &&
@@ -128,7 +164,7 @@ const filterEdges = (edgeList = [], change = true) => {
             ) {
                 // edge has later range than endYear and inGraph so drop it"
                 if (change) dropEdge(edge);
-                if (!change) list.pop(edge.edge_id);
+                if (!change) edgeIDList.pop(edge.edge_id);
             } else {
                 if (
                     edge.source.inGraph &&
@@ -149,10 +185,10 @@ const filterEdges = (edgeList = [], change = true) => {
                 ) {
                     // in graph but should not be
                     if (change) dropEdge(edge);
-                    if (!change) list.pop(edge.edge_id);
+                    if (!change) edgeIDList.pop(edge.edge_id);
                 } else {
                     if (change) dropEdge(edge);
-                    if (!change) list.pop(edge.edge_id);
+                    if (!change) edgeIDList.pop(edge.edge_id);
                 }
             }
         });
@@ -171,15 +207,16 @@ const filterEdges = (edgeList = [], change = true) => {
             } else {
                 // console.log(`drop edge ${edge.edge_id}`)
                 if (change) dropEdge(edge);
-                if (!change) list.pop(edge.edge_id);
+                if (!change) edgeIDList.pop(edge.edge_id);
             }
         });
     }
     if (change) return true;
-    if (!change) return list;
+    if (!change) return edgeIDList;
 };
 
 const clusters = {};
+
 /**
  * filter takes two optional arguments // TODO: Fix this!! //, and serves to run subordinate functions in the correct order when filtering the entire network visualization.
  * The return value is always true.

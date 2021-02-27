@@ -105,11 +105,15 @@ const generateEdgeInfoHTML = (edge) => {
     let settings = getSettings();
     
     let html = `<li class="list-group-item"><strong>ID</strong> ${edge.source.display} - ${edge.target.display}</li>`;
-
+    
+    if (edge.venue) {
+        html += `<li class="list-group-item"><strong>Venue</strong> ${edge.venue}</li>`;
+    }
+    
     if (edge.revue_name) {
         html += `<li class="list-group-item"><strong>Revue mentioned</strong> ${edge.revue_name}</li>`;
     }
-    
+
     html += `<li class="list-group-item">
         <strong class="mb-1">Weight</strong>
         <p class="m-0 mb-1 small ${settings.edges.weightFromCurrent ? '' : 'fw-bold'}">In entire network: ${edge.weight}</p>

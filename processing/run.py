@@ -100,7 +100,8 @@ for i, row in enumerate(df.fillna('').itertuples()):
         edge_data[bipartite_edge1] = {
             'date': date,
             'row_num': row.row_num,
-            'revue_name': row.revue_name
+            'revue_name': row.revue_name,
+            'venue': row.venue_display
         }
         if not bipartite_edge1 in found:
             found[bipartite_edge1] = []
@@ -206,12 +207,13 @@ for i, network in enumerate(bipartite_edges):
         source, target, edge_id = edge
         weight = bipartite_edges[network][edge]
         revue_name = edge_data[edge].get('revue_name')
+        venue = edge_data[edge].get('venue')
         date = edge_data[edge].get('date')
         row_num = edge_data[edge]['row_num']
         comments = get_revue_comments(revue_name, revue_comments)
         general_comments = get_general_comments(edge_id, general_edge_comments)
         
-        bipartite_graph['G'].add_edge(source, target, date=date, revue_name=revue_name, comments=comments, found=found[edge], edge_id=edge_id, general_comments=general_comments, row_num=row_num)
+        bipartite_graph['G'].add_edge(source, target, date=date, revue_name=revue_name, comments=comments, found=found[edge], edge_id=edge_id, general_comments=general_comments, row_num=row_num, venue=venue)
 
     graphs['bipartite'].append(bipartite_graph)
 
