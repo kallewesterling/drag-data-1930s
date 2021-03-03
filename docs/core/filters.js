@@ -242,6 +242,7 @@ const filter = (nodeList = [], edgeList = [], change = true) => {
     if (settings.nodes.communityDetection) {
         communityDetection();
         textElements.text((node)=>`${node.cluster}. ${node.display}`);
+        graph.clusterInfo = getNodeClusterInfo();
     }
     graph.nodes.forEach((node) => {
         node.r = getSize(node);

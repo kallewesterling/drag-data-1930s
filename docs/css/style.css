@@ -511,3 +511,30 @@ svg#main {
         display: none !important;
     }
 }
+
+
+#nodeTable {
+    font-size: 0.75em;
+    position: absolute;
+    bottom: 1em;
+    max-height: 20rem;
+    padding-bottom: 1em;
+    overflow: scroll;
+    z-index: 200;
+    background-color: rgb(249 249 249);
+    box-shadow: 0 -.125rem .25rem rgba(0,0,0,.075)!important;
+}
+
+#nodeTable div table tbody th, #nodeTable div table thead, #nodeTable div table td {
+    color: darkgray !important;
+}
+@media (max-width: 1200px) {
+    #nodeTableContainer {
+        width: 98% !important;
+    }
+}
+@media (min-width: 1199.98px) {
+    #nodeTableContainer {
+        width: 75% !important;
+    }
+}

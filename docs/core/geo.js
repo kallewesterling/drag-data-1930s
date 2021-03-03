@@ -1,5 +1,3 @@
-
-/*
 const processGeo = () => {
     var projection = d3.geoAlbersUsa().scale(400).translate([window.innerWidth/2, window.innerHeight/2]);
     d3.json('data/counties-albers-10m.json').then((data) => {
@@ -33,4 +31,3 @@ const processGeo = () => {
         // g.selectAll("path").attr("d", path)
     });
 }
-*/

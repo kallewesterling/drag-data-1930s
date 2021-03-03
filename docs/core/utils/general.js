@@ -330,6 +330,12 @@ const updateGraphElements = () => {
     //if (window.nodeSelected != undefined) console.log(`window.nodeSelected: ${window.nodeSelected}`)
 
     let settings = getSettings();
+
+    if (!settings.nodes.communityDetection && document.querySelector('html').classList.contains('has-community')) {
+        document.querySelector('html').classList.remove('has-communities');
+        // graph.clusters = {}; /* TODO: Technically this should happen here but causes bug in modifySimulation. */
+    };
+
     nodeElements
         .attr("class", (node) => getNodeClass(node))
         .transition()

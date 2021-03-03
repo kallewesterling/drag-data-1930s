@@ -99,6 +99,7 @@ const graph = {
     networkCount: 0,
     communities: [],
     clusters: {},
+    clusterInfo: {}
 };
 
 graph.plot = graph.svg.append("g").attr("id", "plot");

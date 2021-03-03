@@ -533,6 +533,9 @@ const setupSettingInteractivity = () => {
     d3.select("#switchMode").on("click", function (d) {
         toggleTheme();
     });
+    d3.select("#showClusterInfo").on("click", function (d) {
+        toggle('#nodeTable');
+    });
     d3.select("#nudgeNodes").on("click", function (d) {
         graph.simulation.restart().alpha(0.15);
     });

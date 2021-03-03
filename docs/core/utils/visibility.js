@@ -23,6 +23,7 @@ const isVisible = (selector) => {
  * @returns {boolean} - true
  */
 const toggle = (selector) => {
+    console.log('toggle');
     try {
         if (typeof selector === "object") {
             selector.classed("d-none", isVisible(selector));

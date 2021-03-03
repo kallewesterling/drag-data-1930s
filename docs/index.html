@@ -19,7 +19,8 @@
                 <a id="showEntireDataset" class="order-2 btn btn-sm btn-outline-success mr-3" href="https://docs.google.com/spreadsheets/d/1UlpFQ9WWA6_6X-RuMJ3vHdIbyqhCZ1VRYgcQYjXprAg/edit#gid=0" target="_blank"><i class="bi bi-file-earmark-spreadsheet-fill mr-md-1"></i><span class="d-none d-md-inline-block">Dataset</span></a>
                 <a id="switchMode" class="order-md-3 order-0 btn btn-sm btn-outline-secondary mr-3"></a>
                 <a id="nudgeNodes" class="order-4 btn btn-sm btn-outline-secondary mr-3"><i class="bi bi-unlock-fill mr-md-1"></i><span class="d-none d-md-inline-block">Fix stuck nodes</span></a>
-                <a id="resetLocalStorage" class="order-5 btn btn-sm btn-outline-secondary"><i class="bi bi-cloud-slash-fill mr-md-1"></i><span class="d-none d-md-inline-block">Reset settings</span></a>
+                <a id="resetLocalStorage" class="order-5 btn btn-sm btn-outline-secondary mr-3"><i class="bi bi-cloud-slash-fill mr-md-1"></i><span class="d-none d-md-inline-block">Reset settings</span></a>
+                <a id="showClusterInfo" class="order-5 btn btn-sm btn-outline-secondary"><i class="bi bi-triangle-fill mr-md-1"></i><span class="d-none d-md-inline-block">Show cluster info</span></a>
             </section>
             <div class="collapse navbar-collapse" id="navbarSupportedContent" style="width:auto; max-width:100%">
                 <div id="info" class="d-flex align-items-center">
@@ -48,6 +49,22 @@
                         <h1></h1>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div id="nodeTable" class="w-100 d-flex justify-content-center d-none">
+            <div id="nodeTableContainer">
+                <table class="table" class="">
+                    <thead>
+                    <tr>
+                        <th scope="col">C#</th>
+                        <th scope="col">N#</th>
+                        <th scope="col">Performers</th>
+                        <th scope="col">Venues</th>
+                        <th scope="col">Cities</th>
+                    </tr>
+                    </thead>
+                    <tbody id="appendHere"></tbody>
+                </table>
             </div>
         </div>
         <div id="rationale" class="modal">
