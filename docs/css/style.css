@@ -512,7 +512,6 @@ svg#main {
     }
 }
 
-
 #nodeTable {
     font-size: 0.75em;
     position: absolute;
@@ -521,7 +520,7 @@ svg#main {
     padding-bottom: 1em;
     overflow: scroll;
     z-index: 200;
-    background-color: rgb(249 249 249);
+    background-color: rgb(249 249 249); /* TODO: #22 #nodeTable bg-color makes it too bright in dark mode */
     box-shadow: 0 -.125rem .25rem rgba(0,0,0,.075)!important;
 }
 
@@ -538,3 +537,5 @@ svg#main {
         width: 75% !important;
     }
 }
+
+/* TODO: #21 #floatingInfo text in dark mode is not light and thus not visible. */

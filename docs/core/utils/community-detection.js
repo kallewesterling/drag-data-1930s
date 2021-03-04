@@ -1,5 +1,5 @@
 const communityDetection = () => {
-    loading('Detecting communities using Louvain algorithm.');
+    output('Using Louvain algorithm', false, communityDetection);
 
     // TODO: I am using JLouvain here. Are there other community detectors out there? Learn more about algorithms...
     // See invention of Louvain method here https://arxiv.org/pdf/0803.0476.pdf

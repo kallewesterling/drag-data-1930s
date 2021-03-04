@@ -1,51 +1,59 @@
 window.ERROR_LEVEL = 1;
 
-const clearAll = (e) => {
-    /*
-    // moved to button instead
-    if (!e.altKey && window.toggledCommentedElements) {
-        toggleCommentedElements('true');
-    }
+const froms = {};
 
-    if (d3.select('#popup-info').classed('d-none')) {
-        d3.select('#popup-info').classed('d-none', true);
-    }
-    */
-}
+const output = (message, log_output=false, from=undefined, output_function=console.log, passive = false) => {
+    if (typeof(from) === 'function') // you can send a message from a function, and we'll pull out the name
+        from = from.name;
+    if (typeof(from) === 'object')
+        from = from.constructor.name;
 
-const loading = (message, log_output=false) => {
-    d3.select("#loadingContainer").classed('bg-white', true);
-    d3.select("#loadingContainer").classed('bg-danger', false);
-    d3.select("#loadingContainer").classed('text-white', false);
-    d3.select("#loadingMessage").html(message);
-    d3.select("#loading").classed('d-none', false);
+    window._selectors["loadingContainer"].classed('bg-white', true);
+    window._selectors["loadingContainer"].classed('bg-danger', false);
+    window._selectors["loadingContainer"].classed('text-white', false);
+    window._selectors["loadingMessage"].html(message);
+    window._selectors["loading"].classed('d-none', false);
     window.loadingTimeout = setTimeout(() => {
-        d3.select("#loading").classed('d-none', true);
+        window._selectors["loading"].classed('d-none', true);
     }, 1000);
+
+    if (![...Object.keys(froms)].includes(from)) {
+        // assign color
+        froms[from] = d3.interpolateRainbow(Object.keys(froms).length * 0.15);
+    }
     if (log_output || window.ERROR_LEVEL > 0) {
-        console.log(`[${new Date().toLocaleString()}]`, message)
+        if (typeof(message) === "object") {
+            console.groupCollapsed(`%c${new Date().toLocaleString()} [${from}]`, `color: ${passive ? 'lightgray': froms[from]}`);
+            message.forEach(m=>{
+                if (typeof(m) === "string") {
+                    output_function(`%c${m}`, 'color: lightgray');
+                } else {
+                    output_function(m);
+                }
+            });
+            console.groupEnd()
+        } else {
+            console.groupCollapsed(`%c${new Date().toLocaleString()} [${from}]`, `color: ${passive ? 'lightgray': froms[from]}`);
+            output_function(`%c${message}`, 'color: lightgray');
+            console.groupEnd()
+        }
     }
 }
 
 const error = (message, hide=false, clear_timeout=true) => {
     if (hide) {
-        d3.select("#loading").classed('d-none', true);
+        window._selectors["loading"].classed('d-none', true);
     } else {
-        d3.select("#loadingSpinner").classed('d-none', true);
-        d3.select("#loadingContainer").classed('bg-white', false);
-        d3.select("#loadingContainer").classed('bg-danger', true);
-        d3.select("#loadingContainer").classed('text-white', true);
-        d3.select("#loadingMessage").html(message);
-        d3.select("#loading").classed('d-none', false);
+        window._selectors["loadingSpinner"].classed('d-none', true);
+        window._selectors["loadingContainer"].classed('bg-white', false);
+        window._selectors["loadingContainer"].classed('bg-danger', true);
+        window._selectors["loadingContainer"].classed('text-white', true);
+        window._selectors["loadingMessage"].html(message);
+        window._selectors["loading"].classed('d-none', false);
         if (clear_timeout)
             window.clearTimeout(window.loadingTimeout);
     }
 }
-
-window.onmousemove = (e) => {
-    clearAll(e);
-}
-
 
 /**
  * troubleshoot takes one argument, which specifies whether to try to fix the data present in the current graph.
@@ -107,18 +115,18 @@ const troubleshoot = (fix = false) => {
  * @returns {number} - Identification number for the message box's timeout
  */
 const debugMessage = (message, header = "Warning") => {
-    if (getSettings().debugMessages === false) {
+    if (settingsFromDashboard('debugMessage').debugMessages === false) {
         // console.log("[debugMessage: " + header + "] " + message);
         // console.log("debugMessage suppressed."); //TODO: Turn back on?
         return false;
     }
     let _id = `toast${store.toasterCounter}`;
-    let _html = d3.select("#wrapToasters").html();
+    let _html = window._selectors["wrapToasters"].html();
     _html += `<div class="toast" id="${_id}" role="alert" aria-live="polite" aria-atomic="true" data-delay="5000"><div role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-header"><strong class="mr-auto">${header}</strong><button type="button" class="ml-2 mb-1 btn-close" data-dismiss="toast" aria-label="Close"></button></div>
         <div class="toast-body">${message}</div>
         </div></div>`;
-    d3.select("#wrapToasters").html(_html);
+    window._selectors["wrapToasters"].html(_html);
     // $(`#${_id}`).toast({ delay: 5000 });
     $(`#${_id}`).toast("show");
     let t = setTimeout(() => {
