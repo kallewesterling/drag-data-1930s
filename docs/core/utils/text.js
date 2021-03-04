@@ -101,8 +101,9 @@ const generateNodeInfoHTML = (node) => {
  * @param {Object} edge - d3 selector for a given edge.
  * @return {string} html - raw minified HTML
  */
-const generateEdgeInfoHTML = (edge) => {
-    let settings = getSettings();
+const generateEdgeInfoHTML = (edge, weightFromCurrent = undefined) => {
+    if (!weightFromCurrent)
+        weightFromCurrent = settingsFromDashboard('generateEdgeInfoHTML').edges.weightFromCurrent;
     
     let html = `<li class="list-group-item"><strong>ID</strong> ${edge.source.display} - ${edge.target.display}</li>`;
     
@@ -116,8 +117,8 @@ const generateEdgeInfoHTML = (edge) => {
 
     html += `<li class="list-group-item">
         <strong class="mb-1">Weight</strong>
-        <p class="m-0 mb-1 small ${settings.edges.weightFromCurrent ? '' : 'fw-bold'}">In entire network: ${edge.weight}</p>
-        <p class="m-0 small ${settings.edges.weightFromCurrent ? 'fw-bold' : ''}">In current network: ${edge.calibrated_weight}</p>
+        <p class="m-0 mb-1 small ${weightFromCurrent ? '' : 'fw-bold'}">In entire network: ${edge.weight}</p>
+        <p class="m-0 small ${weightFromCurrent ? 'fw-bold' : ''}">In current network: ${edge.calibrated_weight}</p>
         </li>
         `;
 

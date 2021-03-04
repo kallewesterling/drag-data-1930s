@@ -1,15 +1,16 @@
 "use strict";
 
-const zoom = d3.zoom().extent([[_autoSettings.zoomMin, _autoSettings.zoomMax], [window.innerWidth, window.innerHeight]]);
-zoom.scaleExtent([_autoSettings.zoomMin, _autoSettings.zoomMax])
+const zoom = d3.zoom().extent([[_autoSettings.zoomMin, _autoSettings.zoomMin], [window.innerWidth, window.innerHeight]]);
+zoom.scaleExtent([_autoSettings.zoomMin, _autoSettings.zoomMax]);
 
 const zoomedActions = () => {
-    saveSettings();
+    saveToStorage();
     graph.k = Math.round(d3.event.transform.k * 10) / 10;
     graph.x = Math.round(d3.event.transform.x * 10) / 10;
     graph.y = Math.round(d3.event.transform.y * 10) / 10;
-    updateInfo();    
+    updateInfo();
     graph.plot.attr("transform", d3.event.transform);
+    return true;
 };
 
 zoom.on("zoom", zoomedActions);
@@ -20,15 +21,25 @@ zoom.on("zoom", zoomedActions);
  * The return value is true in all cases.
  * @returns {boolean} - true
  */
-const transformToWindow = () => {
+const transformToWindow = (settings) => {
+    output('Called', false, transformToWindow);
+    
+    if (!settings)
+        settings = settingsFromDashboard('transformToWindow');
+
+    output(`zoomMin: ${settings.zoomMin}, zoomMax: ${settings.zoomMax}`, false, transformToWindow);
+    
     graph.plot.attr("width", window.innerWidth);
     graph.plot.attr("height", window.innerHeight);
     graph.svg.attr("viewBox", [-window.innerWidth/2, -window.innerHeight/2, window.innerWidth, window.innerHeight]);
-    zoom.extent([[_autoSettings.zoomMin, _autoSettings.zoomMax], [window.innerWidth, window.innerHeight]]);
+    
+    zoom.extent([[settings.zoomMin, settings.zoomMax], [window.innerWidth, window.innerHeight]]);
+    
     return true;
 };
 
 
 // first time, load the settings from the saved data, if they exist!
-if (loadSettings('transform'))
-    graph.svg.call(zoom.transform, d3.zoomIdentity.translate(loadSettings('transform').x, loadSettings('transform').y).scale(loadSettings('transform').k))
+let _ = fetchFromStorage("transform", "zoom.js")
+if (_)
+    graph.svg.call(zoom.transform, d3.zoomIdentity.translate(_.x, _.y).scale(_.k))

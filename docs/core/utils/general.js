@@ -318,18 +318,15 @@ const getRelated = (node) => {
 };
 
 /**
- * updateGraphElements takes no arguments but resets all the different graph elements (nodes, edges, labels) to their original settings.
+ * styleGraphElements takes no arguments but resets all the different graph elements (nodes, edges, labels) to their original settings.
  * The return value is always true.
  * @returns {boolean} - true
  */
-const updateGraphElements = () => {
-    loading("updateGraphElements called...");
+const styleGraphElements = (settings = undefined) => {
+    output("Called", false, styleGraphElements);
 
-    //if (window.egoNetwork != undefined) console.log(`window.egoNetwork: ${window.egoNetwork}`)
-    //if (window.toggledCommentedElements != undefined) console.log(`window.toggledCommentedElements: ${window.toggledCommentedElements}`)
-    //if (window.nodeSelected != undefined) console.log(`window.nodeSelected: ${window.nodeSelected}`)
-
-    let settings = getSettings();
+    if (!settings)
+        settings = settingsFromDashboard('styleGraphElements');
 
     if (!settings.nodes.communityDetection && document.querySelector('html').classList.contains('has-community')) {
         document.querySelector('html').classList.remove('has-communities');
@@ -339,14 +336,10 @@ const updateGraphElements = () => {
     nodeElements
         .attr("class", (node) => getNodeClass(node))
         .transition()
-        .attr("r", (node) => getSize(node))
+        .attr("r", (node) => getSize(node, 'r', settings.nodes.nodeMultiplier, settings.nodes.nodeSizeFromCurrent))
         .attr("style", (node) => {
             if (node.cluster && settings.nodes.communityDetection) {
-                return (
-                    "fill: " +
-                    d3.interpolateSinebow(1 / node.cluster) +
-                    " ;" //!important
-                );
+                return `fill: ${d3.interpolateSinebow(1 / node.cluster)};`;
             } else {
                 return "";
             }
@@ -355,7 +348,7 @@ const updateGraphElements = () => {
     edgeElements
         .attr("class", (e) => getEdgeClass(e))
         .transition()
-        .style("stroke-width", (e) => getEdgeStrokeWidth(e));
+        .style("stroke-width", (e) => getEdgeStrokeWidth(e, settings.edges.edgeMultiplier, settings.edges.weightFromCurrent, settings.edgeMinStroke, settings.edgeMaxStroke));
 
     if (!settings.nodes.stickyNodes) {
         textElements.attr("", (node) => {
@@ -375,7 +368,7 @@ const updateGraphElements = () => {
         .transition()
         .duration(750)
         .attr("opacity", 1)
-        .attr("font-size", (node) => getSize(node, "text"));
+        .attr("font-size", (node) => getSize(node, "text", settings.nodes.nodeMultiplier, settings.nodes.nodeSizeFromCurrent));
 
     return true;
 };
@@ -390,10 +383,10 @@ const selectNode = (node) => {
     if (nodeIsSelected(node)) {
         window.nodeSelected = undefined;
         hide("#nodeEdgeInfo");
-        updateGraphElements();
+        styleGraphElements();
     } else {
         window.nodeSelected = true;
-        updateGraphElements();
+        styleGraphElements();
         deselectNodes(node);
         selectRelatedEdges(node);
         setNodeEdgeInfo(node);
@@ -411,7 +404,7 @@ const selectEdge = (edge) => {
     if (edgeIsSelected(edge)) {
         window.edgeSelected = undefined;
         hide("#nodeEdgeInfo");
-        updateGraphElements();
+        styleGraphElements();
     } else {
         window.edgeSelected = true;
         deselectEdges(edge);
@@ -453,13 +446,16 @@ const graphEdgesContains = (edge_id) => {
 };
 
 /**
- * modifySimulation takes no arguments but is the function that runs every time that the d3 network simulation is initiated or started.
+ * modifySimulation takes no arguments but is the function that runs after updateElement — every time that the d3 network has been filtered, and the simulation needs to be restarted.
  * The return value is always true.
  */
-const modifySimulation = () => {
-    let settings = getSettings().force;
+const modifySimulation = (settings) => {
+    output('Called', false, modifySimulation)
+
+    if (!settings)
+        settings = settingsFromDashboard('modifySimulation');
     
-    if (settings.layoutClustering && getSettings().nodes.communityDetection) {
+    if (settings.force.layoutClustering && settings.nodes.communityDetection) {
         function clustering(alpha) {
             graph.nodes.forEach((d) => {
                 const cluster = graph.clusters[d.cluster];
@@ -482,34 +478,34 @@ const modifySimulation = () => {
 
     graph.simulation.force("link").links(graph.edges);
     graph.simulation.nodes(graph.nodes);
-    if (settings.layoutCenter) {
+    if (settings.force.layoutCenter) {
         graph.simulation.force("center", d3.forceCenter());
         graph.simulation.force("center").strength = 1;
     } else {
         graph.simulation.force("center", null);
     }
-    if (settings.layoutForceX) {
+    if (settings.force.layoutForceX) {
         graph.simulation.force("forceX", d3.forceX());
     } else {
         graph.simulation.force("forceX", null);
     }
-    if (settings.layoutForceX) {
+    if (settings.force.layoutForceX) {
         graph.simulation.force("forceY", d3.forceY());
     } else {
         graph.simulation.force("forceY", null);
     }
-    if (settings.layoutCharge) {
+    if (settings.force.layoutCharge) {
         graph.simulation.force("charge", d3.forceManyBody());
-        graph.simulation.force("charge").strength(settings.charge);
+        graph.simulation.force("charge").strength(settings.force.charge);
     } else {
         graph.simulation.force("charge", null);
     }
-    if (settings.layoutCollide) {
+    if (settings.force.layoutCollide) {
         graph.simulation.force("collide", d3.forceCollide());
-        graph.simulation.force("collide").strength(settings.collide);
+        graph.simulation.force("collide").strength(settings.force.collide);
         graph.simulation.force("collide").radius((node) => {
             // our radius here is based on the text label's bounding box!
-            // let r = getSize(node);
+            // let r = getSize(node, 'r', settings.......);
             let selector = `text[data-node="${node.node_id}"]`;
             let textBBox = d3.select(selector).node().getBBox();
             return textBBox.width / 2;
@@ -518,7 +514,7 @@ const modifySimulation = () => {
         graph.simulation.force("collide", null);
     }
 
-    graph.simulation.force("link").strength(settings.linkStrength);
+    graph.simulation.force("link").strength(settings.force.linkStrength);
 
     graph.simulation.on("tick", function () {
         nodeElements.attr("cx", (n) => n.x);
@@ -547,7 +543,6 @@ const modifySimulation = () => {
  */
 const getNodeClass = (node) => {
     let classes = "";
-    let settings = getSettings().nodes;
     if (window.toggledCommentedElements) {
         classes = "node";
         classes += node.has_comments
@@ -587,14 +582,18 @@ const getEdgeClass = (edge) => {
  * @param {Object} edge - d3 selector for a given edge.
  * @returns {string} - The string with the stroke width.
  */
-const getEdgeStrokeWidth = (edge) => {
-    let settings = getSettings();
-    let weightScale = edgeScale(settings);
+const getEdgeStrokeWidth = (edge, edgeMultiplier=undefined, weightFromCurrent=undefined, min, max) => {
+    if (!weightFromCurrent || !edgeMultiplier) {
+        let settings = settingsFromDashboard('getEdgeStrokeWidth');
+        if (!weightFromCurrent)
+            weightFromCurrent = settings.edges.weightFromCurrent;
+        if (!edgeMultiplier)
+            edgeMultiplier = settings.edges.edgeMultiplier;
+    }
+    let weightScale = edgeScale(settings, weightFromCurrent, min, max);
 
-    let evalWeight = settings.edges.weightFromCurrent
-        ? edge.calibrated_weight
-        : edge.weight;
-    return weightScale(evalWeight) * +settings.edges.edgeMultiplier + "px";
+    let evalWeight = weightFromCurrent ? edge.calibrated_weight : edge.weight;
+    return weightScale(evalWeight) * +edgeMultiplier + "px";
 };
 
 /**
@@ -616,32 +615,39 @@ const getTextClass = (node) => {
  * @param {Object} [type] - Either "r" (default) for a `circle` DOM element, or "text" for a `text` DOM element.
  * @returns {number} - The size in pixels
  */
-const getSize = (node, type = "r") => {
-    let settings = getSettings();
-    let yScale = nodeScale(settings);
+const getSize = (node, type = "r", nodeMultiplier = undefined, nodeSizeFromCurrent = undefined) => {
+    if (!nodeMultiplier || !nodeSizeFromCurrent) {
+        settings = settingsFromDashboard("getSize");
+        if (!nodeMultiplier)
+            nodeMultiplier = settings.nodes.nodeMultiplier;
+        if (!nodeSizeFromCurrent)
+            nodeSizeFromCurrent = settings.nodes.nodeSizeFromCurrent
+    }
+
+    let yScale = nodeScale(nodeSizeFromCurrent);
     let val = 0;
     if (window.toggledCommentedElements === true) {
         if (node.has_comments) {
-            return 10 * settings.nodes.nodeMultiplier;
+            return 10 * nodeMultiplier;
         } else {
-            return 5 * settings.nodes.nodeMultiplier;
+            return 5 * nodeMultiplier;
         }
     }
 
     if (type === "r") {
-        if (settings.nodes.nodeSizeFromCurrent === true) {
-            val = yScale(node.currentDegree) * settings.nodes.nodeMultiplier;
+        if (nodeSizeFromCurrent === true) {
+            val = yScale(node.currentDegree) * nodeMultiplier;
         } else {
-            val = yScale(node.degree) * settings.nodes.nodeMultiplier;
+            val = yScale(node.degree) * nodeMultiplier;
         }
     } else if (type === "text") {
-        if (settings.nodes.nodeSizeFromCurrent === true) {
+        if (nodeSizeFromCurrent === true) {
             val =
                 yScale(node.currentDegree) *
-                settings.nodes.nodeMultiplier *
+                nodeMultiplier *
                 1.5;
         } else {
-            val = yScale(node.degree) * settings.nodes.nodeMultiplier * 1.5;
+            val = yScale(node.degree) * nodeMultiplier * 1.5;
         }
     }
     if (val < 0) {

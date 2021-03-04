@@ -23,12 +23,23 @@
         What about the placement of the nodes? This is taken care of by the "force simulation" [TODO: read this https://medium.com/@sxywu/understanding-the-force-ef1237017d5]
 */
 
+// let settings = settingsFromDashboard('root');
+
 (function () {
     // Immediately invoked function to set the theme on initial load
+    
+    // set egoNetwork to false, since we're not in egoNetwork when we start a new window
     window.egoNetwork = false;
-    loadNetwork();
-    transformToWindow();
+
+    let settings = undefined;
+    // catch any querystrings that may include settings
+    if (window.location.search) {
+        settings = queryStringToSettings();
+    }
+    
+    // setup zoom functionality
     graph.svg.call(zoom);
-    //graph.simulation.alphaTarget(0.3).restart();
-    //graph.simulation.alphaTarget(1).restart();
+
+    // load network
+    loadNetwork([{'function': transformToWindow, 'settings': settings}, {'function': saveToStorage}]); // transformToWindow, and saveToStorage is called as a callback
 })();

@@ -4,7 +4,7 @@ const dropNode = (node) => {
     if (node.inGraph) {
         graph.nodes.forEach((o, i) => {
             if (node.node_id === o.node_id) {
-                if (ERROR_LEVEL > 1) loading(`dropping node ${o.node_id}...`);
+                if (ERROR_LEVEL > 1) output(`dropping node ${o.node_id}...`, false, 'dropNode');
                 graph.nodes.splice(i, 1);
                 node.inGraph = false;
                 return true;
@@ -16,7 +16,7 @@ const dropNode = (node) => {
 const dropEdge = (edge) => {
     graph.edges.forEach((o, i) => {
         if (edge.edge_id === o.edge_id) {
-            if (ERROR_LEVEL > 1) loading(`dropping edge ${o.edge_id}...`);
+            if (ERROR_LEVEL > 1) output(`dropping edge ${o.edge_id}...`, false, 'dropEdge');
             graph.edges.splice(i, 1);
             edge.inGraph = false;
             return true;
@@ -41,10 +41,14 @@ const addEdge = (edge) => {
  * The return value is always true.
  * @returns {boolean} - true
  */
-const filterNodes = (nodeList = []) => {
-    loading("filterNodes called...");
+const filterNodes = (nodeList = [], settings = undefined) => {
+    let output_msgs = ["Called"];
+        
     if (!nodeList.length) {
-        let settings = getSettings();
+        if (!settings)
+            settings = settingsFromDashboard('filterNodes');
+
+        output_msgs.push(`--> minDegree: ${settings.nodes.minDegree}`);
         store.nodes.forEach((node) => {
             if (node.degree >= settings.nodes.minDegree) {
                 addNode(node);
@@ -63,6 +67,7 @@ const filterNodes = (nodeList = []) => {
             nodeList.includes(node) ? addNode(node) : dropNode(node);
         });
     }
+    output(output_msgs, false, filterNodes);
     return true;
 };
 
@@ -86,8 +91,12 @@ const getInvalidEdges = (inGraph=true) => {
  * The return value is always true.
  * @returns {boolean} - true
  */
-const filterEdges = (edgeList = [], change = true) => {
-    loading("filterEdges called...");
+const filterEdges = (edgeList = [], settings = undefined, change = true) => {
+    
+    if (!settings)
+    settings = settingsFromDashboard('filterEdges');
+    
+    output(["Called", `--> minWeight: ${settings.edges.minWeight}`, `--> startYear: ${settings.edges.startYear}`, `--> endYear: ${settings.edges.endYear}`], false, 'filterEdges');
 
     if (edgeList.length) {
         console.error('filtering using lists is not implemented.')
@@ -106,12 +115,11 @@ const filterEdges = (edgeList = [], change = true) => {
 
     store.edges.filter(e=>e.passes.startYear && e.passes.endYear && e.passes.minWeight && !e.inGraph).forEach(e=>addEdge(e));
     store.edges.filter(e=>(!e.passes.startYear || !e.passes.endYear || !e.passes.minWeight) && e.inGraph).forEach(e=>dropEdge(e));
-    console.log(store.edges);
 
     return true;
 
     if (!edgeList.length) {
-        let settings = getSettings().edges;
+        let settings = settingsFromDashboard('filterEdges').edges;
         store.edges.forEach((edge) => {
             edge.calibrated_weight = edge.found.length;
 
@@ -223,13 +231,13 @@ const clusters = {};
  * @returns {boolean} - true
  */
 const filter = (nodeList = [], edgeList = [], change = true) => {
-    loading("Filter called...");
-    let settings = getSettings();
+    output("Called", false, filter);
+    let settings = settingsFromDashboard("filter");
 
     hide("#nodeEdgeInfo");
 
-    filterNodes(nodeList);
-    filterEdges(edgeList, change);
+    filterNodes(nodeList, settings);
+    filterEdges(edgeList, settings, change);
 
     modifyNodeDegrees();
 
@@ -237,7 +245,7 @@ const filter = (nodeList = [], edgeList = [], change = true) => {
         filterNodesWithoutEdge();
     }
 
-    updateElements();
+    setupFilteredElements(settings);
 
     if (settings.nodes.communityDetection) {
         communityDetection();
@@ -245,7 +253,7 @@ const filter = (nodeList = [], edgeList = [], change = true) => {
         graph.clusterInfo = getNodeClusterInfo();
     }
     graph.nodes.forEach((node) => {
-        node.r = getSize(node);
+        node.r = getSize(node, 'r', settings.nodes.nodeMultiplier, settings.nodes.nodeSizeFromCurrent);
     });
 
     if (graph.nodes.length < 300)
@@ -255,10 +263,10 @@ const filter = (nodeList = [], edgeList = [], change = true) => {
         node.html_info = generateNodeInfoHTML(node);
     })
     graph.edges.forEach(edge=>{
-        edge.html_info = generateEdgeInfoHTML(edge);
+        edge.html_info = generateEdgeInfoHTML(edge, settings.edges.weightFromCurrent);
     })
 
-    updateGraphElements();
+    styleGraphElements(settings);
     updateInfo();
 
     return true;
@@ -342,12 +350,12 @@ const getUniqueNetworks = (nodeList, returnVal = "nodes") => {
  * The return value is ...
  */
 const egoNetworkOn = async (node) => {
-    loading("egoNetworkOn called...");
-    d3.select("#egoNetwork").classed("d-none", false);
-    d3.select("#egoNetwork > #node").html(node.id);
+    output("Called", false, egoNetworkOn);
+    window._selectors["egoNetwork"].classed("d-none", false);
+    window._selectors["egoNetwork > #node"].html(node.id);
     let egoNetwork = getEgoNetwork(node);
     const result = await filter(egoNetwork);
-    //updateElements();
+    //setupFilteredElements();
     restartSimulation();
     resetDraw();
 
@@ -359,10 +367,10 @@ const egoNetworkOn = async (node) => {
  * The return value is ...
  */
 const egoNetworkOff = async (node) => {
-    loading("egoNetworkOff called...");
-    d3.select("#egoNetwork").classed("d-none", true);
-    const result = await filter();
-    //updateElements();
+    output("Called", false, egoNetworkOff);
+    window._selectors["egoNetwork"].classed("d-none", true);
+    // const result = await filter();
+    //setupFilteredElements();
     restartSimulation();
     resetDraw();
 
@@ -378,36 +386,34 @@ const toggleEgoNetwork = async (
     toggleSettings = true,
     force = undefined
 ) => {
-    loading("toggleEgoNetwork called...");
+    output("Called", false, toggleEgoNetwork);
     // filter nodes based on a given node
     if (window.egoNetwork || force === "off") {
-        console.log("ego network already active - resetting network view...");
+        output("Ego network already active - resetting network view...", false, toggleEgoNetwork);
         await egoNetworkOff();
-        updateElements();
-        updateGraphElements();
+        setupFilteredElements();
+        styleGraphElements();
 
         if (toggleSettings) {
-            //console.log("--> show quick access and settings");
+            // show quick access and settings
             show("#settings");
             show("#infoContainer");
         }
     } else {
-        console.log("filtering out an ego network based on " + node.node_id);
+        output(`Filtering out an ego network based on ${node.node_id}`, false, toggleEgoNetwork);
         await egoNetworkOn(node);
-        updateElements();
-        updateGraphElements();
+        setupFilteredElements();
+        styleGraphElements();
 
-        d3.select("#main").on("click", () => {
+        window._selectors.main.on("click", () => {
             if (d3.event.metaKey && window.egoNetwork) {
-                console.log(
-                    "svg command + click detected while ego network active - resetting network view..."
-                );
+                output(`svg command + click detected while ego network active - resetting network view...`, false, toggleEgoNetwork);
                 resetLocalStorage();
             }
         });
 
         if (toggleSettings) {
-            //console.log("--> hiding quick access and settings");
+            // hiding quick access and settings
             hide("#settings");
             hide("#infoContainer");
         }
@@ -423,7 +429,7 @@ const toggleCommentedElements = (force = undefined) => {
     if (window.toggledCommentedElements || force === "off") {
         window.toggledCommentedElements = false;
         filter();
-        d3.select("#popup-info").classed("d-none", true);
+        window._selectors["popup-info"].classed("d-none", true);
         restartSimulation();
     } else if (!window.toggledCommentedElements || force === "on") {
         window.toggledCommentedElements = true;
@@ -439,7 +445,7 @@ const toggleCommentedElements = (force = undefined) => {
         filter(nodesWithComments, edgesWithComments);
         restartSimulation();
     }
-    d3.select("#commentedNodes")
+    window._selectors["commentedNodes"]
         .classed("bg-dark", !window.toggledCommentedElements)
         .classed("bg-warning", window.toggledCommentedElements);
     return true;
@@ -458,7 +464,7 @@ const filterNodesWithoutEdge = () => {
     while (hasUnconnectedNodes()) {
         graph.nodes.forEach((node) => {
             if (nodeHasEdges(node) === false) {
-                // console.log(`——> remove node ${node.node_id}!`);
+                // remove node with node_id node.node_id!
                 graph.nodes.forEach((o, i) => {
                     if (node.node_id === o.node_id) {
                         graph.nodes.splice(i, 1);
@@ -472,8 +478,8 @@ const filterNodesWithoutEdge = () => {
 
     if (returnObject.dropped.length > 0) {
         troubleshoot(true); // ensures that all nodes are correctly represented in
-        // console.log('running updateElements in filterNodesWithoutEdge')
-        // updateElements();
+        // console.log('running setupFilteredElements in filterNodesWithoutEdge')
+        // setupFilteredElements();
         updateInfo();
     }
 

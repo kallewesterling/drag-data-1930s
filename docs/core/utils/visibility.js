@@ -33,9 +33,9 @@ const toggle = (selector) => {
 
         // special rules
         if (selector === "#settingsContainer") {
-            d3.select("#settingsToggle").classed("toggled", !isVisible(selector));
+            window._selectors["settingsToggle"].classed("toggled", !isVisible(selector));
         } else if (selector === "#infoToggleDiv") {
-            d3.select("#infoToggle").classed("toggled", !isVisible(selector));
+            window._selectors["infoToggle"].classed("toggled", !isVisible(selector));
         }
 
         return true;
@@ -90,13 +90,13 @@ const show = (selector) => {
  * @returns {boolean} - true
  */
 const setNodeEdgeInfo = (elem) => {
-    let selector = d3.select("#nodeEdgeInfoContainer .list-group");
+    let selector = window._selectors["nodeEdgeInfoContainer .list-group"];
     if (elem.node_id) {
         selector.html(elem.html_info);
     } else if (elem.edge_id) {
         selector.html(elem.html_info);
     }
-    let container = d3.select("#nodeEdgeInfo");
+    let container = window._selectors["nodeEdgeInfo"];
     show(container);
 };
 
@@ -105,7 +105,7 @@ const toggleColorNetworks = () => {
         console.log('toggleColorNetworks rejected.')
         return false;
     }
-    loading('Coloring networks...');
+    output("Called", false, toggleColorNetworks);
     if (!window.coloredNetworks) {
         window.coloredNetworks = true;
         colorNetworks();
@@ -146,13 +146,14 @@ const updateInfo = () => {
     return true;
 };
 
-let original = {
-    fill: {},
-    classList: {},
-    r: {}
-};
 
-const showCities = () => {
+const showCities = () => { // TODO: #24 the showCities function is not working - should be rewritten to be able to highlight/pulse any given category of node...
+    let original = {
+        fill: {},
+        classList: {},
+        r: {}
+    };
+
     graph.nodes.forEach(n => {
         let node = d3.select(`#${n.node_id}`)
         original.fill[n.node_id] = node.style('fill');

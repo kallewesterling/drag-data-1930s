@@ -109,7 +109,7 @@
             });
 
 
-            const loadSettings = (item) => {
+            const fetchFromStorage = (item) => {
                     let rawSetting = localStorage.getItem(item);
                     if (rawSetting) {
                         if (rawSetting.includes("{")) {
@@ -157,13 +157,13 @@
 
                 var options = [];
                 new Set(filtered_performers.map(d=>d.degree)).forEach(d=>{
-                    if (d==loadSettings('settings').nodes.minDegree) {
+                    if (d==fetchFromStorage('settings').nodes.minDegree) {
                         options.push(`<option value="${d}" selected>${d}</option>`);
                     } else {
                         options.push(`<option value="${d}">${d}</option>`);
                     }
                 });
-                d3.select("#minDegree").node().innerHTML = options;
+                window._elements.minDegree.innerHTML = options;
 
                 filtered_performers = filtered_performers.filter(d=>d.degree >= +d3.select('#minDegree').node().value)
 

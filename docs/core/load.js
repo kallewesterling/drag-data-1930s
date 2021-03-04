@@ -99,15 +99,16 @@ const setupStoreEdges = (edgeList) => {
  * loadNetwork takes no arguments, but loads the entire network, and runs the other appropriate functions at the start of the script.
  * The return value is true if the network file is loaded correctly and all data is set up appropriately.
  */
-const loadNetwork = () => {
-    loading("loadNetwork called...");
-    let settings = getSettings();
-    // console.log(settings);
+const loadNetwork = (callback=[]) => {
+    output("Called", false, loadNetwork);
     
+    let _ = fetchFromStorage('settings', 'loadNetwork')
+    let filename = _ ? _.datafile.filename : _autoSettings.datafile.filename;
+
     enableSettings();
     document.querySelector('#datafileContainer').removeAttribute('style');
-    d3.json(settings.datafile.filename).then((data) => {
-        loading("file loaded...");
+    d3.json(filename).then((data) => {
+        output("File loaded", false, loadNetwork);
         // for debug purposes (TODO can be removed)
         store.raw = data;
 
@@ -118,6 +119,22 @@ const loadNetwork = () => {
         store.edges = setupStoreEdges(data.links);
 
         loadStoreRanges();
+
+        if (_) {
+            if (_.edges.startYear < store.ranges.years.min) {
+                // TODO: set startYear to store.ranges.years.min
+            }
+
+            if (_.edges.endYear > store.ranges.years.max) {
+                // TODO: set endYear to store.ranges.years.max
+            }
+        }
+
+        // setup settings box
+        if (!store.settingsFinished)
+            setupSettingsInterface("root");
+
+        store.settingsFinished = true;
 
         // Link up store edges with nodes, and vice versa
         store.edges.forEach(e => {
@@ -145,8 +162,6 @@ const loadNetwork = () => {
             });
         });
 
-        settingsSetupYearRange(undefined, undefined, false);
-
         // set up handlers
         setupKeyHandlers();
         setupSettingInteractivity();
@@ -158,6 +173,11 @@ const loadNetwork = () => {
         // setup preview TODO: This is currently disabled
         // preview(store);
         
+        if (callback) {
+            output('Calling callback functions', false, loadNetwork)
+            callback.forEach(c=>c['function'](c.settings));
+        }
+
         return true;
     }).catch(e=> {
         console.error(e);
@@ -166,7 +186,7 @@ const loadNetwork = () => {
         disableSettings(['datafile']);
         toggle('#datafileToggle');
         document.querySelector('#datafileContainer').setAttribute('style', 'background-color: #ffc107 !important;'); // makes the datafileContainer look like "warning"
-        error(`<strong>Data file could not be found.</strong><p class="m-0 small text-muted">${settings.datafile.filename}</p><p class="mt-3 mb-0">Select a different datafile in the "data file" dropdown.</p>`);
+        error(`<strong>Data file could not be found.</strong><p class="m-0 small text-muted">${filename}</p><p class="mt-3 mb-0">Select a different datafile in the "data file" dropdown.</p>`);
         zoom.on("zoom", null);
         return false;
     });
@@ -176,60 +196,25 @@ const loadNetwork = () => {
  * setupInteractivity takes X argument/s... TODO: Needs docstring
  * The return value is ...
  */
-const setupInteractivity = () => {
-    loading("setupInteractivity called...");
+const setupInteractivity = (settings = undefined) => {
+    output("Called", false, setupInteractivity);
 
-    let settings = getSettings();
+    if (!settings)
+        settings = settingsFromDashboard('setupInteractivity');
 
     nodeElements.on("click", (node) => {
         d3.event.stopPropagation();
-        /*
-        if (window.restoreTransform) {
-            // we are in a zoomed position, let's go back to where we were!
-            console.log('zoom out to:', window.restoreTransform)
-            graph.svg.call(zoom.transform, d3.zoomIdentity.translate(window.restoreTransform.x, window.restoreTransform.y).scale(window.restoreTransform.k))
-            window.restoreTransform = undefined;
-            return true;
-        }
-        */
         if (d3.event.metaKey === true) {
             if (nodeIsSelected(node)) {
                 hide("#nodeEdgeInfo");
-                updateGraphElements();
+                styleGraphElements();
             }
-            loading("starting egoNetwork...");
+            output("Starting egoNetwork...", false, setupInteractivity);
             toggleEgoNetwork(node);
             node.fx = null;
             node.fy = null;
             return true;
-        /* // This clause is no longer effective since I have moved things around in the latest version.
-        } else if (window.toggledCommentedElements && node.has_comments) {
-            d3.select("#popup-info")
-                .html(generateCommentHTML(node))
-                .classed("d-none", false)
-                .attr("node-id", node.node_id)
-                .attr(
-                    "style",
-                    `top: ${d3.event.y}px !important; left: ${d3.event.x}px !important;`
-                );
-            return true;
-        */
         } else {
-            /*
-            // testing zoom into node
-            window.restoreTransform = {x: graph.x, y: graph.y, k: graph.k}
-
-            graph.svg.transition()
-                .duration(750)
-                .call(
-                    zoom.transform,
-                    d3.zoomIdentity
-                        .translate(0, 0)
-                        .scale(4)
-                        .translate(-node.x, -node.y),
-                    d3.mouse(graph.svg.node())
-                );
-            */
             selectNode(node);
             return true;
         }
@@ -239,7 +224,7 @@ const setupInteractivity = () => {
         d3.event.stopPropagation();
         if (window.toggledCommentedElements) {
             if (edge.has_comments || edge.has_general_comments) {
-                d3.select("#popup-info")
+                window._selectors["popup-info"]
                     .html(generateCommentHTML(edge))
                     .classed("d-none", false)
                     .attr("edge-id", edge.edge_id)
@@ -285,12 +270,13 @@ let textElements = g.labels.selectAll("text"),
     edgeElements = g.edges.selectAll("line");
 
 /**
- * updateElements takes no arguments.
+ * setupFilteredElements is called after filtering and contains all the d3 logic to process the filtered data. It takes no arguments.
+ * The function inherits settings from filter as they will not have changed since.
  * The return value is always true.
  * @returns {boolean} - true
  */
-const updateElements = () => {
-    loading("updateElements called...");
+const setupFilteredElements = (settings = undefined) => {
+    output("Called", false, setupFilteredElements);
 
     nodeElements = g.nodes
         .selectAll("circle")
@@ -335,8 +321,45 @@ const updateElements = () => {
             (exit) => exit.transition(750).attr("stroke-opacity", 0).remove()
         );
 
-    setupInteractivity();
-    modifySimulation();
+    setupInteractivity(settings);
+    modifySimulation(settings);
 
     return true;
 };
+
+
+const loadStoreRanges = () => {
+    let output_msgs = ["Called"]
+
+    if (store.ranges.nodeDegree && store.ranges.edgeWidth && store.ranges.years.min && store.ranges.years.max && store.ranges.years.array) {
+        output_msgs.push("Ranges already existed");
+        output(output_msgs, false, loadStoreRanges);
+        return store.ranges;
+    }
+
+    store.ranges.nodeDegree = d3.extent(store.nodes, (d) => d.degree);
+    store.ranges.edgeWidth = d3.extent(store.edges, (d) => d.weight);
+
+    store.ranges.years = {
+        min: d3.min(store.edges.map((d) => d.range.start? +d.range.start.substring(0, 4) : 1930)),
+        max: d3.max(store.edges.map((d) => d.range.end? +d.range.end.substring(0, 4) : 1930 )),
+    };
+    
+    store.ranges.years.array = range(
+        store.ranges.years.min,
+        store.ranges.years.max,
+        1
+    );
+    
+    // setup the setting nodes
+    let options = ""
+    store.ranges.years.array.forEach((year) => {
+        options += `<option value="${year}">${year}</option>`;
+    });
+    window._elements.startYear.innerHTML = options;
+    window._elements.endYear.innerHTML = options;
+
+    output_msgs.push("Finished", store.ranges);
+    output(output_msgs, false, loadStoreRanges);
+    return store.ranges;
+}
