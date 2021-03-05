@@ -15,6 +15,8 @@ const _autoSettings = {
         edgeMultiplier: 1,
         startYear: 1920,
         endYear: 1940,
+        minStroke: 1,
+        maxStroke: 7,
     },
     force: {
         layoutCenter: true,
@@ -23,15 +25,13 @@ const _autoSettings = {
         layoutCollide: true,
         layoutForceX: true,
         layoutForceY: true,
-        charge: -320,
+        charge: -700,
         collide: 0.5,
         linkStrength: 0.40,
     },
     zoom: 1.25,
     zoomMin: 0.60,
     zoomMax: 4,
-    edgeMinStroke: 1,
-    edgeMaxStroke: 7,
     debugMessages: false,
     datafile: {
         filename: 'data/multipartite-data.json',
@@ -152,6 +152,13 @@ let _elementNames = [
     'infoToggleDiv',
     'collideContainer',
     'chargeContainer',
+    'charge_label',
+    'collide_label',
+    'minDegree_label',
+    'nodeMultiplier_label',
+    'edgeMultiplier_label',
+    'minWeight_label',
+    'linkStrength_label',
 ]
 
 window._selectors = {}

@@ -348,7 +348,7 @@ const styleGraphElements = (settings = undefined) => {
     edgeElements
         .attr("class", (e) => getEdgeClass(e))
         .transition()
-        .style("stroke-width", (e) => getEdgeStrokeWidth(e, settings.edges.edgeMultiplier, settings.edges.weightFromCurrent, settings.edgeMinStroke, settings.edgeMaxStroke));
+        .style("stroke-width", (e) => getEdgeStrokeWidth(e, settings.edges.edgeMultiplier, settings.edges.weightFromCurrent, settings.edges.minStroke, settings.edges.maxStroke));
 
     if (!settings.nodes.stickyNodes) {
         textElements.attr("", (node) => {
@@ -456,7 +456,7 @@ const modifySimulation = (settings) => {
         settings = settingsFromDashboard('modifySimulation');
     
     if (settings.force.layoutClustering && settings.nodes.communityDetection) {
-        function clustering(alpha) {
+        const clustering = (alpha) => {
             graph.nodes.forEach((d) => {
                 const cluster = graph.clusters[d.cluster];
                 if (cluster === d) return;

@@ -40,32 +40,56 @@ const UIToggleAllSettingBoxes = () => {
 };
 
 
+const ensureDisabledLabels = (interfaceSettings=undefined) => {
+    if (!interfaceSettings)
+        interfaceSettings = refreshValues('ensureDisabledLabels');
+
+    [
+        ["layoutCharge", "charge", "charge_label"],
+        ["layoutCollide", "collide", "collide_label"],
+    ].forEach((d) => {
+        let disable = interfaceSettings[d[0]] === false;
+        window._elements[d[1]].disabled = disable;
+        window._selectors[d[2]].classed("text-muted", disable);
+    });
+}
+
 /**
  * updateLabel takes one required argument, the name of any given label to update. Depending on checkboxes, it may disable slider UI elements.
  * The return value is always true.
  * @param {string} name - The name of the label that needs updating.
  * @returns {boolean} - true
  */
-const updateLabel = (name) => {
-    [
-        ["layoutCharge", "charge", "charge_label"],
-        ["layoutCollide", "collide", "collide_label"],
-    ].forEach((d) => {
-        let disable = d3.select(`#${d[0]}`).node().checked === false;
-        d3.select(`#${d[1]}`).node().disabled = disable;
-        d3.select(`#${d[2]}`).classed("text-muted", disable);
-    });
-    let value = d3.select(`#${name}`).node().value;
+const updateLabel = (name, interfaceSettings=undefined, callback=undefined) => {
+    if (!interfaceSettings)
+        interfaceSettings = refreshValues('ensureDisabledLabels');
+
+    let value = interfaceSettings[name];
     
     // special handling
-    if (name === "collide") {
-        value = value * 100 + "%";
-    } else if (name === "charge") {
-        value = (+value + 1000);
-    } else if (name === "edgeMultiplier") {
-        value = value * 100 + "%";
+    switch (name) {
+        case "charge":
+            value = ((+value + 1100) / 10).toFixed(0) + "%";
+            break;
+
+        // percentages
+        case "collide":
+        case "edgeMultiplier":
+        case "nodeMultiplier":
+        case "linkStrength":
+            value = (value * 100).toFixed(0) + "%";
+            break;
+
+        default:
+            //console.log('Unhandled name', name);
+            break;
     }
-    d3.select(`#${name}_label`).html(`${name} (${value})`);
+    
+    window._selectors[name+'_label'].html(`${name} (${value})`);
+
+    if (callback)
+        callback();
+
     return true;
 };
 
@@ -131,14 +155,14 @@ const resetLocalStorage = () => {
     ["theme", "transform", "settings"].forEach((item) => {
         localStorage.removeItem(item);
     });
-    debugMessage("Locally stored settings have been reset.");
+    output("Locally stored settings have been reset.", false, resetLocalStorage);
     window.location.reload();
     return true;
 };
 
 
-const refreshValues = () => { // TODO: #25 Build into the settings framework...
-    output(`Called`, false, refreshValues);
+const refreshValues = (caller=undefined) => {
+    output(`Called ${caller ? "from "+caller : ""}`, false, refreshValues);
     _ = {}
     for (const [key, element] of Object.entries(window._elements)) {
         if (!element)
@@ -153,10 +177,6 @@ const refreshValues = () => { // TODO: #25 Build into the settings framework...
                     
                     case "range":
                         value = element.value;
-                        
-                        if (+element.value)
-                            value = +element.value;
-
                         break;
 
                     default:
@@ -167,8 +187,6 @@ const refreshValues = () => { // TODO: #25 Build into the settings framework...
 
             case "select":
                 value = element.value;
-                if (+element.value)
-                    value = +element.value;
                 break;
 
             default:
@@ -176,10 +194,37 @@ const refreshValues = () => { // TODO: #25 Build into the settings framework...
                 break;
         }
 
-        if (value || element.type === "checkbox")
+        if (value || element.type === "checkbox") {
+            if (+element.value)
+                value = +element.value;
+
             _[key] = value;
+        }
     }
     return _;
+}
+
+/**
+ * filterStore loops over all of the store's edges and nodes and ensures they all have a correct set of `passes` property object that will tell us whether the edge has passed the test for each of the key.
+ * @param {object} interfaceSettings 
+ * @returns true
+ */
+const filterStore = (interfaceSettings=undefined) => {
+    if (!interfaceSettings)
+        console.trace('filterStore was not provided required interfaceSettings');
+    store.edges.forEach(e=>{
+        e.passes = {}
+        e.passes.startYear = e.range.startYear > interfaceSettings.startYear ? true : false;
+        e.passes.endYear = e.range.endYear < interfaceSettings.endYear ? true : false;
+        e.passes.minWeight = e.weight >= interfaceSettings.minWeight ? true : false;
+    });
+
+    store.nodes.forEach(n=>{
+        n.passes = {}
+        n.passes.minDegree = n.degree > interfaceSettings.minDegree ? true : false;
+    });
+
+    return true;
 }
 
 
@@ -197,123 +242,58 @@ const settingsFromDashboard = (caller=undefined) => {
         store.settingsFinished = true;
     }
 
-    // TODO: #25 Add the refreshValues() here...
+    let interfaceSettings = refreshValues('ensureDisabledLabels');
+    
+    ["collide", "charge", "minDegree", "nodeMultiplier", "edgeMultiplier", "minWeight", "linkStrength"].forEach(label=>updateLabel(label, interfaceSettings));
 
-    let charge = +window._elements.charge.value;
-    let collide = +window._elements.collide.value;
-    let linkStrength = +window._elements.linkStrength.value;
-    let minDegree = +window._elements.minDegree.value;
-    let nodeMultiplier = +window._elements.nodeMultiplier.value;
-    let edgeMultiplier = +window._elements.edgeMultiplier.value;
-    let minWeight = +window._elements.minWeight.value;
-    let datafile = window._elements.datafile.value;
-    let startYear = +window._elements.startYear.value;
-    let endYear = +window._elements.endYear.value;
-    let autoClearNodes = window._elements.autoClearNodes.checked;
-    let nodeSizeFromCurrent = window._elements.nodeSizeFromCurrent.checked;
-    let communityDetection = window._elements.communityDetection.checked;
-    let weightFromCurrent = window._elements.weightFromCurrent.checked;
-    let layoutCenter = window._elements.layoutCenter.checked;
-    let layoutClustering = window._elements.layoutClustering.checked;
-    let layoutForceX = window._elements.layoutForceX.checked;
-    let layoutForceY = window._elements.layoutForceY.checked;
-    let layoutCollide = window._elements.layoutCollide.checked;
-    let layoutCharge = window._elements.layoutCharge.checked;
-    let stickyNodes = window._elements.stickyNodes.checked;
-    let debugMessages = window._elements.debugMessages.checked;
+    ensureDisabledLabels(interfaceSettings);
 
-    if (!startYear) {
-        startYear = _autoSettings.edges.startYear;
-    }
-    if (!endYear) {
-        endYear = _autoSettings.edges.endYear;
-    }
+    filterStore(interfaceSettings);
 
-    ["collide", "charge", "minDegree", "nodeMultiplier", "edgeMultiplier", "minWeight", "linkStrength"].forEach((label) =>
-        updateLabel(label)
-    );
-
-    if (!datafile) {
-        datafile = _autoSettings.datafile.filename;
-    }
-
-    store.edges.forEach(e=>{
-        e.passes = {}
-        e.passes.startYear = e.range.startYear > startYear ? true : false;
-        e.passes.endYear = e.range.endYear < endYear ? true : false;
-        e.passes.minWeight = e.weight >= minWeight ? true : false;
-    });
-
-    store.nodes.forEach(n=>{
-        n.passes = {}
-        n.passes.minDegree = n.degree > minDegree ? true : false;
-    });
-
-    let d = {
+    let mappedInterfaceSettings = {
         nodes: {
-            minDegree: minDegree,
-            nodeMultiplier: nodeMultiplier,
-            autoClearNodes: autoClearNodes,
-            stickyNodes: stickyNodes,
-            nodeSizeFromCurrent: nodeSizeFromCurrent,
-            communityDetection: communityDetection
+            minDegree: interfaceSettings.minDegree,
+            nodeMultiplier: interfaceSettings.nodeMultiplier,
+            autoClearNodes: interfaceSettings.autoClearNodes,
+            stickyNodes: interfaceSettings.stickyNodes,
+            nodeSizeFromCurrent: interfaceSettings.nodeSizeFromCurrent,
+            communityDetection: interfaceSettings.communityDetection
         },
         edges: {
-            minWeight: minWeight,
-            edgeMultiplier: edgeMultiplier,
-            startYear: startYear,
-            endYear: endYear,
-            weightFromCurrent: weightFromCurrent,
+            minWeight: interfaceSettings.minWeight,
+            edgeMultiplier: interfaceSettings.edgeMultiplier,
+            startYear: interfaceSettings.startYear,
+            endYear: interfaceSettings.endYear,
+            weightFromCurrent: interfaceSettings.weightFromCurrent,
+            minStroke: _autoSettings.edges.minStroke,
+            maxStroke: _autoSettings.edges.maxStroke,
         },
         force: {
-            layoutCenter: layoutCenter,
-            layoutClustering: layoutClustering,
-            layoutForceX: layoutForceX,
-            layoutForceY: layoutForceY,
-            layoutCharge: layoutCharge,
-            layoutCollide: layoutCollide,
-            linkStrength: linkStrength,
-            charge: charge,
-            collide: collide,
+            layoutCenter: interfaceSettings.layoutCenter,
+            layoutClustering: interfaceSettings.layoutClustering,
+            layoutForceX: interfaceSettings.layoutForceX,
+            layoutForceY: interfaceSettings.layoutForceY,
+            layoutCharge: interfaceSettings.layoutCharge,
+            layoutCollide: interfaceSettings.layoutCollide,
+            linkStrength: interfaceSettings.linkStrength,
+            charge: interfaceSettings.charge,
+            collide: interfaceSettings.collide,
         },
         zoom: _autoSettings.zoom,
         zoomMin: _autoSettings.zoomMin,
         zoomMax: _autoSettings.zoomMax,
-        edgeMinStroke: _autoSettings.edgeMinStroke,
-        edgeMaxStroke: _autoSettings.edgeMaxStroke,
         debugMessages: debugMessages,
         datafile: {
-            "filename": datafile,
+            "filename": interfaceSettings.datafile,
             "bipartite": false
         }
     }
     output_msg.push("Finished");
-    output_msg.push(d);
+    output_msg.push(mappedInterfaceSettings);
     output(output_msg, false, settingsFromDashboard);
-    return d;
+    return mappedInterfaceSettings;
 };
 
-const settingsSetupYearRange = (startYear=undefined, endYear=undefined, do_filter=true) => {
-
-    if (!startYear)
-        startYear = _autoSettings.edges.startYear;
-
-    if (!endYear)
-        endYear = _autoSettings.edges.endYear;
-    
-    let startVal = +window._elements.startYear.value
-    let endVal = +window._elements.endYear.value
-
-    window._elements.startYear.value = startYear;
-    window._elements.endYear.value = endYear;
-    
-    if (do_filter && (startVal !== startYear || endVal !== endYear)) {
-        filter();
-        setupFilteredElements();
-        styleGraphElements();
-        restartSimulation();
-    }
-}
 
 /**
  * setupSettingsInterface takes no arguments but sets up the settings box correctly, with all the max, min, and step values for UI elements,
@@ -345,7 +325,7 @@ const setupSettingsInterface = (caller = undefined) => {
 
     // set range for charge
     window._elements.charge.min = -1000;
-    window._elements.charge.max = 0;
+    window._elements.charge.max = -100;
     window._elements.charge.step = 100;
 
     // set range for collide
@@ -414,7 +394,7 @@ const setupSettingsInterface = (caller = undefined) => {
  * @param {boolean} restartSim - Set to `true` (default) if you want to restart the simulation after the setting is updated.
  * @returns {boolean} - true
  */
-const changeSetting = (
+const changeSetting = ( // TODO: #28 This function needs an overhaul
     selector,
     setTo,
     _filter = true,
@@ -492,138 +472,138 @@ const changeSetting = (
  */
 const setupSettingInteractivity = () => {
     // dropdown interactivity
-    window._elements.startYear.addEventListener("change", () => {
+    window._selectors.startYear.on("change", () => {
         changeSetting("#startYear", "force", true, "dropdown");
     });
-    window._elements.endYear.addEventListener("change", () => {
+    window._selectors.endYear.on("change", () => {
         changeSetting("#endYear", "force", true, "dropdown");
     });
-    window._selectors["datafile"].on("change", () => {
-        TODO: changeSetting("#datafile", "force", true, "dropdown", [], [location.reload()]);
+    window._selectors.datafile.on("change", () => {
+        changeSetting("#datafile", "force", true, "dropdown", [], [location.reload()]); // TODO:
     });
 
     // slider interactivity
-    window._elements.minDegree.addEventListener("input", () => {
+    window._selectors.minDegree.on("input", () => {
         updateLabel("minDegree");
         //console.log(filterNodes([], false), "possible nodes?")
     });
-    window._elements.minDegree.addEventListener("change", () => {
+    window._selectors.minDegree.on("change", () => {
         changeSetting("#minDegree", "force", true, "slider");
     });
-    window._selectors["minWeight"].on("input", () => {
+    window._selectors.minWeight.on("input", () => {
         updateLabel("minWeight");
     });
-    window._selectors["minWeight"].on("change", () => {
+    window._selectors.minWeight.on("change", () => {
         changeSetting("#minWeight", "force", true, "slider");
     });
 
-    window._selectors["nodeMultiplier"].on("input", () => {
+    window._selectors.nodeMultiplier.on("input", () => {
         changeSetting("#nodeMultiplier", "force", false, "slider", [], [], false);
         graph.simulation.restart().alpha(0.05) // just a nudge
     });
-    window._selectors["edgeMultiplier"].on("input", () => {
+    window._selectors.edgeMultiplier.on("input", () => {
         changeSetting("#edgeMultiplier", "force", false, "slider", [], [], false);
         graph.simulation.restart().alpha(0.05) // just a nudge
     });
-    window._selectors["collide"].on("input", () => {
+    window._selectors.collide.on("input", () => {
         changeSetting("#collide", "force", false, "slider");
     });
-    window._selectors["linkStrength"].on("input", () => {
+    window._selectors.linkStrength.on("input", () => {
         changeSetting("#linkStrength", "force", false, "slider");
     });
-    window._elements.charge.addEventListener("input", () => {
+    window._selectors.charge.on("input", () => {
         changeSetting("#charge", "force", false, "slider");
     });
 
     // checkbox interactivity
-    window._selectors["autoClearNodes"].on("change", () => {
+    window._selectors.autoClearNodes.on("change", () => {
         changeSetting("#autoClearNodes", "force", true);
     });
-    window._selectors["weightFromCurrent"].on("change", () => {
+    window._selectors.weightFromCurrent.on("change", () => {
         changeSetting("#weightFromCurrent", "force", true, "checkbox", [], [], false);
     });
-    window._selectors["nodeSizeFromCurrent"].on("change", () => {
+    window._selectors.nodeSizeFromCurrent.on("change", () => {
         changeSetting("#nodeSizeFromCurrent", "force", true, "checkbox", [], [], false);
     });
-    window._selectors["communityDetection"].on("change", () => {
+    window._selectors.communityDetection.on("change", () => {
         changeSetting("#communityDetection", "force", true, "checkbox", [], [styleGraphElements], false);
     });
-    window._selectors["layoutCenter"].on("change", () => {
+    window._selectors.layoutCenter.on("change", () => {
         changeSetting("#layoutCenter", "force", false);
     });
-    window._selectors["layoutClustering"].on("change", () => {
+    window._selectors.layoutClustering.on("change", () => {
         changeSetting("#layoutClustering", "force", false);
     });
-    window._selectors["layoutForceX"].on("change", () => {
+    window._selectors.layoutForceX.on("change", () => {
         changeSetting("#layoutForceX", "force", false);
     });
-    window._selectors["layoutForceY"].on("change", () => {
+    window._selectors.layoutForceY.on("change", () => {
         changeSetting("#layoutForceY", "force", false);
     });
-    window._selectors["debugMessages"].on("change", () => {
+    window._selectors.debugMessages.on("change", () => {
         saveToStorage();
     });
 
     // checkboxes (special) interactivity
-    window._selectors["stickyNodes"].on("change", () => {
+    window._selectors.stickyNodes.on("change", () => {
         changeSetting("#stickyNodes", "force", false, "checkbox", [
             "resetDraw()",
         ]);
     });
-    window._selectors["layoutCollide"].on("change", () => {
+    window._selectors.layoutCollide.on("change", () => {
         changeSetting("#layoutCollide", "force", false, "checkbox", [
-            "updateLabel('collide')",
+            "updateLabel('collide', undefined, ensureDisabledLabels)",
         ]);
     });
-    window._selectors["layoutCharge"].on("change", () => {
+    window._selectors.layoutCharge.on("change", () => {
         changeSetting("#layoutCharge", "force", false, "checkbox", [
-            "updateLabel('charge')",
+            "updateLabel('charge', undefined, ensureDisabledLabels)",
         ]);
     });
 
     // simple button interactivity
-    window._selectors["switchMode"].on("click", function (d) {
+    window._selectors.switchMode.on("click", function (d) {
         toggleTheme();
     });
-    window._selectors["showClusterInfo"].on("click", function (d) {
+    window._selectors.showClusterInfo.on("click", function (d) {
         toggle("#nodeTable");
     });
-    window._selectors["nudgeNodes"].on("click", function (d) {
+    window._selectors.nudgeNodes.on("click", function (d) {
         graph.simulation.restart().alpha(0.15);
     });
-    window._selectors["resetLocalStorage"].on("click", function (d) {
+    window._selectors.resetLocalStorage.on("click", function (d) {
         resetLocalStorage();
     });
-    window._selectors["clearUnconnected"].on("click", function (d) {
+    window._selectors.clearUnconnected.on("click", function (d) {
         filterNodesWithoutEdge();
     });
     
     // set up settings containers
-    window._selectors["settingsToggle"].on("click", () => {
+    window._selectors.settingsToggle.on("click", () => {
         toggle("#settingsContainer");
     });
-    window._selectors["infoToggle"].on("click", () => {
+    window._selectors.infoToggle.on("click", () => {
         toggle("#infoToggleDiv");
     });
 
     // set up collideContainer and chargeContainer (special cases)
-    window._selectors["collideContainer"].on("click", () => {
+    window._selectors.collideContainer.on("click", () => {
         if (
             d3.event.target.id === "collide" &&
-            window._selectors["collide"].attr("disabled") != null
+            window._selectors.collide.attr("disabled") != null
         ) {
             window._elements.layoutCollide.checked = true;
-            updateLabel("collide");
+            updateLabel("collide", undefined, ensureDisabledLabels);
         }
     });
 
-    window._selectors["chargeContainer"].on("click", () => {
+    window._selectors.chargeContainer.on("click", () => {
         if (
             d3.event.target.id === "charge" &&
-            window._elements.charge.attr("disabled") != null
+            window._selectors.charge.attr("disabled") != null
         ) {
             window._elements.layoutCharge.checked = true;
-            updateLabel("charge");
+            updateLabel("charge", undefined, ensureDisabledLabels);
         }
     });
     return true;
