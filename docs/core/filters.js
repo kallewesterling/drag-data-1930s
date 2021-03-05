@@ -351,8 +351,8 @@ const getUniqueNetworks = (nodeList, returnVal = "nodes") => {
  */
 const egoNetworkOn = async (node) => {
     output("Called", false, egoNetworkOn);
-    window._selectors["egoNetwork"].classed("d-none", false);
-    window._selectors["egoNetwork > #node"].html(node.id);
+    window._selectors.egoNetwork.classed("d-none", false);
+    window._selectors["egoNetwork > #node"].html(node.id); // TODO: #29 fix this line....
     let egoNetwork = getEgoNetwork(node);
     const result = await filter(egoNetwork);
     //setupFilteredElements();
@@ -368,7 +368,7 @@ const egoNetworkOn = async (node) => {
  */
 const egoNetworkOff = async (node) => {
     output("Called", false, egoNetworkOff);
-    window._selectors["egoNetwork"].classed("d-none", true);
+    window._selectors.egoNetwork.classed("d-none", true);
     // const result = await filter();
     //setupFilteredElements();
     restartSimulation();
@@ -445,7 +445,7 @@ const toggleCommentedElements = (force = undefined) => {
         filter(nodesWithComments, edgesWithComments);
         restartSimulation();
     }
-    window._selectors["commentedNodes"]
+    window._selectors.commentedNodes
         .classed("bg-dark", !window.toggledCommentedElements)
         .classed("bg-warning", window.toggledCommentedElements);
     return true;
