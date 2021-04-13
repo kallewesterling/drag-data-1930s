@@ -90,7 +90,7 @@ const show = (selector) => {
  * @returns {boolean} - true
  */
 const setNodeEdgeInfo = (elem) => {
-    let selector = window._selectors["nodeEdgeInfoContainer .list-group"];
+    let selector = d3.select("#nodeEdgeInfoContainer .list-group");
     if (elem.node_id) {
         selector.html(elem.html_info);
     } else if (elem.edge_id) {

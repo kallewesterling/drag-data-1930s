@@ -159,6 +159,7 @@ let _elementNames = [
     'edgeMultiplier_label',
     'minWeight_label',
     'linkStrength_label',
+    'nodeEdgeInfo'
 ]
 
 window._selectors = {}

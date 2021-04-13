@@ -194,7 +194,7 @@ const refreshValues = (caller=undefined) => {
                 break;
         }
 
-        if (value || element.type === "checkbox") {
+        if (element.type === "checkbox" || value) {
             if (+element.value)
                 value = +element.value;
 
@@ -351,12 +351,9 @@ const setupSettingsInterface = (caller = undefined) => {
     window._elements.nodeMultiplier.value = settings.nodes.nodeMultiplier;
     window._elements.minWeight.value = settings.edges.minWeight;
     window._elements.autoClearNodes.checked = settings.nodes.autoClearNodes;
-    window._elements.nodeSizeFromCurrent.checked =
-        settings.nodes.nodeSizeFromCurrent;
-    window._elements.communityDetection.checked =
-        settings.nodes.communityDetection;
-    window._elements.weightFromCurrent.checked =
-        settings.edges.weightFromCurrent;
+    window._elements.nodeSizeFromCurrent.checked = settings.nodes.nodeSizeFromCurrent;
+    window._elements.communityDetection.checked = settings.nodes.communityDetection;
+    window._elements.weightFromCurrent.checked = settings.edges.weightFromCurrent;
     window._elements.charge.value = settings.force.charge;
     window._elements.collide.value = settings.force.collide;
     window._elements.linkStrength.value = settings.force.linkStrength;
@@ -382,6 +379,44 @@ const setupSettingsInterface = (caller = undefined) => {
 };
 
 
+const toggleSetting = (name) => {
+    if (window._elements[name].type !== 'checkbox') {
+        console.trace(`Cannot toggle ${window._elements[name].type}; must provide value.`)
+        return false;
+    }
+
+    let currentSettings = refreshValues();
+    
+    if (!Object.keys(currentSettings).includes(name)) {
+        console.trace(`Setting was not found.`);
+        return false;
+    }
+
+    console.log(currentSettings[name] === true);
+    window._elements[name].click(); // no this is not what we want
+}
+
+const editSetting = (name, value) => {
+    let currentSettings = refreshValues();
+
+    switch (typeof(currentSettings[name])) {
+        case "number":
+            console.trace("Cannot toggle number; must provide value.")
+            console.log('number:', name, currentSettings[name]);
+            console.log(window._elements[name].type);
+            break;
+        case "string":
+            console.log('string:', name, currentSettings[name]);
+            break;
+        case "boolean":
+            console.log('boolean (checkbox):', name, currentSettings[name]);
+            break;
+        default:
+            console.log(typeof(currentSettings[name]))
+            break;
+    };
+}
+
 /**
  * changeSetting is a complex function that can change any given setting, and also makes sure to change the UI representation of that value in the settings box. It is also the function that is run every time a setting UI element is changed in the settings box.
  * The return value is always true.
@@ -404,6 +439,10 @@ const changeSetting = ( // TODO: #28 This function needs an overhaul
     restartSim = true
 ) => {
     output("Called", false, changeSetting);
+
+    console.log(selector);
+    console.log(typeof(selector));
+
     if (typeof selector === "object") {
         setTo = selector.setTo;
         _filter = selector._filter ? selector._filter : true;
@@ -416,6 +455,7 @@ const changeSetting = ( // TODO: #28 This function needs an overhaul
             : [];
         selector = selector.selector;
     }
+
     let force = false;
     if (setTo === "force") {
         force = true;
@@ -656,10 +696,7 @@ const setupKeyHandlers = () => {
             UIToggleAllSettingBoxes();
         } else if (e.key === "c" && e.metaKey) {
             //console.log("command+c called");
-            changeSetting(
-                "#autoClearNodes",
-                !settingsFromDashboard("selectKeyDown1").nodes.autoClearNodes
-            );
+            changeSetting("#autoClearNodes", !settingsFromDashboard("selectKeyDown1").nodes.autoClearNodes);
         } else if (e.key === "+") {
             changeSetting({selector: "#nodeMultiplier", type: "slider", setTo: settingsFromDashboard("selectKeyDown2").nodes.nodeMultiplier+0.25});
         } else if (e.key === "-") {
