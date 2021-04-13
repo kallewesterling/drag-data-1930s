@@ -25,11 +25,14 @@ places = {}
 
 
 SPREADSHEET = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT0E0Y7txIa2pfBuusA1cd8X5OVhQ_D0qZC8D40KhTU3xB7McsPR2kuB7GH6ncmNT3nfjEYGbscOPp0/pub?gid=0&single=true&output=csv'
-data_dir = './docs/data/'
+DIRS = {
+    'json': './docs/data/',
+    'gexf': './gephi/data/'
+}
 
-if not os.path.exists(data_dir):
-    os.makedirs(data_dir, exist_ok=True)
-
+for _, dir in DIRS.items():
+    if not os.path.exists(dir):
+        os.makedirs(dir, exist_ok=True)
 
 print('Loading dataset from Google Sheets...')
 
@@ -199,7 +202,7 @@ bar = progressbar.ProgressBar(max_value=len(bipartite_edges), widgets=[' [Proces
 for i, network in enumerate(bipartite_edges):
     bar.update(i)
     bipartite_graph = {}
-    bipartite_graph['filename'] = f'{data_dir}/bipartite-data-{network}.json'
+    bipartite_graph['filename'] = f'{DIRS["json"]}/bipartite-data-{network}.json'
 
     bipartite_graph['G'] = nx.DiGraph()
 
@@ -332,7 +335,7 @@ bar.finish()
 
 
 # Time to save!
-with open(f'{data_dir}/multipartite-data.json', 'w+') as f:
+with open(f'{DIRS["json"]}/multipartite-data.json', 'w+') as f:
     data = nx.node_link_data(graphs['multipartite'])
     data['dataset'] = SPREADSHEET
     data['bipartite'] = False
@@ -344,3 +347,44 @@ for graph in graphs['bipartite']:
         data['dataset'] = SPREADSHEET
         data['bipartite'] = True
         json.dump(data, f)
+
+
+# Seems like GEXF format requires no None values in node attributes so fixing that:
+gefx_graph = graphs['multipartite'].copy()
+for node, attrs in graphs['multipartite'].nodes.items():
+    for key, value in attrs.items():
+        if value == None:
+            # print('found None - trying to fix')
+            gefx_graph.nodes[node][key] = '(null)'
+        
+        if key == 'geodata' and value != None:
+            if value['lat']:
+                gefx_graph.nodes[node]['Latitude'] = float(value['lat'])
+            else:
+                gefx_graph.nodes[node]['Latitude'] = float(0.0)
+
+            if value['lon']:
+                gefx_graph.nodes[node]['Longitude'] = float(value['lon'])
+            else:
+                gefx_graph.nodes[node]['Longitude'] = float(0.0)
+
+            if value['display_name']:
+                gefx_graph.nodes[node]['geodata-display_name'] = value['display_name']
+            if value['importance']:
+                gefx_graph.nodes[node]['geodata-importance'] = value['importance']
+
+        if key == 'display' and value != None:
+            gefx_graph.nodes[node]['Label'] = value
+
+        gefx_graph.nodes[node][key] = str(value)
+
+for edge, attrs in graphs['multipartite'].edges.items():
+    for key, value in attrs.items():
+        if value == None:
+            # print('found None - trying to fix')
+            gefx_graph.edges[edge][key] = '(null)'
+
+        gefx_graph.edges[edge][key] = str(value)
+
+
+nx.write_gexf(gefx_graph, f'{DIRS["gexf"]}/multipartite-data.gexf')

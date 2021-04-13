@@ -75,6 +75,7 @@ const filterNodes = (nodeList = [], settings = undefined) => {
  * Returns whether a node exists in the current graph or not.
  */
 const nodeInGraph = (node) => {
+    // console.log(typeof(node));
     return graph.nodes.includes(node);
 }
 
@@ -83,7 +84,7 @@ const getValidEdges = (inGraph=false) => {
 }
 
 const getInvalidEdges = (inGraph=true) => {
-    return store.edges.filter(e=>(!e.passes.startYear && !e.passes.endYear && !e.passes.minWeight) && nodeInGraph(e.source) && nodeInGraph(e.target) && e.inGraph === inGraph);
+    return store.edges.filter(e=>(!e.passes.startYear && !e.passes.endYear && !e.passes.minWeight) && e.inGraph === inGraph && nodeInGraph([e.source, e.target]));
 }
 
 /**
@@ -94,7 +95,7 @@ const getInvalidEdges = (inGraph=true) => {
 const filterEdges = (edgeList = [], settings = undefined, change = true) => {
     
     if (!settings)
-    settings = settingsFromDashboard('filterEdges');
+        settings = settingsFromDashboard('filterEdges');
     
     output(["Called", `--> minWeight: ${settings.edges.minWeight}`, `--> startYear: ${settings.edges.startYear}`, `--> endYear: ${settings.edges.endYear}`], false, 'filterEdges');
 
@@ -352,7 +353,7 @@ const getUniqueNetworks = (nodeList, returnVal = "nodes") => {
 const egoNetworkOn = async (node) => {
     output("Called", false, egoNetworkOn);
     window._selectors.egoNetwork.classed("d-none", false);
-    window._selectors["egoNetwork > #node"].html(node.id); // TODO: #29 fix this line....
+    d3.select("egoNetwork > #node").html(node.id); // TODO: #29 fix this line....
     let egoNetwork = getEgoNetwork(node);
     const result = await filter(egoNetwork);
     //setupFilteredElements();
