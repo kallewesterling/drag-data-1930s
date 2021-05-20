@@ -34,7 +34,7 @@ const _autoSettings = {
     zoomMax: 4,
     debugMessages: false,
     datafile: {
-        filename: 'data/multipartite-data.json',
+        filename: 'data/new-relations.json',
         bipartite: false
     }
 };
