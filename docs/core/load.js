@@ -4,7 +4,6 @@ const setupStoreNodes = (nodeList) => {
     let storeNodes = [];
     let counter = 1;
     nodeList.forEach((node) => {
-        console.log(node)
         let prohibitedID = {match: false}
         if (!node.node_id) {
             let newNode = `unidentifiedNode${counter}`;
