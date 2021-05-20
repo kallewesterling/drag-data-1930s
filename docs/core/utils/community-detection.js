@@ -1,4 +1,9 @@
-const communityDetection = () => {
+const communityDetection = (settings = undefined) => {
+    if (!settings)
+        settings = settingsFromDashboard('setupInteractivity');
+    
+    // TODO: add dropdown for communityDetection with options [jLouvain, Girvin-Newman, Claiset-Newman-Moore]
+
     output('Using Louvain algorithm', false, communityDetection);
 
     // TODO: I am using JLouvain here. Are there other community detectors out there? Learn more about algorithms...
@@ -59,34 +64,68 @@ const getNodeClusterInfo = (returnFullNodes = false) => {
         return_val[idx]['by-category']['city'] = return_val[idx]['by-category']['city'].sort();
     });
 
+    let has_performers = return_val.map(v=>v['by-category']['performer']).filter(v=>v.length>0).length > 0;
+    let has_cities = return_val.map(v=>v['by-category']['city']).filter(v=>v.length>0).length > 0;
+    let has_venues = return_val.map(v=>v['by-category']['venue']).filter(v=>v.length>0).length > 0;
+    
     let allHTML = ''
-    return_val.forEach(data => {
-        let html = `
-        <tr>
-            <th scope="row">${data['id']}</th>`;
-        
-        html += `<td>`;
-        html += data['by-category']['performer'].length + data['by-category']['venue'].length + data['by-category']['city'].length;
-        html += `</td><td>`;
-        if (data['by-category']['performer'].length) {
-            data['by-category']['performer'].forEach(node=>{
+    if (has_performers && has_cities && has_venues) {
+        return_val.forEach(data => {
+            let html = `
+            <tr>
+                <th scope="row">${data['id']}</th>`;
+            
+            html += `<td>`;
+            html += data['by-category']['performer'].length + data['by-category']['venue'].length + data['by-category']['city'].length;
+            html += `</td><td>`;
+            if (data['by-category']['performer'].length) {
+                data['by-category']['performer'].forEach(node=>{
+                    html += `<p class="p-0 m-0 small">${node}</p>`
+                });
+            } else {
+                html += `—`
+            }
+            html += `</td><td>`;
+            data['by-category']['venue'].forEach(node=>{
                 html += `<p class="p-0 m-0 small">${node}</p>`
             });
-        } else {
-            html += `—`
-        }
-        html += `</td><td>`;
-        data['by-category']['venue'].forEach(node=>{
-            html += `<p class="p-0 m-0 small">${node}</p>`
-        });
-        html += `</td><td>`;
-        data['by-category']['city'].forEach(node=>{
-            html += `<p class="p-0 m-0 small">${node}</p>`
-        });
-        html += `</td></tr>`;
+            html += `</td><td>`;
+            data['by-category']['city'].forEach(node=>{
+                html += `<p class="p-0 m-0 small">${node}</p>`
+            });
+            html += `</td></tr>`;
 
-        allHTML += html;
-    });
+            allHTML += html;
+        });
+    } else if (has_performers) {
+        [4, 5].forEach(counter=>{
+            document.querySelector(`#nodeTableHeader${counter}`).innerHTML = '';
+        });
+        return_val.forEach(data => {
+            let html = `
+            <tr>
+                <th scope="row">${data['id']}</th>`;
+            
+            html += `<td>`;
+            html += data['by-category']['performer'].length + data['by-category']['venue'].length + data['by-category']['city'].length;
+            html += `</td><td colspan="3">`;
+            if (data['by-category']['performer'].length) {
+                data['by-category']['performer'].forEach(node=>{
+                    html += `<span class="badge bg-secondary" style="margin-right:0.15rem;">${node}</span>`
+                });
+            } else {
+                html += `—`
+            }
+            html += `</td>`;
+
+            allHTML += html;
+        });
+    } else {
+        [1, 2, 3, 4, 5].forEach(counter=>{
+            document.querySelector(`#nodeTableHeader${counter}`).innerHTML = '';
+        });
+        allHTML = `<tr><td colspan="5"><em>No data to display.</em></td></tr>`
+    }
     
     document.querySelector("#appendHere").innerHTML = allHTML;
     // document.querySelector("#clusterCounter").innerHTML = `${return_val.length} `;

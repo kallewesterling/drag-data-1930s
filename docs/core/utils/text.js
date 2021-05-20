@@ -65,26 +65,41 @@ const displayOrID = (o) => {
  * @return {string} html - raw HTML
  */
 const generateNodeInfoHTML = (node) => {
-    let html = `
-        <li class="list-group-item"><strong>ID</strong> ${node.display}</li>
-        <li class="list-group-item">
-            <strong class="mb-1">Degree</strong> ${node.degree}
-            <p class="m-0 mb-1 small">In: ${node.indegree}</p>
-            <p class="m-0 mb-1 small">Out: ${node.outdegree}</p>
-            <p class="m-0 small">Current in network: ${node.currentDegree}</p>
-        </li>
-        <li class="list-group-item">
-            <strong class="mb-1">Source range</strong>
-            <p class="m-0 small">${d3.min(node.sourceRange)}-${d3.max(node.sourceRange)}</p>
-        </li>
-        <li class="list-group-item">
-            <strong>Centrality measures</strong>
-            <p class="m-0 mb-1 small text-muted">Note: Across entire network</p>
-            <p class="m-0 mb-1 small">Betweenness (1000x): ${Math.round(node["1000x-betweenness-centrality"] * 100) / 100}</p>
-            <p class="m-0 mb-1 small">Closeness (1000x): ${Math.round(node["1000x-closeness-centrality"] * 100) / 100}</p>
-            <p class="m-0 mb-1 small">Degree (1000x): ${Math.round(node["1000x-degree-centrality"] * 100) / 100}</p>
-            <p class="m-0 small">Eigenvector (1000x): ${Math.round(node["1000x-eigenvector-centrality"] * 100) / 100}</p>
+    let html = `<li class="list-group-item"><strong>ID</strong> ${node.display}</li>`
+
+    // degrees
+    html += `<li class="list-group-item"><strong class="mb-1">Degree</strong> ${node.degree}
+                <p class="m-0 mb-1 small">In: ${node.indegree}</p>
+                <p class="m-0 mb-1 small">Out: ${node.outdegree}</p>
+                <p class="m-0 small">Current in network: ${node.currentDegree}</p>
+            </li>`
+    
+    // source range
+    html += `<li class="list-group-item"><strong class="mb-1">Source range</strong>
+                <p class="m-0 small">${d3.min(node.sourceRange)}-${d3.max(node.sourceRange)}</p>
+            </li>`
+
+    // centrality measures (v.1)
+    if (node["1000x-betweenness-centrality"]) {
+    html += `<li class="list-group-item"><strong>Centrality measures (1000x)</strong><p class="m-0 mb-1 small text-muted">Note: Across entire network</p>
+            <p class="m-0 mb-1 small">Betweenness: ${Math.round(node["1000x-betweenness-centrality"] * 100) / 100}</p>
+            <p class="m-0 mb-1 small">Closeness: ${Math.round(node["1000x-closeness-centrality"] * 100) / 100}</p>
+            <p class="m-0 mb-1 small">Degree: ${Math.round(node["1000x-degree-centrality"] * 100) / 100}</p>
+            <p class="m-0 small">Eigenvector: ${Math.round(node["1000x-eigenvector-centrality"] * 100) / 100}</p>
         </li>`
+    }
+    
+    // centrality measures (v.2)
+    if (node["betweenness_centrality_100x"]) {
+        html += `<li class="list-group-item"><strong>Centrality measures (100x)</strong><p class="m-0 mb-1 small text-muted">Note: Across entire network</p>
+                <p class="m-0 mb-1 small">Betweenness: ${node["betweenness_centrality_100x"]}</p>
+                <p class="m-0 mb-1 small">Closeness: ${node["closeness_centrality_100x"]}</p>
+                <p class="m-0 mb-1 small">Degree: ${node["degree_centrality_100x"]}</p>
+                <p class="m-0 mb-1 small">Eigenvector: ${node["eigenvector_centrality_100x"]}</p>
+            </li>`
+    }
+
+    // comments (v.1)
     if (node.has_comments) {
         html += `<li class="list-group-item"><strong>Comments</strong>`
         node.comments.forEach(obj => {

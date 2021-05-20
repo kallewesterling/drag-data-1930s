@@ -90,7 +90,8 @@ const setupStoreEdges = (edgeList) => {
         }
 
         // fix weight... TODO: Should really fix this in the Python script!
-        e.weight = e.found.length;
+        if (!e.weight)
+            e.weight = e.found.length;
     });
     return storeEdges;
 }
