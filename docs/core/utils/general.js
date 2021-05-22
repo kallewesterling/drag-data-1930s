@@ -421,6 +421,7 @@ const selectEdge = (edge) => {
 const modifyNodeDegrees = () => {
     graph.nodes.forEach((n) => {
         n.currentDegree = nodeHasEdges(n, true);
+        n.degrees.current_calculated = nodeHasEdges(n, true);
     });
     return true;
 };
@@ -638,7 +639,7 @@ const getSize = (node, type = "r", nodeMultiplier = undefined, nodeSizeFromCurre
         if (nodeSizeFromCurrent === true) {
             val = yScale(node.currentDegree) * nodeMultiplier;
         } else {
-            val = yScale(node.degree) * nodeMultiplier;
+            val = yScale(node.degrees.degree) * nodeMultiplier;
         }
     } else if (type === "text") {
         if (nodeSizeFromCurrent === true) {
@@ -647,7 +648,7 @@ const getSize = (node, type = "r", nodeMultiplier = undefined, nodeSizeFromCurre
                 nodeMultiplier *
                 1.5;
         } else {
-            val = yScale(node.degree) * nodeMultiplier * 1.5;
+            val = yScale(node.degrees.degree) * nodeMultiplier * 1.5;
         }
     }
     if (val < 0) {

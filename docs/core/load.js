@@ -1,5 +1,13 @@
 "use strict";
 
+const testForErroneousNode = (node) => {
+    return !node.node_id ||
+            node.node_id === "" ||
+            node.node_id === "-" ||
+            node.node_id === "–" ||
+            node.node_id === "—"
+}
+
 const setupStoreNodes = (nodeList) => {
     let storeNodes = [];
     let counter = 1;
@@ -15,22 +23,21 @@ const setupStoreNodes = (nodeList) => {
         if (node.node_id.charAt(0).match(/[_—–—.]/)) prohibitedID = Object.assign({match: true, node_id: node.node_id}, node.node_id.charAt(0).match(/[_—–—.]/));
         if (prohibitedID.match) console.error(prohibitedID)
         
-        if (
-            !node.node_id ||
-            node.node_id === "" ||
-            node.node_id === "-" ||
-            node.node_id === "–" ||
-            node.node_id === "—"
-        ) {
+        if (testForErroneousNode(node)) {
             console.error("found an erroneous data point:");
             console.error(node);
         } else {
             let has_comments = node.comments !== undefined && node.comments.length > 0 ? true : false;
+            // console.log(node);
             storeNodes.push(
                 Object.assign(
                     {
                         inGraph: false,
                         has_comments: has_comments,
+                        modularities: {},
+                        centralities: {},
+                        degrees: {},
+                        connected: {}
                     },
                     node
                 )
@@ -89,7 +96,6 @@ const setupStoreEdges = (edgeList) => {
             e.range['endYear'] = +e.range.end.substring(0, 4);
         }
 
-        // fix weight... TODO: Should really fix this in the Python script!
         if (!e.weight)
             e.weight = e.found.length;
     });
@@ -144,23 +150,38 @@ const loadNetwork = (callback=[]) => {
         })
 
         store.nodes.forEach((node) => {
-            node.allEdges = store.edges.filter(
+            // Set up node.connected.edges for each node
+            node.connected.edges = store.edges.filter(
                 (e) =>
                     e.source.node_id === node.node_id ||
                     e.target.node_id === node.node_id
             );
+            
+            // Set up node.connected.nodes for each node
+            node.connected.nodes = []
+            node.connected.nodes.push(...node.connected.edges.map(e=>e.source))
+            node.connected.nodes.push(...node.connected.edges.map(e=>e.target))
+            node.connected.nodes = [...new Set(node.connected.nodes)];
 
-            node.allEdges.forEach((edge) => {
-                let startYear = edge.range.start
+            // Set up node.sourceRange for each node
+            let startYear = 0;
+            let endYear = 0;
+            node.connected.edges.forEach((edge) => {
+                let edgeStartYear = edge.range.start
                     ? +edge.range.start.slice(0, 4)
                     : undefined;
-                let endYear = edge.range.end
+                let edgeEndYear = edge.range.end
                     ? +edge.range.end.slice(0, 4)
                     : undefined;
 
-                node.sourceRange =
-                    startYear && endYear ? range(startYear, endYear, 1) : [];
+                if (startYear === 0 || edgeStartYear < startYear)
+                    startYear = edgeStartYear
+
+                if (endYear === 0 || edgeEndYear > endYear)
+                    endYear = edgeEndYear
             });
+
+            node.sourceRange = startYear && endYear ? range(startYear, endYear, 1) : [];
         });
 
         // set up handlers
