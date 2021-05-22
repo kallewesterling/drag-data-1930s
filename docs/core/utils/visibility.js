@@ -101,10 +101,6 @@ const setNodeEdgeInfo = (elem) => {
 };
 
 const toggleColorNetworks = () => {
-    if (graph.nodes.length > 300 && !window.confirm(`Processing ${graph.nodes.length} nodes is a heavy operation and can take some time...`)) {
-        console.log('toggleColorNetworks rejected.')
-        return false;
-    }
     output("Called", false, toggleColorNetworks);
     if (!window.coloredNetworks) {
         window.coloredNetworks = true;
@@ -135,6 +131,7 @@ const updateInfo = () => {
     document.querySelectorAll('.numCommunities').forEach(elem=>{elem.innerHTML = '<i class="mr-1 bi bi-heart-fill"></i>' + updateValues.numCommunities.content;});
     document.querySelectorAll('.colorNetworks').forEach(elem=>{elem.innerHTML = '' + updateValues.colorNetworks.content;});
     document.querySelectorAll('.commentedNodes').forEach(elem=>{elem.innerHTML = '' + updateValues.commentedNodes.content;});
+    document.querySelectorAll('.colorNetworks').forEach(elem=>{elem.innerHTML = '' + updateValues.colorNetworks.content;});
     
     updateValues.colorNetworks.class.forEach(c => {
         document.querySelectorAll('.colorNetworks').forEach(elem=>{elem.classList.add(c);});

@@ -383,9 +383,12 @@ const loadStoreRanges = () => {
 
     // setup the community algorithms
     options = ""
-    let algorithms = ['', 'jLouvain', 'Clauset-Newman-Moore', 'Girvan Newman', 'Louvain']
+    let algorithms = ['', ...store.algorithms];
+    
     algorithms.forEach((algorithm) => {
-        options += `<option value="${algorithm}">${algorithm}</option>`;
+        options += `<option value="${algorithm}">${algorithm ? algorithm : 'No community detection'}</option>`;
+        if (!algorithm)
+            options += '<option disabled>──────────</option>';
     });
     window._elements.communityDetection.innerHTML = options;
 

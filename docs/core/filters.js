@@ -75,7 +75,6 @@ const filterNodes = (nodeList = [], settings = undefined) => {
  * Returns whether a node exists in the current graph or not.
  */
 const nodeInGraph = (node) => {
-    // console.log(typeof(node));
     return graph.nodes.includes(node);
 }
 
@@ -248,7 +247,7 @@ const filter = (nodeList = [], edgeList = [], change = true) => {
 
     setupFilteredElements(settings);
 
-    if (settings.nodes.communityDetection || [...document.querySelector('html').classList].includes('has-community')) {
+    if (settings.nodes.communityDetection || document.querySelector('html').classList.contains('has-community')) {
         communityDetection();
         textElements.text((node)=>`${node.cluster}. ${node.display}`);
         graph.clusterInfo = getNodeClusterInfo();

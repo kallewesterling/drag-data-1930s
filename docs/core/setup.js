@@ -30,7 +30,7 @@ const _autoSettings = {
         linkStrength: 0.40,
     },
     zoom: 1.25,
-    zoomMin: 0.60,
+    zoomMin: 0.30,
     zoomMax: 4,
     debugMessages: false,
     datafile: {
@@ -88,6 +88,7 @@ const store = {
     },
     toasterCounter: 1,
     settingsFinished: false,
+    algorithms: ['jLouvain', 'Clauset-Newman-Moore', 'Girvan Newman', 'Louvain']
 };
 
 const graph = {

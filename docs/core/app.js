@@ -41,5 +41,5 @@
     graph.svg.call(zoom);
 
     // load network
-    loadNetwork([{'function': transformToWindow, 'settings': settings}, {'function': saveToStorage}]); // transformToWindow, and saveToStorage is called as a callback
+    loadNetwork([{'function': transformToWindow, 'settings': settings}, {'function': saveToStorage}, {'function': setupJLouvain}]); // transformToWindow, saveToStorage, and setupJLouvain is called as a callback
 })();
