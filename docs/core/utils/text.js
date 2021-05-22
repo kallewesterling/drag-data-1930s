@@ -102,8 +102,19 @@ const generateNodeInfoHTML = (node) => {
             </li>`
     }
 
-    // comments (v.1)
-    if (node.has_comments) {
+    if (graph.nodes.map(node=>{return [
+        node.comments.map(c=>c.date).every(a=>a),
+        node.comments.map(c=>c.comment).every(a=>a),
+        node.comments.map(c=>c.source).every(a=>a)
+    ]}).every(a=>a)) {
+        // comments (v.1)
+        html += `<li class="list-group-item"><strong>Comments</strong>`
+        node.comments.forEach(obj => {
+            html += `<p class="m-0 mb-1 small">${obj.date} ${obj.comment} <span class="text-muted">(${obj.source})</span></p>`
+        })
+        html += `</li>`
+    } else if (node.has_comments) {
+        // comments (v.1)
         html += `<li class="list-group-item"><strong>Comments</strong>`
         node.comments.forEach(obj => {
             html += `<p class="m-0 mb-1 small">${obj.comment} <span class="text-muted">(${obj.source})</span></p>`

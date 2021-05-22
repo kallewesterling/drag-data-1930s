@@ -28,7 +28,6 @@ const setupStoreNodes = (nodeList) => {
             console.error(node);
         } else {
             let has_comments = node.comments !== undefined && node.comments.length > 0 ? true : false;
-            // console.log(node);
             storeNodes.push(
                 Object.assign(
                     {
