@@ -135,7 +135,7 @@
                         'name': n.id,
                         'outdegree': n.outdegree,
                         'indegree': n.indegree,
-                        'degree': n.degree
+                        'degree': n.degrees.degree
                     })
                 })
                 filtered_performers.sort((a, b) => (a.degree > b.degree) ? 1 : -1).reverse()

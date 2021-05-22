@@ -221,7 +221,7 @@ const filterStore = (interfaceSettings=undefined) => {
 
     store.nodes.forEach(n=>{
         n.passes = {}
-        n.passes.minDegree = n.degree > interfaceSettings.minDegree ? true : false;
+        n.passes.minDegree = n.degrees.degree > interfaceSettings.minDegree ? true : false;
     });
 
     return true;

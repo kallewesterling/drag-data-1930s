@@ -50,7 +50,7 @@ const filterNodes = (nodeList = [], settings = undefined) => {
 
         output_msgs.push(`--> minDegree: ${settings.nodes.minDegree}`);
         store.nodes.forEach((node) => {
-            if (node.degree >= settings.nodes.minDegree) {
+            if (node.degrees.degree >= settings.nodes.minDegree) {
                 addNode(node);
                 /* potential to add more filters here...*/
             } else if (
@@ -277,8 +277,8 @@ const filter = (nodeList = [], edgeList = [], change = true) => {
 const findNearestNeighbors = (node) => {
     return [
         ...new Set([
-            ...node.allEdges.filter((n) => n.inGraph).map((e) => e.source),
-            ...node.allEdges.filter((n) => n.inGraph).map((e) => e.target),
+            ...node.connected.edges.filter((n) => n.inGraph).map((e) => e.source),
+            ...node.connected.edges.filter((n) => n.inGraph).map((e) => e.target),
         ]),
     ].filter((n) => n !== node);
 };

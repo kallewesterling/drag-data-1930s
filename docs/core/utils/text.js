@@ -68,7 +68,7 @@ const generateNodeInfoHTML = (node) => {
     let html = `<li class="list-group-item"><strong>ID</strong> ${node.display}</li>`
 
     // degrees
-    html += `<li class="list-group-item"><strong class="mb-1">Degree</strong> ${node.degree}
+    html += `<li class="list-group-item"><strong class="mb-1">Degree</strong> ${node.degrees.degree}
                 <p class="m-0 mb-1 small">In: ${node.indegree}</p>
                 <p class="m-0 mb-1 small">Out: ${node.outdegree}</p>
                 <p class="m-0 small">Current in network: ${node.currentDegree}</p>
