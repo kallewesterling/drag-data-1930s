@@ -159,10 +159,10 @@ const loadNetwork = (callback=[]) => {
             
             // Set up node.connected.nodes for each node
             node.connected.nodes = []
-            node.connected.nodes.push(...node.connected.edges.map(e=>e.source))
-            node.connected.nodes.push(...node.connected.edges.map(e=>e.target))
+            node.connected.nodes.push(...node.connected.edges.map(e=>e.source).filter(n=>n.node_id !== node.node_id))
+            node.connected.nodes.push(...node.connected.edges.map(e=>e.target).filter(n=>n.node_id !== node.node_id))
             node.connected.nodes = [...new Set(node.connected.nodes)];
-
+            
             // Set up node.sourceRange for each node
             let startYear = 0;
             let endYear = 0;
@@ -380,6 +380,14 @@ const loadStoreRanges = () => {
     });
     window._elements.startYear.innerHTML = options;
     window._elements.endYear.innerHTML = options;
+
+    // setup the community algorithms
+    options = ""
+    let algorithms = ['', 'jLouvain', 'Clauset-Newman-Moore', 'Girvan Newman', 'Louvain']
+    algorithms.forEach((algorithm) => {
+        options += `<option value="${algorithm}">${algorithm}</option>`;
+    });
+    window._elements.communityDetection.innerHTML = options;
 
     output_msgs.push("Finished", store.ranges);
     output(output_msgs, false, loadStoreRanges);

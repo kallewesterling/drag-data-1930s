@@ -475,6 +475,8 @@ const modifySimulation = (settings) => {
             });
         }
         graph.simulation.force('cluster', clustering);
+    } else {
+        graph.simulation.force('cluster', undefined);
     }
 
     graph.simulation.force("link").links(graph.edges);
