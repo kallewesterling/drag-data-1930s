@@ -352,7 +352,6 @@ const setupSettingsInterface = (caller = undefined) => {
     window._elements.minWeight.value = settings.edges.minWeight;
     window._elements.autoClearNodes.checked = settings.nodes.autoClearNodes;
     window._elements.nodeSizeFromCurrent.checked = settings.nodes.nodeSizeFromCurrent;
-    window._elements.communityDetection.checked = settings.nodes.communityDetection;
     window._elements.weightFromCurrent.checked = settings.edges.weightFromCurrent;
     window._elements.charge.value = settings.force.charge;
     window._elements.collide.value = settings.force.collide;
@@ -367,6 +366,10 @@ const setupSettingsInterface = (caller = undefined) => {
     window._elements.stickyNodes.checked = settings.nodes.stickyNodes;
     window._elements.debugMessages.checked = settings.debugMessages;
     window._elements.datafile.value = settings.datafile.filename;
+
+    if (window._elements.communityDetection.options.length == 0)
+        output("Warning", false, "Warning: No communityDetection options (setupSettingInteractivity)");
+    window._elements.communityDetection.value = settings.nodes.communityDetection;
 
     if (window._elements.startYear.options.length == 0)
         output("Warning", false, "Warning: No startYear options (setupSettingInteractivity)");
@@ -566,7 +569,8 @@ const setupSettingInteractivity = () => {
         changeSetting("#nodeSizeFromCurrent", "force", true, "checkbox", [], [], false);
     });
     window._selectors.communityDetection.on("change", () => {
-        changeSetting("#communityDetection", "force", true, "checkbox", [], [styleGraphElements], false);
+        changeSetting("#communityDetection", "force", true, "dropdown", [], [styleGraphElements], false);
+        // used to be: changeSetting("#communityDetection", "force", true, "checkbox", [], [styleGraphElements], false);
     });
     window._selectors.layoutCenter.on("change", () => {
         changeSetting("#layoutCenter", "force", false);
@@ -908,6 +912,7 @@ const queryStringToSettings = (settings=undefined) => {
                 output_msgs.push(`--> stickyNodes has been set to ${settings.nodes.stickyNodes}`)
                 break;
             
+            /* // TODO #37
             case "community":
             case "communities":
             case "communitydetection":
@@ -915,6 +920,7 @@ const queryStringToSettings = (settings=undefined) => {
                 settings.nodes.communityDetection = (value === "true" || value === "1");
                 output_msgs.push(`--> communityDetection has been set to ${settings.nodes.communityDetection}`)
                 break;
+            */
         
             case "minzoom": // TODO: #20 The zoom can not be set through query string
             case "min-zoom":

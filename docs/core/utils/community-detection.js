@@ -2,35 +2,75 @@ const communityDetection = (settings = undefined) => {
     if (!settings)
         settings = settingsFromDashboard('setupInteractivity');
     
-    // TODO: add dropdown for communityDetection with options [jLouvain, Girvin-Newman, Claiset-Newman-Moore]
+    // TODO: #37 add dropdown for communityDetection with options [jLouvain, Girvin-Newman, Claiset-Newman-Moore]
+    
+    let isDetecting = settings.nodes.communityDetection === 'jLouvain' ||
+                settings.nodes.communityDetection === 'Clauset-Newman-Moore' ||
+                settings.nodes.communityDetection === 'Girvan Newman' ||
+                settings.nodes.communityDetection === 'Louvain'
 
-    output('Using Louvain algorithm', false, communityDetection);
+    if (settings.nodes.communityDetection === 'jLouvain') {
+        output('Using jLouvain algorithm', false, communityDetection);
 
-    // TODO: I am using JLouvain here. Are there other community detectors out there? Learn more about algorithms...
-    // See invention of Louvain method here https://arxiv.org/pdf/0803.0476.pdf
-    var allNodes = graph.nodes.map((d) => d.node_id);
-    var allEdges = graph.edges.map((d) => {
-        return {
-            source: d.source.node_id,
-            target: d.target.node_id,
-            weight: d.weight,
-        };
-    });
+        // TODO: I am using JLouvain here. Are there other community detectors out there? Learn more about algorithms...
+        // See invention of Louvain method here https://arxiv.org/pdf/0803.0476.pdf
+        var allNodes = graph.nodes.map((d) => d.node_id);
+        var allEdges = graph.edges.map((d) => {
+            return {
+                source: d.source.node_id,
+                target: d.target.node_id,
+                weight: d.weight,
+            };
+        });
 
-    var community = jLouvain().nodes(allNodes).edges(allEdges);
+        var community = jLouvain().nodes(allNodes).edges(allEdges);
 
-    let result = community();
+        let result = community();
 
-    graph.nodes.forEach((node) => {
-        node.cluster = result[node.node_id] + 1;
-        if (!graph.clusters[node.cluster] || node.r > graph.clusters[node.cluster].r
-        ) {
-            graph.clusters[node.cluster] = node;
-        }
-    });
-
-    // console.log("clusters", graph.clusters);
-    document.querySelector('html').classList.add('has-community');
+        graph.nodes.forEach((node) => {
+            node.cluster = result[node.node_id] + 1;
+            if (!graph.clusters[node.cluster] || node.r > graph.clusters[node.cluster].r
+            ) {
+                graph.clusters[node.cluster] = node;
+            }
+        });
+    } else if (settings.nodes.communityDetection === 'Clauset-Newman-Moore') {
+        output('Using Clauset-Newman-Moore data from networkx', false, communityDetection);
+        graph.nodes.forEach((node) => {
+            node.cluster = node.modularities['Clauset-Newman-Moore'];
+            if (!graph.clusters[node.cluster] || node.r > graph.clusters[node.cluster].r) {
+                graph.clusters[node.cluster] = node;
+            }
+        });
+    } else if (settings.nodes.communityDetection === 'Girvan Newman') {
+        output('Using Girvan Newman data from networkx', false, communityDetection);
+        graph.nodes.forEach((node) => {
+            node.cluster = node.modularities['Girvan Newman'];
+            if (!graph.clusters[node.cluster] || node.r > graph.clusters[node.cluster].r) {
+                graph.clusters[node.cluster] = node;
+            }
+        });
+    } else if (settings.nodes.communityDetection === 'Louvain') {
+        output('Using Louvain data from networkx', false, communityDetection);
+        graph.nodes.forEach((node) => {
+            node.cluster = node.modularities['Louvain'];
+            if (!graph.clusters[node.cluster] || node.r > graph.clusters[node.cluster].r) {
+                graph.clusters[node.cluster] = node;
+            }
+        });
+        graph.simulation.restart().alpha(1);
+    } else {
+        output('Dropping communityDetection', false, communityDetection);
+        graph.clusters = {}
+        graph.simulation.restart().alpha(1);
+    }
+    if (isDetecting) {
+        // output('Setting has-community class', false, communityDetection);
+        document.querySelector('html').classList.add('has-community');
+    } else {
+        // output('Removing has-community class', false, communityDetection);
+        document.querySelector('html').classList.remove('has-community');
+    }
 }
 
 const getNodeClusterInfo = (returnFullNodes = false) => {

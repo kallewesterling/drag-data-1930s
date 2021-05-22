@@ -248,7 +248,7 @@ const filter = (nodeList = [], edgeList = [], change = true) => {
 
     setupFilteredElements(settings);
 
-    if (settings.nodes.communityDetection) {
+    if (settings.nodes.communityDetection || [...document.querySelector('html').classList].includes('has-community')) {
         communityDetection();
         textElements.text((node)=>`${node.cluster}. ${node.display}`);
         graph.clusterInfo = getNodeClusterInfo();
