@@ -56,11 +56,11 @@
                 <table class="table" class="">
                     <thead>
                     <tr>
-                        <th scope="col">C#</th>
-                        <th scope="col">N#</th>
-                        <th scope="col">Performers</th>
-                        <th scope="col">Venues</th>
-                        <th scope="col">Cities</th>
+                        <th scope="col" id="nodeTableHeader1">C#</th>
+                        <th scope="col" id="nodeTableHeader2">N#</th>
+                        <th scope="col" id="nodeTableHeader3">Performers</th>
+                        <th scope="col" id="nodeTableHeader4">Venues</th>
+                        <th scope="col" id="nodeTableHeader5">Cities</th>
                     </tr>
                     </thead>
                     <tbody id="appendHere"></tbody>
@@ -125,6 +125,7 @@
                     </div>
                     <div class="mb-2 d-none" id="datafileToggle">
                         <select id="datafile">
+                            <option value="data/new-relations.json">co-occurrence</option>
                             <option value="data/multipartite-data.json">multi-partite graph</option>
                             <option value="data/bipartite-data-performer-city.json">bipartite graph (performer-city)</option>
                             <option value="data/bipartite-data-performer-venue.json">bipartite graph (performer-venue)</option>
@@ -276,6 +277,7 @@
         <div id="egoNetwork" class="d-none shadow-lg p-2 text-center bg-warning">Ego network for node <span id="node">NODE</span>.<i id="closeEgoNetwork" class="ml-3 bi bi-stop-circle"></i></div>
     
         <!--<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>-->
+        <script src="core/models/Edge.js"></script>
         <script src="core/utils/debug.js"></script>
         <script src="core/settings.js"></script>
         <script src="core/regex.js"></script>
