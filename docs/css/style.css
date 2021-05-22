@@ -538,4 +538,8 @@ svg#main {
     }
 }
 
+#info span {
+    cursor: pointer;
+}
+
 /* TODO: #21 #floatingInfo text in dark mode is not light and thus not visible. */

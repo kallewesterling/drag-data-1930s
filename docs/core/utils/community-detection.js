@@ -1,59 +1,54 @@
+const setupJLouvain = (nodes=graph.nodes, edges=graph.edges) => {
+    // TODO: I am using JLouvain here. Are there other community detectors out there? Learn more about algorithms...
+    // See invention of Louvain method here https://arxiv.org/pdf/0803.0476.pdf
+    var allNodes = nodes.map((d) => d.node_id);
+    var allEdges = edges.map((d) => {
+        return {
+            source: d.source.node_id,
+            target: d.target.node_id,
+            weight: d.weight,
+        };
+    });
+
+    var community = jLouvain().nodes(allNodes).edges(allEdges);
+
+    let result = community();
+
+    nodes.forEach((node) => {
+        node.modularities['jLouvain'] = result[node.node_id] + 1
+    });
+
+    output(`Successfully created ${[...new Set(nodes.map(node=>node.modularities['jLouvain']))].length} jLouvain communities.`, false, setupJLouvain);
+}
+
 const communityDetection = (settings = undefined) => {
     if (!settings)
         settings = settingsFromDashboard('setupInteractivity');
     
-    // TODO: #37 add dropdown for communityDetection with options [jLouvain, Girvin-Newman, Claiset-Newman-Moore]
+    let isDetecting = false;
+
+    setupJLouvain();
     
-    let isDetecting = settings.nodes.communityDetection === 'jLouvain' ||
-                settings.nodes.communityDetection === 'Clauset-Newman-Moore' ||
-                settings.nodes.communityDetection === 'Girvan Newman' ||
-                settings.nodes.communityDetection === 'Louvain'
+    algorithms_counter = {}
+    store.algorithms.forEach(algorithm=> {
+        algorithms_counter[algorithm] = [...new Set(graph.nodes.map(node => node.modularities[algorithm]))].length;
+        if (settings.nodes.communityDetection === algorithm)
+            isDetecting = true;
+    });
+    algorithms_counter;
 
-    if (settings.nodes.communityDetection === 'jLouvain') {
-        output('Using jLouvain algorithm', false, communityDetection);
+    let hasDetected = document.querySelector('html').classList.contains('has-community');
+    let algorithm = settings.nodes.communityDetection;
 
-        // TODO: I am using JLouvain here. Are there other community detectors out there? Learn more about algorithms...
-        // See invention of Louvain method here https://arxiv.org/pdf/0803.0476.pdf
-        var allNodes = graph.nodes.map((d) => d.node_id);
-        var allEdges = graph.edges.map((d) => {
-            return {
-                source: d.source.node_id,
-                target: d.target.node_id,
-                weight: d.weight,
-            };
-        });
+    if (isDetecting && hasDetected) {
+        // we want to reset graph.clusters
+        graph.clusters = {};
+    }
 
-        var community = jLouvain().nodes(allNodes).edges(allEdges);
-
-        let result = community();
-
+    if (algorithm) {
+        output(`Using ${algorithm} data from networkx`, false, communityDetection);
         graph.nodes.forEach((node) => {
-            node.cluster = result[node.node_id] + 1;
-            if (!graph.clusters[node.cluster] || node.r > graph.clusters[node.cluster].r
-            ) {
-                graph.clusters[node.cluster] = node;
-            }
-        });
-    } else if (settings.nodes.communityDetection === 'Clauset-Newman-Moore') {
-        output('Using Clauset-Newman-Moore data from networkx', false, communityDetection);
-        graph.nodes.forEach((node) => {
-            node.cluster = node.modularities['Clauset-Newman-Moore'];
-            if (!graph.clusters[node.cluster] || node.r > graph.clusters[node.cluster].r) {
-                graph.clusters[node.cluster] = node;
-            }
-        });
-    } else if (settings.nodes.communityDetection === 'Girvan Newman') {
-        output('Using Girvan Newman data from networkx', false, communityDetection);
-        graph.nodes.forEach((node) => {
-            node.cluster = node.modularities['Girvan Newman'];
-            if (!graph.clusters[node.cluster] || node.r > graph.clusters[node.cluster].r) {
-                graph.clusters[node.cluster] = node;
-            }
-        });
-    } else if (settings.nodes.communityDetection === 'Louvain') {
-        output('Using Louvain data from networkx', false, communityDetection);
-        graph.nodes.forEach((node) => {
-            node.cluster = node.modularities['Louvain'];
+            node.cluster = node.modularities[algorithm];
             if (!graph.clusters[node.cluster] || node.r > graph.clusters[node.cluster].r) {
                 graph.clusters[node.cluster] = node;
             }
@@ -64,6 +59,7 @@ const communityDetection = (settings = undefined) => {
         graph.clusters = {}
         graph.simulation.restart().alpha(1);
     }
+    
     if (isDetecting) {
         // output('Setting has-community class', false, communityDetection);
         document.querySelector('html').classList.add('has-community');
@@ -71,6 +67,24 @@ const communityDetection = (settings = undefined) => {
         // output('Removing has-community class', false, communityDetection);
         document.querySelector('html').classList.remove('has-community');
     }
+
+    if (isDetecting || hasDetected) {
+        if (!isDetecting)
+            message = `The number that would sit next to this heart would show how many number of communities have been identified in the graph you are currently seeing. Since you have not chosen to detect communities in the Settings box, the heart displays no community information.`
+        else
+            message = `The number that you see here shows how many number of communities have been identified in the graph you are currently seeing. The algorithm used is the ${algorithm} clustering algorithm, which you can read more about under the "Rationale". Click the button furthest to the left in the menubar if you are more interested.`
+
+        message += '<br />';
+
+        store.algorithms.forEach(algorithm=>{
+            message += `<br />${algorithm}: ${algorithms_counter[algorithm]}`;
+        });
+
+        document.querySelectorAll('.numCommunities').forEach(elem => {
+            elem.dataset.bsContent = message
+        })
+    }
+
 }
 
 const getNodeClusterInfo = (returnFullNodes = false) => {

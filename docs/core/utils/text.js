@@ -13,6 +13,9 @@ const minify = (s) => {
  * @return {string} html - raw HTML
  */
 const getCurrentGraphInfo = () => {
+    store.networkCount = [...new Set(store.nodes.map(node=>node.connected.network.network_id))].length;
+    graph.networkCount = [...new Set(graph.nodes.map(node=>node.connected.network.network_id))].length;
+
     let _return = {
         'numNodes': {'class': [], 'content': `<strong>${graph.nodes.length}</strong><span class="text-muted">/${store.nodes.length}</span>`},
         'numEdges': {'class': [], 'content': `<strong>${graph.edges.length}</strong><span class="text-muted">/${store.edges.length}</span>`},
@@ -20,7 +23,7 @@ const getCurrentGraphInfo = () => {
         'currentZoom': {'class': [], 'content': (graph.k*100).toFixed(0) + '%'},
         'colorNetworks': {
             'class': [window.coloredNetworks ? 'bg-warning' : 'bg-dark'],
-            'content': (graph.networkCount ? graph.networkCount : '') + ' networks'
+            'content': `${graph.networkCount}/${store.networkCount} networks`
         },
         'commentedNodes': {
             'class': [window.toggledCommentedElements ? 'bg-warning' : 'bg-dark'],

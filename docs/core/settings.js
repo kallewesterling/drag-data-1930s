@@ -369,6 +369,9 @@ const setupSettingsInterface = (caller = undefined) => {
 
     if (window._elements.communityDetection.options.length == 0)
         output("Warning", false, "Warning: No communityDetection options (setupSettingInteractivity)");
+    if (!settings.nodes.communityDetection)
+        settings.nodes.communityDetection = '';
+
     window._elements.communityDetection.value = settings.nodes.communityDetection;
 
     if (window._elements.startYear.options.length == 0)
