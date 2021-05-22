@@ -101,7 +101,7 @@ const setNodeEdgeInfo = (elem) => {
 };
 
 const toggleColorNetworks = () => {
-    output("Called", false, toggleColorNetworks);
+    _output("Called", false, toggleColorNetworks);
     if (!window.coloredNetworks) {
         window.coloredNetworks = true;
         colorNetworks();

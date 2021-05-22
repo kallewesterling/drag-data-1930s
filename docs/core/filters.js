@@ -4,7 +4,7 @@ const dropNode = (node) => {
     if (node.inGraph) {
         graph.nodes.forEach((o, i) => {
             if (node.node_id === o.node_id) {
-                if (ERROR_LEVEL > 1) output(`dropping node ${o.node_id}...`, false, 'dropNode');
+                if (ERROR_LEVEL > 1) _output(`dropping node ${o.node_id}...`, false, 'dropNode');
                 graph.nodes.splice(i, 1);
                 node.inGraph = false;
                 return true;
@@ -16,7 +16,7 @@ const dropNode = (node) => {
 const dropEdge = (edge) => {
     graph.edges.forEach((o, i) => {
         if (edge.edge_id === o.edge_id) {
-            if (ERROR_LEVEL > 1) output(`dropping edge ${o.edge_id}...`, false, 'dropEdge');
+            if (ERROR_LEVEL > 1) _output(`dropping edge ${o.edge_id}...`, false, 'dropEdge');
             graph.edges.splice(i, 1);
             edge.inGraph = false;
             return true;
@@ -67,7 +67,7 @@ const filterNodes = (nodeList = [], settings = undefined) => {
             nodeList.includes(node) ? addNode(node) : dropNode(node);
         });
     }
-    output(output_msgs, false, filterNodes);
+    _output(output_msgs, false, filterNodes);
     return true;
 };
 
@@ -96,7 +96,7 @@ const filterEdges = (edgeList = [], settings = undefined, change = true) => {
     if (!settings)
         settings = settingsFromDashboard('filterEdges');
     
-    output(["Called", `--> minWeight: ${settings.edges.minWeight}`, `--> startYear: ${settings.edges.startYear}`, `--> endYear: ${settings.edges.endYear}`], false, 'filterEdges');
+    _output(["Called", `--> minWeight: ${settings.edges.minWeight}`, `--> startYear: ${settings.edges.startYear}`, `--> endYear: ${settings.edges.endYear}`], false, 'filterEdges');
 
     if (edgeList.length) {
         console.error('filtering using lists is not implemented.')
@@ -121,11 +121,11 @@ const filterEdges = (edgeList = [], settings = undefined, change = true) => {
     if (!edgeList.length) {
         let settings = settingsFromDashboard('filterEdges').edges;
         store.edges.forEach((edge) => {
-            edge.calibrated_weight = edge.found.length;
+            edge.adjusted_weight = edge.found.length;
 
             let compareWeightVal =
                 settings.weightFromCurrent === true
-                    ? edge.calibrated_weight
+                    ? edge.adjusted_weight
                     : edge.weight;
 
             if (settings.minWeight) {
@@ -231,7 +231,7 @@ const clusters = {};
  * @returns {boolean} - true
  */
 const filter = (nodeList = [], edgeList = [], change = true) => {
-    output("Called", false, filter);
+    _output("Called", false, filter);
     let settings = settingsFromDashboard("filter");
 
     hide("#nodeEdgeInfo");
@@ -350,7 +350,7 @@ const getUniqueNetworks = (nodeList, returnVal = "nodes") => {
  * The return value is ...
  */
 const egoNetworkOn = async (node) => {
-    output("Called", false, egoNetworkOn);
+    _output("Called", false, egoNetworkOn);
     window._selectors.egoNetwork.classed("d-none", false);
     d3.select("egoNetwork > #node").html(node.id); // TODO: #29 fix this line....
     let egoNetwork = getEgoNetwork(node);
@@ -367,7 +367,7 @@ const egoNetworkOn = async (node) => {
  * The return value is ...
  */
 const egoNetworkOff = async (node) => {
-    output("Called", false, egoNetworkOff);
+    _output("Called", false, egoNetworkOff);
     window._selectors.egoNetwork.classed("d-none", true);
     // const result = await filter();
     //setupFilteredElements();
@@ -386,10 +386,10 @@ const toggleEgoNetwork = async (
     toggleSettings = true,
     force = undefined
 ) => {
-    output("Called", false, toggleEgoNetwork);
+    _output("Called", false, toggleEgoNetwork);
     // filter nodes based on a given node
     if (window.egoNetwork || force === "off") {
-        output("Ego network already active - resetting network view...", false, toggleEgoNetwork);
+        _output("Ego network already active - resetting network view...", false, toggleEgoNetwork);
         await egoNetworkOff();
         setupFilteredElements();
         styleGraphElements();
@@ -400,14 +400,14 @@ const toggleEgoNetwork = async (
             show("#infoContainer");
         }
     } else {
-        output(`Filtering out an ego network based on ${node.node_id}`, false, toggleEgoNetwork);
+        _output(`Filtering out an ego network based on ${node.node_id}`, false, toggleEgoNetwork);
         await egoNetworkOn(node);
         setupFilteredElements();
         styleGraphElements();
 
         window._selectors.main.on("click", () => {
             if (d3.event.metaKey && window.egoNetwork) {
-                output(`svg command + click detected while ego network active - resetting network view...`, false, toggleEgoNetwork);
+                _output(`svg command + click detected while ego network active - resetting network view...`, false, toggleEgoNetwork);
                 resetLocalStorage();
             }
         });

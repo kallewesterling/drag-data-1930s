@@ -22,12 +22,12 @@ zoom.on("zoom", zoomedActions);
  * @returns {boolean} - true
  */
 const transformToWindow = (settings) => {
-    output('Called', false, transformToWindow);
+    _output('Called', false, transformToWindow);
     
     if (!settings)
         settings = settingsFromDashboard('transformToWindow');
 
-    output(`zoomMin: ${settings.zoomMin}, zoomMax: ${settings.zoomMax}`, false, transformToWindow);
+    _output(`zoomMin: ${settings.zoomMin}, zoomMax: ${settings.zoomMax}`, false, transformToWindow);
     
     graph.plot.attr("width", window.innerWidth);
     graph.plot.attr("height", window.innerHeight);

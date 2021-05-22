@@ -1,8 +1,10 @@
-window.ERROR_LEVEL = 1;
 
 const froms = {};
 
-const output = (message, log_output=false, from=undefined, output_function=console.log, passive = false) => {
+/**
+ * Internal function
+ */
+const _output = (message, log_output=false, from=undefined, output_function=console.log, passive = false) => {
     if (typeof(from) === 'function') // you can send a message from a function, and we'll pull out the name
         from = from.name;
     if (typeof(from) === 'object')
@@ -40,6 +42,9 @@ const output = (message, log_output=false, from=undefined, output_function=conso
     }
 }
 
+/**
+ * Internal function
+ */
 const error = (message, hide=false, clear_timeout=true) => {
     if (hide) {
         window._selectors["loading"].classed('d-none', true);

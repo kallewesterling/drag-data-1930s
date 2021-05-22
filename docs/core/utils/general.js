@@ -323,7 +323,7 @@ const getRelated = (node) => {
  * @returns {boolean} - true
  */
 const styleGraphElements = (settings = undefined) => {
-    output("Called", false, styleGraphElements);
+    _output("Called", false, styleGraphElements);
 
     if (!settings)
         settings = settingsFromDashboard('styleGraphElements');
@@ -451,7 +451,7 @@ const graphEdgesContains = (edge_id) => {
  * The return value is always true.
  */
 const modifySimulation = (settings) => {
-    output('Called', false, modifySimulation)
+    _output('Called', false, modifySimulation)
 
     if (!settings)
         settings = settingsFromDashboard('modifySimulation');
@@ -586,7 +586,7 @@ const getEdgeClass = (edge) => {
  * @returns {string} - The string with the stroke width.
  */
 const getEdgeStrokeWidth = (edge, edgeMultiplier=undefined, weightFromCurrent=undefined, min, max) => {
-    if (!weightFromCurrent || !edgeMultiplier) {
+    if (weightFromCurrent===undefined || edgeMultiplier===undefined) {
         let settings = settingsFromDashboard('getEdgeStrokeWidth');
         if (!weightFromCurrent)
             weightFromCurrent = settings.edges.weightFromCurrent;
@@ -594,9 +594,9 @@ const getEdgeStrokeWidth = (edge, edgeMultiplier=undefined, weightFromCurrent=un
             edgeMultiplier = settings.edges.edgeMultiplier;
     }
     let weightScale = edgeScale(settings, weightFromCurrent, min, max);
-
-    let evalWeight = weightFromCurrent ? edge.calibrated_weight : edge.weight;
-    return weightScale(evalWeight) * +edgeMultiplier + "px";
+    
+    let evalWeight = weightFromCurrent ? edge.adjusted_weight : edge.weight;
+    return (((weightScale(evalWeight) ** 2) * +edgeMultiplier) / 2) + "px";
 };
 
 /**

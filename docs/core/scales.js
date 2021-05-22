@@ -5,17 +5,17 @@
  * @param {boolean} sizeFromGraph
  * @param {number} min
  * @param {number} max
- * The return value is a d3 scaleLinear function.
+ * The return value is a d3 scalePow function.
  */
 const nodeScale = (sizeFromGraph = false, min=1, max=10) => {
     if (sizeFromGraph) {
         return d3
-            .scaleLinear()
+            .scalePow()
             .range([min, max])
             .domain(d3.extent(graph.nodes, (d) => d.currentDegree));
     } else {
         return d3
-            .scaleLinear()
+            .scalePow()
             .range([min, max])
             .domain(d3.extent(graph.nodes, (d) => d.degree));
     }
@@ -26,17 +26,17 @@ const nodeScale = (sizeFromGraph = false, min=1, max=10) => {
  * @param {boolean} sizeFromGraph
  * @param {number} min
  * @param {number} max
- * The return value is a d3 scaleLinear function.
+ * The return value is a d3 scalePow function.
  */
-const edgeScale = (sizeFromGraph = false, min, max) => {
-    if (sizeFromGraph) {
+const edgeScale = (settings, weightFromCurrent = false, min, max) => {
+    if (weightFromCurrent) {
         return d3
-            .scaleLinear()
+            .scalePow()
             .range([min, max])
-            .domain(d3.extent(graph.edges, (d) => d.calibrated_weight));
+            .domain(d3.extent(graph.edges, (d) => d.adjusted_weight));
     } else {
         return d3
-            .scaleLinear()
+            .scalePow()
             .range([min, max])
             .domain(d3.extent(store.edges, (d) => d.weight));
     }
