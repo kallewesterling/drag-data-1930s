@@ -136,7 +136,7 @@ const generateEdgeInfoHTML = (edge, weightFromCurrent = undefined) => {
     html += `<li class="list-group-item">
         <strong class="mb-1">Weight</strong>
         <p class="m-0 mb-1 small ${weightFromCurrent ? '' : 'fw-bold'}">In entire network: ${edge.weight}</p>
-        <p class="m-0 small ${weightFromCurrent ? 'fw-bold' : ''}">In current network: ${edge.calibrated_weight}</p>
+        <p class="m-0 small ${weightFromCurrent ? 'fw-bold' : ''}">In current network: ${edge.adjusted_weight}</p>
         </li>
         `;
 

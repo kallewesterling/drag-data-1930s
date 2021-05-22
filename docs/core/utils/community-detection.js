@@ -18,7 +18,7 @@ const setupJLouvain = (nodes=graph.nodes, edges=graph.edges) => {
         node.modularities['jLouvain'] = result[node.node_id] + 1
     });
 
-    output(`Successfully created ${[...new Set(nodes.map(node=>node.modularities['jLouvain']))].length} jLouvain communities.`, false, setupJLouvain);
+    _output(`Successfully created ${[...new Set(nodes.map(node=>node.modularities['jLouvain']))].length} jLouvain communities.`, false, setupJLouvain);
 }
 
 const communityDetection = (settings = undefined) => {
@@ -46,7 +46,7 @@ const communityDetection = (settings = undefined) => {
     }
 
     if (algorithm) {
-        output(`Using ${algorithm} data from networkx`, false, communityDetection);
+        _output(`Using ${algorithm} data from networkx`, false, communityDetection);
         graph.nodes.forEach((node) => {
             node.cluster = node.modularities[algorithm];
             if (!graph.clusters[node.cluster] || node.r > graph.clusters[node.cluster].r) {
@@ -55,16 +55,16 @@ const communityDetection = (settings = undefined) => {
         });
         graph.simulation.restart().alpha(1);
     } else {
-        output('Dropping communityDetection', false, communityDetection);
+        _output('Dropping communityDetection', false, communityDetection);
         graph.clusters = {}
         graph.simulation.restart().alpha(1);
     }
     
     if (isDetecting) {
-        // output('Setting has-community class', false, communityDetection);
+        // _output('Setting has-community class', false, communityDetection);
         document.querySelector('html').classList.add('has-community');
     } else {
-        // output('Removing has-community class', false, communityDetection);
+        // _output('Removing has-community class', false, communityDetection);
         document.querySelector('html').classList.remove('has-community');
     }
 

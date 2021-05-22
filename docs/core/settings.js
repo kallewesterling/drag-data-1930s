@@ -62,7 +62,7 @@ const ensureDisabledLabels = (interfaceSettings=undefined) => {
  */
 const updateLabel = (name, interfaceSettings=undefined, callback=undefined) => {
     if (!interfaceSettings)
-        interfaceSettings = refreshValues('ensureDisabledLabels');
+        interfaceSettings = refreshValues('updateLabel');
 
     let value = interfaceSettings[name];
     
@@ -102,7 +102,7 @@ const saveToStorage = (settings=undefined) => {
     let output_msgs = ["Called"];
 
     if (d3.event && d3.event.transform) {
-        // output("Saving zoom settings", false, saveToStorage)
+        // _output("Saving zoom settings", false, saveToStorage)
         output_msgs.push("Saving zoom settings");
         output_msgs.push(d3.event.transform);
         localStorage.setItem("transform", JSON.stringify(d3.event.transform));
@@ -117,7 +117,7 @@ const saveToStorage = (settings=undefined) => {
     
     localStorage.setItem("settings", JSON.stringify(settings));
     
-    output(output_msgs, false, saveToStorage)
+    _output(output_msgs, false, saveToStorage)
     
     return true;
 };
@@ -134,14 +134,14 @@ const fetchFromStorage = (item, caller=undefined) => {
     if (rawSetting) {
         if (rawSetting.includes("{")) {
             let parsed = JSON.parse(rawSetting);
-            output([msg, parsed], false, `fetchFromStorage - ${item}`)
+            _output([msg, parsed], false, `fetchFromStorage - ${item}`)
             return parsed;
         } else {
-            output([msg, rawSetting], false, `fetchFromStorage - ${item}`)
+            _output([msg, rawSetting], false, `fetchFromStorage - ${item}`)
             return rawSetting;
         }
     } else {
-        output([msg, `*** \`${item}\` does not exist in localStorage.`], false, `fetchFromStorage - ${item}`);
+        _output([msg, `*** \`${item}\` does not exist in localStorage.`], false, `fetchFromStorage - ${item}`);
         return undefined;
     }
 };
@@ -155,14 +155,14 @@ const resetLocalStorage = () => {
     ["theme", "transform", "settings"].forEach((item) => {
         localStorage.removeItem(item);
     });
-    output("Locally stored settings have been reset.", false, resetLocalStorage);
+    _output("Locally stored settings have been reset.", false, resetLocalStorage);
     window.location.reload();
     return true;
 };
 
 
 const refreshValues = (caller=undefined) => {
-    output(`Called ${caller ? "from "+caller : ""}`, false, refreshValues);
+    _output(`Called ${caller ? "from "+caller : ""}`, false, refreshValues);
     _ = {}
     for (const [key, element] of Object.entries(window._elements)) {
         if (!element)
@@ -242,7 +242,7 @@ const settingsFromDashboard = (caller=undefined) => {
         store.settingsFinished = true;
     }
 
-    let interfaceSettings = refreshValues('ensureDisabledLabels');
+    let interfaceSettings = refreshValues('settingsFromDashboard');
     
     ["collide", "charge", "minDegree", "nodeMultiplier", "edgeMultiplier", "minWeight", "linkStrength"].forEach(label=>updateLabel(label, interfaceSettings));
 
@@ -290,7 +290,7 @@ const settingsFromDashboard = (caller=undefined) => {
     }
     output_msg.push("Finished");
     output_msg.push(mappedInterfaceSettings);
-    output(output_msg, false, settingsFromDashboard);
+    _output(output_msg, false, settingsFromDashboard);
     return mappedInterfaceSettings;
 };
 
@@ -301,12 +301,12 @@ const settingsFromDashboard = (caller=undefined) => {
  * @returns {boolean} - true
  */
 const setupSettingsInterface = (caller = undefined) => {
-    output(`Called ${caller ? "from "+caller : ""}`, false, setupSettingsInterface);
+    _output(`Called ${caller ? "from "+caller : ""}`, false, setupSettingsInterface);
     
     let settings = fetchFromStorage("settings", "setupSettingsInterface");
     
     if (!settings) {
-        output(["Stored settings empty, so reloading from autoSettings.", _autoSettings], false, setupSettingsInterface, console.warn);
+        _output(["Stored settings empty, so reloading from autoSettings.", _autoSettings], false, setupSettingsInterface, console.warn);
         settings = _autoSettings;
     }
 
@@ -349,6 +349,7 @@ const setupSettingsInterface = (caller = undefined) => {
     // set auto values
     window._elements.minDegree.value = settings.nodes.minDegree;
     window._elements.nodeMultiplier.value = settings.nodes.nodeMultiplier;
+    window._elements.edgeMultiplier.value = settings.edges.edgeMultiplier;
     window._elements.minWeight.value = settings.edges.minWeight;
     window._elements.autoClearNodes.checked = settings.nodes.autoClearNodes;
     window._elements.nodeSizeFromCurrent.checked = settings.nodes.nodeSizeFromCurrent;
@@ -368,16 +369,16 @@ const setupSettingsInterface = (caller = undefined) => {
     window._elements.datafile.value = settings.datafile.filename;
 
     if (window._elements.communityDetection.options.length == 0)
-        output("Warning", false, "Warning: No communityDetection options (setupSettingInteractivity)");
+        _output("Warning", false, "Warning: No communityDetection options (setupSettingInteractivity)");
     if (!settings.nodes.communityDetection)
         settings.nodes.communityDetection = '';
 
     window._elements.communityDetection.value = settings.nodes.communityDetection;
 
     if (window._elements.startYear.options.length == 0)
-        output("Warning", false, "Warning: No startYear options (setupSettingInteractivity)");
+        _output("Warning", false, "Warning: No startYear options (setupSettingInteractivity)");
     if (window._elements.endYear.options.length == 0)
-        output("Warning", false, "Warning: No endYear options (setupSettingInteractivity)");
+        _output("Warning", false, "Warning: No endYear options (setupSettingInteractivity)");
     window._elements.startYear.value = settings.edges.startYear;
     window._elements.endYear.value = settings.edges.endYear;
     
@@ -444,7 +445,7 @@ const changeSetting = ( // TODO: #28 This function needs an overhaul
     additionalPostFunctions = [],
     restartSim = true
 ) => {
-    output("Called", false, changeSetting);
+    _output("Called", false, changeSetting);
 
     console.log(selector);
     console.log(typeof(selector));
@@ -852,7 +853,7 @@ const disableSettings = (exclude=[]) => {
             elem.classList.add("disabled");
             output_msgs.push(`disabled ${elem.tagName} element with id ${elem.id}.`)
         }
-        output(output_msgs, false, disableSettings);
+        _output(output_msgs, false, disableSettings);
     })
 }
 
@@ -869,7 +870,7 @@ const enableSettings = (exclude=[]) => {
 
 
 const queryStringToSettings = (settings=undefined) => {
-    output("Called", false, queryStringToSettings);
+    _output("Called", false, queryStringToSettings);
     let output_msgs = [];
 
     if (!settings)
@@ -971,10 +972,10 @@ const queryStringToSettings = (settings=undefined) => {
 
 
             default:
-                output(`no such setting found: "${key}"`, false, queryStringToSettings, console.error)
+                _output(`no such setting found: "${key}"`, false, queryStringToSettings, console.error)
         }
     }
-    output(output_msgs, false, queryStringToSettings);
+    _output(output_msgs, false, queryStringToSettings);
     
     saveToStorage(settings);
 

@@ -107,7 +107,7 @@ const setupStoreEdges = (edgeList) => {
  * The return value is true if the network file is loaded correctly and all data is set up appropriately.
  */
 const loadNetwork = (callback=[]) => {
-    output("Called", false, loadNetwork);
+    _output("Called", false, loadNetwork);
     
     let _ = fetchFromStorage('settings', 'loadNetwork')
     let filename = _ ? _.datafile.filename : _autoSettings.datafile.filename;
@@ -115,7 +115,7 @@ const loadNetwork = (callback=[]) => {
     enableSettings();
     document.querySelector('#datafileContainer').removeAttribute('style');
     d3.json(filename).then((data) => {
-        output("File loaded", false, loadNetwork);
+        _output("File loaded", false, loadNetwork);
         // for debug purposes (TODO can be removed)
         store.raw = data;
 
@@ -196,7 +196,7 @@ const loadNetwork = (callback=[]) => {
         // preview(store);
         
         if (callback) {
-            output('Calling callback functions', false, loadNetwork)
+            _output('Calling callback functions', false, loadNetwork)
             callback.forEach(c=>c['function'](c.settings));
         }
 
@@ -208,7 +208,7 @@ const loadNetwork = (callback=[]) => {
         disableSettings(['datafile']);
         toggle('#datafileToggle');
         document.querySelector('#datafileContainer').setAttribute('style', 'background-color: #ffc107 !important;'); // makes the datafileContainer look like "warning"
-        error(`<strong>Data file could not be found.</strong><p class="m-0 small text-muted">${filename}</p><p class="mt-3 mb-0">Select a different datafile in the "data file" dropdown.</p>`);
+        _error(`<strong>Data file could not be found.</strong><p class="m-0 small text-muted">${filename}</p><p class="mt-3 mb-0">Select a different datafile in the "data file" dropdown.</p>`);
         zoom.on("zoom", null);
         return false;
     });
@@ -219,7 +219,7 @@ const loadNetwork = (callback=[]) => {
  * The return value is ...
  */
 const setupInteractivity = (settings = undefined) => {
-    output("Called", false, setupInteractivity);
+    _output("Called", false, setupInteractivity);
 
     if (!settings)
         settings = settingsFromDashboard('setupInteractivity');
@@ -231,7 +231,7 @@ const setupInteractivity = (settings = undefined) => {
                 hide("#nodeEdgeInfo");
                 styleGraphElements();
             }
-            output("Starting egoNetwork...", false, setupInteractivity);
+            _output("Starting egoNetwork...", false, setupInteractivity);
             toggleEgoNetwork(node);
             node.fx = null;
             node.fy = null;
@@ -298,7 +298,7 @@ let textElements = g.labels.selectAll("text"),
  * @returns {boolean} - true
  */
 const setupFilteredElements = (settings = undefined) => {
-    output("Called", false, setupFilteredElements);
+    _output("Called", false, setupFilteredElements);
 
     nodeElements = g.nodes
         .selectAll("circle")
@@ -355,7 +355,7 @@ const loadStoreRanges = () => {
 
     if (store.ranges.nodeDegree && store.ranges.edgeWidth && store.ranges.years.min && store.ranges.years.max && store.ranges.years.array) {
         output_msgs.push("Ranges already existed");
-        output(output_msgs, false, loadStoreRanges);
+        _output(output_msgs, false, loadStoreRanges);
         return store.ranges;
     }
 
@@ -393,6 +393,6 @@ const loadStoreRanges = () => {
     window._elements.communityDetection.innerHTML = options;
 
     output_msgs.push("Finished", store.ranges);
-    output(output_msgs, false, loadStoreRanges);
+    _output(output_msgs, false, loadStoreRanges);
     return store.ranges;
 }

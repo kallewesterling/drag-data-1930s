@@ -25,6 +25,8 @@
 
 // let settings = settingsFromDashboard('root');
 
+window.ERROR_LEVEL = 0;
+
 (function () {
     // Immediately invoked function to set the theme on initial load
     

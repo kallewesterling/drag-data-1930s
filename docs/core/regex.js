@@ -180,7 +180,7 @@ const dateParser = (test_string) => {
                     } else if (rx.locations.Y) {
                         test_date = date[rx.locations.Y];
                     } else {
-                        output("This is a strange error that should not have occurred. Inquire with the developer please!", true, dateParser, console.error);
+                        _output("This is a strange error that should not have occurred. Inquire with the developer please!", true, dateParser, console.error);
                     }
                     dateObj = { dateObj: new Date(Date.parse(test_date)) };
                     try {
