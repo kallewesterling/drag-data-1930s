@@ -8,6 +8,7 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-CuOF+2SnTUfTwSZjCXf01h7uYhfOBuxIhGKPbfEJ3+FqH/s6cIFN9bGr1HmAg4fQ" crossorigin="anonymous">
         <link rel="stylesheet" href="css/themes.css">
         <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="css/menu.css">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.0/font/bootstrap-icons.css">
         <script src="https://unpkg.com/topojson@3"></script>
         <title>U.S. Drag in the 1930s</title>
@@ -15,28 +16,42 @@
     <body>
         <nav class="px-3 navbar navbar-expand-xl navbar-light justify-content-between shadow-sm border-bottom">
             <section class="d-flex">
-                <a data-bs-toggle="modal" data-bs-target="#rationale" data-bs-keyboard="true" type="button" class="order-1 btn btn-sm btn-outline-success mr-3"><i class="bi bi-patch-question-fill mr-md-1"></i><span class="d-none d-md-inline-block">Rationale</span></a>
-                <a id="showEntireDataset" class="order-2 btn btn-sm btn-outline-success mr-3" href="https://docs.google.com/spreadsheets/d/1UlpFQ9WWA6_6X-RuMJ3vHdIbyqhCZ1VRYgcQYjXprAg/edit#gid=0" target="_blank"><i class="bi bi-file-earmark-spreadsheet-fill mr-md-1"></i><span class="d-none d-md-inline-block">Dataset</span></a>
+                <a class="btn btn-sm btn-outline-secondary mr-3" id="togglePopupNav"><i class="bi bi-three-dots-vertical"></i></a>
                 <a id="switchMode" class="order-md-3 order-0 btn btn-sm btn-outline-secondary mr-3"></a>
                 <a id="nudgeNodes" class="order-4 btn btn-sm btn-outline-secondary mr-3"><i class="bi bi-unlock-fill mr-md-1"></i><span class="d-none d-md-inline-block">Fix stuck nodes</span></a>
-                <a id="resetLocalStorage" class="order-5 btn btn-sm btn-outline-secondary mr-3"><i class="bi bi-cloud-slash-fill mr-md-1"></i><span class="d-none d-md-inline-block">Reset settings</span></a>
                 <a id="showClusterInfo" class="order-5 btn btn-sm btn-outline-secondary"><i class="bi bi-triangle-fill mr-md-1"></i><span class="d-none d-md-inline-block">Community details</span></a>
             </section>
             <div class="collapse navbar-collapse" id="navbarSupportedContent" style="width:auto; max-width:100%">
                 <div id="info" class="d-flex align-items-center">
                     <span id="" class="numNodes small mr-3" data-bs-trigger="click" data-bs-toggle="popover" title="Number of nodes" data-bs-content='The numbers here show <strong>number of current nodes</strong>/number of all nodes in the graph. It is an indicator of how much the graph you are seeing has been filtered. You can change the filtering of the edges under the "Node filtering" section in the "Settings" below.'><i class="mr-1 small bi bi-record-fill"></i></span>
-                    <span id="" class="numEdges small mr-3" data-bs-trigger="click" data-bs-toggle="popover" title="Number of edges" data-bs-content='The numbers here show <strong>number of current edges</strong>/number of all edges in the graph. It is an indicator of how much the graph you are seeing has been filtered. You can change the filtering of the edges under the "Edge filtering" section in the "Settings" below.'><i class="mr-1 small bi bi-share-fill"></i></span>
+                    <span id="" class="numEdges small mr-3" data-bs-trigger="click" data-bs-toggle="popover" title="Number of edges" data-bs-content='The numbers here show <strong>number of current edges</strong>/number of all edges in the graph. It is an indicator of how much the graph you are seeing has been filtered. You can change the filtering of the edges under the "Edge filtering" section in the "Settings" below.'><i class="mr-1 small bi bi-slash"></i></span>
                     <span id="" class="unconnectedNodes small mr-3" data-bs-trigger="click" data-bs-toggle="popover" title="Number of unconnected nodes" data-bs-content='The number here shows how many nodes are present in the current graph you are seeing that are unconnected from one another. If you have "auto-clear unconnected nodes" turned on in the "Node filtering" settings, this number should always stay at 0 since any lingering unconnected nodes are removed on rendering.'><i class="mr-1 bi bi-node-minus"></i></span>
-                    <span id="" class="currentZoom small mr-3" data-bs-trigger="click" data-bs-toggle="popover" title="Current zoom level" data-bs-content='This number shows you how scaled the current graph is, between 60–400%.'></span>
                     <span id="" class="numCommunities small mr-3" data-bs-trigger="click" data-bs-toggle="popover" title="Number of communities" data-bs-content='The number that would sit next to this heart would show how many number of communities have been identified in the graph you are currently seeing. Since you have not chosen to detect communities in the Settings box, the heart displays no community information.'></span>
-                    <span id="" class="colorNetworks mr-3 m-0 badge" data-bs-trigger="hover" data-bs-toggle="popover" title="Number of networks" data-bs-content='The number here shows how many disconnected networks are present in the current graph. The fewer the networks, the higher degree of connection between all the nodes. Click the button to color the nodes after which network they belong to. When the coloring is activated, this button will be yellow.'></span>
-                    <span id="" class="commentedNodes m-0 badge" data-bs-trigger="hover" data-bs-toggle="popover" title="Number of commented nodes" data-bs-content='The number of nodes in the current graph that has a comment assigned to them. If you want to show only the nodes that have comments assigned to them and see how they relate to one another, click this button. When this view is activated, this button will be yellow.'></span>
+                    <span id="" class="colorNetworks mr-3" data-bs-trigger="hover" data-bs-toggle="popover" title="Number of networks" data-bs-content='The number here shows how many disconnected networks are present in the current graph. The fewer the networks, the higher degree of connection between all the nodes. Click the button to color the nodes after which network they belong to. When the coloring is activated, this button will be yellow.'></span>
+                    <span id="" class="commentedNodes m-0 mr-3 badge" data-bs-trigger="hover" data-bs-toggle="popover" title="Number of commented nodes" data-bs-content='The number of nodes in the current graph that has a comment assigned to them. If you want to show only the nodes that have comments assigned to them and see how they relate to one another, click this button. When this view is activated, this button will be yellow.'></span>
+                    <span id="" class="currentZoom small" data-bs-trigger="click" data-bs-toggle="popover" title="Current zoom level" data-bs-content='This number shows you how scaled the current graph is, between 60–400%.'></span>
                 </div>
             </div>
         </nav>
+        <nav id="popupNav" class="popup-nav shadow-lg">
+            <div class="p-4 small">
+                <h4>Drag Performers in the 1930s</h4>
+                <p>This visualization shows </p>
+                <h6>How It Started</h6>
+                <p>This project started as a part of my Ph.D. dissertation's research inquiries into historical data in attempts to find queer foundational structures in popular entertainment through social network analysis. Originally funded as a funded through a Connect New York grant in Summer 2018, I was able to begin creating a dataset that linked drag and “pansy” performers in New York City to burlesque theatres and nightclubs in the 1920s–30s. The research was primarily based on the archives of Billboard and Variety as they exist in their entire runs in ProQuest’s Entertainment Archive database. I also started mapping theatres and other venues where such performers regularly appeared.</p>
+                <hr />
+                <h5>About the tool</h5>
+                <p>Here is more information about the tool</p>
+                <hr />
+                <!-- <a data-bs-toggle="modal" data-bs-target="#rationale" data-bs-keyboard="true" type="button" class="d-block order-1 btn btn-sm btn-outline-success mr-3"><i class="bi bi-patch-question-fill"></i><span>Rationale</span></a> -->
+                <a id="showEntireDataset" class="mb-2 d-block order-2 btn btn-sm btn-outline-success mr-3" href="https://docs.google.com/spreadsheets/d/1UlpFQ9WWA6_6X-RuMJ3vHdIbyqhCZ1VRYgcQYjXprAg/edit#gid=0" target="_blank"><i class="bi bi-file-earmark-spreadsheet-fill mr-1"></i><span class="">Dataset</span></a>
+                <a id="resetLocalStorage" class="mb-2 d-block order-5 btn btn-sm btn-outline-secondary mr-3"><i class="bi bi-cloud-slash-fill mr-1"></i><span>Reset settings</span></a>
+            </div>
+        </nav>
+
         <div id="floatingInfo" class="d-flex flex-column p-2 rounded-3 border">
             <span id="" class="numNodes small mr-3 text-muted" data-bs-trigger="click" data-bs-toggle="popover" title="Number of nodes" data-bs-content='The numbers here show <strong>number of current nodes</strong>/number of all nodes in the graph. It is an indicator of how much the graph you are seeing has been filtered. You can change the filtering of the edges under the "Node filtering" section in the "Settings" below.'><i class="mr-1 small bi bi-record-fill"></i></span>
-            <span id="" class="numEdges small mr-3 text-muted" data-bs-trigger="click" data-bs-toggle="popover" title="Number of edges" data-bs-content='The numbers here show <strong>number of current edges</strong>/number of all edges in the graph. It is an indicator of how much the graph you are seeing has been filtered. You can change the filtering of the edges under the "Edge filtering" section in the "Settings" below.'><i class="mr-1 small bi bi-share-fill"></i></span>
+            <span id="" class="numEdges small mr-3 text-muted" data-bs-trigger="click" data-bs-toggle="popover" title="Number of edges" data-bs-content='The numbers here show <strong>number of current edges</strong>/number of all edges in the graph. It is an indicator of how much the graph you are seeing has been filtered. You can change the filtering of the edges under the "Edge filtering" section in the "Settings" below.'><i class="mr-1 small bi bi-slash"></i></span>
             <span id="" class="unconnectedNodes small mr-3 text-muted" data-bs-trigger="click" data-bs-toggle="popover" title="Number of unconnected nodes" data-bs-content='The number here shows how many nodes are present in the current graph you are seeing that are unconnected from one another. If you have "auto-clear unconnected nodes" turned on in the "Node filtering" settings, this number should always stay at 0 since any lingering unconnected nodes are removed on rendering.'><i class="mr-1 bi bi-node-minus"></i></span>
             <span id="" class="currentZoom small mr-3 text-muted" data-bs-trigger="click" data-bs-toggle="popover" title="Current zoom level" data-bs-content='This number shows you how scaled the current graph is, between 60–400%.'></span>
             <span id="" class="numCommunities small mr-3 text-muted" data-bs-trigger="click" data-bs-toggle="popover" title="Number of communities" data-bs-content='The number that would sit next to this heart would show how many number of communities have been identified in the graph you are currently seeing. Since you have not chosen to detect communities in the Settings box, the heart displays no community information.'></span>
@@ -172,12 +187,6 @@
                         <label class="small p-0 m-0" for="communityDetection">algorithm</label>
                         <select id="communityDetection"></select>
                     </div>
-
-                    <!--
-                    <div class="mb-2">
-                        <label class="mr-1" for="communityDetection"><input type="checkbox" id="communityDetection"> community detection</label>
-                    </div>
-                    -->
                 </li>
 
                 <li class="list-group-item">
@@ -303,6 +312,7 @@
         <script src="core/load.js"></script>
         <script src="core/zoom.js"></script>
         <script src="core/app.js"></script>
+        <script src="core/menu.js"></script>
         
         <script src="core/geo.js"></script>
         <script src="core/tour.js"></script>

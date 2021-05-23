@@ -109,7 +109,7 @@ const loadNetwork = (callback=[]) => {
     _output("Called", false, loadNetwork);
     
     let _ = fetchFromStorage('settings', 'loadNetwork')
-    let filename = _ ? _.datafile.filename : _autoSettings.datafile.filename;
+    let filename = _ ? _.datafile.filename : window.autoSettings.datafile.filename;
 
     enableSettings();
     document.querySelector('#datafileContainer').removeAttribute('style');
@@ -385,7 +385,7 @@ const loadStoreRanges = () => {
     let algorithms = ['', ...store.algorithms];
     
     algorithms.forEach((algorithm) => {
-        options += `<option value="${algorithm}">${algorithm ? algorithm : 'No community detection'}</option>`;
+        options += `<option value="${algorithm}">${algorithm ? algorithm : 'No community detection'}${algorithm === 'jLouvain' ? ' (dynamic)' : ''}</option>`;
         if (!algorithm)
             options += '<option disabled>──────────</option>';
     });

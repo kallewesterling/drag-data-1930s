@@ -22,24 +22,14 @@ const getCurrentGraphInfo = () => {
         'unconnectedNodes': {'class': [], 'content': hasUnconnectedNodes()? getUnconnectedNodes().length: 0},
         'currentZoom': {'class': [], 'content': (graph.k*100).toFixed(0) + '%'},
         'colorNetworks': {
-            'class': [window.coloredNetworks ? 'bg-warning' : 'bg-dark'],
-            'content': `${graph.networkCount}/${store.networkCount} networks`
+            'class': [window.coloredNetworks ? 'text-warning' : 'text-dark'],
+            'content': `${graph.networkCount}/${store.networkCount}`
         },
         'commentedNodes': {
             'class': [window.toggledCommentedElements ? 'bg-warning' : 'bg-dark'],
             'content': 'Show nodes with comments'
         },
         'numCommunities': {'class': [], 'content': ''}
-    }
-    if (graph.nodes.length < 300) {
-        _return[''] = {
-            'class': [window.coloredNetworks ? 'bg-warning' : 'bg-dark'],
-            'content': graph.networkCount + ' networks',
-        }
-        _return['commentedNodes'] = {
-            'class': [window.toggledCommentedElements ? 'bg-warning' : 'bg-dark'],
-            'content': graph.nodes.filter(n=>n.has_comments).length + ' commented'
-        }
     }
     if (Object.keys(graph.clusters).length)
         _return['numCommunities'] = {'content': Object.keys(graph.clusters).length}
@@ -102,23 +92,18 @@ const generateNodeInfoHTML = (node) => {
             </li>`
     }
 
-    if (graph.nodes.map(node=>{return [
-        node.comments.map(c=>c.date).every(a=>a),
-        node.comments.map(c=>c.comment).every(a=>a),
-        node.comments.map(c=>c.source).every(a=>a)
-    ]}).every(a=>a)) {
-        // comments (v.1)
+    // add comments...
+    if (node.comments) {
         html += `<li class="list-group-item"><strong>Comments</strong>`
-        node.comments.forEach(obj => {
-            html += `<p class="m-0 mb-1 small">${obj.date} ${obj.comment} <span class="text-muted">(${obj.source})</span></p>`
-        })
-        html += `</li>`
-    } else if (node.has_comments) {
-        // comments (v.1)
-        html += `<li class="list-group-item"><strong>Comments</strong>`
-        node.comments.forEach(obj => {
-            html += `<p class="m-0 mb-1 small">${obj.comment} <span class="text-muted">(${obj.source})</span></p>`
-        })
+        
+        let unique_comments = [...new Set(node.comments.map(c=>c.comment))];
+        unique_comments.forEach(comment => {
+            let comments = node.comments.filter(c=>c.comment === comment)
+            html += `<p class="m-0 mb-1 small">${comment}`
+            comments.forEach(c=>{html += `<div class="text-muted">(${c.date}, ${c.source})</div>`;});
+            html += `</p>`
+        });
+
         html += `</li>`
     }
     return minify(html);
