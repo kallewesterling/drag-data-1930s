@@ -1,13 +1,13 @@
 "use strict";
 
-const _autoSettings = {
+window.autoSettings = {
     nodes: {
         autoClearNodes: true,
         stickyNodes: true,
         nodeSizeFromCurrent: true,
-        minDegree: 6,
-        nodeMultiplier: 1,
-        communityDetection: true,
+        minDegree: 10,
+        nodeMultiplier: 2,
+        communityDetection: 'jLouvain',
     },
     edges: {
         weightFromCurrent: true,
@@ -22,12 +22,12 @@ const _autoSettings = {
         layoutCenter: true,
         layoutClustering: true,
         layoutCharge: true,
-        layoutCollide: true,
+        layoutCollide: false,
         layoutForceX: true,
         layoutForceY: true,
-        charge: -700,
-        collide: 0.5,
-        linkStrength: 0.40,
+        charge: -200,
+        collide: 0,
+        linkStrength: 0.05,
     },
     zoom: 1.25,
     zoomMin: 0.30,

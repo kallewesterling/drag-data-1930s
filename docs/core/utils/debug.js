@@ -145,12 +145,10 @@ const debugMessage = (message, header = "Warning") => {
 
 const colorNetworks = () => {
     let network_ids = [...new Set(store.nodes.map(node=>node.connected.network.network_id))];
-    console.log(`${network_ids.length} networks found`);
+    _output(`${network_ids.length} networks found`, true, colorNetworks);
     
     nodeElements.attr('style', node => {
         networkID = node.connected.network.network_id;
         return 'fill: ' + d3.interpolateRainbow(networkID/network_ids.length*5) + '!important;';
     });
-
-    d3.select('.colorNetworks').html(`Network count: ${network_ids.length}`);
 }

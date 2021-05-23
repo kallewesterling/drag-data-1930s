@@ -47,7 +47,7 @@ const filterNodes = (nodeList = [], settings = undefined) => {
     if (!nodeList.length) {
         if (!settings)
             settings = settingsFromDashboard('filterNodes');
-
+        
         output_msgs.push(`--> minDegree: ${settings.nodes.minDegree}`);
         store.nodes.forEach((node) => {
             if (node.degrees.degree >= settings.nodes.minDegree) {
@@ -252,12 +252,15 @@ const filter = (nodeList = [], edgeList = [], change = true) => {
         textElements.text((node)=>`${node.cluster}. ${node.display}`);
         graph.clusterInfo = getNodeClusterInfo();
     }
+
     graph.nodes.forEach((node) => {
         node.r = getSize(node, 'r', settings.nodes.nodeMultiplier, settings.nodes.nodeSizeFromCurrent);
     });
 
+    /* // Disabling this as we have hard-coded the number of networks in the data now
     if (graph.nodes.length < 300)
         graph.networkCount = getUniqueNetworks(undefined, "counter");
+    */
 
     graph.nodes.forEach(node=>{
         node.html_info = generateNodeInfoHTML(node);

@@ -265,8 +265,8 @@ const settingsFromDashboard = (caller=undefined) => {
             startYear: interfaceSettings.startYear,
             endYear: interfaceSettings.endYear,
             weightFromCurrent: interfaceSettings.weightFromCurrent,
-            minStroke: _autoSettings.edges.minStroke,
-            maxStroke: _autoSettings.edges.maxStroke,
+            minStroke: window.autoSettings.edges.minStroke,
+            maxStroke: window.autoSettings.edges.maxStroke,
         },
         force: {
             layoutCenter: interfaceSettings.layoutCenter,
@@ -279,9 +279,9 @@ const settingsFromDashboard = (caller=undefined) => {
             charge: interfaceSettings.charge,
             collide: interfaceSettings.collide,
         },
-        zoom: _autoSettings.zoom,
-        zoomMin: _autoSettings.zoomMin,
-        zoomMax: _autoSettings.zoomMax,
+        zoom: window.autoSettings.zoom,
+        zoomMin: window.autoSettings.zoomMin,
+        zoomMax: window.autoSettings.zoomMax,
         debugMessages: debugMessages,
         datafile: {
             "filename": interfaceSettings.datafile,
@@ -306,8 +306,8 @@ const setupSettingsInterface = (caller = undefined) => {
     let settings = fetchFromStorage("settings", "setupSettingsInterface");
     
     if (!settings) {
-        _output(["Stored settings empty, so reloading from autoSettings.", _autoSettings], false, setupSettingsInterface, console.warn);
-        settings = _autoSettings;
+        _output(["Stored settings empty, so reloading from autoSettings.", window.autoSettings], false, setupSettingsInterface, console.warn);
+        settings = window.autoSettings;
     }
 
     window._elements.minWeight.max = d3.max(store.ranges.edgeWidth);
@@ -877,7 +877,7 @@ const queryStringToSettings = (settings=undefined) => {
         settings = fetchFromStorage("settings", "queryStringToSettings");
 
     if (!settings)
-        settings = _autoSettings
+        settings = window.autoSettings
 
     const urlParams = new URLSearchParams(window.location.search);
 
@@ -896,7 +896,7 @@ const queryStringToSettings = (settings=undefined) => {
                 if (+value) {
                     settings.nodes.minDegree = +value;
                 } else {
-                    settings.nodes.minDegree = _autoSettings.nodes.minDegree;
+                    settings.nodes.minDegree = window.autoSettings.nodes.minDegree;
                 }
                 break;
             
@@ -906,7 +906,7 @@ const queryStringToSettings = (settings=undefined) => {
                 if (+value) {
                     settings.edges.minWeight = +value
                 } else {
-                    settings.edges.minWeight = _autoSettings.edges.minWeight;
+                    settings.edges.minWeight = window.autoSettings.edges.minWeight;
                 }
                 output_msgs.push(`--> minWeight has been set to ${settings.edges.minWeight}`)
                 break;
@@ -931,7 +931,7 @@ const queryStringToSettings = (settings=undefined) => {
                 if (+value) {
                     settings.zoomMin = +value;
                 } else {
-                    settings.zoomMin = _autoSettings.zoomMin;
+                    settings.zoomMin = window.autoSettings.zoomMin;
                 }
                 output_msgs.push(`--> minZoom has been set to to ${settings.zoomMin}`)
                 break;
@@ -941,7 +941,7 @@ const queryStringToSettings = (settings=undefined) => {
                 if (+value) {
                     settings.zoomMax = +value;
                 } else {
-                    settings.zoomMax = _autoSettings.zoomMax;
+                    settings.zoomMax = window.autoSettings.zoomMax;
                 }
                 output_msgs.push(`--> maxZoom has been set to to ${settings.zoomMax}`)
                 break;
@@ -953,7 +953,7 @@ const queryStringToSettings = (settings=undefined) => {
                 if (+value) {
                     settings.edges.startYear = +value;
                 } else {
-                    settings.edges.startYear = _autoSettings.edges.startYear;
+                    settings.edges.startYear = window.autoSettings.edges.startYear;
                 }
                 output_msgs.push(`--> startYear has been set to to ${settings.edges.startYear}`)
                 break;
@@ -965,7 +965,7 @@ const queryStringToSettings = (settings=undefined) => {
                 if (+value) {
                     settings.edges.endYear = +value;
                 } else {
-                    settings.edges.endYear = _autoSettings.edges.endYear;
+                    settings.edges.endYear = window.autoSettings.edges.endYear;
                 }
                 output_msgs.push(`--> endYear has been set to to ${settings.edges.endYear}`)
                 break;
