@@ -128,7 +128,7 @@ const debugMessage = (message, header = "Warning") => {
     let _id = `toast${store.toasterCounter}`;
     let _html = window._selectors["wrapToasters"].html();
     _html += `<div class="toast" id="${_id}" role="alert" aria-live="polite" aria-atomic="true" data-delay="5000"><div role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="toast-header"><strong class="mr-auto">${header}</strong><button type="button" class="ms-2 mb-1 btn-close" data-dismiss="toast" aria-label="Close"></button></div>
+        <div class="toast-header"><strong class="me-auto">${header}</strong><button type="button" class="ms-2 mb-1 btn-close" data-dismiss="toast" aria-label="Close"></button></div>
         <div class="toast-body">${message}</div>
         </div></div>`;
     window._selectors["wrapToasters"].html(_html);
