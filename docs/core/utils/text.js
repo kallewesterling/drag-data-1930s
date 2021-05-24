@@ -33,7 +33,7 @@ const getCurrentGraphInfo = () => {
     }
     if (Object.keys(graph.clusters).length)
         _return['numCommunities'] = {'content': Object.keys(graph.clusters).length}
-        // html += `<span id="numCommunities" class="small mr-2" data-bs-toggle="popover"><i class="mr-1 bi bi-heart-fill"></i>${Object.keys(graph.clusters).length}</span>`;
+        // html += `<span id="numCommunities" class="small me-2" data-bs-toggle="popover"><i class="me-1 bi bi-heart-fill"></i>${Object.keys(graph.clusters).length}</span>`;
     
 
     return _return;

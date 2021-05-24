@@ -615,9 +615,6 @@ const setupSettingInteractivity = () => {
     });
 
     // simple button interactivity
-    document.getElementById('togglePopupNav').addEventListener('click', () => {
-        toggle('#popupNav')
-    });
     window._selectors.switchMode.on("click", function (d) {
         toggleTheme();
     });

@@ -130,13 +130,13 @@ const updateInfo = () => {
 
     // getCurrentGraphInfo()
     let updateValues = getCurrentGraphInfo()
-    document.querySelectorAll('.numNodes').forEach(elem=>{elem.innerHTML = '<i class="mr-1 small bi bi-record-fill"></i>' + updateValues.numNodes.content;});
-    document.querySelectorAll('.numEdges').forEach(elem=>{elem.innerHTML = '<i class="mr-1 small bi bi-slash"></i>' + updateValues.numEdges.content;}); // share-fill
-    document.querySelectorAll('.unconnectedNodes').forEach(elem=>{elem.innerHTML = '<i class="mr-1 bi bi-node-minus"></i>' + updateValues.unconnectedNodes.content;});
-    document.querySelectorAll('.currentZoom').forEach(elem=>{elem.innerHTML = '<i class="mr-1 bi bi-search"></i>' + updateValues.currentZoom.content;});
-    document.querySelectorAll('.numCommunities').forEach(elem=>{elem.innerHTML = '<i class="mr-1 bi bi-heart-fill"></i>' + updateValues.numCommunities.content;});
+    document.querySelectorAll('.numNodes').forEach(elem=>{elem.innerHTML = '<i class="me-1 small bi bi-record-fill"></i>' + updateValues.numNodes.content;});
+    document.querySelectorAll('.numEdges').forEach(elem=>{elem.innerHTML = '<i class="me-1 small bi bi-slash"></i>' + updateValues.numEdges.content;}); // share-fill
+    document.querySelectorAll('.unconnectedNodes').forEach(elem=>{elem.innerHTML = '<i class="me-1 bi bi-node-minus"></i>' + updateValues.unconnectedNodes.content;});
+    document.querySelectorAll('.currentZoom').forEach(elem=>{elem.innerHTML = '<i class="me-1 bi bi-search"></i>' + updateValues.currentZoom.content;});
+    document.querySelectorAll('.numCommunities').forEach(elem=>{elem.innerHTML = '<i class="me-1 bi bi-heart-fill"></i>' + updateValues.numCommunities.content;});
     document.querySelectorAll('.commentedNodes').forEach(elem=>{elem.innerHTML = '' + updateValues.commentedNodes.content;});
-    document.querySelectorAll('.colorNetworks').forEach(elem=>{elem.innerHTML = '<i class="mr-1 bi bi-share-fill"></i>' + updateValues.colorNetworks.content;});
+    document.querySelectorAll('.colorNetworks').forEach(elem=>{elem.innerHTML = '<i class="me-1 bi bi-share-fill"></i>' + updateValues.colorNetworks.content;});
     
     updateValues.colorNetworks.class.forEach(c => {
         document.querySelectorAll('.colorNetworks').forEach(elem=>{elem.classList.add(c);});
