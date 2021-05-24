@@ -3,13 +3,13 @@
 const zoom = d3.zoom().extent([[window.autoSettings.zoomMin, window.autoSettings.zoomMin], [window.innerWidth, window.innerHeight]]);
 zoom.scaleExtent([window.autoSettings.zoomMin, window.autoSettings.zoomMax]);
 
-const zoomedActions = () => {
-    saveToStorage();
-    graph.k = Math.round(d3.event.transform.k * 10) / 10;
-    graph.x = Math.round(d3.event.transform.x * 10) / 10;
-    graph.y = Math.round(d3.event.transform.y * 10) / 10;
+const zoomedActions = (event) => {
+    saveToStorage(undefined, event);
+    graph.k = Math.round(event.transform.k * 10) / 10;
+    graph.x = Math.round(event.transform.x * 10) / 10;
+    graph.y = Math.round(event.transform.y * 10) / 10;
     updateInfo();
-    graph.plot.attr("transform", d3.event.transform);
+    graph.plot.attr("transform", event.transform);
     return true;
 };
 
