@@ -269,6 +269,8 @@ const setupInteractivity = (settings = undefined) => {
                 node.fy = node.y;
             })
             .on("drag", (node) => {
+                d3.select(`circle#${node.node_id}`).raise();
+                d3.select(`text[data-node=${node.node_id}]`).raise();
                 node.fx = d3.event.x;
                 node.fy = d3.event.y;
             })
