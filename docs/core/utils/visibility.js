@@ -23,7 +23,6 @@ const isVisible = (selector) => {
  * @returns {boolean} - true
  */
 const toggle = (selector) => {
-    console.log('toggle');
     try {
         if (typeof selector === "object") {
             selector.classed("d-none", isVisible(selector));
@@ -36,6 +35,13 @@ const toggle = (selector) => {
             window._selectors["settingsToggle"].classed("toggled", !isVisible(selector));
         } else if (selector === "#infoToggleDiv") {
             window._selectors["infoToggle"].classed("toggled", !isVisible(selector));
+        } else if (selector === "#popupNav") {
+            let menuWidth = getComputedStyle(document.querySelector('.popup-nav')).width;
+            if (document.getElementById("popupNav").style.left == `-${menuWidth}`) {
+                document.getElementById("popupNav").style.left = "0px";
+            } else {
+                document.getElementById("popupNav").style.left = `-${menuWidth}`;
+            }
         }
 
         return true;

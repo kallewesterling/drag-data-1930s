@@ -112,9 +112,6 @@ const loadNetwork = (callback=[]) => {
     let filename = _ ? _.datafile.filename : window.autoSettings.datafile.filename;
 
     include('includes/project.html').then(html=> {
-        console.log(html)
-        console.log(d3.select('#project-description'))
-        
         d3.select('#project-description').html(html);
     });
 
