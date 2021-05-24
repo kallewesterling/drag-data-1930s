@@ -210,8 +210,11 @@ const refreshValues = (caller=undefined) => {
  * @returns true
  */
 const filterStore = (interfaceSettings=undefined) => {
+    _output('Called', false, 'filterStore')
+
     if (!interfaceSettings)
-        console.trace('filterStore was not provided required interfaceSettings');
+        interfaceSettings = refreshValues('settingsFromDashboard');
+
     store.edges.forEach(e=>{
         e.passes = {}
         e.passes.startYear = e.range.startYear > interfaceSettings.startYear ? true : false;
@@ -334,9 +337,9 @@ const setupSettingsInterface = (caller = undefined) => {
     window._elements.collide.step = 0.05;
 
     // set range for collide
-    window._elements.linkStrength.min = 0.05;
+    window._elements.linkStrength.min = 0.01;
     window._elements.linkStrength.max = 1;
-    window._elements.linkStrength.step = 0.05;
+    window._elements.linkStrength.step = 0.01;
 
     // set range for minWeight
     window._elements.minDegree.min = 0;
@@ -542,6 +545,8 @@ const setupSettingInteractivity = () => {
     });
     window._selectors.minWeight.on("change", () => {
         changeSetting("#minWeight", "force", true, "slider");
+        filterStore();
+        filterEdges();
     });
 
     window._selectors.nodeMultiplier.on("input", () => {
