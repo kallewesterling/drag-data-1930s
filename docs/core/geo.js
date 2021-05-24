@@ -26,8 +26,8 @@ const processGeo = () => {
         }
     });
     
-    zoom.on("zoom", () => {
-        graph.plot.attr("transform", d3.event.transform);
+    zoom.on("zoom", (event) => {
+        graph.plot.attr("transform", event.transform);
         // g.selectAll("path").attr("d", path)
     });
 }

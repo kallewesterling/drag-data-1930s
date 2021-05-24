@@ -408,8 +408,8 @@ const toggleEgoNetwork = async (
         setupFilteredElements();
         styleGraphElements();
 
-        window._selectors.main.on("click", () => {
-            if (d3.event.metaKey && window.egoNetwork) {
+        window._selectors.main.on("click", (event) => {
+            if (event.metaKey && window.egoNetwork) {
                 _output(`svg command + click detected while ego network active - resetting network view...`, false, toggleEgoNetwork);
                 resetLocalStorage();
             }

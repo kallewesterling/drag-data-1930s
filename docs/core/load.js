@@ -223,9 +223,11 @@ const setupInteractivity = (settings = undefined) => {
     if (!settings)
         settings = settingsFromDashboard('setupInteractivity');
 
-    nodeElements.on("click", (node) => {
-        d3.event.stopPropagation();
-        if (d3.event.metaKey === true) {
+    nodeElements.on("click", (event, node) => {
+        //console.log('event', event);
+        //console.log('node', node);
+        event.stopPropagation();
+        if (event.metaKey === true) {
             if (nodeIsSelected(node)) {
                 hide("#nodeEdgeInfo");
                 styleGraphElements();
@@ -241,8 +243,8 @@ const setupInteractivity = (settings = undefined) => {
         }
     });
 
-    edgeElements.on("click", (edge) => {
-        d3.event.stopPropagation();
+    edgeElements.on("click", (event, edge) => {
+        event.stopPropagation();
         if (window.toggledCommentedElements) {
             if (edge.has_comments || edge.has_general_comments) {
                 window._selectors["popup-info"]
@@ -251,7 +253,7 @@ const setupInteractivity = (settings = undefined) => {
                     .attr("edge-id", edge.edge_id)
                     .attr(
                         "style",
-                        `top: ${d3.event.y}px !important; left: ${d3.event.x}px !important;`
+                        `top: ${event.y}px !important; left: ${event.x}px !important;`
                     );
             }
         } else {
@@ -262,20 +264,20 @@ const setupInteractivity = (settings = undefined) => {
     nodeElements.call(
         d3
             .drag()
-            .on("start", (node) => {
-                if (!d3.event.active)
+            .on("start", (event, node) => {
+                if (!event.active)
                     graph.simulation.alphaTarget(0.3).restart(); // avoid restarting except on the first drag start event
                 node.fx = node.x;
                 node.fy = node.y;
             })
-            .on("drag", (node) => {
+            .on("drag", (event, node) => {
                 d3.select(`circle#${node.node_id}`).raise();
                 d3.select(`text[data-node=${node.node_id}]`).raise();
-                node.fx = d3.event.x;
-                node.fy = d3.event.y;
+                node.fx = event.x;
+                node.fy = event.y;
             })
-            .on("end", (node) => {
-                if (!d3.event.active) graph.simulation.alphaTarget(0); // restore alphaTarget to normal value
+            .on("end", (event, node) => {
+                if (!event.active) graph.simulation.alphaTarget(0); // restore alphaTarget to normal value
 
                 if (settings.nodes.stickyNodes) {
                     node.fx = node.x;

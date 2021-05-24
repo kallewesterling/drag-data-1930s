@@ -98,14 +98,14 @@ const updateLabel = (name, interfaceSettings=undefined, callback=undefined) => {
  * The return value is true in all cases.
  * @returns {boolean} - true
  */
-const saveToStorage = (settings=undefined) => {    
+const saveToStorage = (settings=undefined, zoom_event=undefined) => {    
     let output_msgs = ["Called"];
 
-    if (d3.event && d3.event.transform) {
+    if (zoom_event && zoom_event.transform) {
         // _output("Saving zoom settings", false, saveToStorage)
         output_msgs.push("Saving zoom settings");
-        output_msgs.push(d3.event.transform);
-        localStorage.setItem("transform", JSON.stringify(d3.event.transform));
+        output_msgs.push(zoom_event.transform);
+        localStorage.setItem("transform", JSON.stringify(zoom_event.transform));
         return true;
     }
     
@@ -640,9 +640,9 @@ const setupSettingInteractivity = () => {
     });
 
     // set up collideContainer and chargeContainer (special cases)
-    window._selectors.collideContainer.on("click", () => {
+    window._selectors.collideContainer.on("click", (event) => {
         if (
-            d3.event.target.id === "collide" &&
+            event.target.id === "collide" &&
             window._selectors.collide.attr("disabled") != null
         ) {
             window._elements.layoutCollide.checked = true;
@@ -650,9 +650,9 @@ const setupSettingInteractivity = () => {
         }
     });
 
-    window._selectors.chargeContainer.on("click", () => {
+    window._selectors.chargeContainer.on("click", (event) => {
         if (
-            d3.event.target.id === "charge" &&
+            event.target.id === "charge" &&
             window._selectors.charge.attr("disabled") != null
         ) {
             window._elements.layoutCharge.checked = true;
@@ -670,11 +670,11 @@ const setupSettingInteractivity = () => {
  */
 const setupKeyHandlers = () => {
     // resetting on keyUp
-    d3.select("html").on("keyup", () => {
-        if (d3.event.key === "Meta" || d3.event.key === "Shift") {
+    d3.select("html").on("keyup", (e) => {
+        if (e.key === "Meta" || e.key === "Shift") {
             hide(".metaShow");
         }
-        if (d3.event.key === "Alt") {
+        if (e.key === "Alt") {
             // toggleCommentedElements(); // moved to button instead
         }
     });
@@ -686,9 +686,7 @@ const setupKeyHandlers = () => {
         {}
     );
 
-    d3.select("html").on("keydown", () => {
-        let e = d3.event;
-        
+    d3.select("html").on("keydown", (e) => {
         if (e.key === "Meta" || e.key === "Shift") {
             show(".metaShow");
         } else if (e.key === "Alt") {
@@ -800,31 +798,16 @@ const setupKeyHandlers = () => {
  * @returns {boolean} - true
  */
 const setupMiscInteractivity = () => {
-    d3.selectAll("[data-toggle]").on("click", () => {
-        d3.event.stopPropagation();
-        if (d3.event.target.classList.contains("toggled")) {
-            d3.event.target.classList.remove("toggled");
+    d3.selectAll("[data-toggle]").on("click", (event) => {
+        event.stopPropagation();
+        if (event.target.classList.contains("toggled")) {
+            event.target.classList.remove("toggled");
         } else {
-            d3.event.target.classList.add("toggled");
+            event.target.classList.add("toggled");
         }
-        console.log(d3.event.target);
-        toggle("#" + d3.event.target.dataset.toggle);
+        // console.log(event.target);
+        toggle("#" + event.target.dataset.toggle);
     });
-
-    /*
-    window._selectors["toggleInfoBox"].on("click", () => {
-        toggle("#info-box");
-    });
-    */
-
-    /*
-    window._selectors["info-box"].on("click", () => {
-        if (d3.event.target.id === "info-box") {
-            //console.log("closing info box!");
-            toggle("#info-box");
-        }
-    });
-    */
 
     d3.select(window).on("resize", transformToWindow);
 
