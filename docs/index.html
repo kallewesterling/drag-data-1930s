@@ -141,10 +141,16 @@
             <ul id="settingsContainer" class="list-group list-group-flush">
                 <li class="list-group-item" id="datafileContainer">
                     <div class="mb-2">
-                        <p class="small text-muted p-0 m-0 fw-bold" data-toggle="datafileToggle">Data file</p>
+                        <p class="small text-muted p-0 m-0 fw-bold" data-toggle="datafileToggle">Dataset</p>
                     </div>
-                    <div class="mb-2 d-none" id="datafileToggle">
+                    <div class="mb-2" id="datafileToggle">
                         <select id="datafile">
+                            <option value="data/co-occurrence-grouped-by-3-days.json">co-occurrence (3-day span)</option>
+                            <option value="data/co-occurrence-grouped-by-14-days.json">co-occurrence (14-day span)</option>
+                            <option value="data/co-occurrence-grouped-by-31-days.json">co-occurrence (31-day span)</option>
+                            <option value="data/co-occurrence-grouped-by-93-days.json">co-occurrence (93-day span)</option>
+                            <option value="data/co-occurrence-grouped-by-186-days.json">co-occurrence (186-day span)</option>
+                            <option value="data/co-occurrence-grouped-by-365-days.json">co-occurrence (365-day span)</option>
                             <option value="data/new-relations.json">co-occurrence (14-day span)</option>
                             <option value="data/multipartite-data.json">multi-partite graph</option>
                             <option value="data/bipartite-data-performer-city.json">bipartite graph (performer-city)</option>
@@ -220,9 +226,11 @@
                     <div class="mt-3 mb-2">
                         <p class="mb-1 text-muted small fw-bold">behavior</p>
                     </div>
-                    <div class="mb-2">
+                    <!--
+                        <div class="mb-2">
                         <label class="me-1" for="weightFromCurrent"><input type="checkbox" id="weightFromCurrent"> determine weight from current graph</label>
                     </div>
+                    -->
                 </li>
 
                 <li class="list-group-item">
@@ -261,7 +269,14 @@
                         </div>
                     </div>
                 </li>
+                
+                <li class="list-group-item">
+                    <div id="legend">
+                        
+                    </div>
+                </li>
 
+                <!--
                 <li class="list-group-item">
                     <div class="mb-2">
                         <p class="small text-muted p-0 m-0 fw-bold" data-toggle="debugToggle">Debug</p>
@@ -270,6 +285,7 @@
                         <label class="me-1" for="debugMessages"><input type="checkbox" id="debugMessages"> debugMessages</label>
                     </div>
                 </li>
+                -->
             </ul>
         </div>
         <div id="infoContainer"></div>
@@ -295,7 +311,19 @@
         <svg id="main" width="100%" height="100%">
             <g id="background"><rect x="-100%" y="-100%" width="200%" height="200%" fill="rgba(0, 0, 0, 0.009)"></rect></g>
         </svg>
-        
+
+        <!--
+        <div class="container" style="top:80%; height:20%; position: absolute;">
+            <div class="row">
+                <div class="col-12">
+                    <table class="table" id="data-info">
+                        <thead></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        -->
 
         <div id="popup-info" class="d-none shadow-lg"></div>
         <div id="egoNetwork" class="d-none shadow-lg p-2 text-center bg-warning">Ego network for node <span id="node">NODE</span>.<i id="closeEgoNetwork" class="ms-3 bi bi-stop-circle"></i></div>
