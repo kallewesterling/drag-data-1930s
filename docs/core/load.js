@@ -51,52 +51,51 @@ const setupStoreEdges = (edgeList) => {
     edgeList.forEach((edge) => {
         let newEdge = Object.assign({
                 has_comments: edge.comments.length > 0 ? true : false,
-                has_general_comments:
-                edge.general_comments.length > 0 ? true : false,
+                has_general_comments: edge.general_comments.length > 0 ? true : false,
                 inGraph: false,
                 dates: [],
                 range: { start: undefined, end: undefined },
             }, edge);
         storeEdges.push(newEdge);
     });
-    storeEdges.forEach((e) => {
-        let testDate = dateParser(e.date);
+    storeEdges.forEach((edge) => {
+        let testDate = dateParser(edge.date);
         if (testDate && testDate.iso !== undefined) {
-            e.dates.push(testDate.iso);
+            edge.dates.push(testDate.iso);
         }
-        e.found = e.found.filter((found) =>
+        edge.found = edge.found.filter((found) =>
             found != null && found != "" && found != "" ? true : false
         );
-        e.found = [...new Set(e.found)];
-        e.found.forEach((source) => {
+        edge.found = [...new Set(edge.found)];
+        edge.found.forEach((source) => {
             let date = dateParser(source);
             if (date && date.iso !== undefined) {
-                e.dates.push(date.iso);
+                edge.dates.push(date.iso);
             } else if (date.iso === undefined) {
-                let testDate = dateParser(e.date);
+                let testDate = dateParser(edge.date);
                 if (testDate && testDate.iso !== undefined) {
                     if (window.ERROR_LEVEL > 1) {
                         console.info(`Could not interpret date in source. Adding date associated with edge (${testDate.iso}) instead:`);
                         console.error(source);
-                        e.dates.push(testDate.iso);
+                        edge.dates.push(testDate.iso);
                     }
                 } else {
                     console.error(`Could not interpret date in ${source}. Backup solution failed too.`);
                 }
             }
         });
-        if (e.dates) {
-            e.dates = [...new Set(e.dates)].sort();
-            e.range = {
-                start: e.dates[0],
-                end: e.dates[e.dates.length - 1],
+        if (edge.dates) {
+            edge.dates = [...new Set(edge.dates)].sort();
+            edge.range = {
+                start: edge.dates[0],
+                end: edge.dates[edge.dates.length - 1],
             };
-            e.range['startYear'] = +e.range.start.substring(0, 4);
-            e.range['endYear'] = +e.range.end.substring(0, 4);
+            edge.range['startYear'] = +edge.range.start.substring(0, 4);
+            edge.range['endYear'] = +edge.range.end.substring(0, 4);
         }
 
-        if (!e.weight)
-            e.weight = e.found.length;
+        if (!edge.weights.weight)
+            edge.weights.weight = edge.found.length;
     });
     return storeEdges;
 }
@@ -215,7 +214,51 @@ const loadNetwork = (callback=[]) => {
         zoom.on("zoom", null);
         return false;
     });
+    
+    /*
+    let json_files = [
+        "data/co-occurrence-grouped-by-3-days.json",
+        "data/co-occurrence-grouped-by-14-days.json",
+        "data/co-occurrence-grouped-by-31-days.json",
+        "data/co-occurrence-grouped-by-93-days.json",
+        "data/co-occurrence-grouped-by-186-days.json",
+        "data/co-occurrence-grouped-by-365-days.json",
+    ];
+    Promise.all(json_files.map(file=>d3.json(file))).then(function(files) {
+        files.forEach((file, ix)=>{
+            datafiles[json_files[ix]] = file;
+        });
+        processData(datafiles);
+    }).catch(function(err) {
+        console.error(err);
+    })
+    */
 };
+
+/*
+let datafiles = {};
+let processData = (datafiles) => {
+    let row = document.createElement('tr')
+    let col1 = row.appendChild(document.createElement('td'))
+    let col2 = row.appendChild(document.createElement('td'))
+    
+    col1.appendChild(document.createTextNode(''))
+    col2.appendChild(document.createTextNode('nodes'))
+
+    document.querySelector('#data-info thead').append(row);
+
+    let rows = []
+    Object.keys(datafiles).forEach(file=>{
+        let row = document.createElement('tr')
+        let col1 = row.appendChild(document.createElement('td'))
+        let col2 = row.appendChild(document.createElement('td'))
+        col1.appendChild(document.createTextNode(file))
+        col2.appendChild(document.createTextNode(datafiles[file].nodes.length))
+        rows.push(row)
+    });
+    rows.forEach(row=>document.querySelector('#data-info tbody').append(row))
+}
+*/
 
 /**
  * setupInteractivity takes X argument/s... TODO: Needs docstring

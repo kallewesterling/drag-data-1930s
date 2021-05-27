@@ -27,7 +27,7 @@ const getCurrentGraphInfo = () => {
         },
         'commentedNodes': {
             'class': [window.toggledCommentedElements ? 'bg-warning' : 'bg-dark'],
-            'content': 'Show nodes with comments'
+            'content': '' //Show nodes with comments
         },
         'numCommunities': {'class': [], 'content': ''}
     }
@@ -115,10 +115,12 @@ const generateNodeInfoHTML = (node) => {
  * @param {Object} edge - d3 selector for a given edge.
  * @return {string} html - raw minified HTML
  */
-const generateEdgeInfoHTML = (edge, weightFromCurrent = undefined) => {
+const generateEdgeInfoHTML = (edge) => { //, weightFromCurrent = undefined
+    /*
     if (!weightFromCurrent)
         weightFromCurrent = settingsFromDashboard('generateEdgeInfoHTML').edges.weightFromCurrent;
-    
+    */
+
     let html = `<li class="list-group-item"><strong>ID</strong> ${edge.source.display} - ${edge.target.display}</li>`;
     
     if (edge.venue) {
@@ -131,8 +133,7 @@ const generateEdgeInfoHTML = (edge, weightFromCurrent = undefined) => {
 
     html += `<li class="list-group-item">
         <strong class="mb-1">Weight</strong>
-        <p class="m-0 mb-1 small ${weightFromCurrent ? '' : 'fw-bold'}">In entire network: ${edge.weight}</p>
-        <p class="m-0 small ${weightFromCurrent ? 'fw-bold' : ''}">In current network: ${edge.adjusted_weight}</p>
+        <p class="m-0 mb-1 small fw-bold">In entire network: ${edge.weights.weight}</p>
         </li>
         `;
 

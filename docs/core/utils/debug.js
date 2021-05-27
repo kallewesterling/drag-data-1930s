@@ -17,7 +17,7 @@ const _output = (message, log_output=false, from=undefined, output_function=cons
     window._selectors["loading"].classed('d-none', false);
     window.loadingTimeout = setTimeout(() => {
         window._selectors["loading"].classed('d-none', true);
-    }, 1000);
+    }, 100);
 
     if (![...Object.keys(froms)].includes(from)) {
         // assign color
@@ -119,6 +119,7 @@ const troubleshoot = (fix = false) => {
  * @param {string} [header]
  * @returns {number} - Identification number for the message box's timeout
  */
+/*
 const debugMessage = (message, header = "Warning") => {
     if (settingsFromDashboard('debugMessage').debugMessages === false) {
         // console.log("[debugMessage: " + header + "] " + message);
@@ -141,6 +142,7 @@ const debugMessage = (message, header = "Warning") => {
     store.toasterCounter += 1;
     return t;
 };
+*/
 
 
 const colorNetworks = () => {

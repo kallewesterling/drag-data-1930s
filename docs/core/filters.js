@@ -92,16 +92,32 @@ const getInvalidEdges = (inGraph=true) => {
  * @returns {boolean} - true
  */
 const filterEdges = (edgeList = [], settings = undefined, change = true) => {
+    if (edgeList.length) {
+        console.error('filtering using lists is not implemented.')
+        return true;
+    }
     
     if (!settings)
         settings = settingsFromDashboard('filterEdges');
     
     _output(["Called", `--> minWeight: ${settings.edges.minWeight}`, `--> startYear: ${settings.edges.startYear}`, `--> endYear: ${settings.edges.endYear}`], false, 'filterEdges');
 
-    if (edgeList.length) {
-        console.error('filtering using lists is not implemented.')
-        return true;
-    }
+    /*
+    let edgesToDrop = [];
+    edgesToDrop.push(...graph.edges.filter(edge=>edge.weights.weight < settings.edges.minWeight));
+    edgesToDrop.push(...graph.edges.filter(edge=>edge.range.startYear < settings.edges.startYear || edge.range.endYear > settings.edges.endYear));
+    edgesToDrop = [...new Set(edgesToDrop.filter(edge=>edge.inGraph === true))];
+
+    let edgesToAdd = [];
+    edgesToAdd.push(...store.edges.filter(edge=>edge.weights.weight > settings.edges.minWeight));
+    edgesToAdd.push(...store.edges.filter(edge=>edge.range.startYear > settings.edges.startYear || edge.range.endYear < settings.edges.endYear));
+    edgesToAdd = [...new Set(edgesToAdd.filter(edge=>edge.inGraph === false))];
+
+    edgesToAdd.forEach(edge=>addEdge(edge));
+    edgesToDrop.forEach(edge=>dropEdge(edge));
+    */
+    
+    filterStore();
 
     getValidEdges().forEach(e=>{
         addEdge(e);
@@ -109,6 +125,10 @@ const filterEdges = (edgeList = [], settings = undefined, change = true) => {
 
     getInvalidEdges().forEach(e=>{
         dropEdge(e);
+    });
+
+    graph.edges.forEach(edge=>{
+        edge.weight = edge.weights.date_groups;
     })
 
     return true;
@@ -126,7 +146,7 @@ const filterEdges = (edgeList = [], settings = undefined, change = true) => {
             let compareWeightVal =
                 settings.weightFromCurrent === true
                     ? edge.adjusted_weight
-                    : edge.weight;
+                    : edge.weights.weight;
 
             if (settings.minWeight) {
                 if (compareWeightVal < settings.minWeight && !edge.inGraph) {
@@ -255,22 +275,16 @@ const filter = (nodeList = [], edgeList = [], change = true) => {
 
     graph.nodes.forEach((node) => {
         node.r = getSize(node, 'r', settings.nodes.nodeMultiplier, settings.nodes.nodeSizeFromCurrent);
+        node.html_info = generateNodeInfoHTML(node);
     });
 
-    /* // Disabling this as we have hard-coded the number of networks in the data now
-    if (graph.nodes.length < 300)
-        graph.networkCount = getUniqueNetworks(undefined, "counter");
-    */
-
-    graph.nodes.forEach(node=>{
-        node.html_info = generateNodeInfoHTML(node);
-    })
     graph.edges.forEach(edge=>{
         edge.html_info = generateEdgeInfoHTML(edge, settings.edges.weightFromCurrent);
     })
 
     styleGraphElements(settings);
     updateInfo();
+    setupLegend();
 
     return true;
 };

@@ -28,16 +28,9 @@ const nodeScale = (sizeFromGraph = false, min=1, max=10) => {
  * @param {number} max
  * The return value is a d3 scalePow function.
  */
-const edgeScale = (settings, weightFromCurrent = false, min, max) => {
-    if (weightFromCurrent) {
-        return d3
-            .scalePow()
-            .range([min, max])
-            .domain(d3.extent(graph.edges, (d) => d.adjusted_weight));
-    } else {
-        return d3
-            .scalePow()
-            .range([min, max])
-            .domain(d3.extent(store.edges, (d) => d.weight));
-    }
+const edgeScale = (min, max) => {
+    return d3
+        .scaleSqrt()
+        .domain(d3.extent(graph.edges.map(edge=>edge.weights.weight)))
+        .range([min, max])
 };

@@ -215,16 +215,26 @@ const filterStore = (interfaceSettings=undefined) => {
     if (!interfaceSettings)
         interfaceSettings = refreshValues('settingsFromDashboard');
 
-    store.edges.forEach(e=>{
-        e.passes = {}
-        e.passes.startYear = e.range.startYear > interfaceSettings.startYear ? true : false;
-        e.passes.endYear = e.range.endYear < interfaceSettings.endYear ? true : false;
-        e.passes.minWeight = e.weight >= interfaceSettings.minWeight ? true : false;
+    store.edges.forEach(edge=>{
+        edge.passes = {}
+        edge.passes.startYear = edge.range.startYear > interfaceSettings.startYear ? true : false;
+        edge.passes.endYear = edge.range.endYear < interfaceSettings.endYear ? true : false;
+        edge.passes.minWeight = edge.weights.weight >= interfaceSettings.minWeight ? true : false;
+        if (!document.querySelector(`line#${edge.edge_id}`)) {
+            edge.inGraph = false;
+        } else {
+            edge.inGraph = true;
+        }
     });
 
     store.nodes.forEach(n=>{
         n.passes = {}
         n.passes.minDegree = n.degrees.degree > interfaceSettings.minDegree ? true : false;
+        if (!document.querySelector(`circle#${node.node_id}`)) {
+            node.inGraph = false;
+        } else {
+            node.inGraph = true;
+        }
     });
 
     return true;
@@ -285,7 +295,7 @@ const settingsFromDashboard = (caller=undefined) => {
         zoom: window.autoSettings.zoom,
         zoomMin: window.autoSettings.zoomMin,
         zoomMax: window.autoSettings.zoomMax,
-        debugMessages: debugMessages,
+        // debugMessages: debugMessages,
         datafile: {
             "filename": interfaceSettings.datafile,
             "bipartite": false
@@ -356,7 +366,7 @@ const setupSettingsInterface = (caller = undefined) => {
     window._elements.minWeight.value = settings.edges.minWeight;
     window._elements.autoClearNodes.checked = settings.nodes.autoClearNodes;
     window._elements.nodeSizeFromCurrent.checked = settings.nodes.nodeSizeFromCurrent;
-    window._elements.weightFromCurrent.checked = settings.edges.weightFromCurrent;
+    // window._elements.weightFromCurrent.checked = settings.edges.weightFromCurrent;
     window._elements.charge.value = settings.force.charge;
     window._elements.collide.value = settings.force.collide;
     window._elements.linkStrength.value = settings.force.linkStrength;
@@ -368,7 +378,7 @@ const setupSettingsInterface = (caller = undefined) => {
     window._elements.layoutCollide.checked = settings.force.layoutCollide;
 
     window._elements.stickyNodes.checked = settings.nodes.stickyNodes;
-    window._elements.debugMessages.checked = settings.debugMessages;
+    // window._elements.debugMessages.checked = settings.debugMessages;
     window._elements.datafile.value = settings.datafile.filename;
 
     if (window._elements.communityDetection.options.length == 0)
@@ -571,9 +581,11 @@ const setupSettingInteractivity = () => {
     window._selectors.autoClearNodes.on("change", () => {
         changeSetting("#autoClearNodes", "force", true);
     });
+    /*
     window._selectors.weightFromCurrent.on("change", () => {
         changeSetting("#weightFromCurrent", "force", true, "checkbox", [], [], false);
     });
+    */
     window._selectors.nodeSizeFromCurrent.on("change", () => {
         changeSetting("#nodeSizeFromCurrent", "force", true, "checkbox", [], [], false);
     });
@@ -593,9 +605,11 @@ const setupSettingInteractivity = () => {
     window._selectors.layoutForceY.on("change", () => {
         changeSetting("#layoutForceY", "force", false);
     });
+    /*
     window._selectors.debugMessages.on("change", () => {
         saveToStorage();
     });
+    */
 
     // checkboxes (special) interactivity
     window._selectors.stickyNodes.on("change", () => {

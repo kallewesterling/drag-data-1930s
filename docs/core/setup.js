@@ -15,8 +15,8 @@ window.autoSettings = {
         edgeMultiplier: 1,
         startYear: 1920,
         endYear: 1940,
-        minStroke: 1,
-        maxStroke: 7,
+        minStroke: 0.9,
+        maxStroke: 5,
     },
     force: {
         layoutCenter: true,
@@ -32,9 +32,9 @@ window.autoSettings = {
     zoom: 1.25,
     zoomMin: 0.30,
     zoomMax: 4,
-    debugMessages: false,
+    // debugMessages: false,
     datafile: {
-        filename: 'data/new-relations.json',
+        filename: 'data/co-occurrence-grouped-by-14-days.json',
         bipartite: false
     }
 };
@@ -104,6 +104,8 @@ const graph = {
 };
 
 graph.plot = graph.svg.append("g").attr("id", "plot");
+graph.communityScale = undefined;
+graph.clusterColors = {};
 
 // place links underneath nodes, and labels on top of everything
 let g = {
@@ -134,7 +136,7 @@ let _elementNames = [
     'layoutCollide',
     'layoutCharge',
     'stickyNodes',
-    'debugMessages',
+    // 'debugMessages',
     'egoNetwork',
     'main',
     'popup-',

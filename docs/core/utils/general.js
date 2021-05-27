@@ -333,13 +333,17 @@ const styleGraphElements = (settings = undefined) => {
         // graph.clusters = {}; /* TODO: Technically this should happen here but causes bug in modifySimulation. */
     };
 
+    graph.clusterColors = {}
+
     nodeElements
         .attr("class", (node) => getNodeClass(node))
         .transition()
         .attr("r", (node) => getSize(node, 'r', settings.nodes.nodeMultiplier, settings.nodes.nodeSizeFromCurrent))
         .attr("style", (node) => {
             if (node.cluster && settings.nodes.communityDetection) {
-                return `fill: ${d3.interpolateSinebow(1 / node.cluster)};`;
+                graph.communityScale = d3.scaleLinear().range([0,1]).domain(d3.extent(nodeElements.data().map(node=>node.cluster)))
+                graph.clusterColors[node.cluster] = d3.interpolateRainbow(graph.communityScale(node.cluster));
+                return `fill: ${graph.clusterColors[node.cluster]};`;
             } else {
                 return "";
             }
@@ -348,7 +352,7 @@ const styleGraphElements = (settings = undefined) => {
     edgeElements
         .attr("class", (e) => getEdgeClass(e))
         .transition()
-        .style("stroke-width", (e) => getEdgeStrokeWidth(e, settings.edges.edgeMultiplier, settings.edges.weightFromCurrent, settings.edges.minStroke, settings.edges.maxStroke));
+        .style("stroke-width", (e) => getEdgeStrokeWidth(e, settings));
 
     if (!settings.nodes.stickyNodes) {
         textElements.attr("", (node) => {
@@ -595,7 +599,8 @@ const getEdgeClass = (edge) => {
  * @param {Object} edge - d3 selector for a given edge.
  * @returns {string} - The string with the stroke width.
  */
-const getEdgeStrokeWidth = (edge, edgeMultiplier=undefined, weightFromCurrent=undefined, min, max) => {
+const getEdgeStrokeWidth = (edge, settings) => { //, weightFromCurrent=undefined, min, max) => {
+    /*
     if (weightFromCurrent===undefined || edgeMultiplier===undefined) {
         let settings = settingsFromDashboard('getEdgeStrokeWidth');
         if (!weightFromCurrent)
@@ -603,10 +608,15 @@ const getEdgeStrokeWidth = (edge, edgeMultiplier=undefined, weightFromCurrent=un
         if (!edgeMultiplier)
             edgeMultiplier = settings.edges.edgeMultiplier;
     }
-    let weightScale = edgeScale(settings, weightFromCurrent, min, max);
+    */
+    if (!settings)
+        settings = settingsFromDashboard('getEdgeStrokeWidth');
+
+    let weightScale = edgeScale(settings.edges.minStroke, settings.edges.maxStroke);
     
-    let evalWeight = weightFromCurrent ? edge.adjusted_weight : edge.weight;
-    return (((weightScale(evalWeight) ** 2) * +edgeMultiplier) / 2) + "px";
+    let evalWeight = edge.weights.weight;
+
+    return weightScale(evalWeight) * +settings.edges.edgeMultiplier + "px";
 };
 
 /**

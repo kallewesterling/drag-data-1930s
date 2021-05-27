@@ -2,7 +2,7 @@ const setupJLouvain = (caller=undefined, nodes=graph.nodes, edges=graph.edges) =
     // TODO: I am using JLouvain here. Are there other community detectors out there? Learn more about algorithms...
     // See invention of Louvain method here https://arxiv.org/pdf/0803.0476.pdf
     
-    _output(`Regenerating jLouvain communities in real-time${caller ? ' from ' + caller: ''}`, true, 'setupJLouvain');
+    _output(`Regenerating jLouvain communities in real-time${caller ? ' from ' + caller: ''}`, false, 'setupJLouvain');
 
     var allNodes = nodes.map((d) => d.node_id);
     var allEdges = edges.map((d) => {
@@ -188,4 +188,23 @@ const getNodeClusterInfo = (returnFullNodes = false) => {
     // document.querySelector("#clusterCounter").innerHTML = `${return_val.length} `;
     
     return return_val;
+}
+
+const setupLegend = () => {
+    console.log('called!');
+    legend = document.querySelector('#legend');
+    legend.innerHTML = '';
+    Object.entries(graph.clusterColors).forEach(([cluster, color]) => {
+        div = document.createElement('div')
+        badge = document.createElement('span')
+        badge.classList.add('badge')
+        badge.classList.add('me-1')
+        badge.style['background-color'] = color
+        badge.innerHTML = '&nbsp';
+        div.appendChild(badge)
+        txt = document.createTextNode(cluster)
+        div.appendChild(txt)
+        legend.appendChild(div)
+    });
+    // d3.select('#legend').html(`${htmlText}`);
 }
