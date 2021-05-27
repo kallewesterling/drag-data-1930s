@@ -343,7 +343,7 @@ const styleGraphElements = (settings = undefined) => {
             if (node.cluster && settings.nodes.communityDetection) {
                 graph.communityScale = d3.scaleLinear().range([0,1]).domain(d3.extent(nodeElements.data().map(node=>node.cluster)))
                 graph.clusterColors[node.cluster] = d3.interpolateRainbow(graph.communityScale(node.cluster));
-                return `fill: ${graph.clusterColors[node.cluster]};`;
+                return `fill: ${RGBToHSL(graph.clusterColors[node.cluster], -30)};`;
             } else {
                 return "";
             }
@@ -364,9 +364,16 @@ const styleGraphElements = (settings = undefined) => {
     textElements
         .attr("class", (node) => {
             if (settings.nodes.communityDetection) {
-                return `label cluster-${node.cluster}`;
+                return `label`;
             } else {
                 return `label`;
+            }
+        })
+        .attr("style", (node) => {
+            if (settings.nodes.communityDetection) {
+                return `fill: ${graph.clusterColors[node.cluster]}; text-shadow: 0 0 4px #00000052;`;
+            } else {
+                return ``;
             }
         })
         .transition()
