@@ -210,11 +210,14 @@ const refreshValues = (caller=undefined) => {
  * @param {object} interfaceSettings 
  * @returns true
  */
-const filterStore = (interfaceSettings=undefined) => {
+const filterStore = (settings=undefined, interfaceSettings=undefined) => {
     _output('Called', false, 'filterStore')
 
     if (!interfaceSettings)
         interfaceSettings = refreshValues('settingsFromDashboard');
+
+    if (!settings)
+        settings = settingsFromDashboard("filterStore");
 
     store.edges.forEach(edge=>{
         edge.passes = {}
@@ -228,9 +231,18 @@ const filterStore = (interfaceSettings=undefined) => {
         }
     });
 
+    let minDegree = 0;
+    if (settings.nodes)
+        minDegree = settings.nodes.minDegree
+    else if (interfaceSettings.minDegree)
+        minDegree = interfaceSettings.minDegree
+    else
+        console.warn('Could not load minDegree setting, so moving forward with 0.')
+    
     store.nodes.forEach(n=>{
         n.passes = {}
-        n.passes.minDegree = n.degrees.degree > interfaceSettings.minDegree ? true : false;
+        n.passes.minDegree = n.degrees.degree >= interfaceSettings.minDegree ? true : false;
+        n.passes.unnamed = n.id.toLowerCase().includes('unnamed') ? false : true;
         if (!document.querySelector(`circle#${node.node_id}`)) {
             node.inGraph = false;
         } else {
@@ -269,6 +281,7 @@ const settingsFromDashboard = (caller=undefined) => {
             minDegree: interfaceSettings.minDegree,
             nodeMultiplier: interfaceSettings.nodeMultiplier,
             autoClearNodes: interfaceSettings.autoClearNodes,
+            autoClearUnnamed: interfaceSettings.autoClearUnnamed,
             stickyNodes: interfaceSettings.stickyNodes,
             nodeSizeFromCurrent: interfaceSettings.nodeSizeFromCurrent,
             communityDetection: interfaceSettings.communityDetection
@@ -367,6 +380,7 @@ const setupSettingsInterface = (caller = undefined) => {
     window._elements.edgeMultiplier.value = settings.edges.edgeMultiplier;
     window._elements.minWeight.value = settings.edges.minWeight;
     window._elements.autoClearNodes.checked = settings.nodes.autoClearNodes;
+    window._elements.autoClearUnnamed.checked = settings.nodes.autoClearUnnamed;
     window._elements.nodeSizeFromCurrent.checked = settings.nodes.nodeSizeFromCurrent;
     // window._elements.weightFromCurrent.checked = settings.edges.weightFromCurrent;
     window._elements.charge.value = settings.force.charge;
@@ -589,6 +603,10 @@ const setupSettingInteractivity = () => {
     // checkbox interactivity
     window._selectors.autoClearNodes.on("change", () => {
         changeSetting("#autoClearNodes", "force", true);
+    });
+    window._selectors.autoClearUnnamed.on("change", () => {
+        changeSetting("#autoClearUnnamed", "force", true, "checkbox", [], [location.reload()]); // TODO: remove reload here...
+        // changeSetting("#autoClearUnnamed", "force", true);
     });
     /*
     window._selectors.weightFromCurrent.on("change", () => {

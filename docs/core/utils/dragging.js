@@ -13,13 +13,19 @@ function dragElement(elmnt) {
 
     function dragMouseDown(e) {
         e = e || window.event;
-        e.preventDefault();
-        // get the mouse cursor position at startup:
-        pos3 = e.clientX;
-        pos4 = e.clientY;
-        document.onmouseup = closeDragElement;
-        // call a function whenever the cursor moves:
-        document.onmousemove = elementDrag;
+        let testElement = e.path.map(p=>p.id).filter(p=>(p !== undefined && p !== null && p !== '' && p !== 'settingsContainer' && p !== 'settingsToggle' && p !== 'settings' && p !== 'quickEdgeInfo' && p !== 'nodeEdgeInfoContainer' && p !== 'nodeEdgeInfo' && p !== 'infoToggleDiv'))
+        console.log(testElement.length);
+        if (testElement.length === 0) {
+            e.preventDefault();
+            // get the mouse cursor position at startup:
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            document.onmouseup = closeDragElement;
+            // call a function whenever the cursor moves:
+            document.onmousemove = elementDrag;
+        } else {
+            console.log(testElement)
+        }
     }
 
     function elementDrag(e) {
@@ -32,9 +38,6 @@ function dragElement(elmnt) {
         pos4 = e.clientY;
         //if (getComputedStyle(elmnt)['bottom'])
         // set the element's new position:
-        elmnt.style['bottom'] = "0px !important"
-        console.log(elmnt.style);
-        elmnt.style.bottom = "auto !important;"
         elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
         elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
     }

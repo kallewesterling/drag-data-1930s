@@ -35,6 +35,21 @@ const nodeHasEdges = (node, count = false) => {
 };
 
 /**
+ * getUnnamedNodes takes no arguments but looks through graph.nodes in the current viz for any unconnected nodes.
+ * The return value is a list of all the node objects that are currently unconnected.
+ * @returns {Array} - Array of all the unconnected nodes in the visualization.
+ */
+const getUnnamedNodes = () => {
+    let unnamedNodes = [];
+    graph.nodes.forEach((node) => {
+        if (node.id.toLowerCase().includes('unnamed')) {
+            unnamedNodes.push(node);
+        }
+    });
+    return unnamedNodes;
+};
+
+/**
  * getUnconnectedNodes takes no arguments but looks through graph.nodes in the current viz for any unconnected nodes.
  * The return value is a list of all the node objects that are currently unconnected.
  * @returns {Array} - Array of all the unconnected nodes in the visualization.
@@ -56,6 +71,15 @@ const getUnconnectedNodes = () => {
  */
 const hasUnconnectedNodes = () => {
     return getUnconnectedNodes().length > 0;
+};
+
+/**
+ * hasUnnamedNodes takes no arguments but checks whether the current graph.nodes contains unnamed nodes.
+ * The return value is a boolean of whether the graph has unnamed nodes.
+ * @returns {boolean} - Boolean that describes whether the graph has unnamed nodes.
+ */
+const hasUnnamedNodes = () => {
+    return getUnnamedNodes().length > 0;
 };
 
 /**
