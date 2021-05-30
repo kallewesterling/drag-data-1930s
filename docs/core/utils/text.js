@@ -229,3 +229,71 @@ const generateCommentHTML = (elem) => {
     }
     return html;
 };
+
+const quickEdgeInfo = (edge) => {
+    const splitDate = (location) => {
+        let allYears = []
+        let allYearsWithMonths = []
+        let periods = edge.coLocated[location];
+        periods.forEach(period=>{
+            let years = [...new Set(period.map(date=>date.slice(0,4)))];
+            let yearsAndMonths = [...new Set(period.map(date=>date.slice(0,7)))];
+            allYears = [...allYears, ...years];
+            allYearsWithMonths = [...allYearsWithMonths, ...yearsAndMonths];
+        });
+        return [allYears, allYearsWithMonths];
+    }
+
+    const getPeriodsAsText = (location) => {
+        const getMonth = (num) => {
+            let months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+            return months[+num - 1]
+        }
+        let periods = edge.coLocated[location];
+        let text = `<li>at <strong>${location}</strong> during ${periods.length === 1 ? "one" : periods.length} period${periods.length > 1 ? "s" : ""},`
+        periods.forEach((period, ix) => {
+            let start = {full: period.sort()[0]}
+            let end = {full: period.sort()[period.length-1]}
+            start.year = +start.full.slice(0,4)
+            start.month = +start.full.slice(5,7)
+            end.year = +end.full.slice(0,4)
+            end.month = +end.full.slice(5,7)
+            
+            if (start.year === end.year && start.month === end.month) {
+                text += ` in ${getMonth(start.month)} of ${start.year}`
+            } else if (start.year === end.year && start.month !== end.month) {
+                text += ` ${getMonth(start.month)}–${getMonth(end.month)} of ${start.year}`
+            } else if (start.year !== end.year && start.month !== end.month) {
+                text += ` ${getMonth(start.month)} ${start.year}–${getMonth(end.month)} ${end.year}`
+            }
+            text += ` (${period.length} date${period.length > 1 ? "s" : ""} recorded)`;
+
+            if (ix < periods.length) {
+                text += '</li>'
+            }
+        });
+
+        return text;
+    }
+    
+    Object.keys(edge.coLocated).forEach(location=>{
+        let allYears = splitDate(location);
+        //console.log(allYears);
+    })
+    html = `<strong>${edge.source.display}</strong> and <strong>${edge.target.display}</strong> appeared together at ${Object.keys(edge.coLocated).length > 1 ? Object.keys(edge.coLocated).length : "one"} venue${Object.keys(edge.coLocated).length > 1 ? "s" : ""}:<ul>`;
+    
+    let coLocatedCount = Object.keys(edge.coLocated).length - 1;
+    
+    Object.keys(edge.coLocated).forEach((location, ix)=>{
+        let numDates = edge.coLocated[location].length;
+        html += getPeriodsAsText(location);
+        if (ix < coLocatedCount) {
+            // html += ' and ';
+        }
+    })
+    html += `</ul>`;
+
+    if (!isVisible("#nodeTable"))
+        show("#quickEdgeInfo");
+    document.querySelector('#quickEdgeInfo').innerHTML = html;
+}

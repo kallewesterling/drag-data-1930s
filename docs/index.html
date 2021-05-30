@@ -151,10 +151,12 @@
                             <option value="data/co-occurrence-grouped-by-93-days.json">co-occurrence (93-day span)</option>
                             <option value="data/co-occurrence-grouped-by-186-days.json">co-occurrence (186-day span)</option>
                             <option value="data/co-occurrence-grouped-by-365-days.json">co-occurrence (365-day span)</option>
-                            <option value="data/new-relations.json">co-occurrence (14-day span)</option>
-                            <option value="data/multipartite-data.json">multi-partite graph</option>
-                            <option value="data/bipartite-data-performer-city.json">bipartite graph (performer-city)</option>
-                            <option value="data/bipartite-data-performer-venue.json">bipartite graph (performer-venue)</option>
+                            <!--
+                                <option value="data/new-relations.json">co-occurrence (14-day span)</option>
+                                <option value="data/multipartite-data.json">multi-partite graph</option>
+                                <option value="data/bipartite-data-performer-city.json">bipartite graph (performer-city)</option>
+                                <option value="data/bipartite-data-performer-venue.json">bipartite graph (performer-venue)</option>
+                            -->
                         </select>
                     </div>
                 </li>
@@ -216,6 +218,10 @@
                         <input class="p-0 m-0" type="range" id="edgeMultiplier" name="edgeMultiplier" min="1" max="40" value="1" step="1">
                         <label class="small p-0 m-0" for="edgeMultiplier" id="edgeMultiplier_label">size edgeMultiplier</label>
                         <span class="text-nowrap small metaShow d-none"><key class="rounded small ms-1 bg-success text-white p-1 fw-bold">+</key><key class="rounded small ms-1 bg-success text-white p-1 fw-bold">-</key></span>
+                    </div>
+                    <div class="mb-2">
+                        <label class="small p-0 m-0" for="weightFrom">weight from</label>
+                        <select id="weightFrom"></select>
                     </div>
                     <div class="mb-2">
                         <label class="small p-0 m-0" for="startYear">startYear</label>
@@ -308,6 +314,8 @@
             </div>
         </div>
 
+        <div class="p-4 shadow" id="quickEdgeInfo"></div>
+
         <svg id="main" width="100%" height="100%">
             <g id="background"><rect x="-100%" y="-100%" width="200%" height="200%" fill="rgba(0, 0, 0, 0.009)"></rect></g>
         </svg>
@@ -349,6 +357,7 @@
         <script src="core/load.js"></script>
         <script src="core/zoom.js"></script>
         <script src="core/app.js"></script>
+        <script src="core/utils/dragging.js"></script>
         
         <script src="core/geo.js"></script>
         <script src="core/tour.js"></script>

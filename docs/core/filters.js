@@ -128,7 +128,7 @@ const filterEdges = (edgeList = [], settings = undefined, change = true) => {
     });
 
     graph.edges.forEach(edge=>{
-        edge.weight = edge.weights.date_groups;
+        edge.weight = edge.weights[settings.edges.weightFrom];
     })
 
     return true;
@@ -284,7 +284,7 @@ const filter = (nodeList = [], edgeList = [], change = true) => {
 
     styleGraphElements(settings);
     updateInfo();
-    setupLegend();
+    // setupLegend();
 
     return true;
 };
