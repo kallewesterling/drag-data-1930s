@@ -50,13 +50,7 @@ const filterNodes = (nodeList = [], settings = undefined) => {
         
         output_msgs.push(`--> minDegree: ${settings.nodes.minDegree}`);
         store.nodes.forEach((node) => {
-            if (node.degrees.degree >= settings.nodes.minDegree) {
-                addNode(node);
-                /* potential to add more filters here...*/
-            } else if (
-                settings.edges.startYear > d3.min(node.sourceRange) &&
-                settings.edges.endYear < d3.max(node.sourceRange)
-            ) {
+            if (node.passes.minDegree && node.passes.unnamed) {
                 addNode(node);
             } else {
                 dropNode(node);
@@ -116,8 +110,6 @@ const filterEdges = (edgeList = [], settings = undefined, change = true) => {
     edgesToAdd.forEach(edge=>addEdge(edge));
     edgesToDrop.forEach(edge=>dropEdge(edge));
     */
-    
-    filterStore();
 
     getValidEdges().forEach(e=>{
         addEdge(e);
@@ -254,7 +246,9 @@ const filter = (nodeList = [], edgeList = [], change = true) => {
     _output("Called", false, filter);
     let settings = settingsFromDashboard("filter");
 
-    hide("#nodeEdgeInfo");
+    hide("#nodeEdgeInfo");    
+    
+    filterStore(settings);
 
     filterNodes(nodeList, settings);
     filterEdges(edgeList, settings, change);
@@ -267,6 +261,7 @@ const filter = (nodeList = [], edgeList = [], change = true) => {
 
     setupFilteredElements(settings);
 
+    // then, detect community
     if (settings.nodes.communityDetection || document.querySelector('html').classList.contains('has-community')) {
         communityDetection();
         textElements.text((node)=>`${node.cluster}. ${node.display}`);
@@ -468,7 +463,38 @@ const toggleCommentedElements = (force = undefined) => {
     return true;
 };
 
-/**
+const filterNodesWithoutName = () => {
+    let returnObject = {
+        runs: 1,
+        dropped: [],
+    };
+    while (hasUnnamedNodes()) {
+        graph.nodes.forEach((node) => {
+            if (node.id.toLowerCase().includes('unnamed')) {
+                // remove node with node_id node.node_id!
+                graph.nodes.forEach((o, i) => {
+                    if (node.node_id === o.node_id) {
+                        graph.nodes.splice(i, 1);
+                        returnObject.dropped.push(node.node_id);
+                    }
+                });
+            }
+        });
+    };
+
+    if (returnObject.dropped.length > 0) {
+        troubleshoot(true); // ensures that all nodes are correctly represented in
+        // console.log('running setupFilteredElements in filterNodesWithoutName')
+        // setupFilteredElements();
+        updateInfo();
+    }
+
+    console.log(returnObject);
+    return returnObject; // could be passed to a debugMessage thus: debugMessage(`Dropped nodes with no edges (after ${runs} runs).`, "Information");
+}
+
+
+    /**
  * filterNodesWithoutEdge takes no arguments but loops through the visualization, looking for unconnected nodes.
  * The return value is an object with information about the dropped nodes.
  * @returns {Object} - Object with two properties, `runs` denotes how many iterations the function ran through, and `dropped` with a list of all node_ids that were removed.

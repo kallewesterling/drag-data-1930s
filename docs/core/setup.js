@@ -3,6 +3,7 @@
 window.autoSettings = {
     nodes: {
         autoClearNodes: true,
+        autoClearUnnamed: false,
         stickyNodes: true,
         nodeSizeFromCurrent: true,
         minDegree: 10,
@@ -127,6 +128,7 @@ let _elementNames = [
     'minWeight',
     'datafile',
     'autoClearNodes',
+    'autoClearUnnamed',
     'nodeSizeFromCurrent',
     'communityDetection',
     'weightFromCurrent',
