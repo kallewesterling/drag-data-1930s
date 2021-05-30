@@ -27,6 +27,10 @@ const setupStoreNodes = (nodeList) => {
             console.error("found an erroneous data point:");
             console.error(node);
         } else {
+            if (node.display.toLowerCase().includes('unnamed performer')) {
+                node.display = "Unnamed performer";
+            }
+
             let has_comments = node.comments !== undefined && node.comments.length > 0 ? true : false;
             storeNodes.push(
                 Object.assign(
@@ -93,6 +97,17 @@ const setupStoreEdges = (edgeList) => {
             edge.range['startYear'] = +edge.range.start.substring(0, 4);
             edge.range['endYear'] = +edge.range.end.substring(0, 4);
         }
+
+        let locations = Object.keys(edge.coLocated);
+        edge.weights.numLocations = locations.length;
+        edge.weights.numDateGroups = 0;
+        edge.weights.numDates = []
+        Object.keys(edge.coLocated).map(key=>{
+            let dateGroups = edge.coLocated[key];
+            edge.weights.numDateGroups += 1;
+            dateGroups.forEach(dates => {edge.weights.numDates = [...edge.weights.numDates, ...dates]});
+        })
+        edge.weights.numDates = [...new Set(edge.weights.numDates)].length
 
         if (!edge.weights.weight)
             edge.weights.weight = edge.found.length;
@@ -290,8 +305,14 @@ const setupInteractivity = (settings = undefined) => {
         }
     });
 
+    edgeElements.on("mouseover", (event, edge) => {
+        if (!window.nodeSelected && !window.edgeSelected)
+            quickEdgeInfo(edge);
+    })
+
     edgeElements.on("click", (event, edge) => {
         event.stopPropagation();
+        quickEdgeInfo(edge);
         if (window.toggledCommentedElements) {
             if (edge.has_comments || edge.has_general_comments) {
                 window._selectors["popup-info"]
@@ -441,6 +462,14 @@ const loadStoreRanges = () => {
             options += '<option disabled>──────────</option>';
     });
     window._elements.communityDetection.innerHTML = options;
+
+    // setup the "weight from" option
+    options = ""
+    let weightFromOptions = {'numDates': 'Number of co-appearances recorded', 'numLocations': 'Number of co-appearing venues', 'numDateGroups': 'Number of co-appearing periods'}
+    Object.entries(weightFromOptions).forEach(([value, text]) => {
+        options += `<option value="${value}">${text}</option>`;
+    });
+    window._elements.weightFrom.innerHTML = options;
 
     output_msgs.push("Finished", store.ranges);
     _output(output_msgs, false, loadStoreRanges);

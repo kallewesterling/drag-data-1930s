@@ -333,16 +333,12 @@ const styleGraphElements = (settings = undefined) => {
         // graph.clusters = {}; /* TODO: Technically this should happen here but causes bug in modifySimulation. */
     };
 
-    graph.clusterColors = {}
-
     nodeElements
         .attr("class", (node) => getNodeClass(node))
         .transition()
         .attr("r", (node) => getSize(node, 'r', settings.nodes.nodeMultiplier, settings.nodes.nodeSizeFromCurrent))
         .attr("style", (node) => {
             if (node.cluster && settings.nodes.communityDetection) {
-                graph.communityScale = d3.scaleLinear().range([0,1]).domain(d3.extent(nodeElements.data().map(node=>node.cluster)))
-                graph.clusterColors[node.cluster] = d3.interpolateRainbow(graph.communityScale(node.cluster));
                 return `fill: ${RGBToHSL(graph.clusterColors[node.cluster], -30)};`;
             } else {
                 return "";
@@ -371,7 +367,7 @@ const styleGraphElements = (settings = undefined) => {
         })
         .attr("style", (node) => {
             if (settings.nodes.communityDetection) {
-                return `fill: ${graph.clusterColors[node.cluster]}; text-shadow: 0 0 4px #00000052;`;
+                return `fill: ${graph.clusterColors[node.cluster]};`; //text-shadow: 0 0 4px #00000052;
             } else {
                 return ``;
             }
@@ -619,10 +615,10 @@ const getEdgeStrokeWidth = (edge, settings) => { //, weightFromCurrent=undefined
     if (!settings)
         settings = settingsFromDashboard('getEdgeStrokeWidth');
 
-    let weightScale = edgeScale(settings.edges.minStroke, settings.edges.maxStroke);
+    let weightScale = edgeScale(settings);
     
-    let evalWeight = edge.weights.weight;
-
+    let evalWeight = edge.weights[settings.edges.weightFrom];
+    
     return weightScale(evalWeight) * +settings.edges.edgeMultiplier + "px";
 };
 

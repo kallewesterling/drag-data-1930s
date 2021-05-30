@@ -18,6 +18,7 @@ const resetDraw = () => {
  * @returns {boolean} - true
  */
 const UIToggleAllSettingBoxes = () => {
+    _output('Called', false, UIToggleAllSettingBoxes)
     // if #rationale is visible, just hide that!
     if (bootstrap.Modal.getInstance(document.querySelector("#rationale")) && bootstrap.Modal.getInstance(document.querySelector("#rationale"))._isShown) {
         bootstrap.Modal.getInstance(document.querySelector("#rationale")).hide();
@@ -277,6 +278,7 @@ const settingsFromDashboard = (caller=undefined) => {
             edgeMultiplier: interfaceSettings.edgeMultiplier,
             startYear: interfaceSettings.startYear,
             endYear: interfaceSettings.endYear,
+            weightFrom: interfaceSettings.weightFrom,
             weightFromCurrent: interfaceSettings.weightFromCurrent,
             minStroke: window.autoSettings.edges.minStroke,
             maxStroke: window.autoSettings.edges.maxStroke,
@@ -395,6 +397,10 @@ const setupSettingsInterface = (caller = undefined) => {
     window._elements.startYear.value = settings.edges.startYear;
     window._elements.endYear.value = settings.edges.endYear;
     
+    if (window._elements.weightFrom.options.length == 0)
+        _output("Warning", false, "Warning: No weightFrom options (setupSettingInteractivity)");
+    window._elements.weightFrom.value = settings.edges.weightFrom;
+
     return true;
 };
 
@@ -532,6 +538,9 @@ const changeSetting = ( // TODO: #28 This function needs an overhaul
  */
 const setupSettingInteractivity = () => {
     // dropdown interactivity
+    window._selectors.weightFrom.on("change", () => {
+        changeSetting("#weightFrom", "force", true, "dropdown");
+    });
     window._selectors.startYear.on("change", () => {
         changeSetting("#startYear", "force", true, "dropdown");
     });
@@ -634,6 +643,8 @@ const setupSettingInteractivity = () => {
     });
     window._selectors.showClusterInfo.on("click", function (d) {
         toggle("#nodeTable");
+        if (isVisible("#nodeTable"))
+            hide("#quickEdgeInfo");
     });
     window._selectors.nudgeNodes.on("click", function (d) {
         graph.simulation.restart().alpha(0.15);
@@ -646,7 +657,8 @@ const setupSettingInteractivity = () => {
     });
     
     // set up settings containers
-    window._selectors.settingsToggle.on("click", () => {
+    window._selectors.settingsToggle.on("click", (evt) => {
+        console.log(evt)
         toggle("#settingsContainer");
     });
     window._selectors.infoToggle.on("click", () => {
@@ -717,7 +729,9 @@ const setupKeyHandlers = () => {
             //console.log("Escape 2 called!");
             hide("#popup-info");
         } else if (e.key === "Escape" && isVisible("#nodeEdgeInfo")) {
-            //console.log("Escape 3 called!");
+            console.log("Escape 3 called!");
+            window.edgeSelected = undefined;
+            window.nodeSelected = undefined;
             resetDraw();
         } else if (e.key === "Escape" || e.key === " ") {
             //console.log("Escape 4 called!");

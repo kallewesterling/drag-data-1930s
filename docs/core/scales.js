@@ -28,9 +28,12 @@ const nodeScale = (sizeFromGraph = false, min=1, max=10) => {
  * @param {number} max
  * The return value is a d3 scalePow function.
  */
-const edgeScale = (min, max) => {
+const edgeScale = (settings) => {
+    let rangeMin = settings.edges.minStroke;
+    let rangeMax = settings.edges.maxStroke;
+    let domainExtent = d3.extent(graph.edges.map(edge=>edge.weights[settings.edges.weightFrom]))
     return d3
         .scaleSqrt()
-        .domain(d3.extent(graph.edges.map(edge=>edge.weights.weight)))
-        .range([min, max])
+        .domain(domainExtent)
+        .range([rangeMin, rangeMax])
 };

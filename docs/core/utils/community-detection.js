@@ -87,7 +87,12 @@ const communityDetection = (settings = undefined) => {
             elem.dataset.bsContent = message
         })
     }
-
+    
+    graph.clusterColors = {}
+    graph.communityScale = d3.scaleLinear().range([0,1]).domain(d3.extent(nodeElements.data().map(node=>node.cluster)))
+    graph.nodes.forEach(node => {
+        graph.clusterColors[node.cluster] = d3.interpolateRainbow(graph.communityScale(node.cluster));
+    });
 }
 
 const getNodeClusterInfo = (returnFullNodes = false) => {
@@ -161,14 +166,21 @@ const getNodeClusterInfo = (returnFullNodes = false) => {
         return_val.forEach(data => {
             let html = `
             <tr>
-                <th scope="row">${data['id']}</th>`;
+                <th scope="row"><span class="badge me-1" style="background-color: ${graph.clusterColors[data['id']]}">${data['id']}</span></th>`;
             
             html += `<td>`;
             html += data['by-category']['performer'].length + data['by-category']['venue'].length + data['by-category']['city'].length;
             html += `</td><td colspan="3">`;
             if (data['by-category']['performer'].length) {
                 data['by-category']['performer'].forEach(node=>{
-                    html += `<span class="badge bg-secondary" style="margin-right:0.15rem;">${node}</span>`
+                    /*
+                    let nodeElement = nodeElements.data().filter(n=>n.id===node)
+                    if (nodeElement.length === 1)
+                        nodeElement = nodeElement[0]
+                    else
+                        console.error('Found too many nodes with ID!')
+                    */
+                    html += `<span class="badge me-1 bg-light text-dark">${node}</span>`
                 });
             } else {
                 html += `—`
@@ -190,6 +202,7 @@ const getNodeClusterInfo = (returnFullNodes = false) => {
     return return_val;
 }
 
+/*
 const setupLegend = () => {
     console.log('called!');
     legend = document.querySelector('#legend');
@@ -208,3 +221,4 @@ const setupLegend = () => {
     });
     // d3.select('#legend').html(`${htmlText}`);
 }
+*/

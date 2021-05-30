@@ -11,6 +11,7 @@ window.autoSettings = {
     },
     edges: {
         weightFromCurrent: true,
+        weightFrom: 'numDates',
         minWeight: 0,
         edgeMultiplier: 1,
         startYear: 1920,
@@ -162,7 +163,8 @@ let _elementNames = [
     'edgeMultiplier_label',
     'minWeight_label',
     'linkStrength_label',
-    'nodeEdgeInfo'
+    'nodeEdgeInfo',
+    'weightFrom'
 ]
 
 window._selectors = {}
