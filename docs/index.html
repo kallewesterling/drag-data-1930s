@@ -141,23 +141,23 @@
             <ul id="settingsContainer" class="list-group list-group-flush">
                 <li class="list-group-item" id="datafileContainer">
                     <div class="mb-2">
-                        <p class="small text-muted p-0 m-0 fw-bold" data-toggle="datafileToggle">Dataset</p>
+                        <p class="small text-muted p-0 m-0 fw-bold" data-toggle="datafileToggle">Co-occurrence Dataset</p>
                     </div>
                     <div class="mb-2" id="datafileToggle">
                         <select id="datafile">
-                            <option value="data/co-occurrence-grouped-by-3-days.json">co-occurrence (3-day span)</option>
-                            <option value="data/co-occurrence-grouped-by-14-days.json">co-occurrence (14-day span)</option>
-                            <option value="data/co-occurrence-grouped-by-31-days.json">co-occurrence (31-day span)</option>
-                            <option value="data/co-occurrence-grouped-by-93-days.json">co-occurrence (93-day span)</option>
-                            <option value="data/co-occurrence-grouped-by-186-days.json">co-occurrence (186-day span)</option>
-                            <option value="data/co-occurrence-grouped-by-365-days.json">co-occurrence (365-day span)</option>
+                            <option value="data/co-occurrence-grouped-by-3-days.json">unfiltered 3-day span</option>
+                            <option value="data/co-occurrence-grouped-by-14-days.json">unfiltered 14-day span</option>
+                            <option value="data/co-occurrence-grouped-by-31-days.json">unfiltered 31-day span</option>
+                            <option value="data/co-occurrence-grouped-by-93-days.json">unfiltered 93-day span</option>
+                            <option value="data/co-occurrence-grouped-by-186-days.json">unfiltered 186-day span</option>
+                            <option value="data/co-occurrence-grouped-by-365-days.json">unfiltered 365-day span</option>
                             <option value="" disabled>Unnamed performers pre-filtered:</option>
-                            <option value="data/co-occurrence-grouped-by-3-days-no-unnamed-performers.json">pre-filtered co-occurrence (3-day span)</option>
-                            <option value="data/co-occurrence-grouped-by-14-days-no-unnamed-performers.json">pre-filtered co-occurrence (14-day span)</option>
-                            <option value="data/co-occurrence-grouped-by-31-days-no-unnamed-performers.json">pre-filtered co-occurrence (31-day span)</option>
-                            <option value="data/co-occurrence-grouped-by-93-days-no-unnamed-performers.json">pre-filtered co-occurrence (93-day span)</option>
-                            <option value="data/co-occurrence-grouped-by-186-days-no-unnamed-performers.json">pre-filtered co-occurrence (186-day span)</option>
-                            <option value="data/co-occurrence-grouped-by-365-days-no-unnamed-performers.json">pre-filtered co-occurrence (365-day span)</option>
+                            <option value="data/co-occurrence-grouped-by-3-days-no-unnamed-performers.json">pre-filtered 3-day span</option>
+                            <option value="data/co-occurrence-grouped-by-14-days-no-unnamed-performers.json">pre-filtered 14-day span</option>
+                            <option value="data/co-occurrence-grouped-by-31-days-no-unnamed-performers.json">pre-filtered 31-day span</option>
+                            <option value="data/co-occurrence-grouped-by-93-days-no-unnamed-performers.json">pre-filtered 93-day span</option>
+                            <option value="data/co-occurrence-grouped-by-186-days-no-unnamed-performers.json">pre-filtered 186-day span</option>
+                            <option value="data/co-occurrence-grouped-by-365-days-no-unnamed-performers.json">pre-filtered 365-day span</option>
                             <!--
                                 <option value="data/new-relations.json">co-occurrence (14-day span)</option>
                                 <option value="data/multipartite-data.json">multi-partite graph</option>
@@ -184,6 +184,10 @@
                         <label class="small p-0 m-0" for="nodeMultiplier" id="nodeMultiplier_label">size nodeMultiplier</label>
                         <span class="text-nowrap small metaShow d-none"><key class="rounded small ms-1 bg-success text-white p-1 fw-bold">+</key><key class="rounded small ms-1 bg-success text-white p-1 fw-bold">-</key></span>
                     </div>
+                    <div class="mb-2">
+                        <label class="small p-0 m-0" for="rFrom">node size from</label>
+                        <select id="rFrom"></select>
+                    </div>
                     <div class="mt-3 mb-2">
                         <p class="mb-1 text-muted small fw-bold">behavior</p>
                     </div>
@@ -201,10 +205,12 @@
                     <div class="mb-2">
                         <label class="me-1" for="stickyNodes"><input type="checkbox" id="stickyNodes"> stickyNodes</label>
                     </div>
+                    <!--
                     <div class="mb-2">
                         <label class="me-1" for="nodeSizeFromCurrent"><input type="checkbox" id="nodeSizeFromCurrent"> node size from current graph</label>
                         <span class="text-nowrap small metaShow d-none"><key class="rounded small ms-1 bg-success text-white p-1 fw-bold">&#8679; + N</key></span>
                     </div>
+                    -->
                     <div class="mt-3 mb-2">
                         <p class="mb-1 text-muted small fw-bold">Detect communities</p>
                     </div>
