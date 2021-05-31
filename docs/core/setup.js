@@ -15,7 +15,7 @@ window.autoSettings = {
         weightFrom: 'numDates',
         minWeight: 0,
         edgeMultiplier: 1,
-        startYear: 1920,
+        startYear: 1930,
         endYear: 1940,
         minStroke: 0.9,
         maxStroke: 5,
