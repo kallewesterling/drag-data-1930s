@@ -405,12 +405,12 @@ const styleGraphElements = (settings = undefined) => {
 };
 
 /**
- * selectNode takes one required argument, the d3 selector for a given node. This is the function that handles the "click" event on the node.
+ * toggleNode takes one required argument, the d3 selector for a given node. This is the function that handles the "click" event on the node.
  * The return value is always true.
  * @param {Object} node - d3 selector for a given node.
  * @returns {boolean} - true
  */
-const selectNode = (node) => {
+const toggleNode = (node) => {
     if (nodeIsSelected(node)) {
         window.nodeSelected = undefined;
         hide("#nodeEdgeInfo");
@@ -426,12 +426,12 @@ const selectNode = (node) => {
 };
 
 /**
- * selectEdge takes one required argument, the d3 selector for a given edge. This is the function that handles the "click" event on the edge.
+ * toggleEdge takes one required argument, the d3 selector for a given edge. This is the function that handles the "click" event on the edge.
  * The return value is always true.
  * @param {Object} edge - d3 selector for a given edge.
  * @returns {boolean} - true
  */
-const selectEdge = (edge) => {
+const toggleEdge = (edge) => {
     if (edgeIsSelected(edge)) {
         window.edgeSelected = undefined;
         hide("#nodeEdgeInfo");

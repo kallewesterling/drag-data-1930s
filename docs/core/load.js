@@ -300,10 +300,16 @@ const setupInteractivity = (settings = undefined) => {
             node.fy = null;
             return true;
         } else {
-            selectNode(node);
+            toggleNode(node);
             return true;
         }
     });
+
+    textElements.on("click", (event, node) => {
+        console.log(node);
+        toggleNode(node);
+        return true;
+    })
 
     edgeElements.on("mouseover", (event, edge) => {
         if (!window.nodeSelected && !window.edgeSelected)
@@ -325,7 +331,7 @@ const setupInteractivity = (settings = undefined) => {
                     );
             }
         } else {
-            selectEdge(edge);
+            toggleEdge(edge);
         }
     });
 
