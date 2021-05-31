@@ -221,14 +221,20 @@ const filterStore = (settings=undefined, interfaceSettings=undefined) => {
 
     store.edges.forEach(edge=>{
         edge.passes = {}
+        // set the correct `passes` for every edge
         edge.passes.startYear = edge.range.startYear > interfaceSettings.startYear ? true : false;
         edge.passes.endYear = edge.range.endYear < interfaceSettings.endYear ? true : false;
         edge.passes.minWeight = edge.weights.weight >= interfaceSettings.minWeight ? true : false;
+        
+        // set the correct `inGraph` for every edge
         if (!document.querySelector(`line#${edge.edge_id}`)) {
             edge.inGraph = false;
         } else {
             edge.inGraph = true;
         }
+
+        // set the correct `weight` for every edge
+        edge.weight = edge.weights[interfaceSettings.weightFrom];
     });
 
     let minDegree = 0;
@@ -240,9 +246,12 @@ const filterStore = (settings=undefined, interfaceSettings=undefined) => {
         console.warn('Could not load minDegree setting, so moving forward with 0.')
     
     store.nodes.forEach(n=>{
+        // set the correct `passes` for every node
         n.passes = {}
         n.passes.minDegree = n.degrees.degree >= interfaceSettings.minDegree ? true : false;
         n.passes.unnamed = n.id.toLowerCase().includes('unnamed') ? false : true;
+        
+        // set the correct `inGraph` for every node
         if (!document.querySelector(`circle#${node.node_id}`)) {
             node.inGraph = false;
         } else {
@@ -284,7 +293,9 @@ const settingsFromDashboard = (caller=undefined) => {
             autoClearUnnamed: interfaceSettings.autoClearUnnamed,
             stickyNodes: interfaceSettings.stickyNodes,
             nodeSizeFromCurrent: interfaceSettings.nodeSizeFromCurrent,
-            communityDetection: interfaceSettings.communityDetection
+            communityDetection: interfaceSettings.communityDetection,
+            minR: window.autoSettings.nodes.minR,
+            maxR: window.autoSettings.nodes.maxR
         },
         edges: {
             minWeight: interfaceSettings.minWeight,

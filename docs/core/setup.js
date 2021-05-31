@@ -9,13 +9,15 @@ window.autoSettings = {
         minDegree: 10,
         nodeMultiplier: 2,
         communityDetection: 'jLouvain',
+        minR: 1,
+        maxR: 35,
     },
     edges: {
         weightFromCurrent: true,
         weightFrom: 'numDates',
         minWeight: 0,
         edgeMultiplier: 1,
-        startYear: 1920,
+        startYear: 1930,
         endYear: 1940,
         minStroke: 0.9,
         maxStroke: 5,
@@ -36,7 +38,7 @@ window.autoSettings = {
     zoomMax: 4,
     // debugMessages: false,
     datafile: {
-        filename: 'data/co-occurrence-grouped-by-14-days.json',
+        filename: "data/co-occurrence-grouped-by-14-days-no-unnamed-performers.json",
         bipartite: false
     }
 };

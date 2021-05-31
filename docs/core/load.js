@@ -465,7 +465,7 @@ const loadStoreRanges = () => {
 
     // setup the "weight from" option
     options = ""
-    let weightFromOptions = {'numDates': 'Number of co-appearances recorded', 'numLocations': 'Number of co-appearing venues', 'numDateGroups': 'Number of co-appearing periods'}
+    let weightFromOptions = {'numDates': 'Total number of co-appearing dates', 'numLocations': 'Number of co-appearing venues', 'numDateGroups': 'Number of co-appearing periods'}
     Object.entries(weightFromOptions).forEach(([value, text]) => {
         options += `<option value="${value}">${text}</option>`;
     });
