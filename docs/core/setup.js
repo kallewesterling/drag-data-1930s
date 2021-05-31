@@ -5,12 +5,13 @@ window.autoSettings = {
         autoClearNodes: true,
         autoClearUnnamed: false,
         stickyNodes: true,
-        nodeSizeFromCurrent: true,
+        //nodeSizeFromCurrent: true,
         minDegree: 10,
         nodeMultiplier: 2,
         communityDetection: 'jLouvain',
         minR: 1,
         maxR: 35,
+        rFrom: 'currentDegree'
     },
     edges: {
         weightFromCurrent: true,
@@ -52,10 +53,12 @@ const keyMapping = {
         noMeta:
             'changeSetting({selector: "#stickyNodes", setTo: !settingsFromDashboard("keyMappingS").nodes.stickyNodes})',
     },
+    /*
     N: {
         shiftKey:
             'changeSetting({selector: "#nodeSizeFromCurrent", type: "checkbox", setTo: !settingsFromDashboard("keyMappingN").nodes.nodeSizeFromCurrent})',
     },
+    */
     ArrowRight: {
         noMeta:
             'changeSetting({selector: "#minDegree", type: "slider", setTo: settingsFromDashboard("keyMappingArrowRight1").nodes.minDegree+1})',
@@ -131,7 +134,7 @@ let _elementNames = [
     'datafile',
     'autoClearNodes',
     'autoClearUnnamed',
-    'nodeSizeFromCurrent',
+    // 'nodeSizeFromCurrent',
     'communityDetection',
     'weightFromCurrent',
     'layoutCenter',
@@ -168,7 +171,8 @@ let _elementNames = [
     'minWeight_label',
     'linkStrength_label',
     'nodeEdgeInfo',
-    'weightFrom'
+    'weightFrom',
+    'rFrom',
 ]
 
 window._selectors = {}

@@ -292,8 +292,9 @@ const settingsFromDashboard = (caller=undefined) => {
             autoClearNodes: interfaceSettings.autoClearNodes,
             autoClearUnnamed: interfaceSettings.autoClearUnnamed,
             stickyNodes: interfaceSettings.stickyNodes,
-            nodeSizeFromCurrent: interfaceSettings.nodeSizeFromCurrent,
+            //nodeSizeFromCurrent: interfaceSettings.nodeSizeFromCurrent,
             communityDetection: interfaceSettings.communityDetection,
+            rFrom: interfaceSettings.rFrom,
             minR: window.autoSettings.nodes.minR,
             maxR: window.autoSettings.nodes.maxR
         },
@@ -392,7 +393,7 @@ const setupSettingsInterface = (caller = undefined) => {
     window._elements.minWeight.value = settings.edges.minWeight;
     window._elements.autoClearNodes.checked = settings.nodes.autoClearNodes;
     window._elements.autoClearUnnamed.checked = settings.nodes.autoClearUnnamed;
-    window._elements.nodeSizeFromCurrent.checked = settings.nodes.nodeSizeFromCurrent;
+    //window._elements.nodeSizeFromCurrent.checked = settings.nodes.nodeSizeFromCurrent;
     // window._elements.weightFromCurrent.checked = settings.edges.weightFromCurrent;
     window._elements.charge.value = settings.force.charge;
     window._elements.collide.value = settings.force.collide;
@@ -425,6 +426,10 @@ const setupSettingsInterface = (caller = undefined) => {
     if (window._elements.weightFrom.options.length == 0)
         _output("Warning", false, "Warning: No weightFrom options (setupSettingInteractivity)");
     window._elements.weightFrom.value = settings.edges.weightFrom;
+
+    if (window._elements.rFrom.options.length == 0)
+        _output("Warning", false, "Warning: No rFrom options (setupSettingInteractivity)");
+    window._elements.rFrom.value = settings.nodes.rFrom;
 
     return true;
 };
@@ -566,6 +571,9 @@ const setupSettingInteractivity = () => {
     window._selectors.weightFrom.on("change", () => {
         changeSetting("#weightFrom", "force", true, "dropdown");
     });
+    window._selectors.rFrom.on("change", () => {
+        changeSetting("#rFrom", "force", true, "dropdown");
+    });
     window._selectors.startYear.on("change", () => {
         changeSetting("#startYear", "force", true, "dropdown");
     });
@@ -624,9 +632,11 @@ const setupSettingInteractivity = () => {
         changeSetting("#weightFromCurrent", "force", true, "checkbox", [], [], false);
     });
     */
+    /*
     window._selectors.nodeSizeFromCurrent.on("change", () => {
         changeSetting("#nodeSizeFromCurrent", "force", true, "checkbox", [], [], false);
     });
+    */
     window._selectors.communityDetection.on("change", () => {
         changeSetting("#communityDetection", "force", true, "dropdown", [], [styleGraphElements], false);
         // used to be: changeSetting("#communityDetection", "force", true, "checkbox", [], [styleGraphElements], false);

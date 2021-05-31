@@ -669,14 +669,24 @@ const getSize = (node, type = "r", settings = undefined) => {
     if (!settings)
         console.error('Settings must be passed to an iterative function like getSize.')
 
-    let nodeSizeFromCurrent = settings.nodes.nodeSizeFromCurrent;
     let nodeMultiplier = settings.nodes.nodeMultiplier;
     let degree = undefined;
 
-    if (nodeSizeFromCurrent === true) {
+    console.log();
+    if (settings.nodes.rFrom === 'currentDegree') {
         degree = node.currentDegree;
+    } else if (settings.nodes.rFrom === 'degrees__degree') {
+        degree = node.degrees.degree;
+    } else if (settings.nodes.rFrom === 'betweenness_centrality') {
+        degree = node.centralities.betweenness_centrality_100x;
+    } else if (settings.nodes.rFrom === 'closeness_centrality') {
+        degree = node.centralities.closeness_centrality_100x;
+    } else if (settings.nodes.rFrom === 'degree_centrality') {
+        degree = node.centralities.degree_centrality_100x;
+    } else if (settings.nodes.rFrom === 'eigenvector_centrality') {
+        degree = node.centralities.eigenvector_centrality_100x;
     } else {
-        degree = node.degrees.degree
+        degree = 1;
     }
 
     let yScale = nodeScale(settings);
