@@ -293,7 +293,9 @@ const settingsFromDashboard = (caller=undefined) => {
             autoClearUnnamed: interfaceSettings.autoClearUnnamed,
             stickyNodes: interfaceSettings.stickyNodes,
             nodeSizeFromCurrent: interfaceSettings.nodeSizeFromCurrent,
-            communityDetection: interfaceSettings.communityDetection
+            communityDetection: interfaceSettings.communityDetection,
+            minR: window.autoSettings.nodes.minR,
+            maxR: window.autoSettings.nodes.maxR
         },
         edges: {
             minWeight: interfaceSettings.minWeight,

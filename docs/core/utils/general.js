@@ -360,7 +360,7 @@ const styleGraphElements = (settings = undefined) => {
     nodeElements
         .attr("class", (node) => getNodeClass(node))
         .transition()
-        .attr("r", (node) => getSize(node, 'r', settings.nodes.nodeMultiplier, settings.nodes.nodeSizeFromCurrent))
+        .attr("r", (node) => getSize(node, 'r', settings))
         .attr("style", (node) => {
             if (node.cluster && settings.nodes.communityDetection) {
                 return `fill: ${RGBToHSL(graph.clusterColors[node.cluster], -30)};`;
@@ -399,7 +399,7 @@ const styleGraphElements = (settings = undefined) => {
         .transition()
         .duration(750)
         .attr("opacity", 1)
-        .attr("font-size", (node) => getSize(node, "text", settings.nodes.nodeMultiplier, settings.nodes.nodeSizeFromCurrent));
+        .attr("font-size", (node) => getSize(node, "text", settings));
 
     return true;
 };
@@ -665,17 +665,22 @@ const getTextClass = (node) => {
  * @param {Object} [type] - Either "r" (default) for a `circle` DOM element, or "text" for a `text` DOM element.
  * @returns {number} - The size in pixels
  */
-const getSize = (node, type = "r", nodeMultiplier = undefined, nodeSizeFromCurrent = undefined) => {
-    if (!nodeMultiplier || !nodeSizeFromCurrent) {
-        settings = settingsFromDashboard("getSize");
-        if (!nodeMultiplier)
-            nodeMultiplier = settings.nodes.nodeMultiplier;
-        if (!nodeSizeFromCurrent)
-            nodeSizeFromCurrent = settings.nodes.nodeSizeFromCurrent
+const getSize = (node, type = "r", settings = undefined) => {
+    if (!settings)
+        console.error('Settings must be passed to an iterative function like getSize.')
+
+    let nodeSizeFromCurrent = settings.nodes.nodeSizeFromCurrent;
+    let nodeMultiplier = settings.nodes.nodeMultiplier;
+    let degree = undefined;
+
+    if (nodeSizeFromCurrent === true) {
+        degree = node.currentDegree;
+    } else {
+        degree = node.degrees.degree
     }
 
-    let yScale = nodeScale(nodeSizeFromCurrent);
-    let val = 0;
+    let yScale = nodeScale(settings);
+
     if (window.toggledCommentedElements === true) {
         if (node.has_comments) {
             return 10 * nodeMultiplier;
@@ -685,26 +690,10 @@ const getSize = (node, type = "r", nodeMultiplier = undefined, nodeSizeFromCurre
     }
 
     if (type === "r") {
-        if (nodeSizeFromCurrent === true) {
-            val = yScale(node.currentDegree) * nodeMultiplier;
-        } else {
-            val = yScale(node.degrees.degree) * nodeMultiplier;
-        }
+        return yScale(degree) * nodeMultiplier;
     } else if (type === "text") {
-        if (nodeSizeFromCurrent === true) {
-            val =
-                yScale(node.currentDegree) *
-                nodeMultiplier *
-                1.5;
-        } else {
-            val = yScale(node.degrees.degree) * nodeMultiplier * 1.5;
-        }
+        return yScale(degree) * nodeMultiplier * 1.5;
     }
-    if (val < 0) {
-        // console.error(`val is less than 0 (${val}) - returning 0`);
-        return 0;
-    }
-    return val;
 };
 
 const lookupNode = (node_id, nodeList = store.nodes) => {

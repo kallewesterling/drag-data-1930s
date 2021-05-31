@@ -9,6 +9,8 @@ window.autoSettings = {
         minDegree: 10,
         nodeMultiplier: 2,
         communityDetection: 'jLouvain',
+        minR: 1,
+        maxR: 35,
     },
     edges: {
         weightFromCurrent: true,

@@ -5,30 +5,36 @@
  * @param {boolean} sizeFromGraph
  * @param {number} min
  * @param {number} max
- * The return value is a d3 scalePow function.
+ * The return value is a d3 scaleSqrt function.
  */
-const nodeScale = (sizeFromGraph = false, min=1, max=10) => {
-    if (sizeFromGraph) {
-        return d3
-            .scalePow()
-            .range([min, max])
-            .domain(d3.extent(graph.nodes, (d) => d.currentDegree));
+const nodeScale = (settings = undefined) => {
+    if (!settings)
+        console.error('Settings must be passed to an iterative function like nodeScale.')
+    
+    let rangeMin = settings.nodes.minR; // 1;
+    let rangeMax = settings.nodes.maxR; // 10;
+
+    let domainExtent = [];
+    if (settings.nodes.nodeSizeFromCurrent) {
+        domainExtent = d3.extent(graph.nodes, node => node.currentDegree)
     } else {
-        return d3
-            .scalePow()
-            .range([min, max])
-            .domain(d3.extent(graph.nodes, (d) => d.degree));
+        domainExtent = d3.extent(graph.nodes, node => node.degrees.degree)
     }
+    return d3
+        .scaleSqrt()
+        .range([rangeMin, rangeMax])
+        .domain(domainExtent);
 };
 
 /**
  * edgeScale returns the scale for the weight of edges based on some parameters.
- * @param {boolean} sizeFromGraph
- * @param {number} min
- * @param {number} max
- * The return value is a d3 scalePow function.
+ * @param {object} settings
+ * The return value is a d3 scaleSqrt function.
  */
-const edgeScale = (settings) => {
+const edgeScale = (settings = undefined) => {
+    if (!settings)
+        console.error('Settings must be passed to an iterative function like nodeScale.')
+
     let rangeMin = settings.edges.minStroke;
     let rangeMax = settings.edges.maxStroke;
     let domainExtent = d3.extent(graph.edges.map(edge=>edge.weights[settings.edges.weightFrom]))
