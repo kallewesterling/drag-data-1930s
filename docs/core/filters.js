@@ -119,10 +119,6 @@ const filterEdges = (edgeList = [], settings = undefined, change = true) => {
         dropEdge(e);
     });
 
-    graph.edges.forEach(edge=>{
-        edge.weight = edge.weights[settings.edges.weightFrom];
-    })
-
     return true;
 
     store.edges.filter(e=>e.passes.startYear && e.passes.endYear && e.passes.minWeight && !e.inGraph).forEach(e=>addEdge(e));
