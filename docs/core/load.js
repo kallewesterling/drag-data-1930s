@@ -471,6 +471,17 @@ const loadStoreRanges = () => {
     });
     window._elements.weightFrom.innerHTML = options;
 
+    // setup the "weight from" option
+    options = ""
+    let rFromOptions = {'currentDegree': 'Degree in current network', 'degrees__degree': 'Overall degree', '': 'Centrality measures', 'betweenness_centrality': 'Betweenness', 'closeness_centrality': 'Closeness', 'degree_centrality': 'Degree', 'eigenvector_centrality': 'Eigenvector'}
+    Object.entries(rFromOptions).forEach(([value, text]) => {
+        if (!value)
+            options += `<option disabled>${text}</option>`;
+        else
+            options += `<option value="${value}">${text}</option>`;
+    });
+    window._elements.rFrom.innerHTML = options;
+
     output_msgs.push("Finished", store.ranges);
     _output(output_msgs, false, loadStoreRanges);
     return store.ranges;
