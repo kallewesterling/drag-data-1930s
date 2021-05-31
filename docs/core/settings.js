@@ -354,7 +354,7 @@ const setupSettingsInterface = (caller = undefined) => {
     window._elements.minDegree.max = d3.max(store.ranges.nodeDegree);
 
     // set range for nodeMultiplier
-    window._elements.nodeMultiplier.min = 1;
+    window._elements.nodeMultiplier.min = 0.1;
     window._elements.nodeMultiplier.max = 5;
     window._elements.nodeMultiplier.step = 0.25;
 
