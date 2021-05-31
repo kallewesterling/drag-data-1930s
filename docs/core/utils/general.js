@@ -600,12 +600,6 @@ const getNodeClass = (node) => {
     return classes;
 };
 
-const getClusterColor = (node) => {
-    if (node.cluster) {
-        console.log(node.cluster);
-    }
-};
-
 /**
  * getEdgeClass takes one required argument, the d3 selector for a given edge. It is the function that provides the class for any given edge in the visualization.
  * The return value is a string of classes.
@@ -672,7 +666,6 @@ const getSize = (node, type = "r", settings = undefined) => {
     let nodeMultiplier = settings.nodes.nodeMultiplier;
     let degree = undefined;
 
-    console.log();
     if (settings.nodes.rFrom === 'currentDegree') {
         degree = node.currentDegree;
     } else if (settings.nodes.rFrom === 'degrees__degree') {
