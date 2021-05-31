@@ -30,7 +30,7 @@ function toggleTheme() {
         window.matchMedia &&
         window.matchMedia("(prefers-color-scheme: dark)").matches == true
     ) {
-        console.log("user has dark mode on - following suit...");
+        // console.log("user has dark mode on - following suit...");
         setTheme("theme-dark");
         return true;
     }
@@ -38,18 +38,18 @@ function toggleTheme() {
         window.matchMedia &&
         window.matchMedia("(prefers-color-scheme: light)").matches == true
     ) {
-        console.log("user has light mode on - following suit...");
+        // console.log("user has light mode on - following suit...");
         setTheme("theme-light");
         return true;
     }
 
     // else, check localStorage...
     if (localStorage.getItem("theme") === "theme-dark") {
-        console.log("user has set dark mode on manually...");
+        // console.log("user has set dark mode on manually...");
         setTheme("theme-dark");
         return true;
     } else {
-        console.log("user has set light mode on manually...");
+        // console.log("user has set light mode on manually...");
         setTheme("theme-light");
         return true;
     }

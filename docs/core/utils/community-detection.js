@@ -204,7 +204,7 @@ const getNodeClusterInfo = (returnFullNodes = false) => {
 
 /*
 const setupLegend = () => {
-    console.log('called!');
+    // console.log('called!');
     legend = document.querySelector('#legend');
     legend.innerHTML = '';
     Object.entries(graph.clusterColors).forEach(([cluster, color]) => {

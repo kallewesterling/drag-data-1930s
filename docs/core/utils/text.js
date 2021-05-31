@@ -278,7 +278,7 @@ const quickEdgeInfo = (edge) => {
     
     Object.keys(edge.coLocated).forEach(location=>{
         let allYears = splitDate(location);
-        //console.log(allYears);
+        // console.log(allYears);
     })
     html = `<strong>${edge.source.display}</strong> and <strong>${edge.target.display}</strong> appeared together at ${Object.keys(edge.coLocated).length > 1 ? Object.keys(edge.coLocated).length : "one"} venue${Object.keys(edge.coLocated).length > 1 ? "s" : ""}:<ul>`;
     

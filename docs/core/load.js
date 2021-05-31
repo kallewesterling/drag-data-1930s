@@ -286,8 +286,8 @@ const setupInteractivity = (settings = undefined) => {
         settings = settingsFromDashboard('setupInteractivity');
 
     nodeElements.on("click", (event, node) => {
-        //console.log('event', event);
-        //console.log('node', node);
+        // console.log('event', event);
+        // console.log('node', node);
         event.stopPropagation();
         if (event.metaKey === true) {
             if (nodeIsSelected(node)) {

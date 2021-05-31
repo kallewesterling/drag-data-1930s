@@ -14,7 +14,7 @@ function dragElement(elmnt) {
     function dragMouseDown(e) {
         e = e || window.event;
         let testElement = e.path.map(p=>p.id).filter(p=>(p !== undefined && p !== null && p !== '' && p !== 'settingsContainer' && p !== 'settingsToggle' && p !== 'settings' && p !== 'quickEdgeInfo' && p !== 'nodeEdgeInfoContainer' && p !== 'nodeEdgeInfo' && p !== 'infoToggleDiv'))
-        console.log(testElement.length);
+        // console.log(testElement.length);
         if (testElement.length === 0) {
             e.preventDefault();
             // get the mouse cursor position at startup:
@@ -24,7 +24,7 @@ function dragElement(elmnt) {
             // call a function whenever the cursor moves:
             document.onmousemove = elementDrag;
         } else {
-            console.log(testElement)
+            // console.log(testElement)
         }
     }
 

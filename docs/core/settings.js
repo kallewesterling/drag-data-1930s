@@ -82,7 +82,7 @@ const updateLabel = (name, interfaceSettings=undefined, callback=undefined) => {
             break;
 
         default:
-            //console.log('Unhandled name', name);
+            // console.log('Unhandled name', name);
             break;
     }
     
@@ -181,7 +181,7 @@ const refreshValues = (caller=undefined) => {
                         break;
 
                     default:
-                        console.log("Unhandled type", element.type);
+                        console.error("Unhandled type", element.type);
                         break;
                 }
                 break;
@@ -191,7 +191,7 @@ const refreshValues = (caller=undefined) => {
                 break;
 
             default:
-                //console.log("Unhandled tagname", element.tagName);
+                // console.log("Unhandled tagname", element.tagName);
                 break;
         }
 
@@ -448,7 +448,7 @@ const toggleSetting = (name) => {
         return false;
     }
 
-    console.log(currentSettings[name] === true);
+    // console.log(currentSettings[name] === true);
     window._elements[name].click(); // no this is not what we want
 }
 
@@ -458,17 +458,17 @@ const editSetting = (name, value) => {
     switch (typeof(currentSettings[name])) {
         case "number":
             console.trace("Cannot toggle number; must provide value.")
-            console.log('number:', name, currentSettings[name]);
-            console.log(window._elements[name].type);
+            // console.log('number:', name, currentSettings[name]);
+            // console.log(window._elements[name].type);
             break;
         case "string":
-            console.log('string:', name, currentSettings[name]);
+            // console.log('string:', name, currentSettings[name]);
             break;
         case "boolean":
-            console.log('boolean (checkbox):', name, currentSettings[name]);
+            // console.log('boolean (checkbox):', name, currentSettings[name]);
             break;
         default:
-            console.log(typeof(currentSettings[name]))
+            // console.log(typeof(currentSettings[name]))
             break;
     };
 }
@@ -496,8 +496,8 @@ const changeSetting = ( // TODO: #28 This function needs an overhaul
 ) => {
     _output("Called", false, changeSetting);
 
-    console.log(selector);
-    console.log(typeof(selector));
+    // console.log(selector);
+    // console.log(typeof(selector));
 
     if (typeof selector === "object") {
         setTo = selector.setTo;
@@ -555,8 +555,8 @@ const changeSetting = ( // TODO: #28 This function needs an overhaul
             Function(func)();
         });
     } else {
-        console.log("already correctly set.");
-        console.log(type);
+        // console.log("already correctly set.");
+        // console.log(type);
     }
     return true;
 };
@@ -587,7 +587,7 @@ const setupSettingInteractivity = () => {
     // slider interactivity
     window._selectors.minDegree.on("input", () => {
         updateLabel("minDegree");
-        //console.log(filterNodes([], false), "possible nodes?")
+        // console.log(filterNodes([], false), "possible nodes?")
     });
     window._selectors.minDegree.on("change", () => {
         changeSetting("#minDegree", "force", true, "slider");
@@ -697,7 +697,7 @@ const setupSettingInteractivity = () => {
     
     // set up settings containers
     window._selectors.settingsToggle.on("click", (evt) => {
-        console.log(evt)
+        // console.log(evt)
         toggle("#settingsContainer");
     });
     window._selectors.infoToggle.on("click", () => {
@@ -757,26 +757,26 @@ const setupKeyHandlers = () => {
         } else if (e.key === "Alt") {
             //toggleCommentedElements(); // moved to button instead
         } else if (e.key === "Escape" && window.egoNetwork) {
-            //console.log("Escape 1 called!");
+            // console.log("Escape 1 called!");
             egoNetworkOff();
             show("#settings");
             show("#infoContainer");
         } else if (e.key === "Escape" && isVisible("#popupNav")) {
-            //console.log("Escape 2 called!");
+            // console.log("Escape 2 called!");
             toggle("#popupNav");
         } else if (e.key === "Escape" && isVisible("#popup-info")) {
-            //console.log("Escape 2 called!");
+            // console.log("Escape 2 called!");
             hide("#popup-info");
         } else if (e.key === "Escape" && isVisible("#nodeEdgeInfo")) {
-            console.log("Escape 3 called!");
+            // console.log("Escape 3 called!");
             window.edgeSelected = undefined;
             window.nodeSelected = undefined;
             resetDraw();
         } else if (e.key === "Escape" || e.key === " ") {
-            //console.log("Escape 4 called!");
+            // console.log("Escape 4 called!");
             UIToggleAllSettingBoxes();
         } else if (e.key === "c" && e.metaKey) {
-            //console.log("command+c called");
+            // console.log("command+c called");
             changeSetting("#autoClearNodes", !settingsFromDashboard("selectKeyDown1").nodes.autoClearNodes);
         } else if (e.key === "+") {
             changeSetting({selector: "#nodeMultiplier", type: "slider", setTo: settingsFromDashboard("selectKeyDown2").nodes.nodeMultiplier+0.25});
@@ -807,7 +807,7 @@ const setupKeyHandlers = () => {
                 if (store.ranges.years.array.includes(year)) {
                     years.push(year);
                 } else {
-                    console.log(`${year} is not a year in the graph's range.`);
+                    console.error(`${year} is not a year in the graph's range.`);
                     // TODO: Stop `t` from timing out, flash the numberModal red, and let the user know that nothing happened
                 }
                 numbers = [];

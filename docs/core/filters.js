@@ -208,7 +208,7 @@ const filterEdges = (edgeList = [], settings = undefined, change = true) => {
                 }
             }
         });
-        //console.log(`${graph.edges.length} after`)
+        // console.log(`${graph.edges.length} after`)
     } else {
         // console.log('have edgeList');
         // console.log(edgeList);
@@ -315,7 +315,7 @@ const getEgoNetwork = (node, maxIterations = 1000) => {
                 ...new Set([...allNeighbors, ...findNearestNeighbors(node)]),
             ];
         });
-        //console.log(`iteration ${i}`, currentNeighbors)
+        // console.log(`iteration ${i}`, currentNeighbors)
 
         if (allNeighbors.length - lengthBefore === 0) stop = true;
     }
