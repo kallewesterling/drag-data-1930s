@@ -38,7 +38,7 @@ window.autoSettings = {
     zoomMax: 4,
     // debugMessages: false,
     datafile: {
-        filename: 'data/co-occurrence-grouped-by-14-days.json',
+        filename: "data/co-occurrence-grouped-by-14-days-no-unnamed-performers.json",
         bipartite: false
     }
 };
