@@ -405,12 +405,12 @@ const styleGraphElements = (settings = undefined) => {
 };
 
 /**
- * selectNode takes one required argument, the d3 selector for a given node. This is the function that handles the "click" event on the node.
+ * toggleNode takes one required argument, the d3 selector for a given node. This is the function that handles the "click" event on the node.
  * The return value is always true.
  * @param {Object} node - d3 selector for a given node.
  * @returns {boolean} - true
  */
-const selectNode = (node) => {
+const toggleNode = (node) => {
     if (nodeIsSelected(node)) {
         window.nodeSelected = undefined;
         hide("#nodeEdgeInfo");
@@ -426,12 +426,12 @@ const selectNode = (node) => {
 };
 
 /**
- * selectEdge takes one required argument, the d3 selector for a given edge. This is the function that handles the "click" event on the edge.
+ * toggleEdge takes one required argument, the d3 selector for a given edge. This is the function that handles the "click" event on the edge.
  * The return value is always true.
  * @param {Object} edge - d3 selector for a given edge.
  * @returns {boolean} - true
  */
-const selectEdge = (edge) => {
+const toggleEdge = (edge) => {
     if (edgeIsSelected(edge)) {
         window.edgeSelected = undefined;
         hide("#nodeEdgeInfo");
@@ -535,25 +535,15 @@ const modifySimulation = (settings) => {
         graph.simulation.force("charge", null);
     }
     if (settings.force.layoutCollide) {
-        var collide = d3.bboxCollide(function (d,i) {
-            let width = document.querySelector(`text[data-node="${d.node_id}"]`).getBBox().width
-            let height = document.querySelector(`text[data-node="${d.node_id}"]`).getBBox().height
-            let divider = 2;
-            return [[-width/divider, -height/divider],[width/divider, height/divider]]
-          })
-          .strength(1)
-          .iterations(2)
+        var collide = d3.bboxCollide((d,i) => {
+                let width = document.querySelector(`text[data-node="${d.node_id}"]`).getBBox().width
+                let height = document.querySelector(`text[data-node="${d.node_id}"]`).getBBox().height
+                let divider = 2;
+                return [[-width/divider, -height/divider],[width/divider, height/divider]]
+            })
+            .strength(1)
+            .iterations(2)
         graph.simulation.force("collide", collide);
-        /*
-        graph.simulation.force("collide", d3.forceCollide());
-        graph.simulation.force("collide").radius((node) => {
-            // our radius here is based on the text label's bounding box!
-            // let r = getSize(node, 'r', settings.......);
-            let selector = `text[data-node="${node.node_id}"]`;
-            let textBBox = d3.select(selector).node().getBBox();
-            return textBBox.width / 2;
-        });
-        */
     } else {
         graph.simulation.force("collide", null);
     }
