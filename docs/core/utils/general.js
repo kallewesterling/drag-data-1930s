@@ -535,25 +535,15 @@ const modifySimulation = (settings) => {
         graph.simulation.force("charge", null);
     }
     if (settings.force.layoutCollide) {
-        var collide = d3.bboxCollide(function (d,i) {
-            let width = document.querySelector(`text[data-node="${d.node_id}"]`).getBBox().width
-            let height = document.querySelector(`text[data-node="${d.node_id}"]`).getBBox().height
-            let divider = 2;
-            return [[-width/divider, -height/divider],[width/divider, height/divider]]
-          })
-          .strength(1)
-          .iterations(2)
+        var collide = d3.bboxCollide((d,i) => {
+                let width = document.querySelector(`text[data-node="${d.node_id}"]`).getBBox().width
+                let height = document.querySelector(`text[data-node="${d.node_id}"]`).getBBox().height
+                let divider = 2;
+                return [[-width/divider, -height/divider],[width/divider, height/divider]]
+            })
+            .strength(1)
+            .iterations(2)
         graph.simulation.force("collide", collide);
-        /*
-        graph.simulation.force("collide", d3.forceCollide());
-        graph.simulation.force("collide").radius((node) => {
-            // our radius here is based on the text label's bounding box!
-            // let r = getSize(node, 'r', settings.......);
-            let selector = `text[data-node="${node.node_id}"]`;
-            let textBBox = d3.select(selector).node().getBBox();
-            return textBBox.width / 2;
-        });
-        */
     } else {
         graph.simulation.force("collide", null);
     }
