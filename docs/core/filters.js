@@ -119,6 +119,18 @@ const filterEdges = (edgeList = [], settings = undefined, change = true) => {
         dropEdge(e);
     });
 
+    graph.edges.filter(edge=>edge.inGraph===true).filter(edge=>edge.source.inGraph===false || edge.target.inGraph===false).forEach(e=>{
+        dropEdge(e);
+    })
+
+    graph.edges.filter(edge=>edge.inGraph===false).filter(edge=>edge.passes.minWeight===true).forEach(e=>{
+        addEdge(e);
+    });
+
+    graph.edges.filter(edge=>edge.inGraph===true).filter(edge=>edge.passes.minWeight===false).forEach(e=>{
+        dropEdge(e);
+    });
+
     return true;
 
     store.edges.filter(e=>e.passes.startYear && e.passes.endYear && e.passes.minWeight && !e.inGraph).forEach(e=>addEdge(e));
