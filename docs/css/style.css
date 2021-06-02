@@ -135,8 +135,8 @@ svg#main {
 
 .label.selected {
     font-weight: bold;
-    fill: red !important;
-    text-shadow: 3px -1px 20px #000000;
+    fill: black !important;
+    text-shadow: 3px -1px 20px rgb(255 0 0 / 48%);
 }
 
 .link.revue {

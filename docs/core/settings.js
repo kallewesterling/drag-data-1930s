@@ -223,8 +223,8 @@ const filterStore = (settings=undefined, interfaceSettings=undefined) => {
     store.edges.forEach(edge=>{
         edge.passes = {}
         // set the correct `passes` for every edge
-        edge.passes.startYear = edge.range.startYear > interfaceSettings.startYear ? true : false;
-        edge.passes.endYear = edge.range.endYear < interfaceSettings.endYear ? true : false;
+        edge.passes.startYear = edge.range.startYear >= interfaceSettings.startYear ? true : false;
+        edge.passes.endYear = edge.range.endYear <= interfaceSettings.endYear ? true : false;
         edge.passes.minWeight = edge.weights.weight >= interfaceSettings.minWeight ? true : false;
         
         // set the correct `inGraph` for every edge

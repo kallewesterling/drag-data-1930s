@@ -35,7 +35,7 @@ window.autoSettings = {
         linkStrength: 0.05,
     },
     zoom: 1.25,
-    zoomMin: 0.30,
+    zoomMin: 0.10,
     zoomMax: 4,
     // debugMessages: false,
     datafile: {

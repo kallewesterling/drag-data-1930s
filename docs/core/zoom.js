@@ -68,6 +68,7 @@ function goTo(x=undefined, y=undefined) {
         d3.zoomIdentity.translate(-x, -y).scale(5)
     );
 }
+// graph.svg.on('mouseover', (evt)=>{console.log(evt.clientX, evt.clientY)})
 
 
 const highlightNode = (node_id) => {
