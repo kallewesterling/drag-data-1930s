@@ -272,7 +272,13 @@ const filter = (nodeList = [], edgeList = [], change = true) => {
     // then, detect community
     if (settings.nodes.communityDetection || document.querySelector('html').classList.contains('has-community')) {
         communityDetection();
-        textElements.text((node)=>`${node.cluster}. ${node.display}`);
+        textElements.text((node)=>{
+            if (node.cluster) {
+                return `${node.cluster}. ${node.display}`;
+            } else {
+                return `${node.display}`;
+            }
+        });
         graph.clusterInfo = getNodeClusterInfo();
     }
 
