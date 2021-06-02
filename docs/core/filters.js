@@ -119,6 +119,18 @@ const filterEdges = (edgeList = [], settings = undefined, change = true) => {
         dropEdge(e);
     });
 
+    graph.edges.filter(edge=>edge.inGraph===true).filter(edge=>edge.source.inGraph===false || edge.target.inGraph===false).forEach(e=>{
+        dropEdge(e);
+    })
+
+    graph.edges.filter(edge=>edge.inGraph===false).filter(edge=>edge.passes.minWeight===true).forEach(e=>{
+        addEdge(e);
+    });
+
+    graph.edges.filter(edge=>edge.inGraph===true).filter(edge=>edge.passes.minWeight===false).forEach(e=>{
+        dropEdge(e);
+    });
+
     return true;
 
     store.edges.filter(e=>e.passes.startYear && e.passes.endYear && e.passes.minWeight && !e.inGraph).forEach(e=>addEdge(e));
@@ -293,7 +305,7 @@ const findNearestNeighbors = (node) => {
 // TODO: Needs docstring
 const getEgoNetwork = (node, maxIterations = 1000) => {
     if (typeof node === "string") {
-        node = lookupNode(node);
+        node = findNode(node);
     }
 
     let nearestNeighbors = findNearestNeighbors(node);
@@ -346,7 +358,7 @@ const getUniqueNetworks = (nodeList, returnVal = "nodes") => {
 
     if (returnVal === "nodes") {
         networks.forEach((network, i) => {
-            networks[i] = network.map((node) => lookupNode(node, graph.nodes));
+            networks[i] = network.map((node) => findNode(node, graph.nodes));
         });
 
         return networks;

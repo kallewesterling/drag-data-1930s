@@ -211,7 +211,7 @@ const deselectEdges = (excludeEdge = undefined) => {
  */
 // TODO: This function essentially doubles with nodeHasEdges...
 const isSourceOrTarget = (node, edgeList = graph.edges) => {
-    if (typeof node === "string") node = lookupNode(node);
+    if (typeof node === "string") node = findNode(node);
 
     let isSource = edgeList.map((d) => d.source.node_id).includes(node.node_id);
     let isTarget = edgeList.map((d) => d.target.node_id).includes(node.node_id);
@@ -229,7 +229,7 @@ const isSourceOrTarget = (node, edgeList = graph.edges) => {
 /*
 const getRelatedEdges = (node, asSource = true, asTarget = true) => {
     if (typeof node === "string")
-        node = lookupNode(node);
+        node = findNode(node);
 
     let allRelatedEdges = [];
     if (asTarget) {
@@ -260,7 +260,7 @@ const getRelatedEdges = (
 
     let nodeList = undefined;
 
-    if (typeof node === "string") node = lookupNode(node);
+    if (typeof node === "string") node = findNode(node);
 
     if (asSource && asTarget) {
         nodeList = edgeList.filter(
@@ -288,7 +288,7 @@ const getRelatedEdges = (
  */
 const selectRelatedEdges = (node) => {
     if (typeof node === "string") {
-        node = lookupNode(node);
+        node = findNode(node);
     }
     g.edges.selectAll("line.link").classed("deselected", true);
     getRelatedEdges(node).forEach((e) => {
@@ -305,7 +305,7 @@ const selectRelatedEdges = (node) => {
  * @returns {Object} - Object that contains all the information about the nodes and edges (2nd and 3rd removed) from the provided node
  */
 const getRelated = (node) => {
-    if (typeof node === "string") node = lookupNode(node);
+    if (typeof node === "string") node = findNode(node);
 
     let secondaryEdges = getRelatedEdges(node);
     let secondaryNodeIDs = [
@@ -689,7 +689,7 @@ const getSize = (node, type = "r", settings = undefined) => {
     }
 };
 
-const lookupNode = (node_id, nodeList = store.nodes) => {
+const findNode = (node_id, nodeList = store.nodes) => {
     return nodeList.find((node) => node.node_id === node_id);
 };
 

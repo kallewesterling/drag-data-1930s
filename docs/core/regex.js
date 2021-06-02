@@ -134,14 +134,13 @@ let regeExes = [
     },
 ];
 
+let year_YYYY_regex = "(1[8-9][0-9][0-9])[-,\\s\\]\\)\\.]"; // since we are only looking for 1800s-1900s (and followed by `whitespace` or `-`)
+let month_MMM_regex = "(January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)";
+let month_MM_regex = "(0[1-9]|1[0-2])";
 let day_regex = "(0[1-9]|[1-2][0-9]|3[0-1])";
 let day_D_regex = "([1-9]|[1-2][0-9]|3[0-1])";
-let month_MMM_regex =
-    "(January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)";
-let month_MM_regex = "(0[1-9]|1[0-2])";
-let month_M_regex = "([1-9]|1[0-2])";
-let year_YYYY_regex = "(1[8-9][0-9][0-9])[-,\\s\\]\\)\\.]"; // since we are only looking for 1800s-1900s (and followed by `whitespace` or `-`)
 let year_YY_regex = "([0-9]{2})"; // since we are only looking for 1900s
+let month_M_regex = "([1-9]|1[0-2])";
 
 /**
  * dateParser takes a string and extracts an ISO date from it.
