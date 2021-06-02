@@ -293,7 +293,7 @@ const findNearestNeighbors = (node) => {
 // TODO: Needs docstring
 const getEgoNetwork = (node, maxIterations = 1000) => {
     if (typeof node === "string") {
-        node = lookupNode(node);
+        node = findNode(node);
     }
 
     let nearestNeighbors = findNearestNeighbors(node);
@@ -346,7 +346,7 @@ const getUniqueNetworks = (nodeList, returnVal = "nodes") => {
 
     if (returnVal === "nodes") {
         networks.forEach((network, i) => {
-            networks[i] = network.map((node) => lookupNode(node, graph.nodes));
+            networks[i] = network.map((node) => findNode(node, graph.nodes));
         });
 
         return networks;

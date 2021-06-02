@@ -386,6 +386,7 @@ const setupFilteredElements = (settings = undefined) => {
                     .append("circle")
                     .attr("r", 0)
                     .attr("id", (node) => node.node_id)
+                    .attr("stroke-width", 0.1)
                     .attr("class", getNodeClass(node)),
             (update) => update,
             (exit) => exit.transition(750).attr("r", 0).remove()

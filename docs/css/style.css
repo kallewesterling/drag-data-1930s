@@ -171,7 +171,7 @@ svg#main {
 
 .node {
     fill: var(--empty-node);
-    stroke-width: 0.1;
+    /* stroke-width: 0.1; */
     stroke: var(--node-stroke);
     cursor: context-menu;
     font-weight: 300;
@@ -554,4 +554,12 @@ svg#main {
     color: darkgray;
     background-color: white;
     z-index: 200;
+}
+
+circle.highlighted {
+    stroke: red !important;
+}
+
+.badge.cluster {
+    background-color: rgb(108 117 125 / 8%);
 }

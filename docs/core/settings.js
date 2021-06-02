@@ -70,7 +70,8 @@ const updateLabel = (name, interfaceSettings=undefined, callback=undefined) => {
     // special handling
     switch (name) {
         case "charge":
-            value = ((+value + 1100) / 10).toFixed(0) + "%";
+            console.log(`charge is set to ${value}`)
+            value = ((+value + 5100) / 10).toFixed(0) + "%";
             break;
 
         // percentages
@@ -364,7 +365,7 @@ const setupSettingsInterface = (caller = undefined) => {
     window._elements.edgeMultiplier.step = 0.05;
 
     // set range for charge
-    window._elements.charge.min = -1000;
+    window._elements.charge.min = -5000;
     window._elements.charge.max = -100;
     window._elements.charge.step = 100;
 
@@ -572,7 +573,9 @@ const setupSettingInteractivity = () => {
         changeSetting("#weightFrom", "force", true, "dropdown");
     });
     window._selectors.rFrom.on("change", () => {
-        changeSetting("#rFrom", "force", true, "dropdown");
+        // changeSetting("#rFrom", "force", true, "dropdown");
+        changeSetting("#rFrom", "force", true, "dropdown", [], [], false);
+        graph.simulation.restart().alpha(0.05) // just a nudge
     });
     window._selectors.startYear.on("change", () => {
         changeSetting("#startYear", "force", true, "dropdown");
