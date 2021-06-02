@@ -67,27 +67,32 @@ const setupStoreEdges = (edgeList) => {
         if (testDate && testDate.iso !== undefined) {
             edge.dates.push(testDate.iso);
         }
-        edge.found = edge.found.filter((found) =>
-            found != null && found != "" && found != "" ? true : false
-        );
-        edge.found = [...new Set(edge.found)];
-        edge.found.forEach((source) => {
-            let date = dateParser(source);
-            if (date && date.iso !== undefined) {
-                edge.dates.push(date.iso);
-            } else if (date.iso === undefined) {
-                let testDate = dateParser(edge.date);
-                if (testDate && testDate.iso !== undefined) {
-                    if (window.ERROR_LEVEL > 1) {
-                        console.info(`Could not interpret date in source. Adding date associated with edge (${testDate.iso}) instead:`);
-                        console.error(source);
-                        edge.dates.push(testDate.iso);
-                    }
+        if (!edge.found) {
+            edge.found = edge.found.filter((found) =>
+                found != null && found != "" && found != "" ? true : false
+            );
+            edge.found = [...new Set(edge.found)];
+            edge.found.forEach((source) => {
+                let date = moment(source)
+                if (!date.isValid()) {
+                    console.error(`Date is uninterpretable: ${date}. Trying backup solution...`)
+                    let date = dateParser(source);
                 } else {
+                    date = {
+                        'date': date,
+                        'iso': date.format('YYYY-MM-DD')
+                    }
+                }
+                if (date && date.iso !== undefined) {
+                    edge.dates.push(date.iso);
+                } else if (date.iso === undefined) {
                     console.error(`Could not interpret date in ${source}. Backup solution failed too.`);
                 }
-            }
-        });
+            });
+        } else {
+            edge.dates = edge.found;
+        }
+        
         if (edge.dates) {
             edge.dates = [...new Set(edge.dates)].sort();
             edge.range = {
@@ -96,6 +101,8 @@ const setupStoreEdges = (edgeList) => {
             };
             edge.range['startYear'] = +edge.range.start.substring(0, 4);
             edge.range['endYear'] = +edge.range.end.substring(0, 4);
+        } else {
+            console.error('No ranges set. The graph will not render.')
         }
 
         let locations = Object.keys(edge.coLocated);
