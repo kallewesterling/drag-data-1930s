@@ -471,9 +471,16 @@ const loadStoreRanges = () => {
     let algorithms = ['', ...store.algorithms];
     
     algorithms.forEach((algorithm) => {
-        options += `<option value="${algorithm}">${algorithm ? algorithm : 'No community detection'}${algorithm === 'jLouvain' ? ' (dynamic)' : ''}</option>`;
-        if (!algorithm)
-            options += '<option disabled>──────────</option>';
+        if (algorithm === 'jLouvain') {
+            options += '<option disabled>Dynamic</option>';
+        } else if (!algorithm) {
+            options += '<option disabled>Off</option>';
+        }
+
+        options += `<option value="${algorithm}">${algorithm ? algorithm : 'No community detection'}</option>`;
+        
+        if (algorithm === 'jLouvain')
+            options += '<option disabled>Entire graph</option>';
     });
     window._elements.communityDetection.innerHTML = options;
 
