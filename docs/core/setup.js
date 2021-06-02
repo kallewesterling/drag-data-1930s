@@ -7,7 +7,7 @@ window.autoSettings = {
         stickyNodes: true,
         //nodeSizeFromCurrent: true,
         minDegree: 10,
-        nodeMultiplier: 2,
+        nodeMultiplier: 0.6,
         communityDetection: 'jLouvain',
         minR: 1,
         maxR: 35,
