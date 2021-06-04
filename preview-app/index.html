@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <script src="https://d3js.org/d3.v6.min.js"></script>
+        <link rel="preconnect" href="https://fonts.gstatic.com" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap"
+            rel="stylesheet"
+        />
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x"
+            crossorigin="anonymous"
+        />
+        <title>U.S. Drag in the 1930s</title>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="col-6 m-3">
+                    <h1>Nodes</h1>
+                    <table
+                        class="table table-striped border"
+                        id="allNodes"
+                    ></table>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            let filename =
+                "../network-app/data/co-occurrence-grouped-by-14-days-no-unnamed-performers.json";
+            let allNodes = [];
+
+            var table = d3.select("table#allNodes");
+            let tr = undefined;
+
+            d3.json(filename).then((data) => {
+                allNodes = data.nodes;
+                render();
+            });
+
+            const render = () => {
+                tbody = table.append("tbody");
+
+                tr = tbody
+                    .selectAll("tr")
+                    .data(allNodes)
+                    .join((enter) => enter.append("tr"));
+
+                columns = [
+                    {
+                        title: "Name",
+                        rows: tr
+                            .append("th")
+                            .attr("scope", "row")
+                            .html((node) => node.id),
+                    },
+                    {
+                        title: "Degree",
+                        rows: tr
+                            .append("td")
+                            .html((node) => node.degrees.degree),
+                    },
+                    {
+                        title: "Legal names",
+                        rows: tr.append("td").html((node) => {
+                            let legal_names = [];
+                            if (node.legal_names.length) {
+                                legal_names = [
+                                    ...new Set(
+                                        Object.values(node.legal_names).map(
+                                            (val) => val.content
+                                        )
+                                    ),
+                                ];
+                            }
+                            if (legal_names.length)
+                                return legal_names.join(", ");
+                        }),
+                    },
+                ];
+
+                thead = table.insert("thead", ":first-child");
+
+                thead_tr = thead.insert("tr");
+
+                th = thead_tr
+                    .selectAll("th")
+                    .data(columns)
+                    .enter()
+                    .append("th")
+                    .attr("scope", "col")
+                    .html((column) => column.title);
+            };
+
+            const sortTable = () => {
+                switching = true;
+                /* Make a loop that will continue until no switching has been done: */
+                while (switching) {
+                    // Start by saying: no switching is done:
+                    switching = false;
+                    rows = [...document.querySelector('table#allNodes tbody').rows];
+                    
+                    /* Loop through all table rows (except the first, which contains table headers): */
+                    rows.forEach((row,i) => {
+                        // Start by saying there should be no switching:
+                        shouldSwitch = false;
+                        
+                        /* Get the two elements you want to compare, one from current row and one from the next: */
+                        if (rows[i+1]) {
+                            cmp1 = rows[i].querySelector('th').innerHTML
+                            cmp2 = rows[i+1].querySelector('th').innerHTML
+
+                            // console.log(`${cmp1} === ${cmp2}`)
+                            
+                            // Check if the two rows should switch place:
+                            if (
+                                cmp1.toLowerCase() >
+                                cmp2.toLowerCase()
+                            ) {
+                                // If so, mark as a switch and break the loop:
+                                shouldSwitch = true;
+                            }
+                        }
+                        if (shouldSwitch) {
+                            /* If a switch has been marked, make the switch and mark that a switch has been done: */
+                            // rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                            switching = true;
+                        }
+                    });
+                    // console.log('done')
+                }
+            };
+        </script>
+
+        <!-- JavaScript Bundle with Popper -->
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"
+            crossorigin="anonymous"
+        ></script>
+    </body>
+</html>
