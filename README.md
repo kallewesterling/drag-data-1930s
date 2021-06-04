@@ -2,11 +2,33 @@
 
 [![ci](https://github.com/kallewesterling/drag-data-1930s/actions/workflows/cy.yml/badge.svg)](https://github.com/kallewesterling/drag-data-1930s/actions/workflows/cy.yml)
 
-To see the final visualization, visit [this website](https://kallewesterling.github.io/drag-data-1930s/).
+A workflow will run and generate the visualization files in a different repository, so to see the final visualization, visit [this website](https://kallewesterling.github.io/drag-network/).
 
-## Steps
+## Running on local machines
 
-### Step 1. Creating Dataset
+### Step 1. Processing dataset
+
+To run the analysis, clone this package and run in your terminal:
+
+```sh
+$ python generate-cooccurrence-data.py
+```
+
+### Step 2. Run server
+
+Then open a local HTTP server:
+
+```sh
+$ python -m http.server
+```
+
+_Note that this will only work on Python 3._
+
+## Who is the Researcher?
+
+Kalle Westerling is a Ph.D. Candidate in Theatre and Performance at The Graduate Center, CUNY, where he works on a dissertation about the history and aesthetics of male-identified bodies in 20th-century burlesque and 21st-century boylesque. He is also the project manager for the NEH-funded project “Expanding Communities of Practice,” aimed at helping to create infrastructure for digital humanities across several higher education institutions across the U.S. [Read more about Kalle Westerling on his website.](https://westerling.nu/)
+
+## What is this dataset?
 
 The dataset was created in a combination of a manual and automatic process, where searches were performed across a number of databases, results collated and PDF files/images of scanned newspapers were presented to the researcher (see below), who then manually coded all of the data into a data row for each person who occurred on that particular data in that particular newspaper.
 
@@ -42,25 +64,3 @@ Cleaned up data includes:
 - Name of the venue
 - Name of the city
 - Source
-
-### Step 2. Processing dataset
-
-To run the analysis, clone this package and run in your terminal:
-
-```sh
-$ python process.py
-```
-
-### Step 3. Visualize
-
-Then open a local http server:
-
-```sh
-$ python -m http.server
-```
-
-_Note that this will only work on Python 3._
-
-## Who is the Researcher?
-
-Kalle Westerling is a Ph.D. Candidate in Theatre and Performance at The Graduate Center, CUNY, where he works on a dissertation about the history and aesthetics of male-identified bodies in 20th-century burlesque and 21st-century boylesque. He is also the project manager for the NEH-funded project “Expanding Communities of Practice,” aimed at helping to create infrastructure for digital humanities across several higher education institutions across the U.S. [Read more about Kalle Westerling on his website.](https://westerling.nu/)
