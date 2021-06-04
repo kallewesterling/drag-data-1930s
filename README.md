@@ -1,4 +1,6 @@
-# Drag data in 1930s (primarily)
+# Drag data in the 1930s
+
+[![ci](https://github.com/kallewesterling/drag-data-1930s/actions/workflows/cy.yml/badge.svg)](https://github.com/kallewesterling/drag-data-1930s/actions/workflows/cy.yml)
 
 To see the final visualization, visit [this website](https://kallewesterling.github.io/drag-data-1930s/).
 
