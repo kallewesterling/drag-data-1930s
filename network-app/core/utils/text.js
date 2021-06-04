@@ -3,38 +3,56 @@
 const minify = (s) => {
     return s
         .replace(/\>[\r\n ]+\</g, "><")
-        .replace(/(<.*?>)|\s+/g, (m, $1) => $1 ? $1 : ' ')
-        .trim()
-}
-  
+        .replace(/(<.*?>)|\s+/g, (m, $1) => ($1 ? $1 : " "))
+        .trim();
+};
+
 /**
  * getCurrentGraphInfo takes no arguments but generates the HTML for the viz information.
  * The return value is always the HTML itself.
  * @return {string} html - raw HTML
  */
 const getCurrentGraphInfo = () => {
-    store.networkCount = [...new Set(store.nodes.map(node=>node.connected.network.network_id))].length;
-    graph.networkCount = [...new Set(graph.nodes.map(node=>node.connected.network.network_id))].length;
+    store.networkCount = [
+        ...new Set(
+            store.nodes.map((node) => node.connected.network.network_id)
+        ),
+    ].length;
+    graph.networkCount = [
+        ...new Set(
+            graph.nodes.map((node) => node.connected.network.network_id)
+        ),
+    ].length;
 
     let _return = {
-        'numNodes': {'class': [], 'content': `<strong>${graph.nodes.length}</strong><span class="text-muted">/${store.nodes.length}</span>`},
-        'numEdges': {'class': [], 'content': `<strong>${graph.edges.length}</strong><span class="text-muted">/${store.edges.length}</span>`},
-        'unconnectedNodes': {'class': [], 'content': hasUnconnectedNodes()? getUnconnectedNodes().length: 0},
-        'currentZoom': {'class': [], 'content': (graph.k*100).toFixed(0) + '%'},
-        'colorNetworks': {
-            'class': [window.coloredNetworks ? 'text-warning' : 'text-dark'],
-            'content': `${graph.networkCount}/${store.networkCount}`
+        numNodes: {
+            class: [],
+            content: `<strong>${graph.nodes.length}</strong><span class="text-muted">/${store.nodes.length}</span>`,
         },
-        'commentedNodes': {
-            'class': [window.toggledCommentedElements ? 'bg-warning' : 'bg-dark'],
-            'content': '' //Show nodes with comments
+        numEdges: {
+            class: [],
+            content: `<strong>${graph.edges.length}</strong><span class="text-muted">/${store.edges.length}</span>`,
         },
-        'numCommunities': {'class': [], 'content': ''}
-    }
+        unconnectedNodes: {
+            class: [],
+            content: hasUnconnectedNodes() ? getUnconnectedNodes().length : 0,
+        },
+        currentZoom: { class: [], content: (graph.k * 100).toFixed(0) + "%" },
+        colorNetworks: {
+            class: [window.coloredNetworks ? "text-warning" : "text-dark"],
+            content: `${graph.networkCount}/${store.networkCount}`,
+        },
+        commentedNodes: {
+            class: [window.toggledCommentedElements ? "bg-warning" : "bg-dark"],
+            content: "", //Show nodes with comments
+        },
+        numCommunities: { class: [], content: "" },
+    };
     if (Object.keys(graph.clusters).length)
-        _return['numCommunities'] = {'content': Object.keys(graph.clusters).length}
-        // html += `<span id="numCommunities" class="small me-2" data-bs-toggle="popover"><i class="me-1 bi bi-heart-fill"></i>${Object.keys(graph.clusters).length}</span>`;
-    
+        _return["numCommunities"] = {
+            content: Object.keys(graph.clusters).length,
+        };
+    // html += `<span id="numCommunities" class="small me-2" data-bs-toggle="popover"><i class="me-1 bi bi-heart-fill"></i>${Object.keys(graph.clusters).length}</span>`;
 
     return _return;
 };
@@ -58,30 +76,40 @@ const displayOrID = (o) => {
  * @return {string} html - raw HTML
  */
 const generateNodeInfoHTML = (node) => {
-    let html = `<li class="list-group-item"><strong>ID</strong> ${node.display}</li>`
+    let html = `<li class="list-group-item"><strong>ID</strong> ${node.display}</li>`;
 
     // degrees
     html += `<li class="list-group-item"><strong class="mb-1">Degree</strong> ${node.degrees.degree}
                 <p class="m-0 mb-1 small">In: ${node.degrees.indegree}</p>
                 <p class="m-0 mb-1 small">Out: ${node.degrees.outdegree}</p>
                 <p class="m-0 small">Current in network: ${node.currentDegree}</p>
-            </li>`
-    
+            </li>`;
+
     // source range
     html += `<li class="list-group-item"><strong class="mb-1">Source range</strong>
-                <p class="m-0 small">${d3.min(node.sourceRange)}-${d3.max(node.sourceRange)}</p>
-            </li>`
+                <p class="m-0 small">${d3.min(node.sourceRange)}-${d3.max(
+        node.sourceRange
+    )}</p>
+            </li>`;
 
     // centrality measures (v.1)
     if (node["1000x-betweenness-centrality"]) {
-    html += `<li class="list-group-item"><strong>Centrality measures (1000x)</strong><p class="m-0 mb-1 small text-muted">Note: Across entire network</p>
-            <p class="m-0 mb-1 small">Betweenness: ${Math.round(node["1000x-betweenness-centrality"] * 100) / 100}</p>
-            <p class="m-0 mb-1 small">Closeness: ${Math.round(node["1000x-closeness-centrality"] * 100) / 100}</p>
-            <p class="m-0 mb-1 small">Degree: ${Math.round(node["1000x-degree-centrality"] * 100) / 100}</p>
-            <p class="m-0 small">Eigenvector: ${Math.round(node["1000x-eigenvector-centrality"] * 100) / 100}</p>
-        </li>`
+        html += `<li class="list-group-item"><strong>Centrality measures (1000x)</strong><p class="m-0 mb-1 small text-muted">Note: Across entire network</p>
+            <p class="m-0 mb-1 small">Betweenness: ${
+                Math.round(node["1000x-betweenness-centrality"] * 100) / 100
+            }</p>
+            <p class="m-0 mb-1 small">Closeness: ${
+                Math.round(node["1000x-closeness-centrality"] * 100) / 100
+            }</p>
+            <p class="m-0 mb-1 small">Degree: ${
+                Math.round(node["1000x-degree-centrality"] * 100) / 100
+            }</p>
+            <p class="m-0 small">Eigenvector: ${
+                Math.round(node["1000x-eigenvector-centrality"] * 100) / 100
+            }</p>
+        </li>`;
     }
-    
+
     // centrality measures (v.2)
     if (node["betweenness_centrality_100x"]) {
         html += `<li class="list-group-item"><strong>Centrality measures (100x)</strong><p class="m-0 mb-1 small text-muted">Note: Across entire network</p>
@@ -89,22 +117,29 @@ const generateNodeInfoHTML = (node) => {
                 <p class="m-0 mb-1 small">Closeness: ${node["closeness_centrality_100x"]}</p>
                 <p class="m-0 mb-1 small">Degree: ${node["degree_centrality_100x"]}</p>
                 <p class="m-0 mb-1 small">Eigenvector: ${node["eigenvector_centrality_100x"]}</p>
-            </li>`
+            </li>`;
     }
 
     // add comments...
-    if (node.comments) {
-        html += `<li class="list-group-item"><strong>Comments</strong>`
-        
-        let unique_comments = [...new Set(node.comments.map(c=>c.comment))];
-        unique_comments.forEach(comment => {
-            let comments = node.comments.filter(c=>c.comment === comment)
-            html += `<p class="m-0 mb-1 small">${comment}`
-            comments.forEach(c=>{html += `<div class="text-muted">(${c.date}, ${c.source})</div>`;});
-            html += `</p>`
+    if (node.comments.length > 0) {
+        html += `<li class="list-group-item"><strong>${node.comments.length} Comments</strong>`;
+
+        let unique_comments = [...new Set(node.comments.map((c) => c.content))];
+        unique_comments.forEach((comment) => {
+            let comments = node.comments.filter((c) => c.content === comment);
+            html += `<p class="m-0 mb-1 small">${comment}`;
+            comments.forEach((c, ix) => {
+                if (ix === 0) html += `<div class="text-muted small"><small>(`;
+
+                html += `${c.source}`;
+
+                if (ix + 1 === comments.length) html += `)</small></div>`;
+                else html += `; `;
+            });
+            html += `</p>`;
         });
 
-        html += `</li>`
+        html += `</li>`;
     }
     return minify(html);
 };
@@ -115,18 +150,19 @@ const generateNodeInfoHTML = (node) => {
  * @param {Object} edge - d3 selector for a given edge.
  * @return {string} html - raw minified HTML
  */
-const generateEdgeInfoHTML = (edge) => { //, weightFromCurrent = undefined
+const generateEdgeInfoHTML = (edge) => {
+    //, weightFromCurrent = undefined
     /*
     if (!weightFromCurrent)
         weightFromCurrent = settingsFromDashboard('generateEdgeInfoHTML').edges.weightFromCurrent;
     */
 
     let html = `<li class="list-group-item"><strong>ID</strong> ${edge.source.display} - ${edge.target.display}</li>`;
-    
+
     if (edge.venue) {
         html += `<li class="list-group-item"><strong>Venue</strong> ${edge.venue}</li>`;
     }
-    
+
     if (edge.revue_name) {
         html += `<li class="list-group-item"><strong>Revue mentioned</strong> ${edge.revue_name}</li>`;
     }
@@ -138,30 +174,32 @@ const generateEdgeInfoHTML = (edge) => { //, weightFromCurrent = undefined
         `;
 
     if (edge.range.start) {
-        html += `<li class="list-group-item"><strong>Range</strong> ${edge.range.start}${edge.range.end ? ' – ' + edge.range.end : ''}</li>`;
+        html += `<li class="list-group-item"><strong>Range</strong> ${
+            edge.range.start
+        }${edge.range.end ? " – " + edge.range.end : ""}</li>`;
     }
 
     if (edge.has_general_comments) {
         html += `<li class="list-group-item"><strong class="mb-1">General comments</strong>`;
-        edge.general_comments.forEach(obj => {
+        edge.general_comments.forEach((obj) => {
             html += `<p class="m-0 mb-1 small">${obj.comment} <span class="text-muted">(${obj.source})</span></p>`;
-        })
+        });
         html += `</li>`;
     }
 
     if (edge.has_comments) {
         html += `<li class="list-group-item"><strong class="mb-1">Comments on revue</strong>`;
-        edge.comments.forEach(obj => {
+        edge.comments.forEach((obj) => {
             html += `<p class="m-0 mb-1 small">${obj.comment} <span class="text-muted">(${obj.source})</span></p>`;
-        })
+        });
         html += `</li>`;
     }
 
     if (edge.found) {
         html += `<li class="list-group-item"><strong class="mb-1">Found in sources:</strong>`;
-        edge.found.forEach(source => {
+        edge.found.forEach((source) => {
             html += `<p class="m-0 mb-1 small">${source}</p>`;
-        })
+        });
         html += `</li>`;
     }
 
@@ -183,7 +221,14 @@ const urlify = (text) => {
             if (!hyperlink.match("^https?://")) {
                 hyperlink = "http://" + hyperlink;
             }
-            return space + '<a target="_blank" href="' + hyperlink + '">' + url + "</a>";
+            return (
+                space +
+                '<a target="_blank" href="' +
+                hyperlink +
+                '">' +
+                url +
+                "</a>"
+            );
         }
     );
 };
@@ -232,68 +277,96 @@ const generateCommentHTML = (elem) => {
 
 const quickEdgeInfo = (edge) => {
     const splitDate = (location) => {
-        let allYears = []
-        let allYearsWithMonths = []
+        let allYears = [];
+        let allYearsWithMonths = [];
         let periods = edge.coLocated[location];
-        periods.forEach(period=>{
-            let years = [...new Set(period.map(date=>date.slice(0,4)))];
-            let yearsAndMonths = [...new Set(period.map(date=>date.slice(0,7)))];
+        periods.forEach((period) => {
+            let years = [...new Set(period.map((date) => date.slice(0, 4)))];
+            let yearsAndMonths = [
+                ...new Set(period.map((date) => date.slice(0, 7))),
+            ];
             allYears = [...allYears, ...years];
             allYearsWithMonths = [...allYearsWithMonths, ...yearsAndMonths];
         });
         return [allYears, allYearsWithMonths];
-    }
+    };
 
     const getPeriodsAsText = (location) => {
         const getMonth = (num) => {
-            let months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-            return months[+num - 1]
-        }
+            let months = [
+                "January",
+                "February",
+                "March",
+                "April",
+                "May",
+                "June",
+                "July",
+                "August",
+                "September",
+                "October",
+                "November",
+                "December",
+            ];
+            return months[+num - 1];
+        };
         let periods = edge.coLocated[location];
-        let text = `<li>at <strong>${location}</strong> during ${periods.length === 1 ? "one" : periods.length} period${periods.length > 1 ? "s" : ""},`
+        let text = `<li>at <strong>${location}</strong> during ${
+            periods.length === 1 ? "one" : periods.length
+        } period${periods.length > 1 ? "s" : ""},`;
         periods.forEach((period, ix) => {
-            let start = {full: period.sort()[0]}
-            let end = {full: period.sort()[period.length-1]}
-            start.year = +start.full.slice(0,4)
-            start.month = +start.full.slice(5,7)
-            end.year = +end.full.slice(0,4)
-            end.month = +end.full.slice(5,7)
-            
+            let start = { full: period.sort()[0] };
+            let end = { full: period.sort()[period.length - 1] };
+            start.year = +start.full.slice(0, 4);
+            start.month = +start.full.slice(5, 7);
+            end.year = +end.full.slice(0, 4);
+            end.month = +end.full.slice(5, 7);
+
             if (start.year === end.year && start.month === end.month) {
-                text += ` in ${getMonth(start.month)} of ${start.year}`
+                text += ` in ${getMonth(start.month)} of ${start.year}`;
             } else if (start.year === end.year && start.month !== end.month) {
-                text += ` ${getMonth(start.month)}–${getMonth(end.month)} of ${start.year}`
+                text += ` ${getMonth(start.month)}–${getMonth(end.month)} of ${
+                    start.year
+                }`;
             } else if (start.year !== end.year && start.month !== end.month) {
-                text += ` ${getMonth(start.month)} ${start.year}–${getMonth(end.month)} ${end.year}`
+                text += ` ${getMonth(start.month)} ${start.year}–${getMonth(
+                    end.month
+                )} ${end.year}`;
             }
-            text += ` (${period.length} date${period.length > 1 ? "s" : ""} recorded)`;
+            text += ` (${period.length} date${
+                period.length > 1 ? "s" : ""
+            } recorded)`;
 
             if (ix < periods.length) {
-                text += '</li>'
+                text += "</li>";
             }
         });
 
         return text;
-    }
-    
-    Object.keys(edge.coLocated).forEach(location=>{
+    };
+
+    Object.keys(edge.coLocated).forEach((location) => {
         let allYears = splitDate(location);
         // console.log(allYears);
-    })
-    html = `<strong>${edge.source.display}</strong> and <strong>${edge.target.display}</strong> appeared together at ${Object.keys(edge.coLocated).length > 1 ? Object.keys(edge.coLocated).length : "one"} venue${Object.keys(edge.coLocated).length > 1 ? "s" : ""}:<ul>`;
-    
+    });
+    html = `<strong>${edge.source.display}</strong> and <strong>${
+        edge.target.display
+    }</strong> appeared together at ${
+        Object.keys(edge.coLocated).length > 1
+            ? Object.keys(edge.coLocated).length
+            : "one"
+    } venue${Object.keys(edge.coLocated).length > 1 ? "s" : ""}:<ul>`;
+
     let coLocatedCount = Object.keys(edge.coLocated).length - 1;
-    
-    Object.keys(edge.coLocated).forEach((location, ix)=>{
+
+    Object.keys(edge.coLocated).forEach((location, ix) => {
         let numDates = edge.coLocated[location].length;
         html += getPeriodsAsText(location);
         if (ix < coLocatedCount) {
             // html += ' and ';
         }
-    })
+    });
     html += `</ul>`;
 
-    if (!isVisible("#nodeTable"))
-        show("#quickEdgeInfo");
-    document.querySelector('#quickEdgeInfo').innerHTML = html;
-}
+    if (!isVisible("#nodeTable")) show("#quickEdgeInfo");
+    document.querySelector("#quickEdgeInfo").innerHTML = html;
+};
