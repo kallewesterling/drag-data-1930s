@@ -26,8 +26,8 @@ jobs:
         env:
           API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
         with:
-          source-directory: 'docs'
+          source-directory: 'network-app'
           destination-github-username: 'kallewesterling'
-          destination-repository-name: 'drag-data'
+          destination-repository-name: 'drag-network'
           user-email: kwesterling1@gradcenter.cuny.edu
           target-branch: main

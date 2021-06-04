@@ -947,11 +947,11 @@ for key in networks:
     }
     data['days'] = re.findall(r'\d+', key)[0]
 
-    with open('./docs/data/'+file_name, 'w+') as fp:
+    with open('./network-app/data/'+file_name, 'w+') as fp:
         json.dump(obj=data, fp=fp)
         # log(f'Saved {fp.name} (took {round((data["timeToCreate"]["totalInSeconds"]/60), 2)} minutes to generate)')
         
-with open('./docs/data/co-occurrence-_metadata.json', 'w+') as fp:
+with open('./network-app/data/co-occurrence-_metadata.json', 'w+') as fp:
     json.dump(obj=metadata, fp=fp)
     # log(f'Saved metadata file.')
 
