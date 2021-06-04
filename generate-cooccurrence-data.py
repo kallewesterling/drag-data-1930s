@@ -1,13 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# # Setup
-#
-# The script is set up: imports all the necessary packages and all the necessary functions to run.
-
-# In[1]:
-
-
 import community as community_louvain
 import copy
 import networkx as nx
@@ -22,28 +15,12 @@ from IPython.display import display, HTML, Markdown, clear_output
 settings = {"DAYSPANS": [3, 14, 31, 93, 186, 365]}
 
 
-# In[2]:
-
-
-# display(HTML("<style>.container {width: 80% !important; }</style>"))
-
-
-# ## Imports
-
-# In[3]:
-
-
-# ## Meta functions
-
-# In[1]:
-
-
 def in_notebook():
     try:
         from IPython import get_ipython
 
         try:
-            if "IPKernelApp" not in get_ipython().config:  # pragma: no cover
+            if "IPKernelApp" not in get_ipython().config:
                 return False
         except AttributeError:
             return False
@@ -76,17 +53,11 @@ def slugify(value, allow_unicode=False, verbose=False):
     return value
 
 
-# ### Central function (`get_raw_data`)
-
-# In[5]:
-
-
 def get_raw_data(verbose=True):
     df = pd.read_csv(
         "https://docs.google.com/spreadsheets/d/e/2PACX-1vT0E0Y7txIa2pfBuusA1cd8X5OVhQ_D0qZC8D40KhTU3xB7McsPR2kuB7GH6ncmNT3nfjEYGbscOPp0/pub?gid=0&single=true&output=csv"
     )
 
-    # Fix basic stuff
     df.replace("—", "", inplace=True)
     df.replace("—*", "", inplace=True)
     df.replace("–", "", inplace=True)
@@ -97,14 +68,6 @@ def get_raw_data(verbose=True):
     return df
 
 
-# ### Main filter function (`filter_data`)
-
-# In[6]:
-
-
-# Main filter function
-
-
 def filter_data(df, min_date=None, max_date=None, verbose=True):
     def has_required_data(row):
         """(internal) for use with DataFrame lambda function to ensure that any given row has the required data present"""
@@ -113,7 +76,6 @@ def filter_data(df, min_date=None, max_date=None, verbose=True):
             or row["Normalized performer"] != ""
             or (row["Performer first-name"] != "" or row["Performer last-name"]) != ""
         )
-        # has_city = row['City'] or row['Normalized City']
         has_venue = row["Venue"] != ""
         if has_performer and has_venue:
             return True
@@ -131,7 +93,6 @@ def filter_data(df, min_date=None, max_date=None, verbose=True):
     df.drop(df[df["has_required_data"] == False].index, inplace=True)
     log(f"**{df.shape[0]} rows after filtering**: Required data.", verbose=verbose)
 
-    # Filter
     df.drop(df[df["Exclude from visualization"] == True].index, inplace=True)
     df.drop(df[df["Exclude from visualization"] == "TRUE"].index, inplace=True)
     log(
@@ -139,7 +100,6 @@ def filter_data(df, min_date=None, max_date=None, verbose=True):
         verbose=verbose,
     )
 
-    # Filter
     df.drop(df[df["Unsure whether drag artist"] == True].index, inplace=True)
     df.drop(df[df["Unsure whether drag artist"] == "TRUE"].index, inplace=True)
     log(
@@ -164,14 +124,6 @@ def filter_data(df, min_date=None, max_date=None, verbose=True):
         )
 
     return df
-
-
-# ### Main clean function (`clean_data`)
-
-# In[7]:
-
-
-# Main clean function
 
 
 def clean_data(df, drop_cols=[], verbose=True):
@@ -242,7 +194,6 @@ def clean_data(df, drop_cols=[], verbose=True):
 
         return null_value
 
-    # Clean up names
     df["Performer"] = df.apply(lambda row: get_performer(row), axis=1)
     df["City"] = df.apply(lambda row: get_city(row), axis=1)
     df["Source"] = df.apply(lambda row: get_source(row), axis=1)
@@ -250,12 +201,11 @@ def clean_data(df, drop_cols=[], verbose=True):
     df["Unique venue"] = df.apply(lambda row: get_unique_venue(row), axis=1)
     log(f"**Cleaned up all names**.", verbose=verbose)
 
-    # Drop unnecessary information
     for col in drop_cols:
         try:
             del df[col]
         except KeyError:
-            pass  # already gone
+            pass
 
     df = df.rename(columns={"Unique venue": "Venue"})
 
@@ -265,13 +215,6 @@ def clean_data(df, drop_cols=[], verbose=True):
     )
 
     return df
-
-
-# # Create a clean, basic dataset from Sheets
-
-# ## Set up functions
-
-# In[8]:
 
 
 def get_clean_network_data(min_date=None, max_date=None, drop_cols=None, verbose=True):
@@ -315,7 +258,7 @@ def get_clean_network_data(min_date=None, max_date=None, drop_cols=None, verbose
             "Comment on node: city",
             "Comment on edge: revue",
             "Normalized Venue",
-        ]  # , 'Unsure whether drag artist'
+        ]
 
     df = clean_data(df, drop_cols, verbose=verbose)
 
@@ -325,28 +268,11 @@ def get_clean_network_data(min_date=None, max_date=None, drop_cols=None, verbose
     return df
 
 
-# ## Clean data generated
-#
-# Dataframe `df` generated, which can create good network data.
-
-# In[9]:
-
-
 df = get_clean_network_data(
     min_date=datetime.datetime(year=1930, month=1, day=1),
     max_date=datetime.datetime(year=1940, month=12, day=31),
     verbose=False,
 )
-
-# To illustrate, we show a 10-row random sample:
-# df.sample(10).sort_index()
-
-
-# # Group data
-
-# ## Set up functions
-
-# In[10]:
 
 
 def get_performers_who_were_there(df, where=None, when=[]):
@@ -446,21 +372,16 @@ def group_dates(
             prev_date_in_range = prev_date >= min_date and prev_date <= max_date
 
         if all([next_date, prev_date, prev_date_in_range, next_date_in_range]):
-            # In the loop and in a chain (near previous date and next)
             in_chain = True
         elif all([next_date, prev_date, next_date_in_range]) and not prev_date_in_range:
-            # In the loop and beginning of a chain (not near previous date but near next)
             start_chain = True
         elif all([next_date, prev_date, prev_date_in_range]) and not next_date_in_range:
-            # In the loop and end of a chain (near previous date but not next)
             end_chain = True
         elif all([next_date, prev_date]) and not all(
             [prev_date_in_range, next_date_in_range]
         ):
-            # In the loop but solo date (not not near previous date nor next)
             solo_date = True
         elif next_date and next_date_in_range:
-            # In the loop but solo date (not not near previous date nor next)
             start_chain = True
         elif next_date:
             solo_date = True
@@ -530,19 +451,7 @@ def get_group_data(df, days=settings["DAYSPANS"], verbose=False):
     return data_dict
 
 
-# ## Get grouped data
-
-# In[11]:
-
-
 group_data_dict = get_group_data(df)
-
-
-# ### Grouped data meta dataset
-#
-# Starts collecting a `metadata` dictionary.
-
-# In[12]:
 
 
 metadata = {}
@@ -550,12 +459,11 @@ metadata = {}
 df_grouped_dates = pd.DataFrame()
 
 venue_span_data = {}
-# Loop through each venue with adhering data
+
 for venue, row in df.groupby("Venue"):
     d = {}
     for days in [3, 14, 31, 93, 186, 365]:
         all_dates = list(set(row.Date))
-        # print(venue, all_dates)
         grouped_dates = group_dates(all_dates, delta=datetime.timedelta(days=days))
         max_span = 0
         max_performers_in_date_group = 0
@@ -581,7 +489,7 @@ for venue, row in df.groupby("Venue"):
             if len(performers_in_date_group) > max_performers_in_date_group:
                 max_performers_in_date_group = len(performers_in_date_group)
             group_member_counters[len(performers_in_date_group)] += 1
-            # print(venue, first_day_in_date_group, last_day_in_date_group, performers_in_date_group)
+
         d[f"num_groups (#, delta: {days} days)"] = len(grouped_dates)
         d[f"max_span (days, delta: {days} days)"] = max_span
         d[
@@ -598,21 +506,8 @@ for venue, row in df.groupby("Venue"):
     }
     df_grouped_dates = df_grouped_dates.astype(dtype)
 
-# display(Markdown('### Sample of 10 random points in the dataset\n\nEach span (`3 days`, `14 days`, `31 days`, `93 days`, `186 days`, and `365 days`) has a `num_groups` column, a `max_span` column, and a `max performers` column.'))
-# df_grouped_dates[list(d.keys())].sample(10).sort_values('num_groups (#, delta: 3 days)', ascending=False)
-
-
-# In[13]:
-
 
 metadata["grouped_dates"] = df_grouped_dates[list(d.keys())].T.to_json()
-
-
-# # Network grouped data
-#
-# Setting up networks with nodes and edges for each of the day spans.
-
-# In[14]:
 
 
 networks = {}
@@ -623,8 +518,6 @@ for venue, data in group_data_dict.items():
     i += 1
     for grouped_by, data2 in data.items():
         clear_output(wait=True)
-        # log(f'Generating network for {grouped_by}.')
-        # log(f'   [{i}/{venue_count}] processing venue {venue}...')
         if not grouped_by in networks:
             networks[grouped_by] = nx.Graph()
             networks[grouped_by].generated = datetime.datetime.now()
@@ -661,9 +554,6 @@ for venue, data in group_data_dict.items():
                             networks[grouped_by].edges[edge]["cities"].append(cities)
 
 
-# In[15]:
-
-
 def drop_unnamed(n):
     return not "unnamed" in n.lower()
 
@@ -680,14 +570,6 @@ for key in networks.keys():
 networks = _networks
 
 
-# In[ ]:
-
-
-# # Edge meta/weight
-
-# In[16]:
-
-
 for key in networks.keys():
     for edge in list(networks[key].edges):
         networks[key].edges[edge]["weights"] = {}
@@ -696,15 +578,6 @@ for key in networks.keys():
         networks[key].edges[edge]["weights"]["venues"] = len(
             networks[key].edges[edge]["coLocated"]
         )
-
-
-# # Node meta/comments
-
-# ## Set up functions for getting node meta information
-#
-# Node meta information = things like comments, images, etc
-
-# In[17]:
 
 
 def get_meta_data(df, category=None, verbose=False):
@@ -738,8 +611,6 @@ def get_meta_data(df, category=None, verbose=False):
             "MAPPING": {"comments": "Comment on edge: revue"},
         },
     }
-
-    # No need to change anything below
 
     for meta_data_category, d in MAP.items():
         if category and not meta_data_category == category:
@@ -785,34 +656,12 @@ def get_meta(df=None, category=None, verbose=False):
     return all_meta[category]
 
 
-# ## Get  node meta data from sheet
-#
-# `node_meta` fetches the information, then we loop through each network and add the meta data to each node.
-
-# In[18]:
-
-
 all_meta = get_meta()
-# adding all the meta data for nodes and edges to metadata['content']
 metadata["content"] = all_meta
-
-
-# ## Add manual meta information to each network's nodes
-
-# In[ ]:
 
 
 for key in networks.keys():
     nx.set_node_attributes(networks[key], all_meta["performers"])
-
-# log(f'Finished setting meta information about performers on all {len(networks)} networks.')
-
-
-# ## Get automatic network meta information per node
-
-# ### Set up functions
-
-# In[ ]:
 
 
 def get_connected_nodes_per_node(G):
@@ -821,7 +670,7 @@ def get_connected_nodes_per_node(G):
 
 def get_unique_networks(connected_nodes_per_node):
     if isinstance(connected_nodes_per_node, dict):
-        pass  # fine!
+        pass
     elif isinstance(connected_nodes_per_node, nx.classes.graph.Graph):
         connected_nodes_per_node = get_connected_nodes_per_node(
             connected_nodes_per_node
@@ -838,14 +687,8 @@ def get_unique_networks(connected_nodes_per_node):
     return unique_networks
 
 
-# ### Add data to each network's nodes
-
-# In[ ]:
-
-
 for key in networks.keys():
     unique_networks = get_unique_networks(networks[key])
-    # log(f'Adding connected network data for network `{key}` ({len(unique_networks)} unique networks found)...')
 
     for network_id, unique_network in enumerate(unique_networks, start=1):
         for performer in unique_network:
@@ -855,13 +698,6 @@ for key in networks.keys():
                     "network_id": network_id,
                 }
             }
-
-
-# ## Get communities per node
-
-# ### Set up custom functions
-
-# In[ ]:
 
 
 def merge_community_dicts(*args):
@@ -885,22 +721,13 @@ def merge_community_dicts(*args):
     return _
 
 
-# ### Set up dictionaries with all the community information
-
-# In[ ]:
-
-
 for key in networks.keys():
-    # log(f'Setting community data on nodes in network {key}...')
-
-    # Run Louvain algorithm
     louvain = community_louvain.best_partition(networks[key])
     louvain = {
         performer: {"modularities": {"Louvain": community_number}}
         for performer, community_number in louvain.items()
     }
 
-    # Run Clauset Newman Moore algorithm
     c = nx.community.greedy_modularity_communities(networks[key])
     clauset_newman_moore = {
         performer: {"modularities": {"Clauset-Newman-Moore": community_number}}
@@ -908,7 +735,6 @@ for key in networks.keys():
         for performer in list_of_performers
     }
 
-    # Run Girvan Newman algorithm
     """
     # TODO: This won't work
     gn = nx.community.girvan_newman(networks[key])
@@ -921,23 +747,15 @@ for key in networks.keys():
     nx.set_node_attributes(networks[key], community_dicts)
 
 
-# ## Set centrality data per node
-
-# In[ ]:
-
-
 for key in networks.keys():
-    # log(f'Setting centrality data on nodes in network {key}...')
     for performer in networks[key].nodes:
         networks[key].nodes[performer]["centralities"] = {}
 
-    # log(f' --> `degree_centrality`')
     for performer, degree in nx.degree_centrality(networks[key]).items():
         networks[key].nodes[performer]["centralities"][
             "degree_centrality_100x"
         ] = round(degree * 100, 6)
 
-    # log(f' --> `betweenness_centrality`')
     for performer, degree in nx.betweenness_centrality(
         networks[key], k=len(networks[key].nodes)
     ).items():
@@ -945,7 +763,6 @@ for key in networks.keys():
             "betweenness_centrality_100x"
         ] = round(degree * 100, 6)
 
-    # log(f' --> `eigenvector_centrality`')
     for performer, degree in nx.eigenvector_centrality(
         networks[key], max_iter=100, weight="weight"
     ).items():
@@ -953,26 +770,16 @@ for key in networks.keys():
             "eigenvector_centrality_100x"
         ] = round(degree * 100, 6)
 
-    # TODO: Katz centrality keeps failing within 1000 iterations :/
-    # log(f' --> `katz_centrality`')
     # try:
     #    for performer, degree in nx.katz_centrality(networks[key]).items():
     #        networks[key].nodes[performer]['centralities']['katz_centrality_100x'] = round(degree*100, 6)
     # except nx.exception.PowerIterationFailedConvergence as e:
     #    print(f'Katz Centrality failed: {e}')
 
-    # log(f' --> `closeness_centrality`')
     for performer, degree in nx.closeness_centrality(networks[key]).items():
         networks[key].nodes[performer]["centralities"][
             "closeness_centrality_100x"
         ] = round(degree * 100, 6)
-
-
-# ## Set degree per node
-
-# ### Set up function
-
-# In[ ]:
 
 
 def get_degrees(G, node):
@@ -983,23 +790,12 @@ def get_degrees(G, node):
     return {"indegree": indegree, "outdegree": outdegree, "degree": degree}
 
 
-# ### Add data to each network's nodes
-
-# In[ ]:
-
-
 for key in networks.keys():
-    # log(f'Setting degree data on {len(networks[key].nodes)} nodes in network {key}...')
     degrees = {
         node: {"degrees": get_degrees(networks[key], node)}
         for node in networks[key].nodes
     }
     nx.set_node_attributes(networks[key], degrees)
-
-
-# ## Add additional node and edge metadata
-
-# In[ ]:
 
 
 for key, network in networks.items():
@@ -1010,10 +806,9 @@ for key, network in networks.items():
 
     for edge in networks[key].edges:
         networks[key].edges[edge]["edge_id"] = slugify(f"{edge[0]}-{edge[1]}")
-        networks[key].edges[edge]["comments"] = []  # TODO
-        networks[key].edges[edge]["general_comments"] = []  # TODO
+        networks[key].edges[edge]["comments"] = []
+        networks[key].edges[edge]["general_comments"] = []
 
-        # setup 'found' property of edges
         networks[key].edges[edge]["found"] = []
         for _, dates in networks[key].edges[edge]["coLocated"].items():
             for datelist in dates:
@@ -1021,7 +816,6 @@ for key, network in networks.items():
                     if not date in networks[key].edges[edge]["found"]:
                         networks[key].edges[edge]["found"].append(date)
 
-        # setup 'comments' for all of the involved venues, cities, revues
         networks[key].edges[edge]["comments"] = {
             "venues": {},
             "cities": {},
@@ -1029,11 +823,6 @@ for key, network in networks.items():
         }
 
     networks[grouped_by].finished = datetime.datetime.now()
-
-
-# # Export to JSON data
-
-# In[ ]:
 
 
 for key in networks:
@@ -1051,20 +840,9 @@ for key in networks:
 
     with open("./network-app/data/" + file_name, "w+") as fp:
         json.dump(obj=data, fp=fp)
-        # log(f'Saved {fp.name} (took {round((data["timeToCreate"]["totalInSeconds"]/60), 2)} minutes to generate)')
 
 with open("./network-app/data/co-occurrence-_metadata.json", "w+") as fp:
     json.dump(obj=metadata, fp=fp)
-    # log(f'Saved metadata file.')
-
-
-# # Export to other formats (optional)
-
-# ## Gephi
-#
-# The following part of the script removes all the metadata from the graph (which causes trouble with Gephi's file format) and generates "naked" network files for each of the co-occurrence graphs.
-
-# In[ ]:
 
 
 gexf_networks = copy.deepcopy(networks)
@@ -1102,13 +880,3 @@ for key in gexf_networks:
     file_name = f"gephi/co-occurrence-{key}.gexf"
 
     nx.write_gexf(gexf_networks[key], file_name)
-    # log(f'Saved {file_name}')
-
-
-# In[ ]:
-
-
-# In[ ]:
-
-
-# In[ ]:
