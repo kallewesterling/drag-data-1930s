@@ -4,7 +4,8 @@ const dropNode = (node) => {
     if (node.inGraph) {
         graph.nodes.forEach((o, i) => {
             if (node.node_id === o.node_id) {
-                if (ERROR_LEVEL > 1) _output(`dropping node ${o.node_id}...`, false, 'dropNode');
+                if (ERROR_LEVEL > 1)
+                    _output(`dropping node ${o.node_id}...`, false, "dropNode");
                 graph.nodes.splice(i, 1);
                 node.inGraph = false;
                 return true;
@@ -16,7 +17,8 @@ const dropNode = (node) => {
 const dropEdge = (edge) => {
     graph.edges.forEach((o, i) => {
         if (edge.edge_id === o.edge_id) {
-            if (ERROR_LEVEL > 1) _output(`dropping edge ${o.edge_id}...`, false, 'dropEdge');
+            if (ERROR_LEVEL > 1)
+                _output(`dropping edge ${o.edge_id}...`, false, "dropEdge");
             graph.edges.splice(i, 1);
             edge.inGraph = false;
             return true;
@@ -43,11 +45,10 @@ const addEdge = (edge) => {
  */
 const filterNodes = (nodeList = [], settings = undefined) => {
     let output_msgs = ["Called"];
-        
+
     if (!nodeList.length) {
-        if (!settings)
-            settings = settingsFromDashboard('filterNodes');
-        
+        if (!settings) settings = settingsFromDashboard("filterNodes");
+
         output_msgs.push(`--> minDegree: ${settings.nodes.minDegree}`);
         store.nodes.forEach((node) => {
             if (node.passes.minDegree && node.passes.unnamed) {
@@ -70,15 +71,30 @@ const filterNodes = (nodeList = [], settings = undefined) => {
  */
 const nodeInGraph = (node) => {
     return graph.nodes.includes(node);
-}
+};
 
-const getValidEdges = (inGraph=false) => {
-    return store.edges.filter(e=>e.passes.startYear && e.passes.endYear && e.passes.minWeight && nodeInGraph(e.source) && nodeInGraph(e.target) && e.inGraph === inGraph);
-}
+const getValidEdges = (inGraph = false) => {
+    return store.edges.filter(
+        (e) =>
+            e.passes.startYear &&
+            e.passes.endYear &&
+            e.passes.minWeight &&
+            nodeInGraph(e.source) &&
+            nodeInGraph(e.target) &&
+            e.inGraph === inGraph
+    );
+};
 
-const getInvalidEdges = (inGraph=true) => {
-    return store.edges.filter(e=>(!e.passes.startYear && !e.passes.endYear && !e.passes.minWeight) && e.inGraph === inGraph && nodeInGraph([e.source, e.target]));
-}
+const getInvalidEdges = (inGraph = true) => {
+    return store.edges.filter(
+        (e) =>
+            !e.passes.startYear &&
+            !e.passes.endYear &&
+            !e.passes.minWeight &&
+            e.inGraph === inGraph &&
+            nodeInGraph([e.source, e.target])
+    );
+};
 
 /**
  * filterEdges takes one optional argument // TODO: Fix this //, and serves to run through all of the store.edges and adding/removing edges from graph.edges, depending on filter values.
@@ -87,14 +103,22 @@ const getInvalidEdges = (inGraph=true) => {
  */
 const filterEdges = (edgeList = [], settings = undefined, change = true) => {
     if (edgeList.length) {
-        console.error('filtering using lists is not implemented.')
+        console.error("filtering using lists is not implemented.");
         return true;
     }
-    
-    if (!settings)
-        settings = settingsFromDashboard('filterEdges');
-    
-    _output(["Called", `--> minWeight: ${settings.edges.minWeight}`, `--> startYear: ${settings.edges.startYear}`, `--> endYear: ${settings.edges.endYear}`], false, 'filterEdges');
+
+    if (!settings) settings = settingsFromDashboard("filterEdges");
+
+    _output(
+        [
+            "Called",
+            `--> minWeight: ${settings.edges.minWeight}`,
+            `--> startYear: ${settings.edges.startYear}`,
+            `--> endYear: ${settings.edges.endYear}`,
+        ],
+        false,
+        "filterEdges"
+    );
 
     /*
     let edgesToDrop = [];
@@ -111,35 +135,63 @@ const filterEdges = (edgeList = [], settings = undefined, change = true) => {
     edgesToDrop.forEach(edge=>dropEdge(edge));
     */
 
-    getValidEdges().forEach(e=>{
-        addEdge(e);
-    })
-
-    getInvalidEdges().forEach(e=>{
-        dropEdge(e);
-    });
-
-    graph.edges.filter(edge=>edge.inGraph===true).filter(edge=>edge.source.inGraph===false || edge.target.inGraph===false).forEach(e=>{
-        dropEdge(e);
-    })
-
-    graph.edges.filter(edge=>edge.inGraph===false).filter(edge=>edge.passes.minWeight===true).forEach(e=>{
+    getValidEdges().forEach((e) => {
         addEdge(e);
     });
 
-    graph.edges.filter(edge=>edge.inGraph===true).filter(edge=>edge.passes.minWeight===false).forEach(e=>{
+    getInvalidEdges().forEach((e) => {
         dropEdge(e);
     });
+
+    graph.edges
+        .filter((edge) => edge.inGraph === true)
+        .filter(
+            (edge) =>
+                edge.source.inGraph === false || edge.target.inGraph === false
+        )
+        .forEach((e) => {
+            dropEdge(e);
+        });
+
+    graph.edges
+        .filter((edge) => edge.inGraph === false)
+        .filter((edge) => edge.passes.minWeight === true)
+        .forEach((e) => {
+            addEdge(e);
+        });
+
+    graph.edges
+        .filter((edge) => edge.inGraph === true)
+        .filter((edge) => edge.passes.minWeight === false)
+        .forEach((e) => {
+            dropEdge(e);
+        });
 
     return true;
 
-    store.edges.filter(e=>e.passes.startYear && e.passes.endYear && e.passes.minWeight && !e.inGraph).forEach(e=>addEdge(e));
-    store.edges.filter(e=>(!e.passes.startYear || !e.passes.endYear || !e.passes.minWeight) && e.inGraph).forEach(e=>dropEdge(e));
+    store.edges
+        .filter(
+            (e) =>
+                e.passes.startYear &&
+                e.passes.endYear &&
+                e.passes.minWeight &&
+                !e.inGraph
+        )
+        .forEach((e) => addEdge(e));
+    store.edges
+        .filter(
+            (e) =>
+                (!e.passes.startYear ||
+                    !e.passes.endYear ||
+                    !e.passes.minWeight) &&
+                e.inGraph
+        )
+        .forEach((e) => dropEdge(e));
 
     return true;
 
     if (!edgeList.length) {
-        let settings = settingsFromDashboard('filterEdges').edges;
+        let settings = settingsFromDashboard("filterEdges").edges;
         store.edges.forEach((edge) => {
             edge.adjusted_weight = edge.found.length;
 
@@ -254,8 +306,8 @@ const filter = (nodeList = [], edgeList = [], change = true) => {
     _output("Called", false, filter);
     let settings = settingsFromDashboard("filter");
 
-    hide("#nodeEdgeInfo");    
-    
+    hide("#nodeEdgeInfo");
+
     filterStore(settings);
 
     filterNodes(nodeList, settings);
@@ -270,9 +322,12 @@ const filter = (nodeList = [], edgeList = [], change = true) => {
     setupFilteredElements(settings);
 
     // then, detect community
-    if (settings.nodes.communityDetection || document.querySelector('html').classList.contains('has-community')) {
+    if (
+        settings.nodes.communityDetection ||
+        document.querySelector("html").classList.contains("has-community")
+    ) {
         communityDetection();
-        textElements.text((node)=>{
+        textElements.text((node) => {
             if (node.cluster) {
                 return `${node.cluster}. ${node.display}`;
             } else {
@@ -283,13 +338,16 @@ const filter = (nodeList = [], edgeList = [], change = true) => {
     }
 
     graph.nodes.forEach((node) => {
-        node.r = getSize(node, 'r', settings);
+        node.r = getSize(node, "r", settings);
         node.html_info = generateNodeInfoHTML(node);
     });
 
-    graph.edges.forEach(edge=>{
-        edge.html_info = generateEdgeInfoHTML(edge, settings.edges.weightFromCurrent);
-    })
+    graph.edges.forEach((edge) => {
+        edge.html_info = generateEdgeInfoHTML(
+            edge,
+            settings.edges.weightFromCurrent
+        );
+    });
 
     styleGraphElements(settings);
     updateInfo();
@@ -302,8 +360,12 @@ const filter = (nodeList = [], edgeList = [], change = true) => {
 const findNearestNeighbors = (node) => {
     return [
         ...new Set([
-            ...node.connected.edges.filter((n) => n.inGraph).map((e) => e.source),
-            ...node.connected.edges.filter((n) => n.inGraph).map((e) => e.target),
+            ...node.connected.edges
+                .filter((n) => n.inGraph)
+                .map((e) => e.source),
+            ...node.connected.edges
+                .filter((n) => n.inGraph)
+                .map((e) => e.target),
         ]),
     ].filter((n) => n !== node);
 };
@@ -415,7 +477,11 @@ const toggleEgoNetwork = async (
     _output("Called", false, toggleEgoNetwork);
     // filter nodes based on a given node
     if (window.egoNetwork || force === "off") {
-        _output("Ego network already active - resetting network view...", false, toggleEgoNetwork);
+        _output(
+            "Ego network already active - resetting network view...",
+            false,
+            toggleEgoNetwork
+        );
         await egoNetworkOff();
         setupFilteredElements();
         styleGraphElements();
@@ -426,14 +492,22 @@ const toggleEgoNetwork = async (
             show("#infoContainer");
         }
     } else {
-        _output(`Filtering out an ego network based on ${node.node_id}`, false, toggleEgoNetwork);
+        _output(
+            `Filtering out an ego network based on ${node.node_id}`,
+            false,
+            toggleEgoNetwork
+        );
         await egoNetworkOn(node);
         setupFilteredElements();
         styleGraphElements();
 
         window._selectors.main.on("click", (event) => {
             if (event.metaKey && window.egoNetwork) {
-                _output(`svg command + click detected while ego network active - resetting network view...`, false, toggleEgoNetwork);
+                _output(
+                    `svg command + click detected while ego network active - resetting network view...`,
+                    false,
+                    toggleEgoNetwork
+                );
                 resetLocalStorage();
             }
         });
@@ -484,7 +558,7 @@ const filterNodesWithoutName = () => {
     };
     while (hasUnnamedNodes()) {
         graph.nodes.forEach((node) => {
-            if (node.id.toLowerCase().includes('unnamed')) {
+            if (node.id.toLowerCase().includes("unnamed")) {
                 // remove node with node_id node.node_id!
                 graph.nodes.forEach((o, i) => {
                     if (node.node_id === o.node_id) {
@@ -494,7 +568,7 @@ const filterNodesWithoutName = () => {
                 });
             }
         });
-    };
+    }
 
     if (returnObject.dropped.length > 0) {
         troubleshoot(true); // ensures that all nodes are correctly represented in
@@ -505,10 +579,9 @@ const filterNodesWithoutName = () => {
 
     console.log(returnObject);
     return returnObject; // could be passed to a debugMessage thus: debugMessage(`Dropped nodes with no edges (after ${runs} runs).`, "Information");
-}
+};
 
-
-    /**
+/**
  * filterNodesWithoutEdge takes no arguments but loops through the visualization, looking for unconnected nodes.
  * The return value is an object with information about the dropped nodes.
  * @returns {Object} - Object with two properties, `runs` denotes how many iterations the function ran through, and `dropped` with a list of all node_ids that were removed.

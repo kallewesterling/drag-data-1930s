@@ -8,14 +8,14 @@ window.autoSettings = {
         //nodeSizeFromCurrent: true,
         minDegree: 10,
         nodeMultiplier: 0.6,
-        communityDetection: 'jLouvain',
+        communityDetection: "jLouvain",
         minR: 1,
         maxR: 35,
-        rFrom: 'currentDegree'
+        rFrom: "currentDegree",
     },
     edges: {
         weightFromCurrent: true,
-        weightFrom: 'numDates',
+        weightFrom: "numDates",
         minWeight: 0,
         edgeMultiplier: 1,
         startYear: 1930,
@@ -35,23 +35,22 @@ window.autoSettings = {
         linkStrength: 0.05,
     },
     zoom: 1.25,
-    zoomMin: 0.10,
+    zoomMin: 0.1,
     zoomMax: 4,
     // debugMessages: false,
     datafile: {
-        filename: "data/co-occurrence-grouped-by-14-days-no-unnamed-performers.json",
-        bipartite: false
-    }
+        filename:
+            "data/co-occurrence-grouped-by-14-days-no-unnamed-performers.json",
+        bipartite: false,
+    },
 };
 
 const keyMapping = {
     U: {
-        noMeta:
-            'changeSetting({selector: "#autoClearNodes", setTo: !settingsFromDashboard("keyMappingU").nodes.autoClearNodes})',
+        noMeta: 'changeSetting({selector: "#autoClearNodes", setTo: !settingsFromDashboard("keyMappingU").nodes.autoClearNodes})',
     },
     S: {
-        noMeta:
-            'changeSetting({selector: "#stickyNodes", setTo: !settingsFromDashboard("keyMappingS").nodes.stickyNodes})',
+        noMeta: 'changeSetting({selector: "#stickyNodes", setTo: !settingsFromDashboard("keyMappingS").nodes.stickyNodes})',
     },
     /*
     N: {
@@ -60,25 +59,21 @@ const keyMapping = {
     },
     */
     ArrowRight: {
-        noMeta:
-            'changeSetting({selector: "#minDegree", type: "slider", setTo: settingsFromDashboard("keyMappingArrowRight1").nodes.minDegree+1})',
+        noMeta: 'changeSetting({selector: "#minDegree", type: "slider", setTo: settingsFromDashboard("keyMappingArrowRight1").nodes.minDegree+1})',
         shiftKey:
             'changeSetting({selector: "#minWeight", type: "slider", setTo: settingsFromDashboard("keyMappingArrowRight2").edges.minWeight+1})',
     },
     ArrowLeft: {
-        noMeta:
-            'changeSetting({selector: "#minDegree", type: "slider", setTo: settingsFromDashboard("keyMappingArrowLeft1").nodes.minDegree-1})',
+        noMeta: 'changeSetting({selector: "#minDegree", type: "slider", setTo: settingsFromDashboard("keyMappingArrowLeft1").nodes.minDegree-1})',
         shiftKey:
             'changeSetting({selector: "#minWeight", type: "slider", setTo: settingsFromDashboard("keyMappingArrowLeft2").edges.minWeight-1})',
     },
     ArrowUp: {
-        noMeta:
-            'changeSetting({selector: "#charge", type: "slider", setTo: settingsFromDashboard("keyMappingArrowUp").force.charge+10})',
+        noMeta: 'changeSetting({selector: "#charge", type: "slider", setTo: settingsFromDashboard("keyMappingArrowUp").force.charge+10})',
     },
     ArrowDown: {
-        noMeta:
-            'changeSetting({selector: "#charge", type: "slider", setTo: settingsFromDashboard("keyMappingArrowDown").force.charge-10})',
-    }
+        noMeta: 'changeSetting({selector: "#charge", type: "slider", setTo: settingsFromDashboard("keyMappingArrowDown").force.charge-10})',
+    },
 };
 
 const store = {
@@ -90,12 +85,17 @@ const store = {
         edgeWidth: 0,
         nodeDegree: 0,
         years: {
-            array: []
-        }
+            array: [],
+        },
     },
     toasterCounter: 1,
     settingsFinished: false,
-    algorithms: ['jLouvain', 'Clauset-Newman-Moore', 'Girvan Newman', 'Louvain']
+    algorithms: [
+        "jLouvain",
+        "Clauset-Newman-Moore",
+        "Girvan Newman",
+        "Louvain",
+    ],
 };
 
 const graph = {
@@ -107,7 +107,7 @@ const graph = {
     networkCount: 0,
     communities: [],
     clusters: {},
-    clusterInfo: {}
+    clusterInfo: {},
 };
 
 graph.plot = graph.svg.append("g").attr("id", "plot");
@@ -122,63 +122,63 @@ let g = {
 };
 
 let _elementNames = [
-    'startYear',
-    'endYear',
-    'minDegree',
-    'charge',
-    'collide',
-    'linkStrength',
-    'nodeMultiplier',
-    'edgeMultiplier',
-    'minWeight',
-    'datafile',
-    'autoClearNodes',
-    'autoClearUnnamed',
+    "startYear",
+    "endYear",
+    "minDegree",
+    "charge",
+    "collide",
+    "linkStrength",
+    "nodeMultiplier",
+    "edgeMultiplier",
+    "minWeight",
+    "datafile",
+    "autoClearNodes",
+    "autoClearUnnamed",
     // 'nodeSizeFromCurrent',
-    'communityDetection',
-    'weightFromCurrent',
-    'layoutCenter',
-    'layoutClustering',
-    'layoutForceX',
-    'layoutForceY',
-    'layoutCollide',
-    'layoutCharge',
-    'stickyNodes',
+    "communityDetection",
+    "weightFromCurrent",
+    "layoutCenter",
+    "layoutClustering",
+    "layoutForceX",
+    "layoutForceY",
+    "layoutCollide",
+    "layoutCharge",
+    "stickyNodes",
     // 'debugMessages',
-    'egoNetwork',
-    'main',
-    'popup-',
-    'commentedNodes',
-    'loadingContainer',
-    'loadingMessage',
-    'loading',
-    'switchMode',
-    'showClusterInfo',
-    'nudgeNodes',
-    'resetLocalStorage',
-    'clearUnconnected',
-    'settingsToggle',
-    'infoToggle',
-    'settingsContainer',
-    'infoToggleDiv',
-    'collideContainer',
-    'chargeContainer',
-    'charge_label',
-    'collide_label',
-    'minDegree_label',
-    'nodeMultiplier_label',
-    'edgeMultiplier_label',
-    'minWeight_label',
-    'linkStrength_label',
-    'nodeEdgeInfo',
-    'weightFrom',
-    'rFrom',
-]
+    "egoNetwork",
+    "main",
+    "popup-",
+    "commentedNodes",
+    "loadingContainer",
+    "loadingMessage",
+    "loading",
+    "switchMode",
+    "showClusterInfo",
+    "nudgeNodes",
+    "resetLocalStorage",
+    "clearUnconnected",
+    "settingsToggle",
+    "infoToggle",
+    "settingsContainer",
+    "infoToggleDiv",
+    "collideContainer",
+    "chargeContainer",
+    "charge_label",
+    "collide_label",
+    "minDegree_label",
+    "nodeMultiplier_label",
+    "edgeMultiplier_label",
+    "minWeight_label",
+    "linkStrength_label",
+    "nodeEdgeInfo",
+    "weightFrom",
+    "rFrom",
+];
 
-window._selectors = {}
-window._elements = {}
+window._selectors = {};
+window._elements = {};
 
-_elementNames.forEach(element => {
-    window._selectors[element] = d3.select(`#${element}`)
-    window._elements[element] = d3.select(`#${element}`).node()
+_elementNames.forEach((element) => {
+    window._selectors[element] = d3.select(`#${element}`);
+    window._elements[element] = d3.select(`#${element}`).node();
 });

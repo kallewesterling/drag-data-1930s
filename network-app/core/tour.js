@@ -2,28 +2,28 @@
 
 const tour1 = [
     {
-        text: 'Welcome. We will start by setting the graph to basic settings',
+        text: "Welcome. We will start by setting the graph to basic settings",
         settings: [
             {
-                selector: '#minDegree',
+                selector: "#minDegree",
                 setTo: 13,
-                type: 'slider'
-            }
-        ]
+                type: "slider",
+            },
+        ],
     },
     {
         wait: 4000,
     },
     {
-        text: 'Next, we will adjust the XYZ, to make visible the connections...'
-    }
-]
+        text: "Next, we will adjust the XYZ, to make visible the connections...",
+    },
+];
 
 const tour = () => {
     // don't forget to run resetLocalStorage() before this function!
-    tour1.forEach(step => {
-        step.settings.forEach(settings => changeSetting(settings))
+    tour1.forEach((step) => {
+        step.settings.forEach((settings) => changeSetting(settings));
         console.log(step.text);
-    })
+    });
     return true;
-}
+};

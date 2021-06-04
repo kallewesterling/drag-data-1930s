@@ -42,7 +42,7 @@ const nodeHasEdges = (node, count = false) => {
 const getUnnamedNodes = () => {
     let unnamedNodes = [];
     graph.nodes.forEach((node) => {
-        if (node.id.toLowerCase().includes('unnamed')) {
+        if (node.id.toLowerCase().includes("unnamed")) {
             unnamedNodes.push(node);
         }
     });
@@ -349,21 +349,26 @@ const getRelated = (node) => {
 const styleGraphElements = (settings = undefined) => {
     _output("Called", false, styleGraphElements);
 
-    if (!settings)
-        settings = settingsFromDashboard('styleGraphElements');
+    if (!settings) settings = settingsFromDashboard("styleGraphElements");
 
-    if (!settings.nodes.communityDetection && document.querySelector('html').classList.contains('has-community')) {
-        document.querySelector('html').classList.remove('has-communities');
+    if (
+        !settings.nodes.communityDetection &&
+        document.querySelector("html").classList.contains("has-community")
+    ) {
+        document.querySelector("html").classList.remove("has-communities");
         // graph.clusters = {}; /* TODO: Technically this should happen here but causes bug in modifySimulation. */
-    };
+    }
 
     nodeElements
         .attr("class", (node) => getNodeClass(node))
         .transition()
-        .attr("r", (node) => getSize(node, 'r', settings))
+        .attr("r", (node) => getSize(node, "r", settings))
         .attr("style", (node) => {
             if (node.cluster && settings.nodes.communityDetection) {
-                return `fill: ${RGBToHSL(graph.clusterColors[node.cluster], -30)};`;
+                return `fill: ${RGBToHSL(
+                    graph.clusterColors[node.cluster],
+                    -30
+                )};`;
             } else {
                 return "";
             }
@@ -482,11 +487,10 @@ const graphEdgesContains = (edge_id) => {
  * The return value is always true.
  */
 const modifySimulation = (settings) => {
-    _output('Called', false, modifySimulation)
+    _output("Called", false, modifySimulation);
 
-    if (!settings)
-        settings = settingsFromDashboard('modifySimulation');
-    
+    if (!settings) settings = settingsFromDashboard("modifySimulation");
+
     if (settings.force.layoutClustering && settings.nodes.communityDetection) {
         const clustering = (alpha) => {
             graph.nodes.forEach((d) => {
@@ -504,10 +508,10 @@ const modifySimulation = (settings) => {
                     cluster.y += y;
                 }
             });
-        }
-        graph.simulation.force('cluster', clustering);
+        };
+        graph.simulation.force("cluster", clustering);
     } else {
-        graph.simulation.force('cluster', undefined);
+        graph.simulation.force("cluster", undefined);
     }
 
     graph.simulation.force("link").links(graph.edges);
@@ -535,14 +539,22 @@ const modifySimulation = (settings) => {
         graph.simulation.force("charge", null);
     }
     if (settings.force.layoutCollide) {
-        var collide = d3.bboxCollide((d,i) => {
-                let width = document.querySelector(`text[data-node="${d.node_id}"]`).getBBox().width
-                let height = document.querySelector(`text[data-node="${d.node_id}"]`).getBBox().height
+        var collide = d3
+            .bboxCollide((d, i) => {
+                let width = document
+                    .querySelector(`text[data-node="${d.node_id}"]`)
+                    .getBBox().width;
+                let height = document
+                    .querySelector(`text[data-node="${d.node_id}"]`)
+                    .getBBox().height;
                 let divider = 2;
-                return [[-width/divider, -height/divider],[width/divider, height/divider]]
+                return [
+                    [-width / divider, -height / divider],
+                    [width / divider, height / divider],
+                ];
             })
             .strength(1)
-            .iterations(2)
+            .iterations(2);
         graph.simulation.force("collide", collide);
     } else {
         graph.simulation.force("collide", null);
@@ -610,7 +622,8 @@ const getEdgeClass = (edge) => {
  * @param {Object} edge - d3 selector for a given edge.
  * @returns {string} - The string with the stroke width.
  */
-const getEdgeStrokeWidth = (edge, settings) => { //, weightFromCurrent=undefined, min, max) => {
+const getEdgeStrokeWidth = (edge, settings) => {
+    //, weightFromCurrent=undefined, min, max) => {
     /*
     if (weightFromCurrent===undefined || edgeMultiplier===undefined) {
         let settings = settingsFromDashboard('getEdgeStrokeWidth');
@@ -620,13 +633,12 @@ const getEdgeStrokeWidth = (edge, settings) => { //, weightFromCurrent=undefined
             edgeMultiplier = settings.edges.edgeMultiplier;
     }
     */
-    if (!settings)
-        settings = settingsFromDashboard('getEdgeStrokeWidth');
+    if (!settings) settings = settingsFromDashboard("getEdgeStrokeWidth");
 
     let weightScale = edgeScale(settings);
-    
+
     let evalWeight = edge.weights[settings.edges.weightFrom];
-    
+
     return weightScale(evalWeight) * +settings.edges.edgeMultiplier + "px";
 };
 
@@ -651,22 +663,24 @@ const getTextClass = (node) => {
  */
 const getSize = (node, type = "r", settings = undefined) => {
     if (!settings)
-        console.error('Settings must be passed to an iterative function like getSize.')
+        console.error(
+            "Settings must be passed to an iterative function like getSize."
+        );
 
     let nodeMultiplier = settings.nodes.nodeMultiplier;
     let degree = undefined;
 
-    if (settings.nodes.rFrom === 'currentDegree') {
+    if (settings.nodes.rFrom === "currentDegree") {
         degree = node.currentDegree;
-    } else if (settings.nodes.rFrom === 'degrees__degree') {
+    } else if (settings.nodes.rFrom === "degrees__degree") {
         degree = node.degrees.degree;
-    } else if (settings.nodes.rFrom === 'betweenness_centrality') {
+    } else if (settings.nodes.rFrom === "betweenness_centrality") {
         degree = node.centralities.betweenness_centrality_100x;
-    } else if (settings.nodes.rFrom === 'closeness_centrality') {
+    } else if (settings.nodes.rFrom === "closeness_centrality") {
         degree = node.centralities.closeness_centrality_100x;
-    } else if (settings.nodes.rFrom === 'degree_centrality') {
+    } else if (settings.nodes.rFrom === "degree_centrality") {
         degree = node.centralities.degree_centrality_100x;
-    } else if (settings.nodes.rFrom === 'eigenvector_centrality') {
+    } else if (settings.nodes.rFrom === "eigenvector_centrality") {
         degree = node.centralities.eigenvector_centrality_100x;
     } else {
         degree = 1;

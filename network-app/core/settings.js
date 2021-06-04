@@ -18,20 +18,28 @@ const resetDraw = () => {
  * @returns {boolean} - true
  */
 const UIToggleAllSettingBoxes = () => {
-    _output('Called', false, UIToggleAllSettingBoxes)
+    _output("Called", false, UIToggleAllSettingBoxes);
     // if #rationale is visible, just hide that!
-    if (bootstrap.Modal.getInstance(document.querySelector("#rationale")) && bootstrap.Modal.getInstance(document.querySelector("#rationale"))._isShown) {
-        bootstrap.Modal.getInstance(document.querySelector("#rationale")).hide();
+    if (
+        bootstrap.Modal.getInstance(document.querySelector("#rationale")) &&
+        bootstrap.Modal.getInstance(document.querySelector("#rationale"))
+            ._isShown
+    ) {
+        bootstrap.Modal.getInstance(
+            document.querySelector("#rationale")
+        ).hide();
         return true;
     }
 
-    if (isVisible("#nodeTable"))
-        hide("#nodeTable");
+    if (isVisible("#nodeTable")) hide("#nodeTable");
 
     // toggle all the settings containers to the correct state!
     if (isVisible("#settingsContainer") && !isVisible("#infoToggleDiv")) {
         toggle("#settingsContainer");
-    } else if (!isVisible("#settingsContainer") && isVisible("#infoToggleDiv")) {
+    } else if (
+        !isVisible("#settingsContainer") &&
+        isVisible("#infoToggleDiv")
+    ) {
         toggle("#infoToggleDiv");
     } else {
         toggle("#settingsContainer");
@@ -40,10 +48,9 @@ const UIToggleAllSettingBoxes = () => {
     return true;
 };
 
-
-const ensureDisabledLabels = (interfaceSettings=undefined) => {
+const ensureDisabledLabels = (interfaceSettings = undefined) => {
     if (!interfaceSettings)
-        interfaceSettings = refreshValues('ensureDisabledLabels');
+        interfaceSettings = refreshValues("ensureDisabledLabels");
 
     [
         ["layoutCharge", "charge", "charge_label"],
@@ -53,7 +60,7 @@ const ensureDisabledLabels = (interfaceSettings=undefined) => {
         window._elements[d[1]].disabled = disable;
         window._selectors[d[2]].classed("text-muted", disable);
     });
-}
+};
 
 /**
  * updateLabel takes one required argument, the name of any given label to update. Depending on checkboxes, it may disable slider UI elements.
@@ -61,16 +68,19 @@ const ensureDisabledLabels = (interfaceSettings=undefined) => {
  * @param {string} name - The name of the label that needs updating.
  * @returns {boolean} - true
  */
-const updateLabel = (name, interfaceSettings=undefined, callback=undefined) => {
-    if (!interfaceSettings)
-        interfaceSettings = refreshValues('updateLabel');
+const updateLabel = (
+    name,
+    interfaceSettings = undefined,
+    callback = undefined
+) => {
+    if (!interfaceSettings) interfaceSettings = refreshValues("updateLabel");
 
     let value = interfaceSettings[name];
-    
+
     // special handling
     switch (name) {
         case "charge":
-            console.log(`charge is set to ${value}`)
+            console.log(`charge is set to ${value}`);
             value = ((+value + 5100) / 10).toFixed(0) + "%";
             break;
 
@@ -86,11 +96,10 @@ const updateLabel = (name, interfaceSettings=undefined, callback=undefined) => {
             // console.log('Unhandled name', name);
             break;
     }
-    
-    window._selectors[name+'_label'].html(`${name} (${value})`);
 
-    if (callback)
-        callback();
+    window._selectors[name + "_label"].html(`${name} (${value})`);
+
+    if (callback) callback();
 
     return true;
 };
@@ -100,7 +109,7 @@ const updateLabel = (name, interfaceSettings=undefined, callback=undefined) => {
  * The return value is true in all cases.
  * @returns {boolean} - true
  */
-const saveToStorage = (settings=undefined, zoom_event=undefined) => {    
+const saveToStorage = (settings = undefined, zoom_event = undefined) => {
     let output_msgs = ["Called"];
 
     if (zoom_event && zoom_event.transform) {
@@ -110,17 +119,16 @@ const saveToStorage = (settings=undefined, zoom_event=undefined) => {
         localStorage.setItem("transform", JSON.stringify(zoom_event.transform));
         return true;
     }
-    
-    if (!settings)
-        settings = settingsFromDashboard("saveToStorage");
+
+    if (!settings) settings = settingsFromDashboard("saveToStorage");
 
     output_msgs.push("Saving settings");
     output_msgs.push(settings);
-    
+
     localStorage.setItem("settings", JSON.stringify(settings));
-    
-    _output(output_msgs, false, saveToStorage)
-    
+
+    _output(output_msgs, false, saveToStorage);
+
     return true;
 };
 
@@ -130,20 +138,24 @@ const saveToStorage = (settings=undefined, zoom_event=undefined) => {
  * @param {string} item - The name of the stored setting to load.
  * @returns {Object|string|undefined} - `undefined` in case no setting with the provided name can be found, and a (parsed) object if the item was stringified before it was saved. If no JSON data exists for the saved setting, a string is returned.
  */
-const fetchFromStorage = (item, caller=undefined) => {
+const fetchFromStorage = (item, caller = undefined) => {
     let rawSetting = localStorage.getItem(item);
-    let msg = `Called ${caller ? "from "+caller : ""} for \`${item}\``
+    let msg = `Called ${caller ? "from " + caller : ""} for \`${item}\``;
     if (rawSetting) {
         if (rawSetting.includes("{")) {
             let parsed = JSON.parse(rawSetting);
-            _output([msg, parsed], false, `fetchFromStorage - ${item}`)
+            _output([msg, parsed], false, `fetchFromStorage - ${item}`);
             return parsed;
         } else {
-            _output([msg, rawSetting], false, `fetchFromStorage - ${item}`)
+            _output([msg, rawSetting], false, `fetchFromStorage - ${item}`);
             return rawSetting;
         }
     } else {
-        _output([msg, `*** \`${item}\` does not exist in localStorage.`], false, `fetchFromStorage - ${item}`);
+        _output(
+            [msg, `*** \`${item}\` does not exist in localStorage.`],
+            false,
+            `fetchFromStorage - ${item}`
+        );
         return undefined;
     }
 };
@@ -157,18 +169,20 @@ const resetLocalStorage = () => {
     ["theme", "transform", "settings"].forEach((item) => {
         localStorage.removeItem(item);
     });
-    _output("Locally stored settings have been reset.", false, resetLocalStorage);
+    _output(
+        "Locally stored settings have been reset.",
+        false,
+        resetLocalStorage
+    );
     window.location.reload();
     return true;
 };
 
-
-const refreshValues = (caller=undefined) => {
-    _output(`Called ${caller ? "from "+caller : ""}`, false, refreshValues);
-    _ = {}
+const refreshValues = (caller = undefined) => {
+    _output(`Called ${caller ? "from " + caller : ""}`, false, refreshValues);
+    _ = {};
     for (const [key, element] of Object.entries(window._elements)) {
-        if (!element)
-            continue;
+        if (!element) continue;
         let value = undefined;
         switch (element.tagName.toLowerCase()) {
             case "input":
@@ -176,7 +190,7 @@ const refreshValues = (caller=undefined) => {
                     case "checkbox":
                         value = element.checked;
                         break;
-                    
+
                     case "range":
                         value = element.value;
                         break;
@@ -197,36 +211,37 @@ const refreshValues = (caller=undefined) => {
         }
 
         if (element.type === "checkbox" || value) {
-            if (+element.value)
-                value = +element.value;
+            if (+element.value) value = +element.value;
 
             _[key] = value;
         }
     }
     return _;
-}
+};
 
 /**
  * filterStore loops over all of the store's edges and nodes and ensures they all have a correct set of `passes` property object that will tell us whether the edge has passed the test for each of the key.
- * @param {object} interfaceSettings 
+ * @param {object} interfaceSettings
  * @returns true
  */
-const filterStore = (settings=undefined, interfaceSettings=undefined) => {
-    _output('Called', false, 'filterStore')
+const filterStore = (settings = undefined, interfaceSettings = undefined) => {
+    _output("Called", false, "filterStore");
 
     if (!interfaceSettings)
-        interfaceSettings = refreshValues('settingsFromDashboard');
+        interfaceSettings = refreshValues("settingsFromDashboard");
 
-    if (!settings)
-        settings = settingsFromDashboard("filterStore");
+    if (!settings) settings = settingsFromDashboard("filterStore");
 
-    store.edges.forEach(edge=>{
-        edge.passes = {}
+    store.edges.forEach((edge) => {
+        edge.passes = {};
         // set the correct `passes` for every edge
-        edge.passes.startYear = edge.range.startYear >= interfaceSettings.startYear ? true : false;
-        edge.passes.endYear = edge.range.endYear <= interfaceSettings.endYear ? true : false;
-        edge.passes.minWeight = edge.weights.weight >= interfaceSettings.minWeight ? true : false;
-        
+        edge.passes.startYear =
+            edge.range.startYear >= interfaceSettings.startYear ? true : false;
+        edge.passes.endYear =
+            edge.range.endYear <= interfaceSettings.endYear ? true : false;
+        edge.passes.minWeight =
+            edge.weights.weight >= interfaceSettings.minWeight ? true : false;
+
         // set the correct `inGraph` for every edge
         if (!document.querySelector(`line#${edge.edge_id}`)) {
             edge.inGraph = false;
@@ -239,19 +254,23 @@ const filterStore = (settings=undefined, interfaceSettings=undefined) => {
     });
 
     let minDegree = 0;
-    if (settings.nodes)
-        minDegree = settings.nodes.minDegree
+    if (settings.nodes) minDegree = settings.nodes.minDegree;
     else if (interfaceSettings.minDegree)
-        minDegree = interfaceSettings.minDegree
+        minDegree = interfaceSettings.minDegree;
     else
-        console.warn('Could not load minDegree setting, so moving forward with 0.')
-    
-    store.nodes.forEach(n=>{
+        console.warn(
+            "Could not load minDegree setting, so moving forward with 0."
+        );
+
+    store.nodes.forEach((n) => {
         // set the correct `passes` for every node
-        n.passes = {}
-        n.passes.minDegree = n.degrees.degree >= interfaceSettings.minDegree ? true : false;
-        n.passes.unnamed = n.id.toLowerCase().includes('unnamed') ? false : true;
-        
+        n.passes = {};
+        n.passes.minDegree =
+            n.degrees.degree >= interfaceSettings.minDegree ? true : false;
+        n.passes.unnamed = n.id.toLowerCase().includes("unnamed")
+            ? false
+            : true;
+
         // set the correct `inGraph` for every node
         if (!document.querySelector(`circle#${node.node_id}`)) {
             node.inGraph = false;
@@ -261,16 +280,15 @@ const filterStore = (settings=undefined, interfaceSettings=undefined) => {
     });
 
     return true;
-}
-
+};
 
 /**
  * settingsFromDashboard takes no arguments but loads the current settings.
  * The return value is an object with all of the settings as property values.
  * @returns {Object} - All of the app's settings.
  */
-const settingsFromDashboard = (caller=undefined) => {
-    let output_msg = [`Called ${caller?"by "+caller:""}`];
+const settingsFromDashboard = (caller = undefined) => {
+    let output_msg = [`Called ${caller ? "by " + caller : ""}`];
 
     // if settings are not set up, set it all up!
     if (!store.settingsFinished) {
@@ -278,9 +296,17 @@ const settingsFromDashboard = (caller=undefined) => {
         store.settingsFinished = true;
     }
 
-    let interfaceSettings = refreshValues('settingsFromDashboard');
-    
-    ["collide", "charge", "minDegree", "nodeMultiplier", "edgeMultiplier", "minWeight", "linkStrength"].forEach(label=>updateLabel(label, interfaceSettings));
+    let interfaceSettings = refreshValues("settingsFromDashboard");
+
+    [
+        "collide",
+        "charge",
+        "minDegree",
+        "nodeMultiplier",
+        "edgeMultiplier",
+        "minWeight",
+        "linkStrength",
+    ].forEach((label) => updateLabel(label, interfaceSettings));
 
     ensureDisabledLabels(interfaceSettings);
 
@@ -297,7 +323,7 @@ const settingsFromDashboard = (caller=undefined) => {
             communityDetection: interfaceSettings.communityDetection,
             rFrom: interfaceSettings.rFrom,
             minR: window.autoSettings.nodes.minR,
-            maxR: window.autoSettings.nodes.maxR
+            maxR: window.autoSettings.nodes.maxR,
         },
         edges: {
             minWeight: interfaceSettings.minWeight,
@@ -325,16 +351,15 @@ const settingsFromDashboard = (caller=undefined) => {
         zoomMax: window.autoSettings.zoomMax,
         // debugMessages: debugMessages,
         datafile: {
-            "filename": interfaceSettings.datafile,
-            "bipartite": false
-        }
-    }
+            filename: interfaceSettings.datafile,
+            bipartite: false,
+        },
+    };
     output_msg.push("Finished");
     output_msg.push(mappedInterfaceSettings);
     _output(output_msg, false, settingsFromDashboard);
     return mappedInterfaceSettings;
 };
-
 
 /**
  * setupSettingsInterface takes no arguments but sets up the settings box correctly, with all the max, min, and step values for UI elements,
@@ -342,12 +367,24 @@ const settingsFromDashboard = (caller=undefined) => {
  * @returns {boolean} - true
  */
 const setupSettingsInterface = (caller = undefined) => {
-    _output(`Called ${caller ? "from "+caller : ""}`, false, setupSettingsInterface);
-    
+    _output(
+        `Called ${caller ? "from " + caller : ""}`,
+        false,
+        setupSettingsInterface
+    );
+
     let settings = fetchFromStorage("settings", "setupSettingsInterface");
-    
+
     if (!settings) {
-        _output(["Stored settings empty, so reloading from autoSettings.", window.autoSettings], false, setupSettingsInterface, console.warn);
+        _output(
+            [
+                "Stored settings empty, so reloading from autoSettings.",
+                window.autoSettings,
+            ],
+            false,
+            setupSettingsInterface,
+            console.warn
+        );
         settings = window.autoSettings;
     }
 
@@ -411,39 +448,61 @@ const setupSettingsInterface = (caller = undefined) => {
     window._elements.datafile.value = settings.datafile.filename;
 
     if (window._elements.communityDetection.options.length == 0)
-        _output("Warning", false, "Warning: No communityDetection options (setupSettingInteractivity)");
+        _output(
+            "Warning",
+            false,
+            "Warning: No communityDetection options (setupSettingInteractivity)"
+        );
     if (!settings.nodes.communityDetection)
-        settings.nodes.communityDetection = '';
+        settings.nodes.communityDetection = "";
 
-    window._elements.communityDetection.value = settings.nodes.communityDetection;
+    window._elements.communityDetection.value =
+        settings.nodes.communityDetection;
 
     if (window._elements.startYear.options.length == 0)
-        _output("Warning", false, "Warning: No startYear options (setupSettingInteractivity)");
+        _output(
+            "Warning",
+            false,
+            "Warning: No startYear options (setupSettingInteractivity)"
+        );
     if (window._elements.endYear.options.length == 0)
-        _output("Warning", false, "Warning: No endYear options (setupSettingInteractivity)");
+        _output(
+            "Warning",
+            false,
+            "Warning: No endYear options (setupSettingInteractivity)"
+        );
     window._elements.startYear.value = settings.edges.startYear;
     window._elements.endYear.value = settings.edges.endYear;
-    
+
     if (window._elements.weightFrom.options.length == 0)
-        _output("Warning", false, "Warning: No weightFrom options (setupSettingInteractivity)");
+        _output(
+            "Warning",
+            false,
+            "Warning: No weightFrom options (setupSettingInteractivity)"
+        );
     window._elements.weightFrom.value = settings.edges.weightFrom;
 
     if (window._elements.rFrom.options.length == 0)
-        _output("Warning", false, "Warning: No rFrom options (setupSettingInteractivity)");
+        _output(
+            "Warning",
+            false,
+            "Warning: No rFrom options (setupSettingInteractivity)"
+        );
     window._elements.rFrom.value = settings.nodes.rFrom;
 
     return true;
 };
 
-
 const toggleSetting = (name) => {
-    if (window._elements[name].type !== 'checkbox') {
-        console.trace(`Cannot toggle ${window._elements[name].type}; must provide value.`)
+    if (window._elements[name].type !== "checkbox") {
+        console.trace(
+            `Cannot toggle ${window._elements[name].type}; must provide value.`
+        );
         return false;
     }
 
     let currentSettings = refreshValues();
-    
+
     if (!Object.keys(currentSettings).includes(name)) {
         console.trace(`Setting was not found.`);
         return false;
@@ -451,14 +510,14 @@ const toggleSetting = (name) => {
 
     // console.log(currentSettings[name] === true);
     window._elements[name].click(); // no this is not what we want
-}
+};
 
 const editSetting = (name, value) => {
     let currentSettings = refreshValues();
 
-    switch (typeof(currentSettings[name])) {
+    switch (typeof currentSettings[name]) {
         case "number":
-            console.trace("Cannot toggle number; must provide value.")
+            console.trace("Cannot toggle number; must provide value.");
             // console.log('number:', name, currentSettings[name]);
             // console.log(window._elements[name].type);
             break;
@@ -471,8 +530,8 @@ const editSetting = (name, value) => {
         default:
             // console.log(typeof(currentSettings[name]))
             break;
-    };
-}
+    }
+};
 
 /**
  * changeSetting is a complex function that can change any given setting, and also makes sure to change the UI representation of that value in the settings box. It is also the function that is run every time a setting UI element is changed in the settings box.
@@ -486,7 +545,8 @@ const editSetting = (name, value) => {
  * @param {boolean} restartSim - Set to `true` (default) if you want to restart the simulation after the setting is updated.
  * @returns {boolean} - true
  */
-const changeSetting = ( // TODO: #28 This function needs an overhaul
+const changeSetting = (
+    // TODO: #28 This function needs an overhaul
     selector,
     setTo,
     _filter = true,
@@ -575,7 +635,7 @@ const setupSettingInteractivity = () => {
     window._selectors.rFrom.on("change", () => {
         // changeSetting("#rFrom", "force", true, "dropdown");
         changeSetting("#rFrom", "force", true, "dropdown", [], [], false);
-        graph.simulation.restart().alpha(0.05) // just a nudge
+        graph.simulation.restart().alpha(0.05); // just a nudge
     });
     window._selectors.startYear.on("change", () => {
         changeSetting("#startYear", "force", true, "dropdown");
@@ -584,7 +644,14 @@ const setupSettingInteractivity = () => {
         changeSetting("#endYear", "force", true, "dropdown");
     });
     window._selectors.datafile.on("change", () => {
-        changeSetting("#datafile", "force", true, "dropdown", [], [location.reload()]); // TODO:
+        changeSetting(
+            "#datafile",
+            "force",
+            true,
+            "dropdown",
+            [],
+            [location.reload()]
+        ); // TODO:
     });
 
     // slider interactivity
@@ -605,12 +672,28 @@ const setupSettingInteractivity = () => {
     });
 
     window._selectors.nodeMultiplier.on("input", () => {
-        changeSetting("#nodeMultiplier", "force", false, "slider", [], [], false);
-        graph.simulation.restart().alpha(0.05) // just a nudge
+        changeSetting(
+            "#nodeMultiplier",
+            "force",
+            false,
+            "slider",
+            [],
+            [],
+            false
+        );
+        graph.simulation.restart().alpha(0.05); // just a nudge
     });
     window._selectors.edgeMultiplier.on("input", () => {
-        changeSetting("#edgeMultiplier", "force", false, "slider", [], [], false);
-        graph.simulation.restart().alpha(0.05) // just a nudge
+        changeSetting(
+            "#edgeMultiplier",
+            "force",
+            false,
+            "slider",
+            [],
+            [],
+            false
+        );
+        graph.simulation.restart().alpha(0.05); // just a nudge
     });
     window._selectors.collide.on("input", () => {
         changeSetting("#collide", "force", false, "slider");
@@ -627,7 +710,14 @@ const setupSettingInteractivity = () => {
         changeSetting("#autoClearNodes", "force", true);
     });
     window._selectors.autoClearUnnamed.on("change", () => {
-        changeSetting("#autoClearUnnamed", "force", true, "checkbox", [], [location.reload()]); // TODO: remove reload here...
+        changeSetting(
+            "#autoClearUnnamed",
+            "force",
+            true,
+            "checkbox",
+            [],
+            [location.reload()]
+        ); // TODO: remove reload here...
         // changeSetting("#autoClearUnnamed", "force", true);
     });
     /*
@@ -641,7 +731,15 @@ const setupSettingInteractivity = () => {
     });
     */
     window._selectors.communityDetection.on("change", () => {
-        changeSetting("#communityDetection", "force", true, "dropdown", [], [styleGraphElements], false);
+        changeSetting(
+            "#communityDetection",
+            "force",
+            true,
+            "dropdown",
+            [],
+            [styleGraphElements],
+            false
+        );
         // used to be: changeSetting("#communityDetection", "force", true, "checkbox", [], [styleGraphElements], false);
     });
     window._selectors.layoutCenter.on("change", () => {
@@ -685,8 +783,7 @@ const setupSettingInteractivity = () => {
     });
     window._selectors.showClusterInfo.on("click", function (d) {
         toggle("#nodeTable");
-        if (isVisible("#nodeTable"))
-            hide("#quickEdgeInfo");
+        if (isVisible("#nodeTable")) hide("#quickEdgeInfo");
     });
     window._selectors.nudgeNodes.on("click", function (d) {
         graph.simulation.restart().alpha(0.15);
@@ -697,7 +794,7 @@ const setupSettingInteractivity = () => {
     window._selectors.clearUnconnected.on("click", function (d) {
         filterNodesWithoutEdge();
     });
-    
+
     // set up settings containers
     window._selectors.settingsToggle.on("click", (evt) => {
         // console.log(evt)
@@ -729,7 +826,6 @@ const setupSettingInteractivity = () => {
     });
     return true;
 };
-
 
 /**
  * setupKeyHandlers takes no arguments but sets up the key interaction with the network visualization.
@@ -780,16 +876,29 @@ const setupKeyHandlers = () => {
             UIToggleAllSettingBoxes();
         } else if (e.key === "c" && e.metaKey) {
             // console.log("command+c called");
-            changeSetting("#autoClearNodes", !settingsFromDashboard("selectKeyDown1").nodes.autoClearNodes);
+            changeSetting(
+                "#autoClearNodes",
+                !settingsFromDashboard("selectKeyDown1").nodes.autoClearNodes
+            );
         } else if (e.key === "+") {
-            changeSetting({selector: "#nodeMultiplier", type: "slider", setTo: settingsFromDashboard("selectKeyDown2").nodes.nodeMultiplier+0.25});
+            changeSetting({
+                selector: "#nodeMultiplier",
+                type: "slider",
+                setTo:
+                    settingsFromDashboard("selectKeyDown2").nodes
+                        .nodeMultiplier + 0.25,
+            });
         } else if (e.key === "-") {
-            changeSetting({selector: "#nodeMultiplier", type: "slider", setTo: settingsFromDashboard("selectKeyDown3").nodes.nodeMultiplier-0.25});
+            changeSetting({
+                selector: "#nodeMultiplier",
+                type: "slider",
+                setTo:
+                    settingsFromDashboard("selectKeyDown3").nodes
+                        .nodeMultiplier - 0.25,
+            });
         }
         if (
-            ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"].includes(
-                e.key
-            )
+            ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"].includes(e.key)
         ) {
             numbers.push(e.key);
             if (years.length === 1) {
@@ -810,7 +919,9 @@ const setupKeyHandlers = () => {
                 if (store.ranges.years.array.includes(year)) {
                     years.push(year);
                 } else {
-                    console.error(`${year} is not a year in the graph's range.`);
+                    console.error(
+                        `${year} is not a year in the graph's range.`
+                    );
                     // TODO: Stop `t` from timing out, flash the numberModal red, and let the user know that nothing happened
                 }
                 numbers = [];
@@ -864,7 +975,6 @@ const setupKeyHandlers = () => {
     return true;
 };
 
-
 /**
  * setupMiscInteractivity takes no arguments but sets up the miscellaneous interaction with elements in the network visualization, and those UI elements that belong to it.
  * The return value is always true.
@@ -894,7 +1004,15 @@ const setupMiscInteractivity = () => {
     return true;
 };
 
-const allSettingsElements = [...document.querySelector("#settings").querySelectorAll("input, select, .btn")].concat([...document.querySelector("#infoContainer").querySelectorAll("input, select, .btn")])
+const allSettingsElements = [
+    ...document
+        .querySelector("#settings")
+        .querySelectorAll("input, select, .btn"),
+].concat([
+    ...document
+        .querySelector("#infoContainer")
+        .querySelectorAll("input, select, .btn"),
+]);
 
 /**
  * disableSettings is called to disable settings.
@@ -902,81 +1020,87 @@ const allSettingsElements = [...document.querySelector("#settings").querySelecto
  * @param {Array} exclude - identifiers (#ID) for settings to exclude from disabling can be included.
  * @returns {boolean} - true
  */
-const disableSettings = (exclude=[]) => {
+const disableSettings = (exclude = []) => {
     let output_msgs = [];
-    allSettingsElements.forEach(elem => {
-        output_msgs = [`processing element ${elem.id}`]
+    allSettingsElements.forEach((elem) => {
+        output_msgs = [`processing element ${elem.id}`];
         if (exclude.includes(elem.id)) {
             // do nothing
-            output_msgs.push(`** Skipped ${elem.tagName} element with id ${elem.id}.`)
+            output_msgs.push(
+                `** Skipped ${elem.tagName} element with id ${elem.id}.`
+            );
         } else {
             elem.disabled = true;
             elem.classList.add("disabled");
-            output_msgs.push(`disabled ${elem.tagName} element with id ${elem.id}.`)
+            output_msgs.push(
+                `disabled ${elem.tagName} element with id ${elem.id}.`
+            );
         }
         _output(output_msgs, false, disableSettings);
-    })
-}
+    });
+};
 
-const enableSettings = (exclude=[]) => {
-    allSettingsElements.forEach(elem => {
+const enableSettings = (exclude = []) => {
+    allSettingsElements.forEach((elem) => {
         if (exclude.includes(elem.id)) {
             // do nothing
         } else {
             elem.disabled = false;
             elem.classList.remove("disabled");
         }
-    })
-}
+    });
+};
 
-
-const queryStringToSettings = (settings=undefined) => {
+const queryStringToSettings = (settings = undefined) => {
     _output("Called", false, queryStringToSettings);
     let output_msgs = [];
 
     if (!settings)
         settings = fetchFromStorage("settings", "queryStringToSettings");
 
-    if (!settings)
-        settings = window.autoSettings
+    if (!settings) settings = window.autoSettings;
 
     const urlParams = new URLSearchParams(window.location.search);
 
     output_msgs.push(`Got query string ${window.location.search}`);
 
     for (const [key, value] of urlParams) {
-        if (!value)
-            continue
+        if (!value) continue;
 
         switch (key.toLowerCase()) {
-            
             case "mindegree":
             case "min_degree":
             case "mindegrees":
-                output_msgs.push(`--> set minDegree to ${value}`)
+                output_msgs.push(`--> set minDegree to ${value}`);
                 if (+value) {
                     settings.nodes.minDegree = +value;
                 } else {
-                    settings.nodes.minDegree = window.autoSettings.nodes.minDegree;
+                    settings.nodes.minDegree =
+                        window.autoSettings.nodes.minDegree;
                 }
                 break;
-            
+
             case "minweight":
             case "min_weight":
             case "minweights":
                 if (+value) {
-                    settings.edges.minWeight = +value
+                    settings.edges.minWeight = +value;
                 } else {
-                    settings.edges.minWeight = window.autoSettings.edges.minWeight;
+                    settings.edges.minWeight =
+                        window.autoSettings.edges.minWeight;
                 }
-                output_msgs.push(`--> minWeight has been set to ${settings.edges.minWeight}`)
+                output_msgs.push(
+                    `--> minWeight has been set to ${settings.edges.minWeight}`
+                );
                 break;
-            
+
             case "stickynodes":
-                settings.nodes.stickyNodes = (value === "true" || value === "1");
-                output_msgs.push(`--> stickyNodes has been set to ${settings.nodes.stickyNodes}`)
+                settings.nodes.stickyNodes = value === "true" || value === "1";
+                output_msgs.push(
+                    `--> stickyNodes has been set to ${settings.nodes.stickyNodes}`
+                );
                 break;
-            
+
             /* // TODO #37
             case "community":
             case "communities":
@@ -986,7 +1110,7 @@ const queryStringToSettings = (settings=undefined) => {
                 output_msgs.push(`--> communityDetection has been set to ${settings.nodes.communityDetection}`)
                 break;
             */
-        
+
             case "minzoom": // TODO: #20 The zoom can not be set through query string
             case "min-zoom":
                 if (+value) {
@@ -994,7 +1118,9 @@ const queryStringToSettings = (settings=undefined) => {
                 } else {
                     settings.zoomMin = window.autoSettings.zoomMin;
                 }
-                output_msgs.push(`--> minZoom has been set to to ${settings.zoomMin}`)
+                output_msgs.push(
+                    `--> minZoom has been set to to ${settings.zoomMin}`
+                );
                 break;
 
             case "maxzoom": // TODO: #20 The zoom can not be set through query string
@@ -1004,7 +1130,9 @@ const queryStringToSettings = (settings=undefined) => {
                 } else {
                     settings.zoomMax = window.autoSettings.zoomMax;
                 }
-                output_msgs.push(`--> maxZoom has been set to to ${settings.zoomMax}`)
+                output_msgs.push(
+                    `--> maxZoom has been set to to ${settings.zoomMax}`
+                );
                 break;
 
             case "min-year":
@@ -1014,9 +1142,12 @@ const queryStringToSettings = (settings=undefined) => {
                 if (+value) {
                     settings.edges.startYear = +value;
                 } else {
-                    settings.edges.startYear = window.autoSettings.edges.startYear;
+                    settings.edges.startYear =
+                        window.autoSettings.edges.startYear;
                 }
-                output_msgs.push(`--> startYear has been set to to ${settings.edges.startYear}`)
+                output_msgs.push(
+                    `--> startYear has been set to to ${settings.edges.startYear}`
+                );
                 break;
 
             case "max-year":
@@ -1028,17 +1159,23 @@ const queryStringToSettings = (settings=undefined) => {
                 } else {
                     settings.edges.endYear = window.autoSettings.edges.endYear;
                 }
-                output_msgs.push(`--> endYear has been set to to ${settings.edges.endYear}`)
+                output_msgs.push(
+                    `--> endYear has been set to to ${settings.edges.endYear}`
+                );
                 break;
 
-
             default:
-                _output(`no such setting found: "${key}"`, false, queryStringToSettings, console.error)
+                _output(
+                    `no such setting found: "${key}"`,
+                    false,
+                    queryStringToSettings,
+                    console.error
+                );
         }
     }
     _output(output_msgs, false, queryStringToSettings);
-    
+
     saveToStorage(settings);
 
     return settings;
-}
+};

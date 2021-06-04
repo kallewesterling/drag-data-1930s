@@ -135,7 +135,8 @@ let regeExes = [
 ];
 
 let year_YYYY_regex = "(1[8-9][0-9][0-9])[-,\\s\\]\\)\\.]"; // since we are only looking for 1800s-1900s (and followed by `whitespace` or `-`)
-let month_MMM_regex = "(January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)";
+let month_MMM_regex =
+    "(January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)";
 let month_MM_regex = "(0[1-9]|1[0-2])";
 let day_regex = "(0[1-9]|[1-2][0-9]|3[0-1])";
 let day_D_regex = "([1-9]|[1-2][0-9]|3[0-1])";
@@ -179,7 +180,12 @@ const dateParser = (test_string) => {
                     } else if (rx.locations.Y) {
                         test_date = date[rx.locations.Y];
                     } else {
-                        _output("This is a strange error that should not have occurred. Inquire with the developer please!", true, dateParser, console.error);
+                        _output(
+                            "This is a strange error that should not have occurred. Inquire with the developer please!",
+                            true,
+                            dateParser,
+                            console.error
+                        );
                     }
                     dateObj = { dateObj: new Date(Date.parse(test_date)) };
                     try {

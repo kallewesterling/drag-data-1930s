@@ -10,8 +10,8 @@ const isVisible = (selector) => {
     try {
         return d3.select(selector).classed("d-none") === false;
     } catch {
-        console.error('Selector cannot be found');
-        console.error(selector)
+        console.error("Selector cannot be found");
+        console.error(selector);
         return false;
     }
 };
@@ -32,22 +32,35 @@ const toggle = (selector) => {
 
         // special rules
         if (selector === "#settingsContainer") {
-            window._selectors["settingsToggle"].classed("toggled", !isVisible(selector));
+            window._selectors["settingsToggle"].classed(
+                "toggled",
+                !isVisible(selector)
+            );
         } else if (selector === "#infoToggleDiv") {
-            window._selectors["infoToggle"].classed("toggled", !isVisible(selector));
+            window._selectors["infoToggle"].classed(
+                "toggled",
+                !isVisible(selector)
+            );
         } else if (selector === "#popupNav") {
-            let menuWidth = getComputedStyle(document.querySelector('.popup-nav')).width;
-            if (document.getElementById("popupNav").style.left == `-${menuWidth}`) {
+            let menuWidth = getComputedStyle(
+                document.querySelector(".popup-nav")
+            ).width;
+            if (
+                document.getElementById("popupNav").style.left ==
+                `-${menuWidth}`
+            ) {
                 document.getElementById("popupNav").style.left = "0px";
             } else {
-                document.getElementById("popupNav").style.left = `-${menuWidth}`;
+                document.getElementById(
+                    "popupNav"
+                ).style.left = `-${menuWidth}`;
             }
         }
 
         return true;
     } catch {
-        console.error('Selector cannot be found');
-        console.error(selector)
+        console.error("Selector cannot be found");
+        console.error(selector);
         return false;
     }
 };
@@ -115,8 +128,10 @@ const toggleColorNetworks = () => {
         window.coloredNetworks = false;
         resetDraw();
     }
-    d3.select('.colorNetworks').classed('text-dark', !window.coloredNetworks).classed('text-warning', window.coloredNetworks);
-}
+    d3.select(".colorNetworks")
+        .classed("text-dark", !window.coloredNetworks)
+        .classed("text-warning", window.coloredNetworks);
+};
 
 /**
  * updateInfo takes no arguments acts as a quick access point for functions that need to update the information about the visualization.
@@ -125,61 +140,93 @@ const toggleColorNetworks = () => {
  */
 const updateInfo = () => {
     show("#info");
-    d3.select('.colorNetworks').on("click", toggleColorNetworks);
-    d3.select('.commentedNodes').on("click", toggleCommentedElements);
+    d3.select(".colorNetworks").on("click", toggleColorNetworks);
+    d3.select(".commentedNodes").on("click", toggleCommentedElements);
 
     // getCurrentGraphInfo()
-    let updateValues = getCurrentGraphInfo()
-    document.querySelectorAll('.numNodes').forEach(elem=>{elem.innerHTML = '<i class="me-1 small bi bi-record-fill"></i>' + updateValues.numNodes.content;});
-    document.querySelectorAll('.numEdges').forEach(elem=>{elem.innerHTML = '<i class="me-1 small bi bi-slash"></i>' + updateValues.numEdges.content;}); // share-fill
-    document.querySelectorAll('.unconnectedNodes').forEach(elem=>{elem.innerHTML = '<i class="me-1 bi bi-node-minus"></i>' + updateValues.unconnectedNodes.content;});
-    document.querySelectorAll('.currentZoom').forEach(elem=>{elem.innerHTML = '<i class="me-1 bi bi-search"></i>' + updateValues.currentZoom.content;});
-    document.querySelectorAll('.numCommunities').forEach(elem=>{elem.innerHTML = '<i class="me-1 bi bi-heart-fill"></i>' + updateValues.numCommunities.content;});
-    document.querySelectorAll('.commentedNodes').forEach(elem=>{elem.innerHTML = '' + updateValues.commentedNodes.content;});
-    document.querySelectorAll('.colorNetworks').forEach(elem=>{elem.innerHTML = '<i class="me-1 bi bi-share-fill"></i>' + updateValues.colorNetworks.content;});
-    
-    updateValues.colorNetworks.class.forEach(c => {
-        document.querySelectorAll('.colorNetworks').forEach(elem=>{elem.classList.add(c);});
+    let updateValues = getCurrentGraphInfo();
+    document.querySelectorAll(".numNodes").forEach((elem) => {
+        elem.innerHTML =
+            '<i class="me-1 small bi bi-record-fill"></i>' +
+            updateValues.numNodes.content;
     });
-    updateValues.commentedNodes.class.forEach(c => {
-        document.querySelectorAll('.commentedNodes').forEach(elem=>{elem.classList.add(c);});
+    document.querySelectorAll(".numEdges").forEach((elem) => {
+        elem.innerHTML =
+            '<i class="me-1 small bi bi-slash"></i>' +
+            updateValues.numEdges.content;
+    }); // share-fill
+    document.querySelectorAll(".unconnectedNodes").forEach((elem) => {
+        elem.innerHTML =
+            '<i class="me-1 bi bi-node-minus"></i>' +
+            updateValues.unconnectedNodes.content;
+    });
+    document.querySelectorAll(".currentZoom").forEach((elem) => {
+        elem.innerHTML =
+            '<i class="me-1 bi bi-search"></i>' +
+            updateValues.currentZoom.content;
+    });
+    document.querySelectorAll(".numCommunities").forEach((elem) => {
+        elem.innerHTML =
+            '<i class="me-1 bi bi-heart-fill"></i>' +
+            updateValues.numCommunities.content;
+    });
+    document.querySelectorAll(".commentedNodes").forEach((elem) => {
+        elem.innerHTML = "" + updateValues.commentedNodes.content;
+    });
+    document.querySelectorAll(".colorNetworks").forEach((elem) => {
+        elem.innerHTML =
+            '<i class="me-1 bi bi-share-fill"></i>' +
+            updateValues.colorNetworks.content;
+    });
+
+    updateValues.colorNetworks.class.forEach((c) => {
+        document.querySelectorAll(".colorNetworks").forEach((elem) => {
+            elem.classList.add(c);
+        });
+    });
+    updateValues.commentedNodes.class.forEach((c) => {
+        document.querySelectorAll(".commentedNodes").forEach((elem) => {
+            elem.classList.add(c);
+        });
     });
 
     return true;
 };
 
-
-const showCities = () => { // TODO: #24 the showCities function is not working - should be rewritten to be able to highlight/pulse any given category of node...
+const showCities = () => {
+    // TODO: #24 the showCities function is not working - should be rewritten to be able to highlight/pulse any given category of node...
     let original = {
         fill: {},
         classList: {},
-        r: {}
+        r: {},
     };
 
-    graph.nodes.forEach(n => {
-        let node = d3.select(`#${n.node_id}`)
-        original.fill[n.node_id] = node.style('fill');
-        original.classList[n.node_id] = node.attr('class');
-        original.r[n.node_id] = +node.attr('r');
+    graph.nodes.forEach((n) => {
+        let node = d3.select(`#${n.node_id}`);
+        original.fill[n.node_id] = node.style("fill");
+        original.classList[n.node_id] = node.attr("class");
+        original.r[n.node_id] = +node.attr("r");
 
         node.transition()
-            .attr('class', null)
-            .transition().duration(500)
-            .style('fill', n => {
-                if (n.category === 'city') {
-                    return 'red';
+            .attr("class", null)
+            .transition()
+            .duration(500)
+            .style("fill", (n) => {
+                if (n.category === "city") {
+                    return "red";
                 } else {
-                    return 'gray';
+                    return "gray";
                 }
             })
-            .transition().delay(1000).duration(500)
-            .attr('r', n => {
-                if (n.category === 'city') {
+            .transition()
+            .delay(1000)
+            .duration(500)
+            .attr("r", (n) => {
+                if (n.category === "city") {
                     return original.r[n.node_id] * 3;
                 } else {
                     return 1;
                 }
             });
     });
-    
-}
+};

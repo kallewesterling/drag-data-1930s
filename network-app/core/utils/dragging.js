@@ -1,11 +1,14 @@
-
 // https://www.w3schools.com/howto/howto_js_draggable.asp
 
 function dragElement(elmnt) {
-    var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+    var pos1 = 0,
+        pos2 = 0,
+        pos3 = 0,
+        pos4 = 0;
     if (document.getElementById(elmnt.id + "header")) {
         // if present, the header is where you move the DIV from:
-        document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
+        document.getElementById(elmnt.id + "header").onmousedown =
+            dragMouseDown;
     } else {
         // otherwise, move the DIV from anywhere inside the DIV:
         elmnt.onmousedown = dragMouseDown;
@@ -13,7 +16,21 @@ function dragElement(elmnt) {
 
     function dragMouseDown(e) {
         e = e || window.event;
-        let testElement = e.path.map(p=>p.id).filter(p=>(p !== undefined && p !== null && p !== '' && p !== 'settingsContainer' && p !== 'settingsToggle' && p !== 'settings' && p !== 'quickEdgeInfo' && p !== 'nodeEdgeInfoContainer' && p !== 'nodeEdgeInfo' && p !== 'infoToggleDiv'))
+        let testElement = e.path
+            .map((p) => p.id)
+            .filter(
+                (p) =>
+                    p !== undefined &&
+                    p !== null &&
+                    p !== "" &&
+                    p !== "settingsContainer" &&
+                    p !== "settingsToggle" &&
+                    p !== "settings" &&
+                    p !== "quickEdgeInfo" &&
+                    p !== "nodeEdgeInfoContainer" &&
+                    p !== "nodeEdgeInfo" &&
+                    p !== "infoToggleDiv"
+            );
         // console.log(testElement.length);
         if (testElement.length === 0) {
             e.preventDefault();
@@ -38,8 +55,8 @@ function dragElement(elmnt) {
         pos4 = e.clientY;
         //if (getComputedStyle(elmnt)['bottom'])
         // set the element's new position:
-        elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-        elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+        elmnt.style.top = elmnt.offsetTop - pos2 + "px";
+        elmnt.style.left = elmnt.offsetLeft - pos1 + "px";
     }
 
     function closeDragElement() {

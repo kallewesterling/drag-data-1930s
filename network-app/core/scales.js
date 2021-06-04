@@ -9,31 +9,43 @@
  */
 const nodeScale = (settings = undefined, scaleFunc = d3.scaleSqrt()) => {
     if (!settings)
-        console.error('Settings must be passed to an iterative function like nodeScale.')
-    
+        console.error(
+            "Settings must be passed to an iterative function like nodeScale."
+        );
+
     let rangeMin = settings.nodes.minR; // 1;
     let rangeMax = settings.nodes.maxR; // 10;
 
     let domainExtent = [];
-    if (settings.nodes.rFrom === 'currentDegree') {
-        domainExtent = d3.extent(graph.nodes, node => node.currentDegree)
-    } else if (settings.nodes.rFrom === 'degrees__degree') {
-        domainExtent = d3.extent(graph.nodes, node => node.degrees.degree)
-    } else if (settings.nodes.rFrom === 'betweenness_centrality') {
-        domainExtent = d3.extent(graph.nodes, node => node.centralities.betweenness_centrality_100x)
-    } else if (settings.nodes.rFrom === 'closeness_centrality') {
-        domainExtent = d3.extent(graph.nodes, node => node.centralities.closeness_centrality_100x)
-    } else if (settings.nodes.rFrom === 'degree_centrality') {
-        domainExtent = d3.extent(graph.nodes, node => node.centralities.degree_centrality_100x)
-    } else if (settings.nodes.rFrom === 'eigenvector_centrality') {
-        domainExtent = d3.extent(graph.nodes, node => node.centralities.eigenvector_centrality_100x)
+    if (settings.nodes.rFrom === "currentDegree") {
+        domainExtent = d3.extent(graph.nodes, (node) => node.currentDegree);
+    } else if (settings.nodes.rFrom === "degrees__degree") {
+        domainExtent = d3.extent(graph.nodes, (node) => node.degrees.degree);
+    } else if (settings.nodes.rFrom === "betweenness_centrality") {
+        domainExtent = d3.extent(
+            graph.nodes,
+            (node) => node.centralities.betweenness_centrality_100x
+        );
+    } else if (settings.nodes.rFrom === "closeness_centrality") {
+        domainExtent = d3.extent(
+            graph.nodes,
+            (node) => node.centralities.closeness_centrality_100x
+        );
+    } else if (settings.nodes.rFrom === "degree_centrality") {
+        domainExtent = d3.extent(
+            graph.nodes,
+            (node) => node.centralities.degree_centrality_100x
+        );
+    } else if (settings.nodes.rFrom === "eigenvector_centrality") {
+        domainExtent = d3.extent(
+            graph.nodes,
+            (node) => node.centralities.eigenvector_centrality_100x
+        );
     } else {
-        domainExtent = [1,1]
+        domainExtent = [1, 1];
     }
 
-    return scaleFunc
-        .range([rangeMin, rangeMax])
-        .domain(domainExtent);
+    return scaleFunc.range([rangeMin, rangeMax]).domain(domainExtent);
 };
 
 /**
@@ -43,12 +55,14 @@ const nodeScale = (settings = undefined, scaleFunc = d3.scaleSqrt()) => {
  */
 const edgeScale = (settings = undefined, scaleFunc = d3.scaleSqrt()) => {
     if (!settings)
-        console.error('Settings must be passed to an iterative function like nodeScale.')
+        console.error(
+            "Settings must be passed to an iterative function like nodeScale."
+        );
 
     let rangeMin = settings.edges.minStroke;
     let rangeMax = settings.edges.maxStroke;
-    let domainExtent = d3.extent(graph.edges.map(edge=>edge.weights[settings.edges.weightFrom]))
-    return scaleFunc
-        .domain(domainExtent)
-        .range([rangeMin, rangeMax])
+    let domainExtent = d3.extent(
+        graph.edges.map((edge) => edge.weights[settings.edges.weightFrom])
+    );
+    return scaleFunc.domain(domainExtent).range([rangeMin, rangeMax]);
 };

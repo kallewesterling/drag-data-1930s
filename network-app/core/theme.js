@@ -33,8 +33,7 @@ function toggleTheme() {
         // console.log("user has dark mode on - following suit...");
         setTheme("theme-dark");
         return true;
-    }
-    else if (
+    } else if (
         window.matchMedia &&
         window.matchMedia("(prefers-color-scheme: light)").matches == true
     ) {

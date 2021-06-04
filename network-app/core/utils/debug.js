@@ -1,22 +1,27 @@
-
 const froms = {};
 
 /**
  * Internal function
  */
-const _output = (message, log_output=false, from=undefined, output_function=console.log, passive = false) => {
-    if (typeof(from) === 'function') // you can send a message from a function, and we'll pull out the name
+const _output = (
+    message,
+    log_output = false,
+    from = undefined,
+    output_function = console.log,
+    passive = false
+) => {
+    if (typeof from === "function")
+        // you can send a message from a function, and we'll pull out the name
         from = from.name;
-    if (typeof(from) === 'object')
-        from = from.constructor.name;
+    if (typeof from === "object") from = from.constructor.name;
 
-    window._selectors["loadingContainer"].classed('bg-white', true);
-    window._selectors["loadingContainer"].classed('bg-danger', false);
-    window._selectors["loadingContainer"].classed('text-white', false);
+    window._selectors["loadingContainer"].classed("bg-white", true);
+    window._selectors["loadingContainer"].classed("bg-danger", false);
+    window._selectors["loadingContainer"].classed("text-white", false);
     window._selectors["loadingMessage"].html(message);
-    window._selectors["loading"].classed('d-none', false);
+    window._selectors["loading"].classed("d-none", false);
     window.loadingTimeout = setTimeout(() => {
-        window._selectors["loading"].classed('d-none', true);
+        window._selectors["loading"].classed("d-none", true);
     }, 100);
 
     if (![...Object.keys(froms)].includes(from)) {
@@ -24,41 +29,46 @@ const _output = (message, log_output=false, from=undefined, output_function=cons
         froms[from] = d3.interpolateRainbow(Object.keys(froms).length * 0.15);
     }
     if (log_output || window.ERROR_LEVEL > 0) {
-        if (typeof(message) === "object") {
-            console.groupCollapsed(`%c${new Date().toLocaleString()} [${from}]`, `color: ${passive ? 'lightgray': froms[from]}`);
-            message.forEach(m=>{
-                if (typeof(m) === "string") {
-                    output_function(`%c${m}`, 'color: lightgray');
+        if (typeof message === "object") {
+            console.groupCollapsed(
+                `%c${new Date().toLocaleString()} [${from}]`,
+                `color: ${passive ? "lightgray" : froms[from]}`
+            );
+            message.forEach((m) => {
+                if (typeof m === "string") {
+                    output_function(`%c${m}`, "color: lightgray");
                 } else {
                     output_function(m);
                 }
             });
-            console.groupEnd()
+            console.groupEnd();
         } else {
-            console.groupCollapsed(`%c${new Date().toLocaleString()} [${from}]`, `color: ${passive ? 'lightgray': froms[from]}`);
-            output_function(`%c${message}`, 'color: lightgray');
-            console.groupEnd()
+            console.groupCollapsed(
+                `%c${new Date().toLocaleString()} [${from}]`,
+                `color: ${passive ? "lightgray" : froms[from]}`
+            );
+            output_function(`%c${message}`, "color: lightgray");
+            console.groupEnd();
         }
     }
-}
+};
 
 /**
  * Internal function
  */
-const error = (message, hide=false, clear_timeout=true) => {
+const error = (message, hide = false, clear_timeout = true) => {
     if (hide) {
-        window._selectors["loading"].classed('d-none', true);
+        window._selectors["loading"].classed("d-none", true);
     } else {
-        window._selectors["loadingSpinner"].classed('d-none', true);
-        window._selectors["loadingContainer"].classed('bg-white', false);
-        window._selectors["loadingContainer"].classed('bg-danger', true);
-        window._selectors["loadingContainer"].classed('text-white', true);
+        window._selectors["loadingSpinner"].classed("d-none", true);
+        window._selectors["loadingContainer"].classed("bg-white", false);
+        window._selectors["loadingContainer"].classed("bg-danger", true);
+        window._selectors["loadingContainer"].classed("text-white", true);
         window._selectors["loadingMessage"].html(message);
-        window._selectors["loading"].classed('d-none', false);
-        if (clear_timeout)
-            window.clearTimeout(window.loadingTimeout);
+        window._selectors["loading"].classed("d-none", false);
+        if (clear_timeout) window.clearTimeout(window.loadingTimeout);
     }
-}
+};
 
 /**
  * troubleshoot takes one argument, which specifies whether to try to fix the data present in the current graph.
@@ -111,7 +121,6 @@ const troubleshoot = (fix = false) => {
     return returnObject; // can be used in a debugMessage, like debugMessage(dropped, "Dropped nodes");
 };
 
-
 /**
  * debugMessage takes two arguments, a first required message that will appear in the div, and an optional second which defines the header.
  * The return value is always the identification number for the message box's timeout.
@@ -144,13 +153,20 @@ const debugMessage = (message, header = "Warning") => {
 };
 */
 
-
 const colorNetworks = () => {
-    let network_ids = [...new Set(store.nodes.map(node=>node.connected.network.network_id))];
+    let network_ids = [
+        ...new Set(
+            store.nodes.map((node) => node.connected.network.network_id)
+        ),
+    ];
     _output(`${network_ids.length} networks found`, true, colorNetworks);
-    
-    nodeElements.attr('style', node => {
+
+    nodeElements.attr("style", (node) => {
         networkID = node.connected.network.network_id;
-        return 'fill: ' + d3.interpolateRainbow(networkID/network_ids.length*5) + '!important;';
+        return (
+            "fill: " +
+            d3.interpolateRainbow((networkID / network_ids.length) * 5) +
+            "!important;"
+        );
     });
-}
+};
