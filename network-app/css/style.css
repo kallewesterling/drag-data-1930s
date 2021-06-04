@@ -165,7 +165,7 @@ svg#main {
     stroke: var(--link-deselected) !important;
 }
 
-.link {
+.link, .label {
     cursor: context-menu;
 }
 
