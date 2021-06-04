@@ -978,7 +978,7 @@ for key in gexf_networks:
                 del gexf_networks[key].edges[edge][k]
                 
 for key in gexf_networks:
-    file_name = f'- Exported data files/co-occurrence-data/co-occurrence-{key}.gexf'
+    file_name = f'gephi/co-occurrence-{key}.gexf'
     
     nx.write_gexf(gexf_networks[key], file_name)
     log(f'Saved {file_name}')
