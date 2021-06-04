@@ -68,7 +68,7 @@ def slugify(value, allow_unicode=False, verbose=False):
     value = re.sub(r'[-\s]+', '_', value).strip('-_')
     if verbose:
         clear_output(wait=True)
-        log(f'Making slug from {init_value}: {value}')
+        log(f'Making slug from {init_value}: {value}', verbose=verbose)
     return value
 
 
@@ -280,7 +280,7 @@ df = get_clean_network_data(
     verbose=False)
 
 # To illustrate, we show a 10-row random sample:
-df.sample(10).sort_index()
+# df.sample(10).sort_index()
 
 
 # # Group data
@@ -353,7 +353,7 @@ def group_dates(dates:list=[], delta=datetime.timedelta(days=14), dateformat='%Y
         raise ValueError(f'A date found in list that did not adhere to format (`{date}`). Needs to follow format `{dateformat}`.') from None
 
     if isinstance(delta, int):
-        delta = timedelta(days=delta)
+        delta = datetime.timedelta(days=delta)
 
     periods = []
 
@@ -425,7 +425,7 @@ def group_dates(dates:list=[], delta=datetime.timedelta(days=14), dateformat='%Y
     return periods
 
 
-def get_group_data(df, days=settings['DAYSPANS']):
+def get_group_data(df, days=settings['DAYSPANS'], verbose=False):
     data_dict = {}
     
     venue_count = len(df.groupby("Venue"))
@@ -433,8 +433,8 @@ def get_group_data(df, days=settings['DAYSPANS']):
     for venue, row in df.groupby('Venue'):
         i+=1
         for num_days in days:
-            log(f'Generating group data for spans of {", ".join([str(x) for x in days])} days.')
-            log(f'   [{i}/{venue_count}] processing venue {venue} (date span {num_days} days)...')
+            log(f'Generating group data for spans of {", ".join([str(x) for x in days])} days.', verbose=verbose)
+            log(f'   [{i}/{venue_count}] processing venue {venue} (date span {num_days} days)...', verbose=verbose)
             clear_output(wait=True)
             all_dates = list(set(row.Date))
             grouped_dates = group_dates(all_dates, delta=datetime.timedelta(days=num_days))
@@ -453,7 +453,7 @@ def get_group_data(df, days=settings['DAYSPANS']):
                     'revues': revues,
                     'cities': cities
                 }
-    log(f'Generated group data for {venue_count} venues.')
+    log(f'Generated group data for {venue_count} venues.', verbose=verbose)
     return data_dict
 
 
@@ -513,8 +513,8 @@ for venue, row in df.groupby('Venue'):
     dtype = {key: int for key in [x for x in d.keys() if not 'group_member_counters for venue' in x]}
     df_grouped_dates = df_grouped_dates.astype(dtype)
 
-display(Markdown('### Sample of 10 random points in the dataset\n\nEach span (`3 days`, `14 days`, `31 days`, `93 days`, `186 days`, and `365 days`) has a `num_groups` column, a `max_span` column, and a `max performers` column.'))
-df_grouped_dates[list(d.keys())].sample(10).sort_values('num_groups (#, delta: 3 days)', ascending=False)
+# display(Markdown('### Sample of 10 random points in the dataset\n\nEach span (`3 days`, `14 days`, `31 days`, `93 days`, `186 days`, and `365 days`) has a `num_groups` column, a `max_span` column, and a `max performers` column.'))
+# df_grouped_dates[list(d.keys())].sample(10).sort_values('num_groups (#, delta: 3 days)', ascending=False)
 
 
 # In[13]:
@@ -540,8 +540,8 @@ for venue, data in group_data_dict.items():
     i+=1
     for grouped_by, data2 in data.items():
         clear_output(wait=True)
-        log(f'Generating network for {grouped_by}.')
-        log(f'   [{i}/{venue_count}] processing venue {venue}...')
+        #log(f'Generating network for {grouped_by}.')
+        #log(f'   [{i}/{venue_count}] processing venue {venue}...')
         if not grouped_by in networks:
             networks[grouped_by] = nx.Graph()
             networks[grouped_by].generated = datetime.datetime.now()
@@ -619,7 +619,7 @@ for key in networks.keys():
 # In[17]:
 
 
-def get_meta_data(df, category=None):
+def get_meta_data(df, category=None, verbose=False):
     meta_data = {
         'performers': {},
         'venues': {},
@@ -668,7 +668,7 @@ def get_meta_data(df, category=None):
         if category and not meta_data_category == category:
             continue
         
-        log(f'Fetching node meta information for {meta_data_category}...')
+        log(f'Fetching node meta information for {meta_data_category}...', verbose=verbose)
         for ix, row in df.iterrows():
             if not row[d['cleaned_row_name']] in meta_data[meta_data_category]:
                 meta_data[meta_data_category][row[d['cleaned_row_name']]] = {}
@@ -690,9 +690,9 @@ def get_meta_data(df, category=None):
     
     return meta_data
 
-def get_meta(df=None, category=None):
+def get_meta(df=None, category=None, verbose=False):
     if not isinstance(df, pd.DataFrame):
-        log('Building new clean data for node meta information...')
+        log('Building new clean data for node meta information...', verbose=verbose)
         df = get_raw_data(verbose=False)
         df = filter_data(df, max_date=None, min_date=None, verbose=False)
         df = clean_data(df, drop_cols=['Venue'], verbose=False)
@@ -724,7 +724,7 @@ metadata['content'] = all_meta # adding all the meta data for nodes and edges to
 for key in networks.keys():
     nx.set_node_attributes(networks[key], all_meta['performers'])
     
-log(f'Finished setting meta information about performers on all {len(networks)} networks.')
+# log(f'Finished setting meta information about performers on all {len(networks)} networks.')
 
 
 # ## Get automatic network meta information per node
@@ -759,7 +759,7 @@ def get_unique_networks(connected_nodes_per_node):
 
 for key in networks.keys():
     unique_networks = get_unique_networks(networks[key])
-    log(f'Adding connected network data for network `{key}` ({len(unique_networks)} unique networks found)...')
+    # log(f'Adding connected network data for network `{key}` ({len(unique_networks)} unique networks found)...')
 
     for network_id, unique_network in enumerate(unique_networks, start=1):
         for performer in unique_network:
@@ -807,7 +807,7 @@ def merge_community_dicts(*args):
 import community as community_louvain
 
 for key in networks.keys():
-    log(f'Setting community data on nodes in network {key}...')
+    # log(f'Setting community data on nodes in network {key}...')
     
     # Run Louvain algorithm
     louvain = community_louvain.best_partition(networks[key])
@@ -836,31 +836,31 @@ for key in networks.keys():
 
 
 for key in networks.keys():
-    log(f'Setting centrality data on nodes in network {key}...')
+    # log(f'Setting centrality data on nodes in network {key}...')
     for performer in networks[key].nodes:
         networks[key].nodes[performer]['centralities'] = {}
 
-    log(f' --> `degree_centrality`')
+    # log(f' --> `degree_centrality`')
     for performer, degree in nx.degree_centrality(networks[key]).items():
         networks[key].nodes[performer]['centralities']['degree_centrality_100x'] = round(degree*100, 6)
 
-    log(f' --> `betweenness_centrality`')
+    # log(f' --> `betweenness_centrality`')
     for performer, degree in nx.betweenness_centrality(networks[key], k=len(networks[key].nodes)).items():
         networks[key].nodes[performer]['centralities']['betweenness_centrality_100x'] = round(degree*100, 6)
 
-    log(f' --> `eigenvector_centrality`')
+    # log(f' --> `eigenvector_centrality`')
     for performer, degree in nx.eigenvector_centrality(networks[key], max_iter=100, weight='weight').items():
         networks[key].nodes[performer]['centralities']['eigenvector_centrality_100x'] = round(degree*100, 6)
 
     # TODO: Katz centrality keeps failing within 1000 iterations :/
-    log(f' --> `katz_centrality`')
+    # log(f' --> `katz_centrality`')
     #try:
     #    for performer, degree in nx.katz_centrality(networks[key]).items():
     #        networks[key].nodes[performer]['centralities']['katz_centrality_100x'] = round(degree*100, 6)
     #except nx.exception.PowerIterationFailedConvergence as e:
     #    print(f'Katz Centrality failed: {e}')
 
-    log(f' --> `closeness_centrality`')
+    # log(f' --> `closeness_centrality`')
     for performer, degree in nx.closeness_centrality(networks[key]).items():
         networks[key].nodes[performer]['centralities']['closeness_centrality_100x'] = round(degree*100, 6)
 
@@ -890,7 +890,7 @@ def get_degrees(G, node):
 
 
 for key in networks.keys():
-    log(f'Setting degree data on {len(networks[key].nodes)} nodes in network {key}...')
+    # log(f'Setting degree data on {len(networks[key].nodes)} nodes in network {key}...')
     degrees = {node: {'degrees': get_degrees(networks[key], node)} for node in networks[key].nodes}
     nx.set_node_attributes(networks[key], degrees)
 
@@ -949,11 +949,11 @@ for key in networks:
 
     with open('./docs/data/'+file_name, 'w+') as fp:
         json.dump(obj=data, fp=fp)
-        log(f'Saved {fp.name} (took {round((data["timeToCreate"]["totalInSeconds"]/60), 2)} minutes to generate)')
+        # log(f'Saved {fp.name} (took {round((data["timeToCreate"]["totalInSeconds"]/60), 2)} minutes to generate)')
         
 with open('./docs/data/co-occurrence-_metadata.json', 'w+') as fp:
     json.dump(obj=metadata, fp=fp)
-    log(f'Saved metadata file.')
+    # log(f'Saved metadata file.')
 
 
 # # Export to other formats (optional)
@@ -981,7 +981,7 @@ for key in gexf_networks:
     file_name = f'gephi/co-occurrence-{key}.gexf'
     
     nx.write_gexf(gexf_networks[key], file_name)
-    log(f'Saved {file_name}')
+    # log(f'Saved {file_name}')
 
 
 # In[ ]:
