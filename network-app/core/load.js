@@ -143,6 +143,7 @@ const loadNetwork = (callback=[]) => {
         // for debug purposes (TODO can be removed)
         store.raw = data;
 
+        d3.select('#createdDate').html(`<p><strong>Visualization last generated</strong>: ${store.raw.createdDate}</p>`);
         // set up store
         store.comments = Object.assign({}, data.comments);
         store.count = Object.assign({}, data.count);
