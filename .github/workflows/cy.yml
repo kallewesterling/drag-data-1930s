@@ -18,7 +18,7 @@ jobs:
         with:
           python-version: 3.8 #install the python needed
       - run: pip install -r requirements.txt
-      - name: execute py script # run the run.py to get the latest data, TODO: create a backend solution that checks for updates so this can run dynamically when there are updates.
+      - name: execute py script # run the run.py to get the latest data, TODO: #68 create a backend solution that checks for updates so this can run dynamically when there are updates.
         run: |
           python generate-cooccurrence-data.py
       - name: create-json
