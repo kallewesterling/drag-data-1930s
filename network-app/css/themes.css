@@ -38,6 +38,9 @@
 
     --border-color: rgba(255,255,255,.125);
     --header-color: rgba(255,255,255,.075);
+
+    --nodeTable-bg: rgba(35, 35, 35,1);
+    --nodeTable-links: rgba(255, 255, 255,1);
 }
 
 .theme-light {
@@ -80,4 +83,7 @@
 
     --border-color: rgba(0,0,0,.125);
     --header-color: rgba(255,255,255,.45);
+
+    --nodeTable-bg: rgb(249 249 249);
+    --nodeTable-links: rgba(0, 0,0,1);
 }
