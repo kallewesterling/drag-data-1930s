@@ -167,6 +167,20 @@ const filterEdges = (edgeList = [], settings = undefined, change = true) => {
             dropEdge(e);
         });
 
+        graph.edges
+        .filter((edge) => edge.inGraph === false)
+        .filter((edge) => edge.passes.startYear === true && edge.passes.endYear === true) // edge has to both pass startYear and endYear to be in the graph
+        .forEach((e) => {
+            addEdge(e);
+        });
+
+    graph.edges
+        .filter((edge) => edge.inGraph === true)
+        .filter((edge) => edge.passes.startYear === false || edge.passes.endYear === false) // if edge does not pass either startYear or endYear it should not be in the graph
+        .forEach((e) => {
+            dropEdge(e);
+        });
+
     return true;
 
     store.edges
