@@ -18,9 +18,15 @@ jobs:
         with:
           python-version: 3.8 #install the python needed
       - run: pip install -r requirements.txt
-      - name: execute py script # run the run.py to get the latest data
-        run: |
-          python generate-cooccurrence-data.py
+#      - name: execute py script # run the run.py to get the latest data
+#        run: |
+#          python generate-cooccurrence-data.py
+      - name: create-json
+        id: create-json
+        uses: jsdaniell/create-json@1.1.2
+        with:
+          name: "network-app/env.json"
+          json: '{"ERROR_LEVEL": 0}'
       - name: Push directory to another repository
         uses: cpina/github-action-push-to-another-repository@v1.3
         env:
