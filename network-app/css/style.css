@@ -522,13 +522,21 @@ svg#main {
     padding-bottom: 1em;
     overflow: scroll;
     z-index: 200;
-    background-color: rgb(249 249 249); /* TODO: #22 #nodeTable bg-color makes it too bright in dark mode */
+    background-color: var(--background-settings) !important;
     box-shadow: 0 -.125rem .25rem rgba(0,0,0,.075)!important;
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
 }
 
 #nodeTable div table tbody th, #nodeTable div table thead, #nodeTable div table td {
     color: darkgray !important;
+    background-color: var(--background-settings) !important;
 }
+
+#nodeTable a {
+    color: var(--nodeTable-links) !important;
+}
+
 @media (max-width: 1200px) {
     #nodeTableContainer {
         width: 98% !important;

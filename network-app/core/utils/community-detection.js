@@ -234,7 +234,7 @@ const getNodeClusterInfo = (returnFullNodes = false) => {
                         .filter((n) => n.id === node);
                     if (nodeElement.length === 1) nodeElement = nodeElement[0];
                     else console.error("Found too many nodes with ID!");
-                    html += `<span class="badge me-1 cluster text-dark" id="communityHighlight${nodeElement.node_id}"><a class="text-dark text-decoration-none" href="javascript:highlightNode('${nodeElement.node_id}')">${node}</a></span>`;
+                    html += `<span class="badge me-1 cluster" id="communityHighlight${nodeElement.node_id}"><a class="text-decoration-none" href="javascript:highlightNode('${nodeElement.node_id}')">${node}</a></span>`;
                 });
             } else {
                 html += `—`;
