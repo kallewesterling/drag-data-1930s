@@ -256,6 +256,30 @@ svg#main {
     transition: display 0s, opacity 0.5s linear;
 }
 
+#settingsContainer .list-group-item p, #settingsContainer .list-group-item label {
+    color: var(--text-color) !important;
+}
+
+#quickEdgeInfo {
+    background-color: var(--quickEdgeInfo-bg) !important;
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+}
+
+#quickEdgeInfo ul {
+    margin-top:0.75rem;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0;
+    padding-left: 1rem;
+    list-style: none;
+    border-left: 5px lightgray solid;
+    border-radius: 1rem;
+}
+
+#quickEdgeInfo li {
+    margin-bottom: 0.25rem;
+}
+
 #wrapToasters {
     position: absolute;
     left: calc(50% - 175px);
@@ -505,6 +529,7 @@ svg#main {
     #floatingInfo span {
         margin-bottom: 0.25em !important;
         text-align: right;
+        color: var(--text-color) !important;
     }
 
 }

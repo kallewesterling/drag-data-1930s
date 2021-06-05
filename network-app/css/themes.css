@@ -4,6 +4,8 @@
     --background-settings: rgba(0, 0, 0, 0.50);
     --settings-label: rgba(255, 255, 255, 1);
 
+    --quickEdgeInfo-bg: rgba(255, 255, 255, 0.15);
+
     --text-color: rgba(255, 255, 255, 1);
 
     --performer: rgba(175, 79, 55, 1);
@@ -48,6 +50,8 @@
 
     --background-settings: rgba(255, 255, 255, 0.50);
     --settings-label: rgba(0, 0, 0, 1);
+
+    --quickEdgeInfo-bg: rgba(255, 255, 255, 0.75);
 
     --text-color: rgba(0, 0, 0, 1);
 
