@@ -15,14 +15,16 @@ const _output = (
         from = from.name;
     if (typeof from === "object") from = from.constructor.name;
 
-    window._selectors["loadingContainer"].classed("bg-white", true);
-    window._selectors["loadingContainer"].classed("bg-danger", false);
-    window._selectors["loadingContainer"].classed("text-white", false);
-    window._selectors["loadingMessage"].html(message);
-    window._selectors["loading"].classed("d-none", false);
-    window.loadingTimeout = setTimeout(() => {
-        window._selectors["loading"].classed("d-none", true);
-    }, 100);
+    if (message.slice(0,6) !== 'Called' && typeof message !== "object") {
+        window._selectors["loadingContainer"].classed("bg-white", true);
+        window._selectors["loadingContainer"].classed("bg-danger", false);
+        window._selectors["loadingContainer"].classed("text-white", false);
+        window._selectors["loadingMessage"].html(message);
+        window._selectors["loading"].classed("d-none", false);
+        window.loadingTimeout = setTimeout(() => {
+            window._selectors["loading"].classed("d-none", true);
+        }, 500);
+    }
 
     if (![...Object.keys(froms)].includes(from)) {
         // assign color

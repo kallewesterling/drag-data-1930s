@@ -80,7 +80,6 @@ const updateLabel = (
     // special handling
     switch (name) {
         case "charge":
-            console.log(`charge is set to ${value}`);
             value = ((+value + 5100) / 10).toFixed(0) + "%";
             break;
 
