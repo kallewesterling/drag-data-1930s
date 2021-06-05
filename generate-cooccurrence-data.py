@@ -9,6 +9,7 @@ import unicodedata
 import re
 import pandas as pd
 import json
+import os
 import datetime
 from IPython.display import display, HTML, Markdown, clear_output
 
@@ -268,11 +269,32 @@ def get_clean_network_data(min_date=None, max_date=None, drop_cols=None, verbose
     return df
 
 
+def test_same_df(df1, df2):
+    for cols in [[x for x in df1.columns], [x for x in df2.columns]]:
+        for col in cols:
+            for ix, row in (df1 == df2).iterrows():
+                if not all([row[col] for col in cols]):
+                    return False
+            if not [x for x in df1[col]] == [x for x in df2[col]]:
+                return False
+    return True
+
+
 df = get_clean_network_data(
     min_date=datetime.datetime(year=1930, month=1, day=1),
     max_date=datetime.datetime(year=1940, month=12, day=31),
     verbose=False,
 )
+
+
+if os.path.exists('network-app/data/_df.pickle'):
+    df_test = pd.read_pickle('network-app/data/_df.pickle')
+
+    if test_same_df(df, df_test):
+        print("Dataset is same. Exiting...")
+        exit()
+
+df.to_pickle('network-app/data/_df.pickle')
 
 
 def get_performers_who_were_there(df, where=None, when=[]):
