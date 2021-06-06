@@ -486,8 +486,8 @@ const loadStoreRanges = () => {
         return store.ranges;
     }
 
-    store.ranges.nodeDegree = d3.extent(store.nodes, (d) => d.degree);
-    store.ranges.edgeWidth = d3.extent(store.edges, (d) => d.weight);
+    store.ranges.nodeDegree = d3.extent(store.nodes, node=>node.degrees.degree);
+    store.ranges.edgeWidth = d3.extent(store.edges, edge=>edge.weights.weight);
 
     store.ranges.years = {
         min: d3.min(
