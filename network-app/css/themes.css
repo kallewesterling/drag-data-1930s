@@ -1,7 +1,7 @@
 .theme-dark {
     --background: rgba(0, 0, 0, 1);
 
-    --background-settings: rgba(0, 0, 0, 0.50);
+    --background-settings: rgba(0, 0, 0, 0.5);
     --settings-label: rgba(255, 255, 255, 1);
 
     --quickEdgeInfo-bg: rgba(255, 255, 255, 0.15);
@@ -33,22 +33,22 @@
     --city-selected-secondary: rgb(213, 169, 169);
     --city-selected-tertiary: rgb(213, 169, 169);
     --city-deselected: rgb(87, 87, 87);
-    
+
     --empty-node: rgba(255, 255, 255, 0.5);
     --disabled-node: rgba(255, 255, 255, 0.05);
     --node-stroke: rgba(255, 255, 255, 0.5);
 
-    --border-color: rgba(255,255,255,.125);
-    --header-color: rgba(255,255,255,.075);
+    --border-color: rgba(255, 255, 255, 0.125);
+    --header-color: rgba(255, 255, 255, 0.075);
 
-    --nodeTable-bg: rgba(35, 35, 35,1);
-    --nodeTable-links: rgba(255, 255, 255,1);
+    --nodeTable-bg: rgba(35, 35, 35, 1);
+    --nodeTable-links: rgba(255, 255, 255, 1);
 }
 
 .theme-light {
     --background: rgba(0, 0, 0, 0.009);
 
-    --background-settings: rgba(255, 255, 255, 0.50);
+    --background-settings: rgba(255, 255, 255, 0.5);
     --settings-label: rgba(0, 0, 0, 1);
 
     --quickEdgeInfo-bg: rgba(255, 255, 255, 0.75);
@@ -85,9 +85,9 @@
     --disabled-node: rgba(0, 0, 0, 0.05);
     --node-stroke: rgba(255, 255, 255, 1);
 
-    --border-color: rgba(0,0,0,.125);
-    --header-color: rgba(255,255,255,.45);
+    --border-color: rgba(0, 0, 0, 0.125);
+    --header-color: rgba(255, 255, 255, 0.45);
 
     --nodeTable-bg: rgb(249 249 249);
-    --nodeTable-links: rgba(0, 0,0,1);
+    --nodeTable-links: rgba(0, 0, 0, 1);
 }

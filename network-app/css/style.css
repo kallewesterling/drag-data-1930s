@@ -1,8 +1,9 @@
 * {
-    font-family: 'Open Sans', sans-serif;
+    font-family: "Open Sans", sans-serif;
 }
 
-body, html {
+body,
+html {
     height: 100% !important;
     z-index: -1000;
 }
@@ -21,7 +22,8 @@ body, html {
     backdrop-filter: blur(4px);
 }
 
-#settings, #infoContainer {
+#settings,
+#infoContainer {
     color: var(--text-color) !important;
 }
 #settings > .card-header {
@@ -74,11 +76,11 @@ nav .btn {
 }
 
 .theme-dark nav #switchMode::after {
-    content: 'Light mode' !important;
+    content: "Light mode" !important;
 }
 
 .theme-light nav #switchMode::after {
-    content: 'Dark mode' !important;
+    content: "Dark mode" !important;
 }
 
 #infoContainer > p,
@@ -165,7 +167,8 @@ svg#main {
     stroke: var(--link-deselected) !important;
 }
 
-.link, .label {
+.link,
+.label {
     cursor: context-menu;
 }
 
@@ -256,7 +259,8 @@ svg#main {
     transition: display 0s, opacity 0.5s linear;
 }
 
-#settingsContainer .list-group-item p, #settingsContainer .list-group-item label {
+#settingsContainer .list-group-item p,
+#settingsContainer .list-group-item label {
     color: var(--text-color) !important;
 }
 
@@ -267,7 +271,7 @@ svg#main {
 }
 
 #quickEdgeInfo ul {
-    margin-top:0.75rem;
+    margin-top: 0.75rem;
     margin-bottom: 0.75rem;
     padding-bottom: 0;
     padding-left: 1rem;
@@ -342,7 +346,7 @@ svg#main {
     overflow: hidden;
     overflow-y: scroll;
     max-height: 600px;
-    background-color: rgba(255,255,255,0.9);
+    background-color: rgba(255, 255, 255, 0.9);
     z-index: 500;
     -webkit-backdrop-filter: blur(4px);
     backdrop-filter: blur(4px);
@@ -388,33 +392,32 @@ svg#main {
     z-index: 500;
 }
 
-
 .cluster-0 {
-    fill: #EBBAB9 !important;
+    fill: #ebbab9 !important;
 }
 
 .cluster-1 {
-    fill: #C9C5BA !important;
+    fill: #c9c5ba !important;
 }
 
 .cluster-2 {
-    fill: #B5BDB2 !important;
+    fill: #b5bdb2 !important;
 }
 
 .cluster-3 {
-    fill: #ABB9AE !important;
+    fill: #abb9ae !important;
 }
 
 .cluster-4 {
-    fill: #A1B5AA !important;
+    fill: #a1b5aa !important;
 }
 
 .cluster-5 {
-    fill: #97B1A6 !important;
+    fill: #97b1a6 !important;
 }
 
 .cluster-6 {
-    fill: #809D9E !important;
+    fill: #809d9e !important;
 }
 
 .cluster-7 {
@@ -422,7 +425,7 @@ svg#main {
 }
 
 .cluster-8 {
-    fill: #557D86 !important;
+    fill: #557d86 !important;
 }
 
 .cluster-9 {
@@ -430,42 +433,43 @@ svg#main {
 }
 
 .cluster-10 {
-    fill: #EBBAB9 !important;
+    fill: #ebbab9 !important;
 }
 
 .cluster-11 {
-    fill: #EBBAB9 !important;
+    fill: #ebbab9 !important;
 }
 
 .cluster-12 {
-    fill: #EBBAB9;
+    fill: #ebbab9;
 }
 
 .cluster-13 {
-    fill: #EBBAB9;
+    fill: #ebbab9;
 }
 
 .cluster-14 {
-    fill: #EBBAB9;
+    fill: #ebbab9;
 }
 
 .cluster-15 {
-    fill: #EBBAB9;
+    fill: #ebbab9;
 }
 
 .cluster-16 {
-    fill: #EBBAB9;
+    fill: #ebbab9;
 }
 
 .cluster-17 {
-    fill: #EBBAB9;
+    fill: #ebbab9;
 }
 
 .cluster-18 {
-    fill: #EBBAB9;
+    fill: #ebbab9;
 }
 
-.colorNetworks, .commentedNodes {
+.colorNetworks,
+.commentedNodes {
     cursor: pointer;
 }
 
@@ -474,7 +478,8 @@ svg#main {
     color: inherit !important;
 }
 
-[class^="bi-"]::before, [class*=" bi-"]::before {
+[class^="bi-"]::before,
+[class*=" bi-"]::before {
     padding-bottom: 2.5px !important;
 }
 
@@ -487,10 +492,10 @@ svg#main {
     font-variant: normal;
     text-transform: none;
     line-height: 1;
-    vertical-align: -.125em;
+    vertical-align: -0.125em;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    margin-right: .25rem!important;
+    margin-right: 0.25rem !important;
 }
 
 #toggledSettings::before {
@@ -502,17 +507,18 @@ svg#main {
     font-variant: normal;
     text-transform: none;
     line-height: 1;
-    vertical-align: -.125em;
+    vertical-align: -0.125em;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
 
 .toggled #toggledSettings::before {
-    content: "\f14c";    
+    content: "\f14c";
 }
 
-#info span, section {
-    white-space: nowrap!important;
+#info span,
+section {
+    white-space: nowrap !important;
 }
 @media (max-width: 1199.98px) {
     #floatingInfo {
@@ -531,7 +537,6 @@ svg#main {
         text-align: right;
         color: var(--text-color) !important;
     }
-
 }
 @media (min-width: 1200px) {
     #floatingInfo {
@@ -548,12 +553,14 @@ svg#main {
     overflow: scroll;
     z-index: 200;
     background-color: var(--background-settings) !important;
-    box-shadow: 0 -.125rem .25rem rgba(0,0,0,.075)!important;
+    box-shadow: 0 -0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
     -webkit-backdrop-filter: blur(4px);
     backdrop-filter: blur(4px);
 }
 
-#nodeTable div table tbody th, #nodeTable div table thead, #nodeTable div table td {
+#nodeTable div table tbody th,
+#nodeTable div table thead,
+#nodeTable div table td {
     color: darkgray !important;
     background-color: var(--background-settings) !important;
 }
@@ -581,7 +588,7 @@ svg#main {
 
 #quickEdgeInfo {
     position: absolute;
-    top:90%;
+    top: 90%;
     left: 20px;
     width: 40%;
     color: darkgray;
