@@ -360,6 +360,34 @@ const settingsFromDashboard = (caller = undefined) => {
     return mappedInterfaceSettings;
 };
 
+const settingsFromQueryString = (caller = undefined) => {
+    let output_msg = [`Called ${caller ? "by " + caller : ""}`];
+
+    const urlParams = new URLSearchParams(window.location.search);
+
+    let QSSettings = new Object();
+
+    for (const [key, value] of urlParams) {
+        if (!value) continue;
+        [
+            "minDegree",
+            "minWeight",
+            "zoomMax",
+            "zoomMin",
+            "startYear",
+            "endYear",
+            "x",
+            "y",
+            "z",
+        ].forEach((k) => {
+            if (k.toLowerCase() === key.toLowerCase())
+                if (+value) QSSettings[k] = +value;
+                else QSSettings[k] = value;
+        });
+    }
+    return QSSettings;
+};
+
 /**
  * setupSettingsInterface takes no arguments but sets up the settings box correctly, with all the max, min, and step values for UI elements,
  * The return value is true in all cases.
@@ -1059,119 +1087,65 @@ const queryStringToSettings = (settings = undefined) => {
 
     if (!settings) settings = window.autoSettings;
 
-    const urlParams = new URLSearchParams(window.location.search);
+    const QSSettings = settingsFromQueryString();
 
-    output_msgs.push(`Got query string ${window.location.search}`);
-
-    for (const [key, value] of urlParams) {
-        if (!value) continue;
-
-        switch (key.toLowerCase()) {
-            case "mindegree":
-            case "min_degree":
-            case "mindegrees":
-                output_msgs.push(`--> set minDegree to ${value}`);
-                if (+value) {
-                    settings.nodes.minDegree = +value;
-                } else {
-                    settings.nodes.minDegree =
-                        window.autoSettings.nodes.minDegree;
-                }
-                break;
-
-            case "minweight":
-            case "min_weight":
-            case "minweights":
-                if (+value) {
-                    settings.edges.minWeight = +value;
-                } else {
-                    settings.edges.minWeight =
-                        window.autoSettings.edges.minWeight;
-                }
-                output_msgs.push(
-                    `--> minWeight has been set to ${settings.edges.minWeight}`
-                );
-                break;
-
-            case "stickynodes":
-                settings.nodes.stickyNodes = value === "true" || value === "1";
-                output_msgs.push(
-                    `--> stickyNodes has been set to ${settings.nodes.stickyNodes}`
-                );
-                break;
-
-            /* // TODO #37
-            case "community":
-            case "communities":
-            case "communitydetection":
-            case "community-detection":
-                settings.nodes.communityDetection = (value === "true" || value === "1");
-                output_msgs.push(`--> communityDetection has been set to ${settings.nodes.communityDetection}`)
-                break;
-            */
-
-            case "minzoom": // TODO: #20 The zoom can not be set through query string
-            case "min-zoom":
-                if (+value) {
-                    settings.zoomMin = +value;
-                } else {
-                    settings.zoomMin = window.autoSettings.zoomMin;
-                }
-                output_msgs.push(
-                    `--> minZoom has been set to to ${settings.zoomMin}`
-                );
-                break;
-
-            case "maxzoom": // TODO: #20 The zoom can not be set through query string
-            case "max-zoom":
-                if (+value) {
-                    settings.zoomMax = +value;
-                } else {
-                    settings.zoomMax = window.autoSettings.zoomMax;
-                }
-                output_msgs.push(
-                    `--> maxZoom has been set to to ${settings.zoomMax}`
-                );
-                break;
-
-            case "min-year":
-            case "minyear":
-            case "start-year":
-            case "startyear":
-                if (+value) {
-                    settings.edges.startYear = +value;
-                } else {
-                    settings.edges.startYear =
-                        window.autoSettings.edges.startYear;
-                }
-                output_msgs.push(
-                    `--> startYear has been set to to ${settings.edges.startYear}`
-                );
-                break;
-
-            case "max-year":
-            case "maxyear":
-            case "end-year":
-            case "endyear":
-                if (+value) {
-                    settings.edges.endYear = +value;
-                } else {
-                    settings.edges.endYear = window.autoSettings.edges.endYear;
-                }
-                output_msgs.push(
-                    `--> endYear has been set to to ${settings.edges.endYear}`
-                );
-                break;
-
-            default:
-                _output(
-                    `no such setting found: "${key}"`,
-                    false,
-                    queryStringToSettings,
-                    console.error
-                );
-        }
+    if (QSSettings.minDegree) {
+        output_msgs.push(`--> set minDegree to ${QSSettings.minDegree}`);
+        settings.nodes.minDegree = QSSettings.minDegree;
     }
+
+    if (QSSettings.minWeight) {
+        output_msgs.push(`--> set minWeight to ${QSSettings.minWeight}`);
+        settings.edges.minWeight = QSSettings.minWeight;
+    }
+
+    if (QSSettings.zoomMin || QSSettings.zoomMax) {
+        output_msgs.push(
+            `--> set zoomMin to ${QSSettings.zoomMin} and zoomMax to ${QSSettings.zoomMax}`
+        );
+        (settings.zoomMin = window.autoSettings.zoomMin),
+            (settings.zoomMax = window.autoSettings.zoomMax);
+
+        if (QSSettings.zoomMin !== undefined)
+            settings.zoomMin = QSSettings.zoomMin;
+
+        if (QSSettings.zoomMax !== undefined)
+            settings.zoomMax = QSSettings.zoomMax;
+
+        zoom.scaleExtent([settings.zoomMin, settings.zoomMax]);
+    }
+
+    if (QSSettings.startYear) {
+        output_msgs.push(`--> set startYear to ${QSSettings.startYear}`);
+        settings.edges.startYear = QSSettings.startYear;
+    }
+
+    if (QSSettings.endYear) {
+        output_msgs.push(`--> set endYear to ${QSSettings.endYear}`);
+        settings.edges.endYear = QSSettings.endYear;
+    }
+
+    if (QSSettings.x || QSSettings.y || QSSettings.z) {
+        output_msgs.push(
+            `--> set x to ${QSSettings.x}, y to ${QSSettings.y}, and z to ${QSSettings.z}`
+        );
+        let x = 0,
+            y = 0,
+            z = 1;
+
+        if (QSSettings.x !== undefined) x = QSSettings.x;
+
+        if (QSSettings.y !== undefined) y = QSSettings.y;
+
+        if (QSSettings.z !== undefined) z = QSSettings.z;
+
+        graph.svg
+            .transition()
+            .duration(1000)
+            .call(zoom.transform, d3.zoomIdentity.translate(x, y).scale(z));
+    }
+
+    output_msgs.forEach((msg) => console.error(msg));
     _output(output_msgs, false, queryStringToSettings);
 
     saveToStorage(settings);
