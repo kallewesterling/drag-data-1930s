@@ -369,4 +369,5 @@ const quickEdgeInfo = (edge) => {
 
     if (!isVisible("#nodeTable")) show("#quickEdgeInfo");
     document.querySelector("#quickEdgeInfo").innerHTML = html;
+    document.querySelector("#quickEdgeInfo").style.top = `${window.innerHeight - document.querySelector("#quickEdgeInfo").offsetHeight - 20}px`
 };
