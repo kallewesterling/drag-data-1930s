@@ -327,6 +327,8 @@ const filter = (nodeList = [], edgeList = [], change = true) => {
     filterNodes(nodeList, settings);
     filterEdges(edgeList, settings, change);
 
+    setCurrentCentralities();
+
     modifyNodeDegrees();
 
     if (settings.nodes.autoClearNodes) {
