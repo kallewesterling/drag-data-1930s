@@ -603,3 +603,8 @@ circle.highlighted {
 .badge.cluster {
     background-color: rgb(108 117 125 / 8%);
 }
+
+#settingsContainer select {
+    background-color: var(--background);
+    color: var(--text-color);
+}
