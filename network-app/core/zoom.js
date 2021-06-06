@@ -59,9 +59,9 @@ if (_)
         d3.zoomIdentity.translate(_.x, _.y).scale(_.k)
     );
 
-function goTo(x = undefined, y = undefined) {
+function goTo(x = undefined, y = undefined, k = undefined) {
     // TODO: Fix this function... it should zoom into the coordinates provided above... For now, emergency function below `highlightNode`
-    if (!x || !y) {
+    if (x === undefined || y === undefined) {
         let node =
             graph.nodes[Math.floor(Math.random() * graph.nodes.length - 1)];
         let x = node.x;
@@ -76,15 +76,11 @@ function goTo(x = undefined, y = undefined) {
         d3.zoomIdentity.translate(window.innerWidth / 2, window.innerHeight / 2).scale(5).translate(-x, -y)
     );
     */
-    graph.svg
-        .transition()
-        .duration(1000)
-        .call(zoom.transform, d3.zoomIdentity.translate(_.x, _.y).scale(_.k));
 
     graph.svg
         .transition()
         .duration(1000)
-        .call(zoom.transform, d3.zoomIdentity.translate(-x, -y).scale(5));
+        .call(zoom.transform, d3.zoomIdentity.translate(-x, -y).scale(k));
 }
 // graph.svg.on('mouseover', (evt)=>{console.log(evt.clientX, evt.clientY)})
 
