@@ -6,15 +6,29 @@ A workflow will run and generate the visualization files in a different reposito
 
 ## Running on local machines
 
-### Step 1. Processing dataset
+### Step 1. Clone the Correct Repository
 
-To run the analysis, clone this package and run in your terminal:
+This repository contains the source code but the most recent "compiled" `network-app` is located in the [`drag-network` repository](https://github.com/kallewesterling/drag-network). The easiest thing is therefore to 
 
 ```sh
-$ python generate-cooccurrence-data.py
+$ git clone https://github.com/kallewesterling/drag-network
 ```
 
-### Step 2. Run server
+### Step 2. Processing dataset
+
+Since you are cloning the `drag-network` repository, you do not need to process the dataset as it already comes with the latest updated one.
+
+~~To run the analysis, clone this package and run in your terminal:~~
+
+~~$ python generate-cooccurrence-data.py~~
+
+### Step 3. Run server
+
+Navigate into the cloned directory:
+
+```sh
+$ cd drag-network
+```
 
 Then open a local HTTP server:
 
