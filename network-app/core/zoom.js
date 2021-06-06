@@ -59,34 +59,42 @@ if (_)
         d3.zoomIdentity.translate(_.x, _.y).scale(_.k)
     );
 
-function goTo(x = undefined, y = undefined, k = undefined) {
-    // TODO: Fix this function... it should zoom into the coordinates provided above... For now, emergency function below `highlightNode`
-    if (x === undefined || y === undefined) {
-        let node =
-            graph.nodes[Math.floor(Math.random() * graph.nodes.length - 1)];
-        let x = node.x;
-        let y = node.y;
-    }
-    let width = graph.plot.attr("width");
-    let height = graph.plot.attr("height");
+function zoomToNode(node = undefined, z=4) {
+    if (node === undefined)
+        node = graph.nodes[Math.floor(Math.random() * graph.nodes.length - 1)];
 
-    /*
-    graph.svg.transition().duration(1000).call(
-        zoom.transform,
-        d3.zoomIdentity.translate(window.innerWidth / 2, window.innerHeight / 2).scale(5).translate(-x, -y)
-    );
-    */
+    if (typeof node == 'string')
+        node = findNode(node);
+
+    // goTo(node.x, node.y, 4);
+    graph.svg
+        .transition()
+        .duration(1000)
+        .call(zoom.transform, d3.zoomIdentity.scale(4).translate(-node.x, -node.y));
+
+    highlightNode(node.node_id, 3);
+
+    return node;
+}
+
+function goTo(x = undefined, y = undefined, k = undefined) {
+    if (x === undefined || y === undefined) {
+        console.error('This function requires and x and a y coordinate.');
+        return false;
+    }
+
+    if (k === undefined)
+        k = 1;
 
     graph.svg
         .transition()
         .duration(1000)
-        .call(zoom.transform, d3.zoomIdentity.translate(-x, -y).scale(k));
+        .call(zoom.transform, d3.zoomIdentity.scale(k).translate(-x, -y));
+
 }
-// graph.svg.on('mouseover', (evt)=>{console.log(evt.clientX, evt.clientY)})
 
-const highlightNode = (node_id) => {
-    console.log("highlightNode called");
 
+const highlightNode = (node_id, repeatFor = 5) => {
     if (!document.querySelector(`circle#${node_id}`))
         if (graph.nodes.filter((node) => node.id === node_id).length === 1)
             node_id = graph.nodes.filter((node) => node.id === node_id)[0]
@@ -97,7 +105,7 @@ const highlightNode = (node_id) => {
         let counter = 0;
         (function repeat() {
             counter += 1;
-            if (counter > 5) {
+            if (counter > repeatFor) {
                 document.querySelector(
                     `#communityHighlight${node_id}`
                 ).style.backgroundColor = "";
