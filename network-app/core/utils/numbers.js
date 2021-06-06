@@ -48,17 +48,35 @@ const setCurrentCentralities = () => {
         graph.edges.map((edge) => [edge.source.node_id, edge.target.node_id])
     );
     graph.nodes.forEach((node) => (node.currentCentralities = {}));
-    Object.entries(jsnx.betweennessCentrality(G)._stringValues).forEach(
-        (entry) => {
-            const [key, value] = entry;
-            findNode(key).currentCentralities.betweenness_centrality_100x = value * 100;
-        }
-    );
-    Object.entries(jsnx.eigenvectorCentrality(G)._stringValues).forEach(
-        (entry) => {
-            const [key, value] = entry;
-            findNode(key).currentCentralities.eigenvector_centrality_100x = value * 100;
-        }
-    );
+
+    let betweennessCentralities = undefined, eigenvectorCentralities = undefined;
+
+    try {
+        betweennessCentralities = jsnx.betweennessCentrality(G)._stringValues;
+    } catch {
+        console.error('Could not generate betweenness centralities for network.')
+    }
+    try {
+        eigenvectorCentralities = jsnx.eigenvectorCentrality(G)._stringValues;
+    } catch {
+        console.error('Could not generate eigenvector centralities for network.')
+    }
+
+    if (typeof betweennessCentralities === 'object') {
+        Object.entries(betweennessCentralities).forEach(
+            (entry) => {
+                const [key, value] = entry;
+                findNode(key).currentCentralities.betweenness_centrality_100x = (value * 100).toFixed(5);
+            }
+        );
+    }
+    if (typeof eigenvectorCentralities === 'object') {
+        Object.entries(eigenvectorCentralities).forEach(
+            (entry) => {
+                const [key, value] = entry;
+                findNode(key).currentCentralities.eigenvector_centrality_100x = (value * 100).toFixed(5);
+            }
+        );
+    }
     return graph.nodes;
 };
