@@ -334,6 +334,9 @@ const setupInteractivity = (settings = undefined) => {
     nodeElements.on("click", (event, node) => {
         // console.log('event', event);
         // console.log('node', node);
+        if (window.tour)
+            return false;
+
         event.stopPropagation();
         if (event.metaKey === true) {
             if (nodeIsSelected(node)) {
@@ -352,16 +355,21 @@ const setupInteractivity = (settings = undefined) => {
     });
 
     textElements.on("click", (event, node) => {
-        console.log(node);
+        if (window.tour)
+            return false;
         toggleNode(node);
         return true;
     });
 
     edgeElements.on("mouseover", (event, edge) => {
+        if (window.tour)
+            return false;
         if (!window.nodeSelected && !window.edgeSelected) quickEdgeInfo(edge);
     });
 
     edgeElements.on("click", (event, edge) => {
+        if (window.tour)
+            return false;
         event.stopPropagation();
         quickEdgeInfo(edge);
         if (window.toggledCommentedElements) {

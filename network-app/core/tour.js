@@ -19,11 +19,51 @@ const tour1 = [
     },
 ];
 
-const tour = () => {
-    // don't forget to run resetLocalStorage() before this function!
-    tour1.forEach((step) => {
-        step.settings.forEach((settings) => changeSetting(settings));
-        console.log(step.text);
+function until(conditionFunction) {
+    const poll = (resolve) => {
+        if (conditionFunction()) resolve();
+        else setTimeout((_) => poll(resolve), 400);
+    };
+
+    return new Promise(poll);
+}
+
+async function tour(steps = []) {
+    window.tour = true;
+
+    // hide settings
+    hide("#settings");
+
+    changeSetting("#minDegree", 0, true, 'slider');
+    changeSetting("#minWeight", 0, true, 'slider');
+    changeSetting("#startYear", 1930, true, 'dropdown');
+    changeSetting("#endYear", 1940, true, 'dropdown');
+
+    await until((_) => window.simulationDone == true);
+
+    steps = [
+        {
+            node_id: "jackie_maye",
+            zoom: 1,
+            wait: 4000,
+            html: "Jackie Maye",
+            textX: 200,
+            textY: 200,
+        },
+    ];
+
+    goTo(0,0);
+    
+    steps.forEach((step) => {
+        let nodeObject = findNode(step.node_id);
+        if (nodeObject) {
+            d3.select('#quickEdgeInfo').style('top', `${step.textY}px`)
+            d3.select('#quickEdgeInfo').style('left', `${step.textX}px`)
+            d3.select('#quickEdgeInfo').html(step.html)
+            zoomToNode(step.node_id, step.zoom);
+        } else {
+            console.error(`Could not find node with id ${step.node_id}`)
+        }
     });
-    return true;
-};
+
+}

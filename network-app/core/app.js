@@ -32,6 +32,7 @@
             { function: transformToWindow, settings: settings },
             { function: saveToStorage },
             { function: setupJLouvain },
+            { function: tour },
         ]); // transformToWindow, saveToStorage, and setupJLouvain is called as a callback
 
     });
