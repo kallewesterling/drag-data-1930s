@@ -384,7 +384,7 @@ const setupInteractivity = (settings = undefined) => {
         d3
             .drag()
             .on("start", (event, node) => {
-                if (!event.active) graph.simulation.alphaTarget(0.3).restart(); // avoid restarting except on the first drag start event
+                // if (!event.active) graph.simulation.alphaTarget(0.3).restart(); // avoid restarting except on the first drag start event
                 node.fx = node.x;
                 node.fy = node.y;
             })
@@ -411,7 +411,7 @@ const setupInteractivity = (settings = undefined) => {
         d3
             .drag()
             .on("start", (event, node) => {
-                if (!event.active) graph.simulation.alphaTarget(0.3).restart(); // avoid restarting except on the first drag start event
+                // if (!event.active) graph.simulation.alphaTarget(0.3).restart(); // avoid restarting except on the first drag start event
                 node.fx = node.x;
                 node.fy = node.y;
             })
