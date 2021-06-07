@@ -59,7 +59,7 @@ if (_)
         d3.zoomIdentity.translate(_.x, _.y).scale(_.k)
     );
 
-function zoomToNode(node = undefined, z=4) {
+function zoomToNode(node = undefined, z=4, blink=3) {
     if (node === undefined)
         node = graph.nodes[Math.floor(Math.random() * graph.nodes.length - 1)];
 
@@ -70,9 +70,9 @@ function zoomToNode(node = undefined, z=4) {
     graph.svg
         .transition()
         .duration(1000)
-        .call(zoom.transform, d3.zoomIdentity.scale(4).translate(-node.x, -node.y));
+        .call(zoom.transform, d3.zoomIdentity.scale(z).translate(-node.x, -node.y));
 
-    highlightNode(node.node_id, 3);
+    highlightNode(node.node_id, blink);
 
     return node;
 }

@@ -563,6 +563,7 @@ const modifySimulation = (settings) => {
     graph.simulation.force("link").strength(settings.force.linkStrength);
 
     graph.simulation.on("tick", function () {
+        window.simulationDone = false;
         nodeElements.attr("cx", (n) => n.x);
         nodeElements.attr("cy", (n) => n.y);
 
@@ -574,6 +575,10 @@ const modifySimulation = (settings) => {
         textElements.attr("x", (n) => n.x - (document.querySelector(`text[data-node=${n.node_id}]`).getBBox().width/2));
         textElements.attr("y", (n) => n.y + n.r/2);
     });
+
+    graph.simulation.on("end", function () {
+        window.simulationDone = true;
+    })
 
     // restart the simulation now that everything is set
     graph.simulation.restart();
