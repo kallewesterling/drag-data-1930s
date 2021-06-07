@@ -282,7 +282,7 @@ const generateCommentHTML = (elem) => {
     return html;
 };
 
-const quickEdgeInfo = (edge) => {
+const getQuickEdgeInfoHTML = (edge) => {
     const splitDate = (location) => {
         let allYears = [];
         let allYearsWithMonths = [];
@@ -317,7 +317,7 @@ const quickEdgeInfo = (edge) => {
             return months[+num - 1];
         };
         let periods = edge.coLocated[location];
-        let text = `<li>at <strong>${location}</strong> during ${
+        let text = `<li class="small">at <strong>${location}</strong> during ${
             periods.length === 1 ? "one" : periods.length
         } period${periods.length > 1 ? "s" : ""},`;
         periods.forEach((period, ix) => {
@@ -355,13 +355,13 @@ const quickEdgeInfo = (edge) => {
         let allYears = splitDate(location);
         // console.log(allYears);
     });
-    html = `<strong>${edge.source.display}</strong> and <strong>${
+    html = `<p class="small"><strong>${edge.source.display}</strong> and <strong>${
         edge.target.display
     }</strong> appeared together at ${
         Object.keys(edge.coLocated).length > 1
             ? Object.keys(edge.coLocated).length
             : "one"
-    } venue${Object.keys(edge.coLocated).length > 1 ? "s" : ""}:<ul>`;
+    } venue${Object.keys(edge.coLocated).length > 1 ? "s" : ""}:</p><ul>`;
 
     let coLocatedCount = Object.keys(edge.coLocated).length - 1;
 
@@ -373,6 +373,12 @@ const quickEdgeInfo = (edge) => {
         }
     });
     html += `</ul>`;
+
+    return html;
+}
+
+const quickEdgeInfo = (edge) => {
+    let html = getQuickEdgeInfoHTML(edge);
 
     if (!isVisible("#nodeTable")) show("#quickEdgeInfo");
     document.querySelector("#quickEdgeInfo").innerHTML = html;
