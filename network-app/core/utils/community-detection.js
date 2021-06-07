@@ -68,11 +68,19 @@ const communityDetection = (settings = undefined) => {
     }
 
     if (algorithm) {
-        _output(
-            `Using ${algorithm} data from networkx`,
-            false,
-            communityDetection
-        );
+        if (algorithm !== 'jLouvain')
+            _output(
+                `Using ${algorithm} data from networkx`,
+                false,
+                communityDetection
+            );
+        else
+            _output(
+                `Using ${algorithm} data (dynamically)`,
+                false,
+                communityDetection
+            );
+
         graph.nodes.forEach((node) => {
             node.cluster = node.modularities[algorithm];
             if (

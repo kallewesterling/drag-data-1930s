@@ -111,12 +111,19 @@ const generateNodeInfoHTML = (node) => {
     }
 
     // centrality measures (v.2)
-    if (node["betweenness_centrality_100x"]) {
-        html += `<li class="list-group-item"><strong>Centrality measures (100x)</strong><p class="m-0 mb-1 small text-muted">Note: Across entire network</p>
-                <p class="m-0 mb-1 small">Betweenness: ${node["betweenness_centrality_100x"]}</p>
-                <p class="m-0 mb-1 small">Closeness: ${node["closeness_centrality_100x"]}</p>
-                <p class="m-0 mb-1 small">Degree: ${node["degree_centrality_100x"]}</p>
-                <p class="m-0 mb-1 small">Eigenvector: ${node["eigenvector_centrality_100x"]}</p>
+    if (node.centralities["betweenness_centrality_100x"]) {
+        html += `<li class="list-group-item"><strong>Overall centrality measures (100x)</strong><p class="m-0 mb-1 small text-muted">Note: Across entire network</p>
+                <p class="m-0 mb-1 small">Betweenness: ${node.centralities["betweenness_centrality_100x"]}</p>
+                <p class="m-0 mb-1 small">Closeness: ${node.centralities["closeness_centrality_100x"]}</p>
+                <p class="m-0 mb-1 small">Degree: ${node.centralities["degree_centrality_100x"]}</p>
+                <p class="m-0 mb-1 small">Eigenvector: ${node.centralities["eigenvector_centrality_100x"]}</p>
+            </li>`;
+    }
+
+    if (node.currentCentralities["betweenness_centrality_100x"]) {
+        html += `<li class="list-group-item"><strong>Current centrality measures in network (100x)</strong><p class="m-0 mb-1 small text-muted">Note: In currently displayed network</p>
+                <p class="m-0 mb-1 small">Betweenness: ${node.currentCentralities["betweenness_centrality_100x"]}</p>
+                <p class="m-0 mb-1 small">Eigenvector: ${node.currentCentralities["eigenvector_centrality_100x"]}</p>
             </li>`;
     }
 
