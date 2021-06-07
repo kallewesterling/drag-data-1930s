@@ -406,6 +406,33 @@ const setupInteractivity = (settings = undefined) => {
                 }
             })
     );
+    
+    textElements.call(
+        d3
+            .drag()
+            .on("start", (event, node) => {
+                if (!event.active) graph.simulation.alphaTarget(0.3).restart(); // avoid restarting except on the first drag start event
+                node.fx = node.x;
+                node.fy = node.y;
+            })
+            .on("drag", (event, node) => {
+                d3.select(`circle#${node.node_id}`).raise();
+                d3.select(`text[data-node=${node.node_id}]`).raise();
+                node.fx = event.x;
+                node.fy = event.y;
+            })
+            .on("end", (event, node) => {
+                if (!event.active) graph.simulation.alphaTarget(0); // restore alphaTarget to normal value
+
+                if (settings.nodes.stickyNodes) {
+                    node.fx = node.x;
+                    node.fy = node.y;
+                } else {
+                    node.fx = null;
+                    node.fy = null;
+                }
+            })
+    );
 };
 
 let textElements = g.labels.selectAll("text"),
