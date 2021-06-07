@@ -355,11 +355,11 @@ const filter = (nodeList = [], edgeList = [], change = true) => {
 
     graph.nodes.forEach((node) => {
         node.r = getSize(node, "r", settings);
-        node.html_info = generateNodeInfoHTML(node);
+        node.infoHTML = generateNodeInfoHTML(node);
     });
 
     graph.edges.forEach((edge) => {
-        edge.html_info = generateEdgeInfoHTML(
+        edge.infoHTML = generateEdgeInfoHTML(
             edge,
             settings.edges.weightFromCurrent
         );
