@@ -116,6 +116,8 @@ const highlightNode = (node_id, repeatFor = 5) => {
                     .querySelector(`#communityHighlight${node_id} a`)
                     .classList.remove("text-light");
 
+                nodeElements.attr('stroke-width', 0.1);
+
                 return undefined;
             }
             circle
