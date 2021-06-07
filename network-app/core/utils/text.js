@@ -164,7 +164,11 @@ const generateEdgeInfoHTML = (edge) => {
         weightFromCurrent = settingsFromDashboard('generateEdgeInfoHTML').edges.weightFromCurrent;
     */
 
-    let html = `<li class="list-group-item"><strong>ID</strong> ${edge.source.display} - ${edge.target.display}</li>`;
+    let html = ''
+
+    html += `<li class="list-group-item"><strong>ID</strong> ${edge.source.display} - ${edge.target.display}</li>`;
+
+    html += '<li class="list-group-item">' + getQuickEdgeInfoHTML(edge, false, ['mb-1']) + '</li>';
 
     if (edge.venue) {
         html += `<li class="list-group-item"><strong>Venue</strong> ${edge.venue}</li>`;
@@ -174,9 +178,22 @@ const generateEdgeInfoHTML = (edge) => {
         html += `<li class="list-group-item"><strong>Revue mentioned</strong> ${edge.revue_name}</li>`;
     }
 
+    if (edge.revues) {
+        html += `<li class="list-group-item"><strong>Revues</strong><ul>`;
+
+        edge.revues.forEach(revue=>{
+            html += `<li>${revue}</li>`;
+        })
+        
+        html += `</ul></li>`;
+    }
+
     html += `<li class="list-group-item">
-        <strong class="mb-1">Weight</strong>
-        <p class="m-0 mb-1 small fw-bold">In entire network: ${edge.weights.weight}</p>
+        <p class="mb-1"><strong>Weights</strong></p>
+        <p class="m-0 mb-1"><strong>In entire network:</strong> ${edge.weights.weight}</p>
+        <p class="m-0 mb-1"><strong>Date groups:</strong> ${edge.weights.dateGroups}</p>
+        <p class="m-0 mb-1"><strong>Number of dates:</strong> ${edge.weights.numDates}</p>
+        <p class="m-0 mb-1"><strong>Number of locations:</strong> ${edge.weights.numLocations}</p>
         </li>
         `;
 
@@ -202,6 +219,7 @@ const generateEdgeInfoHTML = (edge) => {
         html += `</li>`;
     }
 
+    /* // TODO: Sources are = date (fix in Python)
     if (edge.found) {
         html += `<li class="list-group-item"><strong class="mb-1">Found in sources:</strong>`;
         edge.found.forEach((source) => {
@@ -209,6 +227,7 @@ const generateEdgeInfoHTML = (edge) => {
         });
         html += `</li>`;
     }
+    */
 
     return minify(html);
 };
@@ -282,7 +301,7 @@ const generateCommentHTML = (elem) => {
     return html;
 };
 
-const getQuickEdgeInfoHTML = (edge) => {
+const getQuickEdgeInfoHTML = (edge, small=true, p_classes = [], ul_classes = [], li_classes = []) => {
     const splitDate = (location) => {
         let allYears = [];
         let allYearsWithMonths = [];
@@ -317,7 +336,7 @@ const getQuickEdgeInfoHTML = (edge) => {
             return months[+num - 1];
         };
         let periods = edge.coLocated[location];
-        let text = `<li class="small">at <strong>${location}</strong> during ${
+        let text = `<li class="${li_classes.join(' ')}${small ? ' small' : ''}">at <strong>${location}</strong> during ${
             periods.length === 1 ? "one" : periods.length
         } period${periods.length > 1 ? "s" : ""},`;
         periods.forEach((period, ix) => {
@@ -355,13 +374,13 @@ const getQuickEdgeInfoHTML = (edge) => {
         let allYears = splitDate(location);
         // console.log(allYears);
     });
-    html = `<p class="small"><strong>${edge.source.display}</strong> and <strong>${
+    html = `<p class="${p_classes.join(' ')}${small ? ' small' : ''}"><strong>${edge.source.display}</strong> and <strong>${
         edge.target.display
     }</strong> appeared together at ${
         Object.keys(edge.coLocated).length > 1
             ? Object.keys(edge.coLocated).length
             : "one"
-    } venue${Object.keys(edge.coLocated).length > 1 ? "s" : ""}:</p><ul>`;
+    } venue${Object.keys(edge.coLocated).length > 1 ? "s" : ""}:</p><ul class="${ul_classes.join(' ')}">`;
 
     let coLocatedCount = Object.keys(edge.coLocated).length - 1;
 

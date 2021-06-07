@@ -111,9 +111,9 @@ const show = (selector) => {
 const setNodeEdgeInfo = (elem) => {
     let selector = d3.select("#nodeEdgeInfoContainer .list-group");
     if (elem.node_id) {
-        selector.html(elem.html_info);
+        selector.html(elem.infoHTML);
     } else if (elem.edge_id) {
-        selector.html(elem.html_info);
+        selector.html(elem.infoHTML);
     }
     let container = window._selectors["nodeEdgeInfo"];
     show(container);
