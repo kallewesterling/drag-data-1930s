@@ -270,13 +270,17 @@ def get_clean_network_data(min_date=None, max_date=None, drop_cols=None, verbose
 
 
 def test_same_df(df1, df2):
-    for cols in [[x for x in df1.columns], [x for x in df2.columns]]:
-        for col in cols:
-            for ix, row in (df1 == df2).iterrows():
-                if not all([row[col] for col in cols]):
+    try:
+        for cols in [[x for x in df1.columns], [x for x in df2.columns]]:
+            for col in cols:
+                for ix, row in (df1 == df2).iterrows():
+                    if not all([row[col] for col in cols]):
+                        return False
+                if not [x for x in df1[col]] == [x for x in df2[col]]:
                     return False
-            if not [x for x in df1[col]] == [x for x in df2[col]]:
-                return False
+    except ValueError:
+        return False
+
     return True
 
 
