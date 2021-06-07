@@ -396,7 +396,7 @@ const styleGraphElements = (settings = undefined) => {
         })
         .attr("style", (node) => {
             if (settings.nodes.communityDetection) {
-                return `fill: ${graph.clusterColors[node.cluster]};`; //text-shadow: 0 0 4px #00000052;
+                return `fill: ${d3.color(graph.clusterColors[node.cluster]).darker(0.5).toString()};`; //text-shadow: 0 0 4px #00000052;
             } else {
                 return ``;
             }
@@ -571,8 +571,8 @@ const modifySimulation = (settings) => {
         edgeElements.attr("x2", (e) => e.target.x);
         edgeElements.attr("y2", (e) => e.target.y);
 
-        textElements.attr("x", (n) => n.x);
-        textElements.attr("y", (n) => n.y + 4);
+        textElements.attr("x", (n) => n.x - (document.querySelector(`text[data-node=${n.node_id}]`).getBBox().width/2));
+        textElements.attr("y", (n) => n.y + n.r/2);
     });
 
     // restart the simulation now that everything is set
