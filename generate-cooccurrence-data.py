@@ -291,14 +291,14 @@ df = get_clean_network_data(
 )
 
 
-if os.path.exists('network-app/data/_df.pickle'):
-    df_test = pd.read_pickle('network-app/data/_df.pickle')
+if os.path.exists("network-app/data/_df.pickle"):
+    df_test = pd.read_pickle("network-app/data/_df.pickle")
 
     if test_same_df(df, df_test):
         print("Dataset is same. Exiting...")
         exit()
 
-df.to_pickle('network-app/data/_df.pickle')
+df.to_pickle("network-app/data/_df.pickle")
 
 
 def get_performers_who_were_there(df, where=None, when=[]):
@@ -539,9 +539,8 @@ metadata["grouped_dates"] = df_grouped_dates[list(d.keys())].T.to_json()
 networks = {}
 
 venue_count = len(group_data_dict)
-i = 0
+
 for venue, data in group_data_dict.items():
-    i += 1
     for grouped_by, data2 in data.items():
         clear_output(wait=True)
         if not grouped_by in networks:
@@ -572,12 +571,18 @@ for venue, data in group_data_dict.items():
                         if not "revues" in networks[grouped_by].edges[edge]:
                             networks[grouped_by].edges[edge]["revues"] = []
                         if not revues in networks[grouped_by].edges[edge]["revues"]:
-                            networks[grouped_by].edges[edge]["revues"].append(revues)
+                            networks[grouped_by].edges[edge]["revues"].extend(revues)
+                            networks[grouped_by].edges[edge]["revues"] = list(
+                                set(networks[grouped_by].edges[edge]["revues"])
+                            )
 
                         if not "cities" in networks[grouped_by].edges[edge]:
                             networks[grouped_by].edges[edge]["cities"] = []
                         if not cities in networks[grouped_by].edges[edge]["cities"]:
-                            networks[grouped_by].edges[edge]["cities"].append(cities)
+                            networks[grouped_by].edges[edge]["cities"].extend(cities)
+                            networks[grouped_by].edges[edge]["cities"] = list(
+                                set(networks[grouped_by].edges[edge]["cities"])
+                            )
 
 
 def drop_unnamed(n):
