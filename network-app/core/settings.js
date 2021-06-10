@@ -660,7 +660,6 @@ const setupSettingInteractivity = () => {
         changeSetting("#weightFrom", "force", true, "dropdown");
     });
     window._selectors.rFrom.on("change", () => {
-        // changeSetting("#rFrom", "force", true, "dropdown");
         changeSetting("#rFrom", "force", true, "dropdown", [], [], false);
         graph.simulation.restart().alpha(0.05); // just a nudge
     });
@@ -678,7 +677,7 @@ const setupSettingInteractivity = () => {
             "dropdown",
             [],
             [location.reload()]
-        ); // TODO:
+        );
     });
 
     // slider interactivity
