@@ -606,3 +606,20 @@ circle.highlighted {
     background-color: var(--background);
     color: var(--text-color);
 }
+
+#loadingDot[data-running="true"] {
+    color: rgb(255, 116, 2);
+    -webkit-animation: 0.75s linear infinite spinner-grow;
+    animation: 0.75s linear infinite spinner-grow;
+}
+
+@media (prefers-reduced-motion) {
+    .animation {
+        -webkit-animation: none;
+        animation: none;
+    }
+}
+
+#loadingDot[data-running="false"] {
+    color: green;
+}

@@ -562,7 +562,8 @@ const modifySimulation = (settings) => {
 
     graph.simulation.force("link").strength(settings.force.linkStrength);
 
-    graph.simulation.on("tick", function () {
+    graph.simulation.on("tick", () => {
+        d3.select('#loadingDot').attr('data-running', true);
         nodeElements.attr("cx", (n) => n.x);
         nodeElements.attr("cy", (n) => n.y);
 
@@ -580,6 +581,7 @@ const modifySimulation = (settings) => {
 
     return true;
 };
+
 
 /**
  * getNodeClass takes one required argument, the d3 selector for a given node. It is the function that provides the class for any given node in the visualization.

@@ -395,7 +395,7 @@ const setupInteractivity = (settings = undefined) => {
                 node.fy = event.y;
             })
             .on("end", (event, node) => {
-                if (!event.active) graph.simulation.alphaTarget(0); // restore alphaTarget to normal value
+                //if (!event.active) graph.simulation.alphaTarget(0); // restore alphaTarget to normal value
 
                 if (settings.nodes.stickyNodes) {
                     node.fx = node.x;
@@ -422,7 +422,7 @@ const setupInteractivity = (settings = undefined) => {
                 node.fy = event.y;
             })
             .on("end", (event, node) => {
-                if (!event.active) graph.simulation.alphaTarget(0); // restore alphaTarget to normal value
+                //if (!event.active) graph.simulation.alphaTarget(0); // restore alphaTarget to normal value
 
                 if (settings.nodes.stickyNodes) {
                     node.fx = node.x;

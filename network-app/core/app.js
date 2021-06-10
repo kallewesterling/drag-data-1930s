@@ -36,4 +36,13 @@
 
     });
 
+    // keep track of processes...
+    graph.simulation.on("tick", () => {
+        console.log(graph.simulation.alpha())
+        d3.select('#loadingDot').attr('data-running', true);
+    });
+    graph.simulation.on('end', () => {
+        d3.select('#loadingDot').attr('data-running', false).attr('title', 'Done');
+    })
+
 })();

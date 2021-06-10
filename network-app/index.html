@@ -31,6 +31,7 @@
                     <span id="" class="currentZoom small" data-bs-trigger="click" data-bs-toggle="popover" title="Current zoom level" data-bs-content='This number shows you how scaled the current graph is, between 60–400%.'></span>
                 </div>
             </div>
+            <i id="loadingDot" class="ms-4 small bi bi-record-fill"></i>
         </nav>
         <nav id="popupNav" class="popup-nav shadow-lg">
             <div class="p-4 small">
@@ -325,7 +326,7 @@
         </div>
         <div id="previewData" class="small shadow-sm border p-3 rounded-3 d-none"><svg id="preview"></svg></div>
 
-        <div id="loading" class="h-100 d-flex justify-content-center">
+        <div id="loading" class="h-100 d-flex justify-content-center d-none">
             <div id="loadingContainer" class="my-auto p-4 bg-white rounded shadow-lg d-flex flex-column">
                 <div id="loadingMessage"></div>
                 <div class="text-center" id="loadingSpinner">

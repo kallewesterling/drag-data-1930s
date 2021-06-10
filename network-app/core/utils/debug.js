@@ -16,6 +16,7 @@ const _output = (
     if (typeof from === "object") from = from.constructor.name;
 
     if (message.slice(0,6) !== 'Called' && typeof message !== "object") {
+        /*
         window._selectors["loadingContainer"].classed("bg-white", true);
         window._selectors["loadingContainer"].classed("bg-danger", false);
         window._selectors["loadingContainer"].classed("text-white", false);
@@ -24,6 +25,8 @@ const _output = (
         window.loadingTimeout = setTimeout(() => {
             window._selectors["loading"].classed("d-none", true);
         }, 500);
+        */
+       d3.select('#loadingDot').attr('title', message);
     }
 
     if (![...Object.keys(froms)].includes(from)) {
