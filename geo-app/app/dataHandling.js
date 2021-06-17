@@ -32,9 +32,7 @@ const getLines = (performerName) => {
         if (nextPoint) {
             [thisLat, thisLon, thisYear, thisCity] = thisPoint;
             [nextLat, nextLon, nextYear, nextCity] = nextPoint;
-            if (thisCity === nextCity) {
-                console.warn("Traveling from and to same city");
-            } else {
+            if (thisCity !== nextCity) {
                 allLines.push({
                     start: thisYear,
                     end: nextYear,
@@ -48,43 +46,62 @@ const getLines = (performerName) => {
     return allLines;
 };
 
-const travelLineInfo = (line) => {
-    document.body.dataset.clickedLine = true;
+const drawAllTravels = (performerName, skipClearTravel, specialColor) => {
+    const transition = (travelCircle, route) => {
+        var l = route.node().getTotalLength();
+        travelCircle
+            .transition()
+            .duration(durations.travelCircle)
+            .attrTween("transform", delta(route.node()))
+            .attr("r", () => {
+                // console.log(sizes.endTravelNode);
+                return sizes.endTravelNode;
+            });
+    };
 
-    resetTravelPaths();
-    d3.select(`path#${line.id}`)
-        .style("stroke", "red")
-        .style("stroke-width", 5)
-        .attr("marker-end", "none");
-    d3.select(`circle[path-id=${line.id}]`).attr("fill", "red").attr("r", 10);
-    //console.log(line);
-    d3.select("#explanation").html(`
-        <p style="color: var(--bs-primary)">${line.startCity}–${
-        line.endCity
-    }</p>
-        <p style="color: var(--bs-secondary)">${line.start}${
-        line.start !== line.end ? "–" + line.end : ""
-    }</p>
-    `);
-};
+    const delta = (path) => {
+        var l = path.getTotalLength();
+        return function (i) {
+            return function (t) {
+                var p = path.getPointAtLength(t * l);
+                return "translate(" + p.x + "," + p.y + ")";
+            };
+        };
+    };
 
-const resetTravelPaths = () => {
-    document.body.dataset.clickedLine = false;
-    document.body.dataset.travels = true;
-    d3.selectAll(`path.travelLine`)
-        .style("stroke", "green")
-        .attr("stroke-dashoffset", 0)
-        .attr("marker-end", "url(#arrowhead)")
-        .style("stroke-width", "1.5");
-    d3.selectAll(`circle[path-id]`).attr("fill", "green").attr("r", 10);
-};
+    const mouseoverInfo = (evt, line) => {
+        cityRange =
+            line.endCity !== line.startCity
+                ? line.startCity + "–" + line.endCity
+                : line.startCity;
+        yearRange =
+            line.end !== line.start ? line.start + "–" + line.end : line.start;
+        store.tooltip.transition().duration(200).style("opacity", 0.9);
+        store.tooltip
+            .html(
+                `<p class="small m-0 fw-bolder">${performerName}</p>
+                <p class="small m-0">${cityRange}</p>
+                <p class="small m-0">${yearRange}</p>`
+            )
+            .style("left", evt.pageX + "px")
+            .style("top", evt.pageY - 28 + "px");
+    };
 
-const drawAllTravels = (performerName) => {
+    const hideTooltip = () => {
+        store.tooltip
+            .transition()
+            .delay(1000)
+            .duration(1000)
+            .style("opacity", 0);
+    };
+
+    if (skipClearTravel === undefined || skipClearTravel === false) {
+        console.log("clearing travel...");
+        clearTravels();
+    }
     document.body.dataset.travels = true;
     document.body.dataset.performerName = performerName;
-
     clearCircles();
-    clearTravels();
 
     allLines = getLines(performerName);
     //console.log(allLines);
@@ -94,7 +111,7 @@ const drawAllTravels = (performerName) => {
         route = store.travels
             .append("path")
             .attr("d", line.path)
-            .style("stroke", "green")
+            .style("stroke", colors.travelGreenTransparency)
             .style("stroke-width", "1")
             .attr("fill", "none")
             .attr("class", "travelLine")
@@ -103,9 +120,10 @@ const drawAllTravels = (performerName) => {
             .attr("end", line.end)
             .attr("startCity", line.startCity)
             .attr("endCity", line.endCity)
-            .on("click", () => {
-                travelLineInfo(line);
-            });
+            .on("mouseover", (evt) => {
+                mouseoverInfo(evt, line);
+            })
+            .on("mouseout", hideTooltip);
 
         store.travels.selectAll("path").each(function (d) {
             var totalLength = this.getTotalLength();
@@ -113,42 +131,26 @@ const drawAllTravels = (performerName) => {
                 .attr("stroke-dasharray", totalLength + " " + totalLength)
                 .attr("stroke-dashoffset", totalLength)
                 .transition()
-                .duration(4000)
+                .duration(durations.travelPath)
                 .attr("stroke-dashoffset", 0)
-                .attr("marker-end", "url(#arrowhead)")
+                // .attr("marker-end", "url(#arrowhead)")
                 .style("stroke-width", "1.5");
         });
 
-        plane = store.travels
+        travelCircle = store.travels
             .append("circle")
-            .attr("r", 5)
-            .attr("fill", "green")
+            .attr("r", () => {
+                return sizes.startTravelNode;
+            })
+            .attr("fill", specialColor ? specialColor : colors.travelGreen)
             .attr("path-id", id)
-            .on("click", () => {
-                travelLineInfo(line);
-            });
+            .on("mouseover", (evt) => {
+                mouseoverInfo(evt, line);
+            })
+            .on("mouseout", hideTooltip);
 
-        transition(plane, route);
+        transition(travelCircle, route);
     });
-
-    function transition(plane, route) {
-        var l = route.node().getTotalLength();
-        plane
-            .transition()
-            .duration(10000)
-            .attrTween("transform", delta(route.node()))
-            .attr("r", 10);
-    }
-
-    function delta(path) {
-        var l = path.getTotalLength();
-        return function (i) {
-            return function (t) {
-                var p = path.getPointAtLength(t * l);
-                return "translate(" + p.x + "," + p.y + ")";
-            };
-        };
-    }
 };
 
 const getPath = (longLatFrom, longLatTo) => {
@@ -162,20 +164,25 @@ const getPath = (longLatFrom, longLatTo) => {
 };
 
 const clearTravels = () => {
-    console.log(document.body.dataset);
+    document.body.dataset.travels = false;
+    document.body.dataset.performerName = undefined;
     store.travels
         .selectAll("path")
         .transition()
         .style("stroke", "white")
-        .style("stroke-width", "0");
+        .style("stroke-width", "0")
+        //.delay(2000)
+        .remove();
     store.travels
         .selectAll("circle")
         .transition()
         .style("fill", "white")
-        .style("r", "0");
+        .style("r", "0")
+        //.delay(2000)
+        .remove();
 
-    store.travels.selectAll("path").remove();
-    store.travels.selectAll("circle").remove();
+    store.travels.selectAll("path").data([]).exit().remove();
+    store.travels.selectAll("circle").data([]).exit().remove();
 };
 
 const clearCircles = () => {
@@ -183,7 +190,14 @@ const clearCircles = () => {
 
     if (document.body.dataset.travels === "true") {
         store.map.transition(10000).attr("stroke-opacity", "0.25");
-        store.circles.transition().attr("fill", "white").attr("r", 0).remove();
+        store.circles
+            .selectAll("circle")
+            .data([])
+            .exit()
+            .transition()
+            .attr("r", 0)
+            .remove();
+        // store.circles.transition().attr("fill", "white").attr("r", 0).remove();
     } else {
         console.log("not in travel...");
         console.log(document.body.dataset);
@@ -259,7 +273,7 @@ const getCityFromLonLat = (lon, lat) => {
         ),
     ];
     if (testVal.length === 1) return testVal[0];
-    console.warn("Ambivalent result from `getCityFromLonLat`", testVal);
+    warning("Ambivalent result from `getCityFromLonLat`", testVal);
     return false;
 };
 
@@ -271,12 +285,16 @@ const getTravels = (performerName) => {
         if (nextPoint) {
             [thisLat, thisLon, thisYear, thisCity] = thisPoint;
             [nextLat, nextLon, nextYear, nextCity] = nextPoint;
-            if (thisCity === nextCity) {
-                // console.warn("Traveling from and to same city");
-            } else {
+            if (thisCity !== nextCity) {
                 travels.push([thisCity, nextCity]);
             }
         }
     });
     return travels;
+};
+
+const getModularity = (performerName) => {
+    finding = store.modularitiesArray.findIndex((d) => d[0] === performerName);
+    if (finding !== -1) return store.modularitiesArray[finding][1];
+    return -1;
 };
