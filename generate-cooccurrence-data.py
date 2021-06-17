@@ -11,7 +11,11 @@ import pandas as pd
 import json
 import os
 import datetime
-from IPython.display import display, HTML, Markdown, clear_output
+
+try:
+    from IPython.display import display, HTML, Markdown, clear_output
+except ModuleNotFoundError:
+    print("No IPython found.")
 
 settings = {"DAYSPANS": [3, 14, 31, 93, 186, 365]}
 
