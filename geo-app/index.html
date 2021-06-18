@@ -67,31 +67,75 @@
             <div style="padding-right: 10px"><i class="bi bi-wrench"></i></div>
             <div>This website requires a larger browser window.</div>
         </div>
-        <div class="container d-none d-sm-block">
-            <div
-                class="row pt-3 pb-5 d-flex"
-                style="justify-content: space-around"
-            >
-                <div class="col-9">
-                    <div id="slider" class="mb-3"></div>
-                </div>
-                <div class="col-3">
-                    <button class="btn btn-primary" id="stepButton">
-                        &raquo;
-                    </button>
-                    <button class="btn btn-primary" id="stepButtonInclude">
-                        &raquo;&raquo;
-                    </button>
-                    <select id="nodeSizeFrom">
-                        <option value="relativeCount">Relative count</option>
-                        <option value="absoluteCount">Absolute count</option>
-                        <option value="none">None</option>
-                    </select>
-                </div>
+        <div id="settings" class="small card shadow-sm border rounded-3 d-none d-sm-block">
+            <div class="card-header d-flex justify-content-between align-items-center" id="settingsToggle">
+                <span><i class="bi bi-gear me-2"></i>Settings</span>
+                <span id="toggledSettings"></i></span>
             </div>
+            <div id="settingsContent">
+                <ul id="settingsContainer" class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <h5 class="mb-1">XXXXXXX</h5>
+                        <p class="m-0"><strong>Year range</strong></p>
+                        <div id="slider" class="mx-3 mt-2 mb-1"></div>
+                        <div class="pt-5">
+                            <button class="btn btn-sm btn-dark" id="stepButton" onClick="stepButtonClicked('#stepButton')">
+                                <i class="bi bi-caret-right"></i>
+                            </button>
+                            <button class="btn btn-sm btn-dark" id="stepButtonInclude" onClick="stepButtonClicked('#stepButtonInclude', true)">
+                                <i class="bi bi-caret-right-fill"></i>
+                            </button>
+                        </div>
+                        <div class="pt-3">
+                        <p class="m-0 pe-3 float-start"><strong>Node size</strong></p>
+                        <select id="nodeSizeFrom" class="float-start">
+                            <option value="relativeCount">Relative count</option>
+                            <option value="absoluteCount">Absolute count</option>
+                            <option value="none">None</option>
+                        </select>
+                    </div>
+                    </li>
+                    <li class="list-group-item">
+                        <h5 class="mb-1">Traveling performers</h5>
+                        <p class="m-0">Show travels of an individual performer</p>
+                        <select id="selectPerformer"></select
+                        ><div>
+                            <span class="small text-muted"
+                            ><i
+                                class="bi bi-sort-alpha-down sortPerformerNames"
+                                style="cursor: pointer"
+                                data-sort="alpha"
+                            ></i>
+                        </span>
+                        <span class="small text-muted"
+                            ><i
+                                class="
+                                    bi bi-sort-numeric-down-alt
+                                    sortPerformerNames
+                                "
+                                style="cursor: pointer"
+                                data-sort="numeric"
+                            ></i
+                        ></span>
+                    </div>
+                    </li>
+                    <li class="list-group-item">
+                        <h5 class="mb-1">Traveling clusters of performers</h5>
+                        <p><strong>Clusters</strong></p>
+                        <div id="clusterList"></div>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+
+        <div class="container-xxl d-none d-sm-block">
             <div class="row">
                 <div class="col-12" id="mapContainer">
                     <svg xmlns="http://www.w3.org/2000/svg" id="map">
+                        <filter id="shadow" x="0" y="0" width="200%" height="200%">
+                            <feDropShadow dx="40" dy="40" stdDeviation="35" flood-color="black" flood-opacity="0.01"></feDropShadow>
+                          </filter>
                         <symbol
                             id="check-circle-fill"
                             fill="currentColor"
@@ -139,25 +183,7 @@
             </div>
             <div class="row">
                 <div class="col-6">
-                    <p>Show travels of an individual performer</p>
-                    <select id="selectPerformer"></select
-                    ><span class="small text-muted"
-                        ><i
-                            class="bi bi-sort-alpha-down sortPerformerNames"
-                            style="cursor: pointer"
-                            data-sort="alpha"
-                        ></i>
-                    </span>
-                    <span class="small text-muted"
-                        ><i
-                            class="
-                                bi bi-sort-numeric-down-alt
-                                sortPerformerNames
-                            "
-                            style="cursor: pointer"
-                            data-sort="numeric"
-                        ></i
-                    ></span>
+                    
                 </div>
                 <div class="col-4">
                     <div id="explanation"></div>
@@ -165,8 +191,7 @@
             </div>
             <div class="row">
                 <div class="col-12">
-                    <p><strong>Clusters</strong></p>
-                    <div id="clusterList"></div>
+                    
                 </div>
             </div>
             <div class="row d-none" id="warnings">
@@ -198,5 +223,6 @@
         <script src="app/sizing.js"></script>
         <script src="app/dataHandling.js"></script>
         <script src="app/interactivity.js"></script>
+        <script src="app/dragging.js"></script>
     </body>
 </html>

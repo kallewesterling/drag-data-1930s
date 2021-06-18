@@ -41,12 +41,75 @@ span[data-cluster-id] {
 
 .theme-dark {
     --background: rgba(0, 0, 0, 1);
+    --background-settings: rgba(0, 0, 0, 1);
 }
 
 .theme-light {
     --background: rgba(0, 0, 0, 0.009);
+    --background-settings: rgba(0, 0, 0, 0.01);
 }
 
 body {
     background-color: var(--background);
+}
+
+#settings {
+    position: absolute;
+    top: 4.5em;
+    left: 1em;
+    max-height: 91%;
+    /* z-index: 400; */
+    max-width: 350px;
+    min-width: 350px;
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+}
+
+#settingsContent {
+    overflow: hidden;
+    overflow-y: scroll;
+    background-color: rgba(255, 255, 255, 0.479);
+}
+
+#settingsToggle {
+    background-color: var(--background-settings) !important;
+    cursor: grab;
+}
+#settings button {
+    background-color: var(--background-settings);
+    color: var(--text-color);
+}
+
+nav {
+    background-color: var(--header-color);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    z-index: 400;
+    height: 3em;
+    color: var(--text-color);
+}
+
+nav .btn {
+    color: var(--text-color);
+}
+#toggledSettings::before {
+    content: "\f14b";
+    display: inline-block;
+    font-family: bootstrap-icons !important;
+    font-style: normal;
+    font-weight: normal !important;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    vertical-align: -0.125em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.toggled #toggledSettings::before {
+    content: "\f14c";
+}
+
+.noUi-pips-horizontal {
+    height: auto !important;
 }
