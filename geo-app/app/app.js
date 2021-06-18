@@ -31,7 +31,7 @@ const load = () => {
 
     const setupNetworkData = () => {
         d3.json(
-            "../network-app/data/co-occurrence-grouped-by-14-days-no-unnamed-performers.json"
+            "data/co-occurrence-grouped-by-14-days-no-unnamed-performers.json"
         )
             .then((data) => {
                 store.networkData = data;
