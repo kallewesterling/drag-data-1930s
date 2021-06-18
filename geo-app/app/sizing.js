@@ -7,7 +7,12 @@ const getMapSize = () => {
     return [width, height];
     */
     let width = window.innerWidth;
-    let height = window.innerHeight;
+    let height =
+        window.innerHeight -
+        window
+            .getComputedStyle(document.querySelector("nav"))
+            .height.replace("px", "") -
+        4;
     return [width, height];
 };
 
