@@ -1,0 +1,31 @@
+.theme-dark {
+    --background: rgba(0, 0, 0, 1);
+    --background-settings: rgba(0, 0, 0, 0.3);
+    --header-color: rgba(0, 0, 0, 1);
+    --map-background: rgb(32, 86, 92);
+    --tooltip-background: rgb(246, 206, 113);
+
+    /* SVG settings */
+    --land: rgb(28, 58, 63);
+    --state-border: rgba(0, 0, 0, 0.18);
+    --county-border: rgba(0, 0, 0, 0.071);
+    --city-circle: rgba(246, 206, 113, 0.514);
+    --travel-line: rgb(245, 118, 130);
+    --travel-circle: rgba(27, 71, 75, 0.686);
+}
+
+.theme-light {
+    --background: rgba(0, 0, 0, 0.009);
+    --background-settings: rgba(255, 255, 255, 0.5);
+    --header-color: rgba(255, 255, 255, 1);
+    --map-background: rgb(98, 198, 214);
+    --tooltip-background: rgb(246, 206, 113);
+
+    /* SVG settings */
+    --land: #3a9ba6;
+    --state-border: rgba(0, 0, 0, 0.18);
+    --county-border: rgba(0, 0, 0, 0.071);
+    --city-circle: rgba(246, 206, 113, 0.514);
+    --travel-line: rgb(245, 118, 130);
+    --travel-circle: rgba(27, 71, 75, 0.686);
+}

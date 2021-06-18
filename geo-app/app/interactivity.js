@@ -210,9 +210,12 @@ document.querySelectorAll(".sortPerformerNames").forEach((element) => {
 
 d3.select(window).on("resize", (evt) => {
     [width, height] = getMapSize();
+    centerX = width / 2;
+    centerY = height / 2;
+
     d3.select("svg#map").attr("width", width).attr("height", height);
     store.projection
-        .translate([width / 2, size.height / 2]) // translate to center of screen
+        .translate([centerX, centerY]) // translate to center of screen
         .scale([2000]); // scale things down so see entire US
 
     // check if settings is outside
@@ -231,3 +234,47 @@ d3.select("#settingsToggle").on("click", (evt) => {
     toggle("#settingsContent");
     evt.stopPropagation();
 });
+
+zooming = (event) => {
+    if (d3.select("body").classed("no-zoom")) {
+        event.sourceEvent.preventDefault();
+        event.sourceEvent.stopPropagation();
+        return false;
+    } else {
+        console.log("zoom called..");
+        d3.select("g#mapObjects")
+            .selectAll("path")
+            .attr("transform", event.transform);
+
+        d3.select("g#mapObjects")
+            .selectAll("circle")
+            .attr("transform", (circle) => {
+                return event.transform;
+            });
+
+        // change scale of projection
+        currentScale = store.projection.scale();
+        newScale = event.transform.k * 2000;
+        /*
+        console.log(
+            `Changed scale from ${currentScale.toFixed(
+                0
+            )} to ${newScale.toFixed(0)}.`
+        );
+        */
+        store.projection.scale(newScale);
+
+        // change offset...
+        newX = centerX + event.transform.x;
+        newY = centerY + event.transform.y;
+        // console.log(newX.toFixed(0), newY.toFixed(0));
+
+        store.projection.translate([newX, newY]);
+    }
+};
+
+var zoom = d3.zoom().scaleExtent([1, 8]);
+
+zoom.on("zoom", zooming);
+
+d3.select("svg#map").call(zoom);

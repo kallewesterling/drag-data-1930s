@@ -17,6 +17,9 @@ const getMapSize = () => {
 };
 
 [width, height] = getMapSize();
+centerX = width / 2;
+centerY = height / 2;
+
 d3.select("svg#map")
     .attr("width", width)
     .attr("height", height)

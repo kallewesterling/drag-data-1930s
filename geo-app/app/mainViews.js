@@ -127,16 +127,40 @@ const renderCircles = () => {
     const mouseoverInfo = (evt, circle) => {
         if (evt.buttons > 0) return true;
         store.tooltip.transition().duration(200).style("opacity", 0.9);
+        [startYear, endYear] = slider.noUiSlider.get();
         store.tooltip
             .html(
-                `<p class="small m-0 fw-bolder">${circle.label}</p>
-                <p class="small m-0">${circle.count}</p>`
+                `<p class="small m-0 fw-bolder">${circle.label}<span class="text-white-muted ms-1">${startYear}–${endYear}</span></p>
+                <p class="small m-0">${circle.count} times a performer traveled to/from</p>
+                <p class="small m-0">${circle.performers.length} performers associated</p>`
             )
             .style("left", evt.pageX + "px")
             .style("top", evt.pageY - 28 + "px");
     };
 
-    data = Object.values(graph.cityData).sort((a, b) => {
+    cities = getCities();
+    years = d3.range(
+        slider.noUiSlider.get()[0],
+        slider.noUiSlider.get()[1] + 1
+    );
+
+    data = [];
+    cities.forEach((city) => {
+        d = {
+            label: city,
+            lat: getLat(city),
+            lon: getLon(city),
+            count: 0,
+            performers: getPerformerNamesByGeo(city),
+        };
+        years.forEach((year) => {
+            d.count += getPerformerCount(city, year);
+        });
+        if (d.count > 0) {
+            data.push(d);
+        }
+    });
+    data.sort((a, b) => {
         if (a.count > b.count) {
             return -1;
         } else if (b.count > a.count) {
@@ -174,10 +198,10 @@ const renderCircles = () => {
         .attr("r", (circle) => getCircleSize(circle));
 
     store.circles.selectAll("circle").each(function (circle) {
-        // console.log(circle.city);
-        // console.log(circle.count);
-        //console.log(this);
         d3.select(this)
+            .on("click", (evt) => {
+                console.log(circle);
+            })
             .on("mouseover", (evt) => {
                 mouseoverInfo(evt, circle);
             })

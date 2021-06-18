@@ -11,10 +11,6 @@ const getPerformer = (name) => {
     return store.raw.filter((p) => p.performer === name);
 };
 
-const getPerformers = () => {
-    return [...new Set(store.raw.map((p) => p.performer))].sort();
-};
-
 const getLineData = (performerName) => {
     return getPerformer(performerName).map((n) => [
         n.lat,
@@ -52,19 +48,35 @@ const drawAllTravels = (performerName, skipClearTravel, specialColor) => {
         travelCircle
             .transition()
             .duration(durations.travelCircle)
-            .attrTween("transform", delta(route.node()))
+            .attrTween("cx", delta(route.node(), "dx"))
+            .attrTween("cy", delta(route.node(), "dy"))
             .attr("r", () => {
                 // console.log(sizes.endTravelNode);
                 return sizes.endTravelNode;
+            })
+            .on("start", () => {
+                d3.select("body").classed("no-zoom", true);
+            })
+            .on("end", () => {
+                // fix the cx, cy, and reset transform when the transition is finished
+                var p = route.node().getPointAtLength(1 * l);
+                // travelCircle.attr("transform", "");
+                d3.select("body").classed("no-zoom", false);
             });
     };
 
-    const delta = (path) => {
+    const delta = (path, returnVal = "translate") => {
         var l = path.getTotalLength();
-        return function (i) {
-            return function (t) {
+        return () => {
+            return (t) => {
                 var p = path.getPointAtLength(t * l);
-                return "translate(" + p.x + "," + p.y + ")";
+                if (returnVal === "translate") {
+                    return "translate(" + p.x + "," + p.y + ")";
+                } else if (returnVal === "dx") {
+                    return p.x;
+                } else if (returnVal === "dy") {
+                    return p.y;
+                }
             };
         };
     };
