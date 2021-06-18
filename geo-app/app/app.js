@@ -121,3 +121,18 @@ load();
 const hasKey = (key, object) => {
     return Object.keys(object).includes(key);
 };
+
+var zoom = d3
+    .zoom()
+    .scaleExtent([1, 8])
+    .on("zoom", (event) => {
+        d3.select("g#mapObjects")
+            .selectAll("path")
+            .attr("transform", event.transform);
+
+        d3.select("g#mapObjects")
+            .selectAll("circle")
+            .attr("transform", event.transform);
+    });
+
+d3.select("svg#map").call(zoom);

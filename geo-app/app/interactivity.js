@@ -181,7 +181,6 @@ d3.select("#stepButton").on("click", () => stepButtonClicked("#stepButton"));
 
 d3.select("#nodeSizeFrom").on("change", nodeSizeClicked);
 document.addEventListener("mouseover", () => {
-    // console.log("mouseover");
     if (document.body.dataset.travels === "true") {
         slider.setAttribute("disabled", true);
     } else {
@@ -211,16 +210,12 @@ document.querySelectorAll(".sortPerformerNames").forEach((element) => {
 
 d3.select(window).on("resize", (evt) => {
     [width, height] = getMapSize();
-    if (width === "100%") {
-        return false;
-    }
     d3.select("svg#map").attr("width", width).attr("height", height);
     store.projection
         .translate([width / 2, size.height / 2]) // translate to center of screen
-        .scale([1400]); // scale things down so see entire US
+        .scale([2000]); // scale things down so see entire US
 
     // check if settings is outside
-
     settingsOutsideWindow =
         +window
             .getComputedStyle(document.querySelector("#settings"))
@@ -229,8 +224,6 @@ d3.select(window).on("resize", (evt) => {
     if (settingsOutsideWindow) {
         createPopBackSettings();
     }
-    //console.log(window.innerWidth, window.innerHeight);
-    //console.log(store.projection.translate([100, 100]));
 });
 
 d3.select("#settingsToggle").on("click", (evt) => {

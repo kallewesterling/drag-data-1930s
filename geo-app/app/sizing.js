@@ -1,8 +1,13 @@
 const getMapSize = () => {
+    /*
     width = window
         .getComputedStyle(document.querySelector("#mapContainer"))
         .width.replace("px", "");
     height = size.multiplier * +width;
+    return [width, height];
+    */
+    let width = window.innerWidth;
+    let height = window.innerHeight;
     return [width, height];
 };
 
@@ -15,4 +20,4 @@ d3.select("svg#map")
 
 store.projection
     .translate([width / 2, height / 2]) // translate to center of screen
-    .scale([1400]); // scale things down so see entire US
+    .scale([2000]); // scale things down so see entire US

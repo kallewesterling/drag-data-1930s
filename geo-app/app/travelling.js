@@ -103,8 +103,8 @@ const drawAllTravels = (performerName, skipClearTravel, specialColor) => {
         route = store.travels
             .append("path")
             .attr("d", line.path)
-            .style("stroke", colors.travelGreenTransparency)
-            .style("stroke-width", "1")
+            // .style("stroke", colors.travelGreenTransparency)
+            // .style("stroke-width", "1")
             .attr("fill", "none")
             .attr("class", "travelLine")
             .attr("id", id)
@@ -134,7 +134,8 @@ const drawAllTravels = (performerName, skipClearTravel, specialColor) => {
             .attr("r", () => {
                 return sizes.startTravelNode;
             })
-            .attr("fill", specialColor ? specialColor : colors.travelGreen)
+            .attr("fill", specialColor ? specialColor : "")
+            .attr("class", "travelCircle")
             .attr("path-id", id)
             .on("mouseover", (evt) => {
                 mouseoverInfo(evt, line);

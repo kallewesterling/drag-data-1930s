@@ -42,15 +42,22 @@ span[data-cluster-id] {
 .theme-dark {
     --background: rgba(0, 0, 0, 1);
     --background-settings: rgba(0, 0, 0, 1);
+    --map-background: rgb(80, 171, 173);
 }
 
 .theme-light {
     --background: rgba(0, 0, 0, 0.009);
     --background-settings: rgba(0, 0, 0, 0.01);
+    --map-background: #62c6d6;
+    --land: #3a9ba6;
 }
 
 body {
     background-color: var(--background);
+}
+
+svg {
+    background-color: var(--map-background);
 }
 
 #settings {
@@ -116,10 +123,51 @@ nav .btn {
 
 #popBackSettings {
     position: absolute;
-    top: 4.5em;
+    top: 4em;
     left: 1em;
     width: 3em;
     height: 3em;
     background-color: white;
     cursor: pointer;
+}
+
+#warnings {
+    position: absolute;
+    top: 4em;
+    right: 1em;
+}
+
+#warnings .alert {
+    margin-bottom: 0 !important;
+}
+
+/* SVG */
+
+path.land {
+    fill: var(--land);
+}
+
+path.state {
+    fill: none;
+    stroke-width: 0.1px;
+    stroke: #0000002e;
+}
+
+path.county {
+    fill: none;
+    stroke-width: 0.1px;
+    stroke: #00000012;
+}
+
+.cityCircle {
+    fill: #f6ce7183;
+}
+
+path.travelLine {
+    stroke: #f57682;
+    stroke-width: 1px;
+}
+
+circle.travelCircle {
+    fill: #1b474b;
 }

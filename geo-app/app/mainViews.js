@@ -125,6 +125,7 @@ const renderCircles = () => {
     };
 
     const mouseoverInfo = (evt, circle) => {
+        if (evt.buttons > 0) return true;
         store.tooltip.transition().duration(200).style("opacity", 0.9);
         store.tooltip
             .html(
@@ -135,9 +136,18 @@ const renderCircles = () => {
             .style("top", evt.pageY - 28 + "px");
     };
 
+    data = Object.values(graph.cityData).sort((a, b) => {
+        if (a.count > b.count) {
+            return -1;
+        } else if (b.count > a.count) {
+            return 1;
+        }
+        return 0;
+    });
+
     store.circles
         .selectAll("circle")
-        .data(Object.values(graph.cityData), (d) => d.label)
+        .data(data, (d) => d.label)
         .join(
             (enter) =>
                 enter
@@ -155,7 +165,7 @@ const renderCircles = () => {
                     .attr("data-name", (circle) => circle.city)
                     .attr("data-lat", (circle) => circle.lat)
                     .attr("data-lon", (circle) => circle.lon)
-                    .attr("fill", colors.circles),
+                    .classed("cityCircle", true),
             (update) =>
                 update.attr("data-currentCount", (circle) => circle.count),
             (exit) => exit.remove()
@@ -184,20 +194,20 @@ const renderMap = (json) => {
         .attr("fill", "none");
 
     store.map
-        .selectAll("path")
-        .data(json.features)
-        .enter()
         .append("path")
-        .attr("d", store.path)
-        .style("stroke", "#000")
+        .attr("d", store.path(topojson.feature(json, json.objects.land)))
+        .style("stroke", "#0000000d")
         .style("stroke-width", "1")
-        .attr("fill", (d) => {
-            if (d.id === "VA") {
-                // TODO: Because this state isn't a closed path, I believe, it does not render correctly. Therefore, VA is excluded from fill...
-                return "none";
-            } else {
-                return colors.fillMap;
-            }
-        })
-        .attr("data-id", (d) => d.id);
+        .attr("class", "land")
+        .attr("filter", "url(#shadow)");
+
+    store.map
+        .append("path")
+        .attr("d", store.path(topojson.feature(json, json.objects.states)))
+        .attr("class", "state");
+
+    store.map
+        .append("path")
+        .attr("d", store.path(topojson.feature(json, json.objects.counties)))
+        .attr("class", "county");
 };

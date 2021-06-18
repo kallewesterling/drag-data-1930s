@@ -13,10 +13,13 @@ const store = {
     clusters: {},
 };
 store.path = d3.geoPath().projection(store.projection);
-store.graticules = d3.select("svg#map").append("g").attr("id", "graticules");
-store.map = d3.select("svg#map").append("g").attr("id", "map");
-store.circles = d3.select("svg#map").append("g").attr("id", "circles");
-store.travels = d3.select("svg#map").append("g").attr("id", "travels");
+store.graticules = d3
+    .select("g#mapObjects")
+    .append("g")
+    .attr("id", "graticules");
+store.map = d3.select("g#mapObjects").append("g").attr("id", "map");
+store.circles = d3.select("g#mapObjects").append("g").attr("id", "circles");
+store.travels = d3.select("g#mapObjects").append("g").attr("id", "travels");
 
 const graph = {
     locationsByYear: {},
