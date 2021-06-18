@@ -208,3 +208,33 @@ document.querySelectorAll(".sortPerformerNames").forEach((element) => {
         setupDropdown(evt.srcElement.dataset.sort);
     });
 });
+
+d3.select(window).on("resize", (evt) => {
+    [width, height] = getMapSize();
+    if (width === "100%") {
+        return false;
+    }
+    d3.select("svg#map").attr("width", width).attr("height", height);
+    store.projection
+        .translate([width / 2, size.height / 2]) // translate to center of screen
+        .scale([1400]); // scale things down so see entire US
+
+    // check if settings is outside
+
+    settingsOutsideWindow =
+        +window
+            .getComputedStyle(document.querySelector("#settings"))
+            .left.replace("px", "") > window.innerWidth;
+
+    if (settingsOutsideWindow) {
+        createPopBackSettings();
+    }
+    //console.log(window.innerWidth, window.innerHeight);
+    //console.log(store.projection.translate([100, 100]));
+});
+
+d3.select("#settingsToggle").on("click", (evt) => {
+    console.log("clickhandler");
+    toggle("#settingsContent");
+    evt.stopPropagation();
+});
