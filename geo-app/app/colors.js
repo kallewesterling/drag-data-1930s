@@ -15,3 +15,9 @@ const durations = {
     travelPath: 2000,
     travelCircle: 1500,
 };
+
+const size = {
+    width: 1296,
+    height: 725,
+    multiplier: 0.56,
+};

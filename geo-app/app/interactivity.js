@@ -1,6 +1,28 @@
-const setupDropdown = () => {
+const setupDropdown = (sort = "alpha") => {
+    console.log("setupDrodown running", sort);
     options = '<option value=""></option>';
-    getTravelingPerformers(true).forEach((performer) => {
+    if (sort === "alpha") {
+        performerNames = getTravelingPerformers(true).sort();
+    } else if (sort === "numeric") {
+        compare = (a, b) => {
+            at = getTravels(a).length;
+            bt = getTravels(b).length;
+            if (at > bt) {
+                return -1;
+            }
+            if (at < bt) {
+                return 1;
+            }
+            // a must be equal to b
+            return 0;
+        };
+        performerNames = getTravelingPerformers(true).sort(compare);
+    } else {
+        throw new Error(
+            "Not implemented: You must use alpha or numeric sorting."
+        );
+    }
+    performerNames.forEach((performer) => {
         numTravels = getTravels(performer).length;
         if (numTravels > 0)
             options += `<option value='${performer}'>${performer} (${numTravels})</option>`;
@@ -46,7 +68,7 @@ const setupClusterNav = () => {
                                       "</ul>"
                                     : "."
                             }`,
-                            "warning"
+                            "alert"
                         );
                     } else {
                         warning(
@@ -166,7 +188,7 @@ document.addEventListener("mouseover", () => {
         slider.removeAttribute("disabled");
     }
 });
-store.svg.on("click", () => SVGClicked());
+d3.select("svg#map").on("click", () => SVGClicked());
 store.map.on("click", () => MapClicked());
 
 d3.select("#selectPerformer").on("change", () => {
@@ -176,4 +198,13 @@ d3.select("#selectPerformer").on("change", () => {
     } else {
         drawAllTravels(d3.select("#selectPerformer").node().value);
     }
+});
+d3.select("#switchMode").on("click", function (d) {
+    toggleTheme();
+});
+
+document.querySelectorAll(".sortPerformerNames").forEach((element) => {
+    d3.select(element).on("click", (evt) => {
+        setupDropdown(evt.srcElement.dataset.sort);
+    });
 });

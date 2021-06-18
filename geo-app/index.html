@@ -22,26 +22,76 @@
         <link href="css/style.css" rel="stylesheet" />
         <script src="includes/nouislider.js"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.1.0/topojson.min.js"></script>
-
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.0/font/bootstrap-icons.css"
+        />
         <title>U.S. Drag in the 1930s</title>
     </head>
     <body>
-        <div class="container">
+        <nav
+            class="
+                px-3
+                navbar navbar-expand-xl navbar-light
+                justify-content-between
+                shadow-sm
+                border-bottom
+                d-none d-sm-flex
+            "
+        >
+            <section class="d-flex">
+                <a
+                    id="switchMode"
+                    class="
+                        order-md-3 order-0
+                        btn btn-sm btn-outline-secondary
+                        me-3
+                    "
+                ></a>
+            </section>
+            <div
+                class="collapse navbar-collapse justify-content-end"
+                id="navbarSupportedContent"
+                style="width: auto; max-width: 100%"
+            >
+                <div id="info" class="d-flex align-items-center"></div>
+            </div>
+            <i
+                id="loadingDot"
+                class="ms-4 small bi bi-record-fill"
+                data-running="false"
+                title="zoomMin: undefined, zoomMax: undefined"
+            ></i>
+        </nav>
+        <div class="p-5 m-5 d-flex d-sm-none">
+            <div style="padding-right: 10px"><i class="bi bi-wrench"></i></div>
+            <div>This website requires a larger browser window.</div>
+        </div>
+        <div class="container d-none d-sm-block">
             <div
                 class="row pt-3 pb-5 d-flex"
                 style="justify-content: space-around"
             >
-                <div class="col-6">
+                <div class="col-9">
                     <div id="slider" class="mb-3"></div>
+                </div>
+                <div class="col-3">
+                    <button class="btn btn-primary" id="stepButton">
+                        &raquo;
+                    </button>
+                    <button class="btn btn-primary" id="stepButtonInclude">
+                        &raquo;&raquo;
+                    </button>
+                    <select id="nodeSizeFrom">
+                        <option value="relativeCount">Relative count</option>
+                        <option value="absoluteCount">Absolute count</option>
+                        <option value="none">None</option>
+                    </select>
                 </div>
             </div>
             <div class="row">
-                <div class="col-12">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="960"
-                        height="500"
-                    >
+                <div class="col-12" id="mapContainer">
+                    <svg xmlns="http://www.w3.org/2000/svg" id="map">
                         <symbol
                             id="check-circle-fill"
                             fill="currentColor"
@@ -88,22 +138,26 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-2">
-                    <button class="btn btn-primary" id="stepButton">
-                        &raquo;
-                    </button>
-                    <button class="btn btn-primary" id="stepButtonInclude">
-                        &raquo;&raquo;
-                    </button>
-                    <select id="nodeSizeFrom">
-                        <option value="relativeCount">Relative count</option>
-                        <option value="absoluteCount">Absolute count</option>
-                        <option value="none">None</option>
-                    </select>
-                </div>
                 <div class="col-6">
                     <p>Show travels of an individual performer</p>
-                    <select id="selectPerformer"></select>
+                    <select id="selectPerformer"></select
+                    ><span class="small text-muted"
+                        ><i
+                            class="bi bi-sort-alpha-down sortPerformerNames"
+                            style="cursor: pointer"
+                            data-sort="alpha"
+                        ></i>
+                    </span>
+                    <span class="small text-muted"
+                        ><i
+                            class="
+                                bi bi-sort-numeric-down-alt
+                                sortPerformerNames
+                            "
+                            style="cursor: pointer"
+                            data-sort="numeric"
+                        ></i
+                    ></span>
                 </div>
                 <div class="col-4">
                     <div id="explanation"></div>
@@ -136,9 +190,12 @@
             </div>
         </div>
         <script src="app/colors.js"></script>
+        <script src="app/utils.js"></script>
         <script src="app/warnings.js"></script>
         <script src="app/build.js"></script>
         <script src="app/app.js"></script>
+        <script src="app/mainViews.js"></script>
+        <script src="app/sizing.js"></script>
         <script src="app/dataHandling.js"></script>
         <script src="app/interactivity.js"></script>
     </body>

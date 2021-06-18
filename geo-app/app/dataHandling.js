@@ -87,14 +87,6 @@ const drawAllTravels = (performerName, skipClearTravel, specialColor) => {
             .style("top", evt.pageY - 28 + "px");
     };
 
-    const hideTooltip = () => {
-        store.tooltip
-            .transition()
-            .delay(1000)
-            .duration(1000)
-            .style("opacity", 0);
-    };
-
     if (skipClearTravel === undefined || skipClearTravel === false) {
         console.log("clearing travel...");
         clearTravels();
@@ -202,65 +194,6 @@ const clearCircles = () => {
         console.log("not in travel...");
         console.log(document.body.dataset);
     }
-};
-
-const getBoundingBox = (performerName, project) => {
-    lats = getLineData(performerName).map((n) => n[0]);
-    longs = getLineData(performerName).map((n) => n[1]);
-    maxLat = d3.max(lats);
-    minLat = d3.min(lats);
-    maxLon = d3.max(longs);
-    minLon = d3.min(longs);
-
-    ([projectedMaxLon, projectedMaxLat] = store.projection([minLon, minLat])),
-        ([projectedMinLon, projectedMinLat] = store.projection([
-            maxLon,
-            maxLat,
-        ]));
-
-    store.svg
-        .append("rect")
-        .attr("y", projectedMinLon)
-        .attr("x", projectedMinLat)
-        .attr("height", 10)
-        .attr("width", 10);
-
-    store.svg
-        .append("rect")
-        .attr("y", projectedMaxLon)
-        .attr("x", projectedMaxLat)
-        .attr("height", 10)
-        .attr("width", 10);
-
-    store.svg
-        .append("line")
-        .attr("x1", 47)
-        .attr("x2", 47)
-        .attr("y1", 0)
-        .attr("y2", 200)
-        .attr("stroke", "black");
-
-    if (!project)
-        return {
-            maxLon: maxLon,
-            minLon: minLon,
-            minLat: minLat,
-            maxLat: maxLat,
-        };
-
-    return {
-        maxLon: projectedMaxLon,
-        minLon: projectedMinLon,
-        minLat: projectedMinLat,
-        maxLat: projectedMaxLat,
-    };
-    /*
-            minLon, minLat],
-        [, maxLat],
-        store.projection([minLon, minLat]),
-        store.projection([maxLon, maxLat]),
-    ];
-    */
 };
 
 const getCityFromLonLat = (lon, lat) => {
