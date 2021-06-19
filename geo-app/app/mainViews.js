@@ -126,16 +126,13 @@ const renderCircles = () => {
 
     const mouseoverInfo = (evt, circle) => {
         if (evt.buttons > 0) return true;
-        store.tooltip.transition().duration(200).style("opacity", 0.9);
         [startYear, endYear] = slider.noUiSlider.get();
-        store.tooltip
-            .html(
-                `<p class="small m-0 fw-bolder">${circle.label}<span class="text-white-muted ms-1">${startYear}–${endYear}</span></p>
+        store.tooltip.html(
+            `<p class="small m-0 fw-bolder">${circle.label}<span class="text-white-muted ms-1">${startYear}–${endYear}</span></p>
                 <p class="small m-0">${circle.count} times a performer traveled to/from</p>
                 <p class="small m-0">${circle.performers.length} performers associated</p>`
-            )
-            .style("left", evt.pageX + "px")
-            .style("top", evt.pageY - 28 + "px");
+        );
+        showTooltip(evt.pageX + 10, evt.pageY - 28);
     };
 
     cities = getCities();
@@ -209,6 +206,7 @@ const renderCircles = () => {
     });
 };
 
+citiesData = [];
 const renderMap = (json) => {
     store.graticules
         .append("path")
@@ -234,4 +232,82 @@ const renderMap = (json) => {
         .append("path")
         .attr("d", store.path(topojson.feature(json, json.objects.counties)))
         .attr("class", "county");
+};
+
+const renderCities = (cities, excludeVisualized = true) => {
+    citiesData = cities.features;
+
+    let maxPopulation = 400000;
+    store.filteredCities = citiesData
+        .filter((c) => c.properties.POPULATION > maxPopulation)
+        .map(
+            (c) =>
+                [
+                    {
+                        lon: c.geometry.coordinates[0],
+                        lat: c.geometry.coordinates[1],
+                        projected: store.projection([
+                            c.geometry.coordinates[0],
+                            c.geometry.coordinates[1],
+                        ]),
+                        properties: c.properties,
+                    },
+                ][0]
+        );
+
+    console.log(store.filteredCities);
+    // we want to filter further here...
+
+    cityScale = d3
+        .scaleLog()
+        .domain(
+            d3.extent(store.filteredCities.map((c) => c.properties.POPULATION))
+        )
+        .range([1, 10]);
+
+    cityCircles = store.cities
+        .selectAll("circle")
+        .data(store.filteredCities)
+        .join(
+            (enter) =>
+                enter
+                    .append("circle")
+                    .attr("cx", (d) => d.projected[0])
+                    .attr("cy", (d) => d.projected[1])
+                    .attr(
+                        "data-name",
+                        (d) => `${d.properties.NAME}, ${d.properties.ST}`
+                    )
+                    .attr("data-lat", (d) => d.lat)
+                    .attr("data-lon", (d) => d.lon)
+                    .attr("class", "generalCityCircle")
+                    .attr("fill", "rgba(0,0,0,0.4)")
+                    .on("mouseover", (evt) => {
+                        store.citytip.html(
+                            `<p class="small m-0 fw-bolder">${d.properties.NAME}, ${d.properties.ST}</p>
+                                <p class="small m-0">${d.properties.POPULATION}</p>`
+                        );
+                        showCitytip(evt.pageX + 10, evt.pageY - 28);
+                    })
+                    .on("mouseout", hideCitytip),
+            (update) => update,
+            (exit) => exit
+        )
+        .attr("r", 0)
+        .transition()
+        .duration(2000)
+        .attr("r", (d) => cityScale(d.properties.POPULATION));
+
+    store.cities
+        .selectAll("text")
+        .data(store.filteredCities)
+        .enter()
+        .append("text")
+        .attr(
+            "x",
+            (d) => d.projected[0] + cityScale(d.properties.POPULATION) + 5
+        )
+        .attr("y", (d) => d.projected[1])
+        .attr("class", "cityName")
+        .text((d) => d.properties.NAME);
 };

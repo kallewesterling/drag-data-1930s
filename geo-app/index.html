@@ -29,6 +29,9 @@
         <title>U.S. Drag in the 1930s</title>
     </head>
     <body>
+        <div class="tooltip shadow p-2" style="opacity:0;"></div>
+        <div class="helptip shadow p-2" style="opacity:0;"></div>
+        <div class="citytip shadow p-2" style="opacity:0;"></div>
         <nav
             class="
                 px-3
@@ -46,6 +49,7 @@
                         order-md-3 order-0
                         btn btn-sm btn-outline-secondary
                         me-3
+                        text-black-60
                     "
                 ></a>
             </section>
@@ -75,7 +79,7 @@
             <div id="settingsContent">
                 <ul id="settingsContainer" class="list-group list-group-flush">
                     <li class="list-group-item">
-                        <h5 class="mb-1">Performer counts</h5>
+                        <h6 class="fw-bolder border-bottom border-dark pb-2 mb-2">Performer counts</h6>
                         <p class="m-0"><strong>Year range</strong></p>
                         <div id="slider" class="mx-3 mt-2 mb-1"></div>
                         <div class="pt-5">
@@ -96,18 +100,18 @@
                     </div>
                     </li>
                     <li class="list-group-item">
-                        <h5 class="mb-1">Traveling performers</h5>
+                        <h6 class="fw-bolder border-bottom border-dark pb-2 mb-2">Traveling performers</h6>
                         <p class="m-0">Show travels of an individual performer</p>
                         <select id="selectPerformer"></select
                         ><div>
-                            <span class="small text-muted"
+                            <span class="small text-black-60" data-display-info="true" data-header="Sort alphabetically" data-explanation="Click here to sort the drop-down of performer names alphabetically."
                             ><i
                                 class="bi bi-sort-alpha-down sortPerformerNames"
                                 style="cursor: pointer"
                                 data-sort="alpha"
                             ></i>
                         </span>
-                        <span class="small text-muted"
+                        <span class="small text-black-60" data-display-info="true" data-header="Sort numerically" data-explanation="Click here to sort the drop-down of performer names numerically in descending order."
                             ><i
                                 class="
                                     bi bi-sort-numeric-down-alt
@@ -120,8 +124,7 @@
                     </div>
                     </li>
                     <li class="list-group-item">
-                        <h5 class="mb-1">Traveling clusters of performers</h5>
-                        <p><strong>Clusters</strong></p>
+                        <h6 class="fw-bolder border-bottom border-dark pb-2 mb-2">Traveling clusters of performers <span class="text-black-20 small" data-display-info="true" data-header="Traveling clusters of performers" data-explanation="The numbered clusters below are segmented by the 14-day dataset from the network visualization (with unnamed performers dropped from the dataset). If you click each cluster, the cluster's performers' travels will be visualized on the map. A warning/info dialog will also be displayed if the data results are limited."><i class="bi bi-info-circle-fill"></i></span></h6>
                         <div id="clusterList"></div>
                     </li>
 
@@ -129,7 +132,7 @@
             </div>
         </div>
 
-        <svg xmlns="http://www.w3.org/2000/svg" id="map" width="100%">
+        <svg xmlns="http://www.w3.org/2000/svg" id="map" width="100%" class="d-none d-sm-flex">
             <filter id="shadow" x="0" y="0" width="200%" height="200%">
                 <feDropShadow dx="20" dy="20" stdDeviation="0" flood-color="black" flood-opacity="0.03"></feDropShadow>
               </filter>
@@ -206,6 +209,7 @@
         <script src="app/travelling.js"></script>
         <script src="app/interactivity.js"></script>
         <script src="app/dragging.js"></script>
+        <script src="app/help.js"></script>
         <script src="app/dataUtils.js"></script>
     </body>
 </html>

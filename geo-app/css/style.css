@@ -14,7 +14,38 @@ div.tooltip {
     backdrop-filter: blur(1.5px);
 }
 
-span[data-cluster-id] {
+div.citytip {
+    position: absolute;
+    text-align: left;
+    max-width: 400px;
+    z-index: 500;
+    background: white !important;
+    color: black !important;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+    overflow: hidden;
+    -webkit-backdrop-filter: blur(1.5px);
+    backdrop-filter: blur(1.5px);
+}
+
+div.helptip {
+    position: absolute;
+    text-align: left;
+    max-width: 400px;
+    z-index: 500;
+    background: white !important;
+    color: black !important;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+    overflow: hidden;
+    -webkit-backdrop-filter: blur(1.5px);
+    backdrop-filter: blur(1.5px);
+}
+
+span[data-cluster-id],
+span[data-display-info="true"] {
     cursor: pointer;
 }
 
@@ -139,6 +170,23 @@ nav .btn {
     cursor: pointer;
 }
 
+#loadingDot[data-running="true"] {
+    color: rgb(255, 116, 2);
+    -webkit-animation: 0.75s linear infinite spinner-grow;
+    animation: 0.75s linear infinite spinner-grow;
+}
+
+@media (prefers-reduced-motion) {
+    .animation {
+        -webkit-animation: none;
+        animation: none;
+    }
+}
+
+#loadingDot[data-running="false"] {
+    color: green;
+}
+
 #warnings {
     position: absolute;
     top: 4em;
@@ -149,7 +197,34 @@ nav .btn {
     margin-bottom: 0 !important;
 }
 
+#warnings .alert svg {
+    background-color: inherit !important;
+}
+
+.theme-light .text-black-20 {
+    color: rgba(0, 0, 0, 0.2) !important;
+}
+
+.theme-dark .text-black-20 {
+    color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.theme-light .text-black-60 {
+    color: rgba(0, 0, 0, 0.6) !important;
+}
+
+.theme-dark .text-black-60 {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
 /* SVG */
+
+text.cityName {
+    font-size: 0.5em;
+    fill: var(--city-name) !important;
+    text-anchor: right;
+    alignment-baseline: central;
+}
 
 path.land {
     fill: var(--land);
@@ -167,8 +242,14 @@ path.county {
     stroke: var(--county-border);
 }
 
+.generalCityCircle {
+    fill: var(--general-city-circle);
+    cursor: pointer;
+}
+
 .cityCircle {
     fill: var(--city-circle);
+    cursor: pointer;
 }
 
 path.travelLine {

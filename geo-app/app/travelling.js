@@ -42,7 +42,7 @@ const getLines = (performerName) => {
     return allLines;
 };
 
-const drawAllTravels = (performerName, skipClearTravel, specialColor) => {
+const drawAllTravels = (performerName, skipClearTravel) => {
     const transition = (travelCircle, route) => {
         var l = route.node().getTotalLength();
         travelCircle
@@ -56,12 +56,14 @@ const drawAllTravels = (performerName, skipClearTravel, specialColor) => {
             })
             .on("start", () => {
                 d3.select("body").classed("no-zoom", true);
+                d3.select("#loadingDot").attr("data-running", true);
             })
             .on("end", () => {
                 // fix the cx, cy, and reset transform when the transition is finished
                 var p = route.node().getPointAtLength(1 * l);
                 // travelCircle.attr("transform", "");
                 d3.select("body").classed("no-zoom", false);
+                d3.select("#loadingDot").attr("data-running", false);
             });
     };
 
@@ -88,15 +90,14 @@ const drawAllTravels = (performerName, skipClearTravel, specialColor) => {
                 : line.startCity;
         yearRange =
             line.end !== line.start ? line.start + "–" + line.end : line.start;
-        store.tooltip.transition().duration(200).style("opacity", 0.9);
-        store.tooltip
-            .html(
-                `<p class="small m-0 fw-bolder">${performerName}</p>
+
+        store.tooltip.html(
+            `<p class="small m-0 fw-bolder">${performerName}</p>
                 <p class="small m-0">${cityRange}</p>
                 <p class="small m-0">${yearRange}</p>`
-            )
-            .style("left", evt.pageX + "px")
-            .style("top", evt.pageY - 28 + "px");
+        );
+
+        showTooltip(evt.pageX, evt.pageY - 28);
     };
 
     if (skipClearTravel === undefined || skipClearTravel === false) {
@@ -108,15 +109,13 @@ const drawAllTravels = (performerName, skipClearTravel, specialColor) => {
     clearCircles();
 
     allLines = getLines(performerName);
-    //console.log(allLines);
+
     allLines.forEach((line) => {
         id = line.path.replaceAll(".", "").replaceAll(",", "");
         line.id = id;
-        route = store.travels
+        route = store.travelPaths
             .append("path")
             .attr("d", line.path)
-            // .style("stroke", colors.travelGreenTransparency)
-            // .style("stroke-width", "1")
             .attr("fill", "none")
             .attr("class", "travelLine")
             .attr("id", id)
@@ -129,7 +128,7 @@ const drawAllTravels = (performerName, skipClearTravel, specialColor) => {
             })
             .on("mouseout", hideTooltip);
 
-        store.travels.selectAll("path").each(function (d) {
+        store.travelPaths.selectAll("path").each(function (d) {
             var totalLength = this.getTotalLength();
             d3.select(this)
                 .attr("stroke-dasharray", totalLength + " " + totalLength)
@@ -137,16 +136,14 @@ const drawAllTravels = (performerName, skipClearTravel, specialColor) => {
                 .transition()
                 .duration(durations.travelPath)
                 .attr("stroke-dashoffset", 0)
-                // .attr("marker-end", "url(#arrowhead)")
                 .style("stroke-width", "1.5");
         });
 
-        travelCircle = store.travels
+        travelCircle = store.travelCircles
             .append("circle")
             .attr("r", () => {
                 return sizes.startTravelNode;
             })
-            .attr("fill", specialColor ? specialColor : "")
             .attr("class", "travelCircle")
             .attr("path-id", id)
             .on("mouseover", (evt) => {

@@ -241,14 +241,20 @@ zooming = (event) => {
         event.sourceEvent.stopPropagation();
         return false;
     } else {
-        console.log("zoom called..");
+        // console.log("zoom called..");
         d3.select("g#mapObjects")
             .selectAll("path")
             .attr("transform", event.transform);
 
         d3.select("g#mapObjects")
             .selectAll("circle")
-            .attr("transform", (circle) => {
+            .attr("transform", () => {
+                return event.transform;
+            });
+
+        d3.select("g#mapObjects")
+            .selectAll("text")
+            .attr("transform", () => {
                 return event.transform;
             });
 

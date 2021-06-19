@@ -27,6 +27,9 @@ const load = () => {
         d3.json("data/us.json").then((json) => {
             renderMap(json);
         });
+        d3.json("data/USA_Major_Cities.geojson").then((cities) => {
+            renderCities(cities);
+        });
     };
 
     const setupNetworkData = () => {
@@ -117,7 +120,3 @@ const getMaxYearMinYear = () => {
 };
 
 load();
-
-const hasKey = (key, object) => {
-    return Object.keys(object).includes(key);
-};

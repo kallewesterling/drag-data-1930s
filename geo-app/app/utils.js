@@ -49,8 +49,42 @@ function toggleTheme() {
     }
 })();
 
+const hideSelector = (selector, delay = 1000, duration = 1000) => {
+    selector.transition().delay(delay).duration(duration).style("opacity", 0);
+};
+
+const showSelectorLocation = (selector, x, y) => {
+    selector.style("left", `${x}px`).style("top", `${y}px`);
+};
+const showSelectorAt = (selector, x, y) => {
+    selector.transition().duration(200).style("opacity", 0.9);
+    if (x !== undefined && y !== undefined) {
+        showSelectorLocation(selector, x, y);
+    }
+};
+
+const showCitytip = (x, y) => {
+    showSelectorAt(store.citytip, x, y);
+};
+
+const hideCitytip = () => {
+    hideSelector(store.citytip, 1000, 1000);
+};
+
+const showTooltip = (x, y) => {
+    showSelectorAt(store.tooltip, x, y);
+};
+
 const hideTooltip = () => {
-    store.tooltip.transition().delay(1000).duration(1000).style("opacity", 0);
+    hideSelector(store.tooltip, 1000, 1000);
+};
+
+const showHelptip = (x, y) => {
+    showSelectorAt(store.helptip, x, y);
+};
+
+const hideHelptip = () => {
+    hideSelector(store.helptip, 0, 200);
 };
 
 const createPopBackSettings = () => {
@@ -102,4 +136,8 @@ const toggle = (selector) => {
         d3.select(selector).classed("d-none", isVisible(selector));
     }
     return true;
+};
+
+const hasKey = (key, object) => {
+    return Object.keys(object).includes(key);
 };
