@@ -14,7 +14,7 @@
     --state-border: rgba(0, 0, 0, 0.18);
     --county-border: rgba(0, 0, 0, 0.071);
     --city-circle: rgba(246, 206, 113, 0.514);
-    --general-city-circle: rgba(27, 71, 75, 0.686);
+    --general-city-circle: rgba(255, 255, 255, 0.2);
     --travel-line: rgb(245, 118, 130);
     --travel-circle: rgba(27, 71, 75, 0.686);
 }
@@ -31,7 +31,7 @@
     --state-border: rgba(0, 0, 0, 0.18);
     --county-border: rgba(0, 0, 0, 0.071);
     --city-circle: rgba(246, 206, 113, 0.514);
-    --general-city-circle: rgba(27, 71, 75, 0.686);
+    --general-city-circle: rgba(255, 255, 255, 0.2);
     --travel-line: rgb(245, 118, 130);
     --travel-circle: rgba(27, 71, 75, 0.686);
     --city-name: rgba(255, 255, 255, 0.2);
