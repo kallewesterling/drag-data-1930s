@@ -65,11 +65,11 @@ const drawAllTravels = (performerName, skipClearTravel) => {
                 // console.log(p)
                 //
                 //console.log(store.currentTransform)
-                [cx, cy] = store.projection([travelCircle.attr("data-lon"), travelCircle.attr("data-lat")]);
-                travelCircle.attr("cx", store.currentTransform.x ? cx - store.currentTransform.x : cx);
-                travelCircle.attr("cy", store.currentTransform.y ? cy - store.currentTransform.y : cy);
-                if (store.currentTransform) travelCircle.attr("transform", store.currentTransform);
-                console.log(d3.select(`path#${travelCircle.attr("path-id")}`))
+                //[cx, cy] = store.projection([travelCircle.attr("data-lon"), travelCircle.attr("data-lat")]);
+                //travelCircle.attr("cx", store.currentTransform.x ? cx - store.currentTransform.x : cx);
+                //travelCircle.attr("cy", store.currentTransform.y ? cy - store.currentTransform.y : cy);
+                //if (store.currentTransform) travelCircle.attr("transform", store.currentTransform);
+                //console.log(d3.select(`path#${travelCircle.attr("path-id")}`))
                 d3.select("body").classed("no-zoom", false);
                 d3.select("#loadingDot").attr("data-running", false);
             });
@@ -80,7 +80,14 @@ const drawAllTravels = (performerName, skipClearTravel) => {
         return () => {
             return (t) => {
                 var p = path.getPointAtLength(t * l);
+                let x = p.x,
+                    y = p.y;
                 if (returnVal === "translate") {
+                    if (store.currentTransform) {
+                        (x = p.x + store.currentTransform.x),
+                            (y = p.y + store.currentTransform.y);
+                    }
+
                     return "translate(" + p.x + "," + p.y + ")";
                 } else if (returnVal === "dx") {
                     return p.x;
@@ -135,6 +142,10 @@ const drawAllTravels = (performerName, skipClearTravel) => {
                 mouseoverInfo(evt, line);
             })
             .on("mouseout", hideTooltip);
+
+        if (store.currentTransform) {
+            route.attr("transform", store.currentTransform);
+        }
 
         store.travelPaths.selectAll("path").each(function (d) {
             var totalLength = this.getTotalLength();

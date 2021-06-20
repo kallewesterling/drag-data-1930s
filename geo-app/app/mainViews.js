@@ -249,13 +249,25 @@ const renderCities = (cities, excludeVisualized = true) => {
 
     //console.log(store.filteredCities);
     // we want to filter further here...
-
     cityScale = d3
         .scaleLog()
         .domain(
             d3.extent(store.filteredCities.map((c) => c.properties.POPULATION))
         )
         .range([1, 10]);
+
+    store.cities
+        .selectAll("text")
+        .data(store.filteredCities)
+        .enter()
+        .append("text")
+        .attr(
+            "x",
+            (d) => d.projected[0] + cityScale(d.properties.POPULATION) + 5
+        )
+        .attr("y", (d) => d.projected[1])
+        .attr("class", "cityName")
+        .text((d) => d.properties.NAME);
 
     cityCircles = store.cities
         .selectAll("circle")
@@ -273,15 +285,7 @@ const renderCities = (cities, excludeVisualized = true) => {
                     .attr("data-lat", (d) => d.lat)
                     .attr("data-lon", (d) => d.lon)
                     .attr("class", "generalCityCircle")
-                    .attr("fill", "rgba(0,0,0,0.4)")
-                    .on("mouseover", (evt) => {
-                        store.citytip.html(
-                            `<p class="small m-0 fw-bolder">${d.properties.NAME}, ${d.properties.ST}</p>
-                                <p class="small m-0">${d.properties.POPULATION}</p>`
-                        );
-                        showCitytip(evt.pageX + 10, evt.pageY - 28);
-                    })
-                    .on("mouseout", hideCitytip),
+                    .attr("fill", "rgba(0,0,0,0.4)"),
             (update) => update,
             (exit) => exit
         )
@@ -290,16 +294,18 @@ const renderCities = (cities, excludeVisualized = true) => {
         .duration(2000)
         .attr("r", (d) => cityScale(d.properties.POPULATION));
 
-    store.cities
-        .selectAll("text")
-        .data(store.filteredCities)
-        .enter()
-        .append("text")
-        .attr(
-            "x",
-            (d) => d.projected[0] + cityScale(d.properties.POPULATION) + 5
-        )
-        .attr("y", (d) => d.projected[1])
-        .attr("class", "cityName")
-        .text((d) => d.properties.NAME);
+    store.cities.selectAll("circle").each(function (circle) {
+        d3.select(this)
+            .on("mouseover", (evt) => {
+                const f = d3.format(".2s");
+                store.citytip.html(
+                    `<p class="small m-0 fw-bolder">${
+                        circle.properties.NAME
+                    }, ${circle.properties.ST}</p>
+                    <p class="small m-0">${f(circle.properties.POPULATION)}</p>`
+                );
+                showCitytip(evt.pageX + 10, evt.pageY - 28);
+            })
+            .on("mouseout", hideCitytip);
+    });
 };
