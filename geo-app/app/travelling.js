@@ -34,6 +34,10 @@ const getLines = (performerName) => {
                     end: nextYear,
                     startCity: thisCity,
                     endCity: nextCity,
+                    startLat: thisLat,
+                    startLon: thisLon,
+                    endLat: nextLat,
+                    endLon: nextLon,
                     path: getPath([thisLon, thisLat], [nextLon, nextLat]),
                 });
             }
@@ -48,20 +52,24 @@ const drawAllTravels = (performerName, skipClearTravel) => {
         travelCircle
             .transition()
             .duration(durations.travelCircle)
-            .attrTween("cx", delta(route.node(), "dx"))
-            .attrTween("cy", delta(route.node(), "dy"))
-            .attr("r", () => {
-                // console.log(sizes.endTravelNode);
-                return sizes.endTravelNode;
-            })
+            .attrTween("transform", delta(route.node(), "translate"))
+            //.attrTween("cy", delta(route.node(), "dy"))
+            .attr("r", () => sizes.endTravelNode)
             .on("start", () => {
                 d3.select("body").classed("no-zoom", true);
                 d3.select("#loadingDot").attr("data-running", true);
             })
             .on("end", () => {
                 // fix the cx, cy, and reset transform when the transition is finished
-                var p = route.node().getPointAtLength(1 * l);
-                // travelCircle.attr("transform", "");
+                // var p = route.node().getPointAtLength(1 * l);
+                // console.log(p)
+                //
+                //console.log(store.currentTransform)
+                [cx, cy] = store.projection([travelCircle.attr("data-lon"), travelCircle.attr("data-lat")]);
+                travelCircle.attr("cx", store.currentTransform.x ? cx - store.currentTransform.x : cx);
+                travelCircle.attr("cy", store.currentTransform.y ? cy - store.currentTransform.y : cy);
+                if (store.currentTransform) travelCircle.attr("transform", store.currentTransform);
+                console.log(d3.select(`path#${travelCircle.attr("path-id")}`))
                 d3.select("body").classed("no-zoom", false);
                 d3.select("#loadingDot").attr("data-running", false);
             });
@@ -146,6 +154,8 @@ const drawAllTravels = (performerName, skipClearTravel) => {
             })
             .attr("class", "travelCircle")
             .attr("path-id", id)
+            .attr("data-lat", () => line.endLat)
+            .attr("data-lon", () => line.endLon)
             .on("mouseover", (evt) => {
                 mouseoverInfo(evt, line);
             })

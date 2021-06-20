@@ -9,6 +9,7 @@ const store = {
     citytip: d3.select("div.citytip"),
     modularitiesArray: [],
     clusters: {},
+    currentTransform: undefined
 };
 store.path = d3.geoPath().projection(store.projection);
 store.graticules = d3

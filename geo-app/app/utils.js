@@ -141,3 +141,9 @@ const toggle = (selector) => {
 const hasKey = (key, object) => {
     return Object.keys(object).includes(key);
 };
+
+const getCircleLocation = (circle) => {
+    let projected = store.projection([circle.lon, circle.lat]);
+    if (projected) return projected;
+    return -1000;
+}

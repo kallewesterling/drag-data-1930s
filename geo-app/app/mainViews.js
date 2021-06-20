@@ -173,16 +173,8 @@ const renderCircles = () => {
             (enter) =>
                 enter
                     .append("circle")
-                    .attr("cx", (circle) => {
-                        projected = store.projection([circle.lon, circle.lat]);
-                        if (projected) return projected[0];
-                        return -1000;
-                    })
-                    .attr("cy", (circle) => {
-                        projected = store.projection([circle.lon, circle.lat]);
-                        if (projected) return projected[1];
-                        return -1000;
-                    })
+                    .attr("cx", (circle) => getCircleLocation(circle)[0])
+                    .attr("cy", (circle) => getCircleLocation(circle)[1])
                     .attr("data-name", (circle) => circle.city)
                     .attr("data-lat", (circle) => circle.lat)
                     .attr("data-lon", (circle) => circle.lon)
@@ -255,7 +247,7 @@ const renderCities = (cities, excludeVisualized = true) => {
                 ][0]
         );
 
-    console.log(store.filteredCities);
+    //console.log(store.filteredCities);
     // we want to filter further here...
 
     cityScale = d3

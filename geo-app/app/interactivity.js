@@ -235,47 +235,51 @@ d3.select("#settingsToggle").on("click", (evt) => {
     evt.stopPropagation();
 });
 
+const changeView = (transformObject = store.currentTransform) => {
+    if (!transformObject) {
+        return false;
+    }
+
+    /* First, change store.projection */
+
+    // change scale
+    newScale = transformObject.k * 2000;
+    store.projection.scale(newScale);
+
+    // change offset
+    newX = centerX + transformObject.x;
+    newY = centerY + transformObject.y;
+
+    store.projection.translate([newX, newY]);
+
+    /* Second, change all objects */
+    d3.select("g#mapObjects")
+        .selectAll("path")
+        .attr("transform", transformObject);
+
+    d3.select("g#mapObjects")
+        .selectAll("circle[data-lat][data-lon]") // select circles without data-lat and data-lon set...
+        .attr("transform", transformObject);
+
+    // circle[data-lat][data-lon] = circles with lat and long...
+    d3.select("g#mapObjects").selectAll("circle:not([data-lat][data-lon])"); // select circles with data-lat and data-lon set...
+
+    d3.select("g#mapObjects")
+        .selectAll("text")
+        .attr("transform", transformObject);
+
+    return true;
+};
+
 zooming = (event) => {
     if (d3.select("body").classed("no-zoom")) {
         event.sourceEvent.preventDefault();
         event.sourceEvent.stopPropagation();
         return false;
     } else {
-        // console.log("zoom called..");
-        d3.select("g#mapObjects")
-            .selectAll("path")
-            .attr("transform", event.transform);
+        store.currentTransform = event.transform;
 
-        d3.select("g#mapObjects")
-            .selectAll("circle")
-            .attr("transform", () => {
-                return event.transform;
-            });
-
-        d3.select("g#mapObjects")
-            .selectAll("text")
-            .attr("transform", () => {
-                return event.transform;
-            });
-
-        // change scale of projection
-        currentScale = store.projection.scale();
-        newScale = event.transform.k * 2000;
-        /*
-        console.log(
-            `Changed scale from ${currentScale.toFixed(
-                0
-            )} to ${newScale.toFixed(0)}.`
-        );
-        */
-        store.projection.scale(newScale);
-
-        // change offset...
-        newX = centerX + event.transform.x;
-        newY = centerY + event.transform.y;
-        // console.log(newX.toFixed(0), newY.toFixed(0));
-
-        store.projection.translate([newX, newY]);
+        changeView(store.currentTransform);
     }
 };
 
