@@ -161,8 +161,17 @@ const loadNetwork = (callback = []) => {
 
     enableSettings();
     document.querySelector("#datafileContainer").removeAttribute("style");
+
+    const networkCleanup = (data) => {
+        let p = d3.timeParse('%Y-%m-%d %H:%M:%S')
+        data.createdDate = p(data.createdDate);
+        data.days = +data.days;
+        return data;
+    }
     d3.json(filename)
         .then((data) => {
+            data = networkCleanup(data);
+            console.log(data)
             _output("File loaded", false, loadNetwork);
             // for debug purposes (TODO can be removed)
             store.raw = data;
