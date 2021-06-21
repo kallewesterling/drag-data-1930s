@@ -32,11 +32,18 @@ const load = () => {
         });
     };
 
+    const networkCleanup = (data) => {
+        p = d3.timeParse('%Y-%m-%d %H:%M:%S')
+        data.createdDate = p(data.createdDate);
+        data.days = +data.days;
+        return data;
+    }
     const setupNetworkData = () => {
         d3.json(
             "data/co-occurrence-grouped-by-14-days-no-unnamed-performers.json"
         )
             .then((data) => {
+                data = networkCleanup(data);
                 store.networkData = data;
             })
             .then(() => {
@@ -94,8 +101,17 @@ const load = () => {
             });
         });
     };
-
-    d3.csv("data/geolocated_performers.csv")
+    
+    const performerTypes = (d) => {
+        return {
+            city: d.city,
+            lat: +d.lat,
+            lon: +d.lon,
+            performer: d.performer,
+            year: +d.year
+        }
+    }
+    d3.csv("data/geolocated_performers.csv", performerTypes)
         .then((data) => {
             setupStore(data);
         })
