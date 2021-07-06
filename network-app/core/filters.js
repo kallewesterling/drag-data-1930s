@@ -1,6 +1,7 @@
 "use strict";
 
 const dropNode = (node) => {
+    console.log(node)
     if (node.inGraph) {
         graph.nodes.forEach((o, i) => {
             if (node.node_id === o.node_id) {
