@@ -344,6 +344,10 @@ const setupInteractivity = (settings = undefined) => {
         // console.log('event', event);
         // console.log('node', node);
         event.stopPropagation();
+        if (event.altKey === true && event.metaKey === true && event.shiftKey === true) {
+            dropNode(node);
+            return true;
+        }
         if (event.metaKey === true) {
             if (nodeIsSelected(node)) {
                 hide("#nodeEdgeInfo");
@@ -354,14 +358,23 @@ const setupInteractivity = (settings = undefined) => {
             node.fx = null;
             node.fy = null;
             return true;
-        } else {
-            toggleNode(node);
-            return true;
         }
+        toggleNode(node);
+        return true;
     });
 
     textElements.on("click", (event, node) => {
-        console.log(node);
+        event.stopPropagation();
+        if (event.altKey === true && event.metaKey === true && event.shiftKey === true) {
+            let nodes = [];
+            graph.nodes.forEach(n=>{
+                if (n !== node) {
+                    nodes.push(n);
+                }
+            })
+            filter(nodes);
+            return true;
+        }
         toggleNode(node);
         return true;
     });
