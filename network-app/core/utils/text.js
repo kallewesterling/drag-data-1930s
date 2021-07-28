@@ -401,5 +401,19 @@ const quickEdgeInfo = (edge) => {
 
     if (!isVisible("#nodeTable")) show("#quickEdgeInfo");
     document.querySelector("#quickEdgeInfo").innerHTML = html;
+    document.querySelector("#quickEdgeInfo").style.left = "20px";
     document.querySelector("#quickEdgeInfo").style.top = `${window.innerHeight - document.querySelector("#quickEdgeInfo").offsetHeight - 20}px`
+};
+
+const quickCommentInfo = (comments, top = 0, left = 0) => {
+    let html = ``;
+    comments.forEach(comment => {
+        html += `<ul><li><span class="text-dark">${comment.content}</span><br/>${comment.source}</li></ul>`;
+    })
+    html += ``;
+    
+    if (!isVisible("#nodeTable")) show("#quickEdgeInfo");
+    document.querySelector("#quickEdgeInfo").innerHTML = html;
+    document.querySelector("#quickEdgeInfo").style.top = `${top}px`
+    document.querySelector("#quickEdgeInfo").style.left = `${left}px`
 };

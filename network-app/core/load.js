@@ -171,7 +171,7 @@ const loadNetwork = (callback = []) => {
     d3.json(filename)
         .then((data) => {
             data = networkCleanup(data);
-            console.log(data)
+            if (window.ERROR_LEVEL > 0) console.log(data);
             _output("File loaded", false, loadNetwork);
             // for debug purposes (TODO can be removed)
             store.raw = data;
@@ -362,6 +362,29 @@ const setupInteractivity = (settings = undefined) => {
         toggleNode(node);
         return true;
     });
+
+    const showComment = (node, top = 0, left = 0) => {
+        let searchBoxContent = document.querySelector('#searchComment').value;
+        if (d3.select('body').classed('searchComment') && searchBoxContent !== '') {
+            let comments = []
+            node.comments.forEach(comment => {
+                if (comment.content.toLowerCase().includes(searchBoxContent)) {
+                    comments.push(comment)
+                }
+            });
+            if (comments.length) {
+                quickCommentInfo(comments, top, left);
+            }
+        }
+    }
+
+    nodeElements.on("mouseover", (event, node) => {
+        showComment(node, event.clientY, event.clientX);
+    })
+
+    textElements.on("mouseover", (event, node) => {
+        showComment(node, event.clientY, event.clientX);
+    })
 
     textElements.on("click", (event, node) => {
         event.stopPropagation();

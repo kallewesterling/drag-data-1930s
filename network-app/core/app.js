@@ -38,7 +38,7 @@
 
     // keep track of processes...
     graph.simulation.on("tick", () => {
-        console.log(graph.simulation.alpha())
+        if (window.ERROR_LEVEL > 0) _output(graph.simulation.alpha().toString(), true, 'tick')
         d3.select('#loadingDot').attr('data-running', true);
     });
     graph.simulation.on('end', () => {

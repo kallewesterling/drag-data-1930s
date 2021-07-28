@@ -359,6 +359,12 @@ const styleGraphElements = (settings = undefined) => {
         // graph.clusters = {}; /* TODO: Technically this should happen here but causes bug in modifySimulation. */
     }
 
+
+    [...document.querySelectorAll('#searchToggle input')].forEach(elem => {
+        elem.value = '';
+    })
+    resetAfterSearch();
+
     nodeElements
         .attr("class", (node) => getNodeClass(node))
         .transition()
@@ -712,3 +718,88 @@ const findNode = (node_id, nodeList = store.nodes) => {
 const hasFixedNodes = () => {
     return graph.nodes.map((n) => n.fx).every((d) => d === null);
 };
+
+const getVenuesForNode = (node_id) => {
+    let _ = [];
+    findNode(node_id).connected.edges.map(e=>e.coLocated).forEach(o=>Object.keys(o).forEach(venue=>_.push(venue)));
+    _ = [...new Set(_)];
+    return _;
+}
+
+const findVenue = (search_term) => {
+    let res = [];
+    store.edges.forEach(e=>{
+        Object.keys(e.coLocated).forEach(v=>{
+            if (v.toLowerCase().includes(search_term))
+                res.push(e);
+        });
+    })
+    return res;
+}
+
+const findComment = (search_term) => {
+    let res = [];
+    store.nodes.filter(n => n.has_comments).forEach(n=>{
+        n.comments.forEach(comment => {
+            if (comment.content.toLowerCase().includes(search_term))
+                res.push(n);
+        })
+    });
+    return res;
+}
+
+const resetForSearch = (type) => {
+    let isAlreadySearching = [...document.querySelector('body').classList].includes(type);
+    if (!isAlreadySearching) {
+        console.log('start searching...');
+        document.querySelector('body').classList.add(type);
+        deselectNodes();
+        textElements.attr('opacity', 0.2)
+    }
+}
+
+const resetAfterSearch = (type) => {
+    console.log('stop searching...')
+    document.querySelector('body').classList.remove(type)
+}
+
+const highlightSelected = (arg) => {
+    edgeElements.classed('selected', edge => arg.edges.includes(edge));
+    nodeElements.classed('selected', node => arg.nodes.includes(node))
+    nodeElements.classed('highlighted', node => arg.nodes.includes(node))
+    textElements.attr('opacity', node => arg.nodes.includes(node) ? 1 : 0.2);
+    textElements.classed('selected', node => arg.nodes.includes(node) ? 1 : 0.2);
+    console.log('highlightSelected finished')
+}
+
+const searchEdge = (e) => {
+    console.log(e)
+    if (e.inputType === 'insertText' || e.inputType === 'insertFromPaste' || (e.inputType === 'deleteContentBackward' && document.querySelector('#searchEdge').value !== '')) {
+        resetForSearch('searchEdge');
+        console.log('continue searching...');
+        let selectedEdges = findVenue(document.querySelector('#searchEdge').value);
+        let selectedSources = selectedEdges.map(e=>e.source);
+        let selectedTargets = selectedEdges.map(e=>e.target);
+        highlightSelected({edges: selectedEdges, nodes: [...selectedTargets, ...selectedSources]});
+    } else if (e.inputType.includes('delete') && document.querySelector('#searchEdge').value === '') {
+        resetAfterSearch('searchEdge');
+        styleGraphElements();
+    }
+}
+
+const searchComment = (e) => {
+    let searchField = document.querySelector('#searchComment').value;
+    if (e.inputType === 'insertText' || e.inputType === 'insertFromPaste' || (e.inputType === 'deleteContentBackward' && searchField !== '')) {
+        resetForSearch('searchComment');
+        console.log('continue searching...');
+        let selectedNodes = findComment(searchField);
+        nodeElements.classed('selected', node => selectedNodes.includes(node))
+        highlightSelected({edges: [], nodes: selectedNodes});
+    } else if (e.inputType === 'deleteContentBackward' && searchField === '') {
+        resetAfterSearch('searchComment');
+        styleGraphElements();
+    }
+}
+
+d3.select('#searchEdge').on('input', e => searchEdge(e))
+d3.select('#searchComment').on('input', e => searchComment(e))

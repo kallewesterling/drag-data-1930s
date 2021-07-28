@@ -439,7 +439,7 @@ const setupSettingsInterface = (caller = undefined) => {
     window._elements.collide.step = 0.05;
 
     // set range for collide
-    window._elements.linkStrength.min = 0.01;
+    window._elements.linkStrength.min = 0.001;
     window._elements.linkStrength.max = 1;
     window._elements.linkStrength.step = 0.01;
 
@@ -897,7 +897,7 @@ const setupKeyHandlers = () => {
             window.edgeSelected = undefined;
             window.nodeSelected = undefined;
             resetDraw();
-        } else if (e.key === "Escape" || e.key === " ") {
+        } else if (e.key === "Escape") { //  `|| e.key === " "` has to be removed here as space needs to be possible in search fields
             // console.log("Escape 4 called!");
             UIToggleAllSettingBoxes();
         } else if (e.key === "c" && e.metaKey) {
