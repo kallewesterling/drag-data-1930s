@@ -391,6 +391,8 @@ function generate_dendogram(graph, part_init) {
 	return function() {
 		const core = function() {
 			const dendogram = generate_dendogram(original_graph, partition_init);
+			_output(`running core`, false, 'jLouvain')
+			_output(dendogram, true, 'jLouvain')
 
 			return partition_at_level(dendogram, dendogram.length - 1);
 		};
