@@ -131,8 +131,8 @@ const setupStoreEdges = (edgeList) => {
         edge.weights.numDates = [];
         Object.keys(edge.coLocated).map((key) => {
             let dateGroups = edge.coLocated[key];
-            edge.weights.numDateGroups += 1;
             dateGroups.forEach((dates) => {
+                edge.weights.numDateGroups += 1;
                 edge.weights.numDates = [...edge.weights.numDates, ...dates];
             });
         });
