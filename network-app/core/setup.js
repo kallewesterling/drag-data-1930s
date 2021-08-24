@@ -40,7 +40,7 @@ window.autoSettings = {
     // debugMessages: false,
     datafile: {
         filename:
-            "data/co-occurrence-grouped-by-14-days-no-unnamed-performers.json",
+            "data/v1-co-occurrence-grouped-by-14-days-no-unnamed-performers.json",
         bipartite: false,
     },
 };

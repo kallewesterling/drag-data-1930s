@@ -128,7 +128,7 @@ const generateNodeInfoHTML = (node) => {
     }
 
     // add comments...
-    if (node.comments.length > 0) {
+    if (node.comments && node.comments.length > 0) {
         html += `<li class="list-group-item"><strong>${node.comments.length} Comments</strong>`;
 
         let unique_comments = [...new Set(node.comments.map((c) => c.content))];

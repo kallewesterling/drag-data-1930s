@@ -18,6 +18,16 @@ except ModuleNotFoundError:
     print("No IPython found.")
 
 settings = {"DAYSPANS": [3, 14, 31, 93, 186, 365]}
+urls = [
+    {
+        "prefix": "v1",
+        "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vT0E0Y7txIa2pfBuusA1cd8X5OVhQ_D0qZC8D40KhTU3xB7McsPR2kuB7GH6ncmNT3nfjEYGbscOPp0/pub?gid=95950987&single=true&output=csv",
+    },
+    {
+        "prefix": "live",
+        "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vT0E0Y7txIa2pfBuusA1cd8X5OVhQ_D0qZC8D40KhTU3xB7McsPR2kuB7GH6ncmNT3nfjEYGbscOPp0/pub?gid=0&single=true&output=csv",
+    },
+]
 
 
 def in_notebook():
@@ -58,10 +68,11 @@ def slugify(value, allow_unicode=False, verbose=False):
     return value
 
 
-def get_raw_data(verbose=True):
-    df = pd.read_csv(
-        "https://docs.google.com/spreadsheets/d/e/2PACX-1vT0E0Y7txIa2pfBuusA1cd8X5OVhQ_D0qZC8D40KhTU3xB7McsPR2kuB7GH6ncmNT3nfjEYGbscOPp0/pub?gid=95950987&single=true&output=csv"
-    )
+def get_raw_data(
+    verbose=True,
+    url="https://docs.google.com/spreadsheets/d/e/2PACX-1vT0E0Y7txIa2pfBuusA1cd8X5OVhQ_D0qZC8D40KhTU3xB7McsPR2kuB7GH6ncmNT3nfjEYGbscOPp0/pub?gid=95950987&single=true&output=csv",
+):
+    df = pd.read_csv(url)
 
     df.replace("—", "", inplace=True)
     df.replace("—*", "", inplace=True)
@@ -222,10 +233,16 @@ def clean_data(df, drop_cols=[], verbose=True):
     return df
 
 
-def get_clean_network_data(min_date=None, max_date=None, drop_cols=None, verbose=True):
+def get_clean_network_data(
+    min_date=None,
+    max_date=None,
+    drop_cols=None,
+    verbose=True,
+    url="https://docs.google.com/spreadsheets/d/e/2PACX-1vT0E0Y7txIa2pfBuusA1cd8X5OVhQ_D0qZC8D40KhTU3xB7McsPR2kuB7GH6ncmNT3nfjEYGbscOPp0/pub?gid=95950987&single=true&output=csv",
+):
     """A "collector" function that runs through `get_raw_data`, `filter_data` and `clean_data` in that order and then resets the index."""
 
-    df = get_raw_data(verbose=verbose)
+    df = get_raw_data(verbose=verbose, url=url)
     df = filter_data(df, min_date=min_date, max_date=max_date, verbose=verbose)
 
     if not drop_cols:
@@ -286,23 +303,6 @@ def test_same_df(df1, df2):
         return False
 
     return True
-
-
-df = get_clean_network_data(
-    min_date=datetime.datetime(year=1930, month=1, day=1),
-    max_date=datetime.datetime(year=1940, month=12, day=31),
-    verbose=False,
-)
-
-
-if os.path.exists("network-app/data/_df.pickle"):
-    df_test = pd.read_pickle("network-app/data/_df.pickle")
-
-    if test_same_df(df, df_test):
-        print("Dataset is same. Exiting...")
-        exit()
-
-df.to_pickle("network-app/data/_df.pickle")
 
 
 def get_performers_who_were_there(df, where=None, when=[]):
@@ -481,138 +481,8 @@ def get_group_data(df, days=settings["DAYSPANS"], verbose=False):
     return data_dict
 
 
-group_data_dict = get_group_data(df)
-
-
-metadata = {}
-
-df_grouped_dates = pd.DataFrame()
-
-venue_span_data = {}
-
-for venue, row in df.groupby("Venue"):
-    d = {}
-    for days in [3, 14, 31, 93, 186, 365]:
-        all_dates = list(set(row.Date))
-        grouped_dates = group_dates(all_dates, delta=datetime.timedelta(days=days))
-        max_span = 0
-        max_performers_in_date_group = 0
-        group_member_counters = Counter()
-        for date_group in grouped_dates:
-            venue_span_data[str(date_group)] = {}
-            performers_in_date_group = []
-            last_day_in_date_group = max(
-                [datetime.datetime.strptime(x, "%Y-%m-%d") for x in date_group]
-            )
-            first_day_in_date_group = min(
-                [datetime.datetime.strptime(x, "%Y-%m-%d") for x in date_group]
-            )
-            datespan = (last_day_in_date_group - first_day_in_date_group).days
-            if datespan > max_span:
-                max_span = datespan
-            for performer in [
-                get_performers_who_were_there(df, where=venue, when=x)
-                for x in date_group
-            ]:
-                performers_in_date_group.extend(performer)
-            performers_in_date_group = list(set(performers_in_date_group))
-            if len(performers_in_date_group) > max_performers_in_date_group:
-                max_performers_in_date_group = len(performers_in_date_group)
-            group_member_counters[len(performers_in_date_group)] += 1
-
-        d[f"num_groups (#, delta: {days} days)"] = len(grouped_dates)
-        d[f"max_span (days, delta: {days} days)"] = max_span
-        d[
-            f"max performers in a group (#, delta: {days} days)"
-        ] = max_performers_in_date_group
-        d[
-            f"group_member_counters for venue (#, delta: {days} days)"
-        ] = group_member_counters
-    s = pd.Series(d, name=venue)
-    df_grouped_dates = df_grouped_dates.append(s)
-    dtype = {
-        key: int
-        for key in [x for x in d.keys() if not "group_member_counters for venue" in x]
-    }
-    df_grouped_dates = df_grouped_dates.astype(dtype)
-
-
-metadata["grouped_dates"] = df_grouped_dates[list(d.keys())].T.to_json()
-
-
-networks = {}
-
-venue_count = len(group_data_dict)
-
-for venue, data in group_data_dict.items():
-    for grouped_by, data2 in data.items():
-        clear_output(wait=True)
-        if not grouped_by in networks:
-            networks[grouped_by] = nx.Graph()
-            networks[grouped_by].generated = datetime.datetime.now()
-
-        for date_group_id, data3 in data2.items():
-            if len(data3["performers"]) > 1:
-                performers = data3["performers"]
-                dates = data3["dates"]
-                revues = data3["revues"]
-                cities = data3["cities"]
-                for performer in performers:
-                    for target in [x for x in performers if not x == performer]:
-                        edge = (performer, target)
-                        if not edge in networks[grouped_by].edges:
-                            networks[grouped_by].add_edges_from([edge], coLocated={})
-                        if not venue in networks[grouped_by].edges[edge]["coLocated"]:
-                            networks[grouped_by].edges[edge]["coLocated"][venue] = []
-                        if (
-                            not dates
-                            in networks[grouped_by].edges[edge]["coLocated"][venue]
-                        ):
-                            networks[grouped_by].edges[edge]["coLocated"][venue].append(
-                                dates
-                            )
-
-                        if not "revues" in networks[grouped_by].edges[edge]:
-                            networks[grouped_by].edges[edge]["revues"] = []
-                        if not revues in networks[grouped_by].edges[edge]["revues"]:
-                            networks[grouped_by].edges[edge]["revues"].extend(revues)
-                            networks[grouped_by].edges[edge]["revues"] = list(
-                                set(networks[grouped_by].edges[edge]["revues"])
-                            )
-
-                        if not "cities" in networks[grouped_by].edges[edge]:
-                            networks[grouped_by].edges[edge]["cities"] = []
-                        if not cities in networks[grouped_by].edges[edge]["cities"]:
-                            networks[grouped_by].edges[edge]["cities"].extend(cities)
-                            networks[grouped_by].edges[edge]["cities"] = list(
-                                set(networks[grouped_by].edges[edge]["cities"])
-                            )
-
-
 def drop_unnamed(n):
     return not "unnamed" in n.lower()
-
-
-_networks = {}
-
-for key in networks.keys():
-    _networks[key] = copy.deepcopy(networks[key])
-    _networks[f"{key}-no-unnamed-performers"] = nx.subgraph_view(
-        _networks[key], filter_node=drop_unnamed
-    )
-    _networks[f"{key}-no-unnamed-performers"].generated = datetime.datetime.now()
-
-networks = _networks
-
-
-for key in networks.keys():
-    for edge in list(networks[key].edges):
-        networks[key].edges[edge]["weights"] = {}
-        for co_located, date_groups in networks[key].edges[edge]["coLocated"].items():
-            networks[key].edges[edge]["weights"]["dateGroups"] = len(date_groups)
-        networks[key].edges[edge]["weights"]["venues"] = len(
-            networks[key].edges[edge]["coLocated"]
-        )
 
 
 def get_meta_data(df, category=None, verbose=False):
@@ -676,10 +546,15 @@ def get_meta_data(df, category=None, verbose=False):
     return meta_data
 
 
-def get_meta(df=None, category=None, verbose=False):
+def get_meta(
+    df=None,
+    category=None,
+    verbose=False,
+    url="https://docs.google.com/spreadsheets/d/e/2PACX-1vT0E0Y7txIa2pfBuusA1cd8X5OVhQ_D0qZC8D40KhTU3xB7McsPR2kuB7GH6ncmNT3nfjEYGbscOPp0/pub?gid=95950987&single=true&output=csv",
+):
     if not isinstance(df, pd.DataFrame):
         log("Building new clean data for node meta information...", verbose=verbose)
-        df = get_raw_data(verbose=False)
+        df = get_raw_data(verbose=False, url=url)
         df = filter_data(df, max_date=None, min_date=None, verbose=False)
         df = clean_data(df, drop_cols=["Venue"], verbose=False)
 
@@ -689,14 +564,6 @@ def get_meta(df=None, category=None, verbose=False):
         return all_meta
 
     return all_meta[category]
-
-
-all_meta = get_meta()
-metadata["content"] = all_meta
-
-
-for key in networks.keys():
-    nx.set_node_attributes(networks[key], all_meta["performers"])
 
 
 def get_connected_nodes_per_node(G):
@@ -722,19 +589,6 @@ def get_unique_networks(connected_nodes_per_node):
     return unique_networks
 
 
-for key in networks.keys():
-    unique_networks = get_unique_networks(networks[key])
-
-    for network_id, unique_network in enumerate(unique_networks, start=1):
-        for performer in unique_network:
-            networks[key].nodes[performer]["connected"] = {
-                "network": {
-                    "nodes": [x for x in unique_network if not x == performer],
-                    "network_id": network_id,
-                }
-            }
-
-
 def merge_community_dicts(*args):
     _ = {}
     for dictionary in args:
@@ -756,67 +610,6 @@ def merge_community_dicts(*args):
     return _
 
 
-for key in networks.keys():
-    louvain = community_louvain.best_partition(networks[key])
-    louvain = {
-        performer: {"modularities": {"Louvain": community_number}}
-        for performer, community_number in louvain.items()
-    }
-
-    c = nx.community.greedy_modularity_communities(networks[key])
-    clauset_newman_moore = {
-        performer: {"modularities": {"Clauset-Newman-Moore": community_number}}
-        for community_number, list_of_performers in enumerate(c, start=1)
-        for performer in list_of_performers
-    }
-
-    """
-    # TODO: This won't work
-    gn = nx.community.girvan_newman(networks[key])
-    first_girvan_newman_iteration = next(gn)
-    girvan_newman_groups = {group: names for group, names in enumerate([list(x) for x in first_girvan_newman_iteration], start=1)}
-    """
-
-    community_dicts = merge_community_dicts(louvain, clauset_newman_moore)
-
-    nx.set_node_attributes(networks[key], community_dicts)
-
-
-for key in networks.keys():
-    for performer in networks[key].nodes:
-        networks[key].nodes[performer]["centralities"] = {}
-
-    for performer, degree in nx.degree_centrality(networks[key]).items():
-        networks[key].nodes[performer]["centralities"][
-            "degree_centrality_100x"
-        ] = round(degree * 100, 6)
-
-    for performer, degree in nx.betweenness_centrality(
-        networks[key], k=len(networks[key].nodes)
-    ).items():
-        networks[key].nodes[performer]["centralities"][
-            "betweenness_centrality_100x"
-        ] = round(degree * 100, 6)
-
-    for performer, degree in nx.eigenvector_centrality(
-        networks[key], max_iter=100, weight="weight"
-    ).items():
-        networks[key].nodes[performer]["centralities"][
-            "eigenvector_centrality_100x"
-        ] = round(degree * 100, 6)
-
-    # try:
-    #    for performer, degree in nx.katz_centrality(networks[key]).items():
-    #        networks[key].nodes[performer]['centralities']['katz_centrality_100x'] = round(degree*100, 6)
-    # except nx.exception.PowerIterationFailedConvergence as e:
-    #    print(f'Katz Centrality failed: {e}')
-
-    for performer, degree in nx.closeness_centrality(networks[key]).items():
-        networks[key].nodes[performer]["centralities"][
-            "closeness_centrality_100x"
-        ] = round(degree * 100, 6)
-
-
 def get_degrees(G, node):
     indegree = sum([1 for edge in G.edges if edge[0] == node])
     outdegree = sum([1 for edge in G.edges if edge[1] == node])
@@ -825,93 +618,348 @@ def get_degrees(G, node):
     return {"indegree": indegree, "outdegree": outdegree, "degree": degree}
 
 
-for key in networks.keys():
-    degrees = {
-        node: {"degrees": get_degrees(networks[key], node)}
-        for node in networks[key].nodes
-    }
-    nx.set_node_attributes(networks[key], degrees)
+for url_data in urls:
+    PREFIX = url_data["prefix"]
+    URL = url_data["url"]
+    PICKLE = f"network-app/data/_df-{PREFIX}.pickle"
 
+    print(f"Generating `{PREFIX}`...")
 
-for key, network in networks.items():
-    for node in networks[key].nodes:
-        networks[key].nodes[node]["node_id"] = slugify(node)
-        networks[key].nodes[node]["category"] = "performer"
-        networks[key].nodes[node]["display"] = node
+    skip = False
 
-    for edge in networks[key].edges:
-        networks[key].edges[edge]["edge_id"] = slugify(f"{edge[0]}-{edge[1]}")
-        networks[key].edges[edge]["comments"] = []
-        networks[key].edges[edge]["general_comments"] = []
+    df = get_clean_network_data(
+        min_date=datetime.datetime(year=1930, month=1, day=1),
+        max_date=datetime.datetime(year=1940, month=12, day=31),
+        verbose=False,
+        url=URL,
+    )
 
-        networks[key].edges[edge]["found"] = []
-        for _, dates in networks[key].edges[edge]["coLocated"].items():
-            for datelist in dates:
-                for date in datelist:
-                    if not date in networks[key].edges[edge]["found"]:
-                        networks[key].edges[edge]["found"].append(date)
+    if os.path.exists(PICKLE):
+        df_test = pd.read_pickle(PICKLE)
 
-        networks[key].edges[edge]["comments"] = {
-            "venues": {},
-            "cities": {},
-            "revues": {},
+        if test_same_df(df, df_test):
+            print("Dataset is same. Exiting...")
+            skip = True
+
+    if skip:
+        continue
+
+    df.to_pickle(PICKLE)
+
+    group_data_dict = get_group_data(df)
+
+    metadata = {}
+
+    df_grouped_dates = pd.DataFrame()
+
+    venue_span_data = {}
+
+    print(f"`{PREFIX}`: Generating date data for venues")
+    for venue, row in df.groupby("Venue"):
+        d = {}
+        for days in [3, 14, 31, 93, 186, 365]:
+            all_dates = list(set(row.Date))
+            grouped_dates = group_dates(all_dates, delta=datetime.timedelta(days=days))
+            max_span = 0
+            max_performers_in_date_group = 0
+            group_member_counters = Counter()
+            for date_group in grouped_dates:
+                venue_span_data[str(date_group)] = {}
+                performers_in_date_group = []
+                last_day_in_date_group = max(
+                    [datetime.datetime.strptime(x, "%Y-%m-%d") for x in date_group]
+                )
+                first_day_in_date_group = min(
+                    [datetime.datetime.strptime(x, "%Y-%m-%d") for x in date_group]
+                )
+                datespan = (last_day_in_date_group - first_day_in_date_group).days
+                if datespan > max_span:
+                    max_span = datespan
+                for performer in [
+                    get_performers_who_were_there(df, where=venue, when=x)
+                    for x in date_group
+                ]:
+                    performers_in_date_group.extend(performer)
+                performers_in_date_group = list(set(performers_in_date_group))
+                if len(performers_in_date_group) > max_performers_in_date_group:
+                    max_performers_in_date_group = len(performers_in_date_group)
+                group_member_counters[len(performers_in_date_group)] += 1
+
+            d[f"num_groups (#, delta: {days} days)"] = len(grouped_dates)
+            d[f"max_span (days, delta: {days} days)"] = max_span
+            d[
+                f"max performers in a group (#, delta: {days} days)"
+            ] = max_performers_in_date_group
+            d[
+                f"group_member_counters for venue (#, delta: {days} days)"
+            ] = group_member_counters
+        s = pd.Series(d, name=venue)
+        df_grouped_dates = df_grouped_dates.append(s)
+        dtype = {
+            key: int
+            for key in [
+                x for x in d.keys() if not "group_member_counters for venue" in x
+            ]
+        }
+        df_grouped_dates = df_grouped_dates.astype(dtype)
+
+    metadata["grouped_dates"] = df_grouped_dates[list(d.keys())].T.to_json()
+
+    networks = {}
+
+    venue_count = len(group_data_dict)
+
+    print(f"`{PREFIX}`: Generating data for network edges and nodes")
+    for venue, data in group_data_dict.items():
+        for grouped_by, data2 in data.items():
+            clear_output(wait=True)
+            if not grouped_by in networks:
+                networks[grouped_by] = nx.Graph()
+                networks[grouped_by].generated = datetime.datetime.now()
+
+            for date_group_id, data3 in data2.items():
+                if len(data3["performers"]) > 1:
+                    performers = data3["performers"]
+                    dates = data3["dates"]
+                    revues = data3["revues"]
+                    cities = data3["cities"]
+                    for performer in performers:
+                        for target in [x for x in performers if not x == performer]:
+                            edge = (performer, target)
+                            if not edge in networks[grouped_by].edges:
+                                networks[grouped_by].add_edges_from(
+                                    [edge], coLocated={}
+                                )
+                            if (
+                                not venue
+                                in networks[grouped_by].edges[edge]["coLocated"]
+                            ):
+                                networks[grouped_by].edges[edge]["coLocated"][
+                                    venue
+                                ] = []
+                            if (
+                                not dates
+                                in networks[grouped_by].edges[edge]["coLocated"][venue]
+                            ):
+                                networks[grouped_by].edges[edge]["coLocated"][
+                                    venue
+                                ].append(dates)
+
+                            if not "revues" in networks[grouped_by].edges[edge]:
+                                networks[grouped_by].edges[edge]["revues"] = []
+                            if not revues in networks[grouped_by].edges[edge]["revues"]:
+                                networks[grouped_by].edges[edge]["revues"].extend(
+                                    revues
+                                )
+                                networks[grouped_by].edges[edge]["revues"] = list(
+                                    set(networks[grouped_by].edges[edge]["revues"])
+                                )
+
+                            if not "cities" in networks[grouped_by].edges[edge]:
+                                networks[grouped_by].edges[edge]["cities"] = []
+                            if not cities in networks[grouped_by].edges[edge]["cities"]:
+                                networks[grouped_by].edges[edge]["cities"].extend(
+                                    cities
+                                )
+                                networks[grouped_by].edges[edge]["cities"] = list(
+                                    set(networks[grouped_by].edges[edge]["cities"])
+                                )
+
+    _networks = {}
+
+    print(f"`{PREFIX}`: Generating networks")
+    for key in networks.keys():
+        _networks[key] = copy.deepcopy(networks[key])
+        _networks[f"{key}-no-unnamed-performers"] = nx.subgraph_view(
+            _networks[key], filter_node=drop_unnamed
+        )
+        _networks[f"{key}-no-unnamed-performers"].generated = datetime.datetime.now()
+
+    networks = _networks
+
+    print(f"`{PREFIX}`: Adding edges")
+    for key in networks.keys():
+        for edge in list(networks[key].edges):
+            networks[key].edges[edge]["weights"] = {}
+            for co_located, date_groups in (
+                networks[key].edges[edge]["coLocated"].items()
+            ):
+                networks[key].edges[edge]["weights"]["dateGroups"] = len(date_groups)
+            networks[key].edges[edge]["weights"]["venues"] = len(
+                networks[key].edges[edge]["coLocated"]
+            )
+
+    print(f"`{PREFIX}`: Adding metadata")
+    all_meta = get_meta()
+    metadata["content"] = all_meta
+
+    for key in networks.keys():
+        nx.set_node_attributes(networks[key], all_meta["performers"])
+
+    print(f"`{PREFIX}`: Generating unique network data")
+    for key in networks.keys():
+        unique_networks = get_unique_networks(networks[key])
+
+        for network_id, unique_network in enumerate(unique_networks, start=1):
+            for performer in unique_network:
+                networks[key].nodes[performer]["connected"] = {
+                    "network": {
+                        "nodes": [x for x in unique_network if not x == performer],
+                        "network_id": network_id,
+                    }
+                }
+
+    print(f"`{PREFIX}`: Generating modularities for networks")
+    for key in networks.keys():
+        print(f"{' '*len(PREFIX)}   --> Louvain for `{key}`")
+        louvain = community_louvain.best_partition(networks[key])
+        louvain = {
+            performer: {"modularities": {"Louvain": community_number}}
+            for performer, community_number in louvain.items()
         }
 
-    networks[grouped_by].finished = datetime.datetime.now()
+        print(f"{' '*len(PREFIX)}   --> CNM for `{key}`")
+        c = nx.community.greedy_modularity_communities(networks[key])
+        clauset_newman_moore = {
+            performer: {"modularities": {"Clauset-Newman-Moore": community_number}}
+            for community_number, list_of_performers in enumerate(c, start=1)
+            for performer in list_of_performers
+        }
 
+        """
+        # TODO: This won't work
+        gn = nx.community.girvan_newman(networks[key])
+        first_girvan_newman_iteration = next(gn)
+        girvan_newman_groups = {group: names for group, names in enumerate([list(x) for x in first_girvan_newman_iteration], start=1)}
+        """
 
-for key in networks:
-    file_name = f"co-occurrence-{key}.json"
+        community_dicts = merge_community_dicts(louvain, clauset_newman_moore)
 
-    data = nx.node_link_data(networks[key])
-    data["createdDate"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    diff = datetime.datetime.now() - networks[key].generated
-    data["timeToCreate"] = {
-        "minutes": diff.seconds // 60,
-        "seconds": diff.seconds % 60,
-        "totalInSeconds": diff.seconds,
-    }
-    data["days"] = re.findall(r"\d+", key)[0]
+        nx.set_node_attributes(networks[key], community_dicts)
 
-    with open("./network-app/data/" + file_name, "w+") as fp:
-        json.dump(obj=data, fp=fp)
+    print(f"`{PREFIX}`: Setting modularities on network metadata")
+    for key in networks.keys():
+        for performer in networks[key].nodes:
+            networks[key].nodes[performer]["centralities"] = {}
 
-with open("./network-app/data/co-occurrence-_metadata.json", "w+") as fp:
-    json.dump(obj=metadata, fp=fp)
+        for performer, degree in nx.degree_centrality(networks[key]).items():
+            networks[key].nodes[performer]["centralities"][
+                "degree_centrality_100x"
+            ] = round(degree * 100, 6)
 
+        for performer, degree in nx.betweenness_centrality(
+            networks[key], k=len(networks[key].nodes)
+        ).items():
+            networks[key].nodes[performer]["centralities"][
+                "betweenness_centrality_100x"
+            ] = round(degree * 100, 6)
 
-gexf_networks = copy.deepcopy(networks)
+        for performer, degree in nx.eigenvector_centrality(
+            networks[key], max_iter=1000, weight="weight"
+        ).items():
+            networks[key].nodes[performer]["centralities"][
+                "eigenvector_centrality_100x"
+            ] = round(degree * 100, 6)
 
-for key in gexf_networks:
-    for node in gexf_networks[key].nodes:
-        for k in [
-            "comments",
-            "legal_names",
-            "alleged_ages",
-            "assumed_birth_years",
-            "images",
-            "exotic_dancer",
-            "fan_dancer",
-            "blackface",
-            "sepia",
-        ]:
-            if k in gexf_networks[key].nodes[node]:
-                del gexf_networks[key].nodes[node][k]
-    for edge in gexf_networks[key].edges:
-        for k in [
-            "coLocated",
-            "revues",
-            "cities",
-            "weights",
-            "edge_id",
-            "comments",
-            "general_comments",
-            "found",
-        ]:
-            if k in gexf_networks[key].edges[edge]:
-                del gexf_networks[key].edges[edge][k]
+        # try:
+        #    for performer, degree in nx.katz_centrality(networks[key]).items():
+        #        networks[key].nodes[performer]['centralities']['katz_centrality_100x'] = round(degree*100, 6)
+        # except nx.exception.PowerIterationFailedConvergence as e:
+        #    print(f'Katz Centrality failed: {e}')
 
-for key in gexf_networks:
-    file_name = f"gephi/co-occurrence-{key}.gexf"
+        for performer, degree in nx.closeness_centrality(networks[key]).items():
+            networks[key].nodes[performer]["centralities"][
+                "closeness_centrality_100x"
+            ] = round(degree * 100, 6)
 
-    nx.write_gexf(gexf_networks[key], file_name)
+    print(f"`{PREFIX}`: Setting degrees on network metadata")
+    for key in networks.keys():
+        degrees = {
+            node: {"degrees": get_degrees(networks[key], node)}
+            for node in networks[key].nodes
+        }
+        nx.set_node_attributes(networks[key], degrees)
+
+    print(f"`{PREFIX}`: Correcting last-minute data for networks")
+    for key, network in networks.items():
+        for node in networks[key].nodes:
+            networks[key].nodes[node]["node_id"] = slugify(node)
+            networks[key].nodes[node]["category"] = "performer"
+            networks[key].nodes[node]["display"] = node
+
+        for edge in networks[key].edges:
+            networks[key].edges[edge]["edge_id"] = slugify(f"{edge[0]}-{edge[1]}")
+            networks[key].edges[edge]["comments"] = []
+            networks[key].edges[edge]["general_comments"] = []
+
+            networks[key].edges[edge]["found"] = []
+            for _, dates in networks[key].edges[edge]["coLocated"].items():
+                for datelist in dates:
+                    for date in datelist:
+                        if not date in networks[key].edges[edge]["found"]:
+                            networks[key].edges[edge]["found"].append(date)
+
+            networks[key].edges[edge]["comments"] = {
+                "venues": {},
+                "cities": {},
+                "revues": {},
+            }
+
+        networks[grouped_by].finished = datetime.datetime.now()
+
+    print(f"`{PREFIX}`: Saving JSON files for each network")
+    for key in networks:
+        file_name = f"{PREFIX}-co-occurrence-{key}.json"
+
+        data = nx.node_link_data(networks[key])
+        data["createdDate"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        diff = datetime.datetime.now() - networks[key].generated
+        data["timeToCreate"] = {
+            "minutes": diff.seconds // 60,
+            "seconds": diff.seconds % 60,
+            "totalInSeconds": diff.seconds,
+        }
+        data["days"] = re.findall(r"\d+", key)[0]
+
+        with open("./network-app/data/" + file_name, "w+") as fp:
+            json.dump(obj=data, fp=fp)
+
+    with open(f"./network-app/data/{PREFIX}-co-occurrence-_metadata.json", "w+") as fp:
+        json.dump(obj=metadata, fp=fp)
+
+    print(f"`{PREFIX}`: Saving Gephi files for each network")
+    gexf_networks = copy.deepcopy(networks)
+
+    for key in gexf_networks:
+        for node in gexf_networks[key].nodes:
+            for k in [
+                "comments",
+                "legal_names",
+                "alleged_ages",
+                "assumed_birth_years",
+                "images",
+                "exotic_dancer",
+                "fan_dancer",
+                "blackface",
+                "sepia",
+            ]:
+                if k in gexf_networks[key].nodes[node]:
+                    del gexf_networks[key].nodes[node][k]
+        for edge in gexf_networks[key].edges:
+            for k in [
+                "coLocated",
+                "revues",
+                "cities",
+                "weights",
+                "edge_id",
+                "comments",
+                "general_comments",
+                "found",
+            ]:
+                if k in gexf_networks[key].edges[edge]:
+                    del gexf_networks[key].edges[edge][k]
+
+    for key in gexf_networks:
+        file_name = f"gephi/{PREFIX}-co-occurrence-{key}.gexf"
+
+        nx.write_gexf(gexf_networks[key], file_name)
