@@ -3,14 +3,17 @@
 
 import community as community_louvain
 import copy
+from colorama import Fore, Back, Style
 import networkx as nx
 from collections import Counter
 import unicodedata
 import re
 import pandas as pd
 import json
+import jellyfish
 import os
 import datetime
+from tqdm import tqdm
 
 try:
     from IPython.display import display, HTML, Markdown, clear_output
@@ -84,7 +87,7 @@ def get_raw_data(
     return df
 
 
-def filter_data(df, min_date=None, max_date=None, verbose=True):
+def filter_data(df, min_date=None, max_date=None, verbose=True, skip_unsure=False):
     def has_required_data(row):
         """(internal) for use with DataFrame lambda function to ensure that any given row has the required data present"""
         has_performer = (
@@ -105,6 +108,8 @@ def filter_data(df, min_date=None, max_date=None, verbose=True):
     def string_date(row):
         return row["Date"].strftime("%Y-%m-%d")
 
+    df = df.copy()
+
     df["has_required_data"] = df.apply(lambda row: has_required_data(row), axis=1)
     df.drop(df[df["has_required_data"] == False].index, inplace=True)
     log(f"**{df.shape[0]} rows after filtering**: Required data.", verbose=verbose)
@@ -116,12 +121,13 @@ def filter_data(df, min_date=None, max_date=None, verbose=True):
         verbose=verbose,
     )
 
-    df.drop(df[df["Unsure whether drag artist"] == True].index, inplace=True)
-    df.drop(df[df["Unsure whether drag artist"] == "TRUE"].index, inplace=True)
-    log(
-        f"**{df.shape[0]} rows after filtering**: Unsure whether drag artist.",
-        verbose=verbose,
-    )
+    if skip_unsure == False:
+        df.drop(df[df["Unsure whether drag artist"] == True].index, inplace=True)
+        df.drop(df[df["Unsure whether drag artist"] == "TRUE"].index, inplace=True)
+        log(
+            f"**{df.shape[0]} rows after filtering**: Unsure whether drag artist.",
+            verbose=verbose,
+        )
 
     df["has_correct_date"] = df.apply(lambda row: has_correct_date(row), axis=1)
     df.drop(df[df["has_correct_date"] == False].index, inplace=True)
@@ -151,6 +157,13 @@ def clean_data(df, drop_cols=[], verbose=True):
 
         if last_name and not first_name:
             return last_name
+
+        if (
+            row["Normalized performer"]
+            and not "—" in row["Normalized performer"]
+            and not "–" in row["Normalized performer"]
+        ):
+            return row["Normalized performer"]
 
         if first_name and last_name:
             if not "—" in first_name and not "—" in last_name:
@@ -623,9 +636,7 @@ for url_data in urls:
     URL = url_data["url"]
     PICKLE = f"network-app/data/_df-{PREFIX}.pickle"
 
-    print(f"Generating `{PREFIX}`...")
-
-    skip = False
+    print(Style.DIM + f"Generating `{PREFIX}`..." + Style.RESET_ALL)
 
     df = get_clean_network_data(
         min_date=datetime.datetime(year=1930, month=1, day=1),
@@ -638,8 +649,15 @@ for url_data in urls:
         df_test = pd.read_pickle(PICKLE)
 
         if test_same_df(df, df_test):
-            print("Dataset is same. Exiting...")
+            print(Fore.RED + "Dataset is same. Exiting..." + Style.RESET_ALL)
             skip = True
+        else:
+            print(
+                Fore.GREEN
+                + "Dataset is new/changed. Updating JSON files..."
+                + Style.RESET_ALL
+            )
+            skip = False
 
     if skip:
         continue
@@ -654,8 +672,11 @@ for url_data in urls:
 
     venue_span_data = {}
 
-    print(f"`{PREFIX}`: Generating date data for venues")
-    for venue, row in df.groupby("Venue"):
+    for venue, row in tqdm(
+        df.groupby("Venue"),
+        bar_format="Generating date data for venues: {n_fmt}/{total_fmt} {bar}",
+        colour="green",
+    ):
         d = {}
         for days in [3, 14, 31, 93, 186, 365]:
             all_dates = list(set(row.Date))
@@ -709,8 +730,11 @@ for url_data in urls:
 
     venue_count = len(group_data_dict)
 
-    print(f"`{PREFIX}`: Generating data for network edges and nodes")
-    for venue, data in group_data_dict.items():
+    for venue, data in tqdm(
+        group_data_dict.items(),
+        bar_format="Generating data for network edges and nodes: {n_fmt}/{total_fmt} {bar}",
+        colour="green",
+    ):
         for grouped_by, data2 in data.items():
             clear_output(wait=True)
             if not grouped_by in networks:
@@ -767,8 +791,11 @@ for url_data in urls:
 
     _networks = {}
 
-    print(f"`{PREFIX}`: Generating networks")
-    for key in networks.keys():
+    for key in tqdm(
+        networks.keys(),
+        bar_format="Generating networks: {n_fmt}/{total_fmt} {bar}",
+        colour="green",
+    ):
         _networks[key] = copy.deepcopy(networks[key])
         _networks[f"{key}-no-unnamed-performers"] = nx.subgraph_view(
             _networks[key], filter_node=drop_unnamed
@@ -777,8 +804,11 @@ for url_data in urls:
 
     networks = _networks
 
-    print(f"`{PREFIX}`: Adding edges")
-    for key in networks.keys():
+    for key in tqdm(
+        networks.keys(),
+        bar_format="Adding edges: {n_fmt}/{total_fmt} {bar}",
+        colour="green",
+    ):
         for edge in list(networks[key].edges):
             networks[key].edges[edge]["weights"] = {}
             for co_located, date_groups in (
@@ -789,15 +819,26 @@ for url_data in urls:
                 networks[key].edges[edge]["coLocated"]
             )
 
-    print(f"`{PREFIX}`: Adding metadata")
-    all_meta = get_meta()
+    all_meta = get_meta(url=URL)
     metadata["content"] = all_meta
 
-    for key in networks.keys():
+    for key in tqdm(
+        networks.keys(),
+        bar_format="Adding metadata: {n_fmt}/{total_fmt} {bar}",
+        colour="green",
+    ):
         nx.set_node_attributes(networks[key], all_meta["performers"])
 
-    print(f"`{PREFIX}`: Generating unique network data")
-    for key in networks.keys():
+    print(
+        Style.DIM
+        + f"`{PREFIX}`: Generating metadata for connected nodes in each network"
+        + Style.RESET_ALL
+    )
+    for key in tqdm(
+        networks.keys(),
+        bar_format="Generating metadata for connected nodes in each network: {n_fmt}/{total_fmt} {bar}",
+        colour="green",
+    ):
         unique_networks = get_unique_networks(networks[key])
 
         for network_id, unique_network in enumerate(unique_networks, start=1):
@@ -809,16 +850,19 @@ for url_data in urls:
                     }
                 }
 
-    print(f"`{PREFIX}`: Generating modularities for networks")
-    for key in networks.keys():
-        print(f"{' '*len(PREFIX)}   --> Louvain for `{key}`")
+    for key in tqdm(
+        networks.keys(),
+        bar_format="Generating modularities for network: {n_fmt}/{total_fmt} {bar}",
+        colour="green",
+    ):
+        tqdm.write(f"{' '*len(PREFIX)}   --> Louvain for `{key}`")
         louvain = community_louvain.best_partition(networks[key])
         louvain = {
             performer: {"modularities": {"Louvain": community_number}}
             for performer, community_number in louvain.items()
         }
 
-        print(f"{' '*len(PREFIX)}   --> CNM for `{key}`")
+        tqdm.write(f"{' '*len(PREFIX)}   --> CNM for `{key}`")
         c = nx.community.greedy_modularity_communities(networks[key])
         clauset_newman_moore = {
             performer: {"modularities": {"Clauset-Newman-Moore": community_number}}
@@ -837,8 +881,11 @@ for url_data in urls:
 
         nx.set_node_attributes(networks[key], community_dicts)
 
-    print(f"`{PREFIX}`: Setting modularities on network metadata")
-    for key in networks.keys():
+    for key in tqdm(
+        networks.keys(),
+        bar_format="Setting modularities on network metadata: {n_fmt}/{total_fmt} {bar}",
+        colour="green",
+    ):
         for performer in networks[key].nodes:
             networks[key].nodes[performer]["centralities"] = {}
 
@@ -872,16 +919,22 @@ for url_data in urls:
                 "closeness_centrality_100x"
             ] = round(degree * 100, 6)
 
-    print(f"`{PREFIX}`: Setting degrees on network metadata")
-    for key in networks.keys():
+    for key in tqdm(
+        networks.keys(),
+        bar_format="Setting degrees on network metadata: {n_fmt}/{total_fmt} {bar}",
+        colour="green",
+    ):
         degrees = {
             node: {"degrees": get_degrees(networks[key], node)}
             for node in networks[key].nodes
         }
         nx.set_node_attributes(networks[key], degrees)
 
-    print(f"`{PREFIX}`: Correcting last-minute data for networks")
-    for key, network in networks.items():
+    for key, network in tqdm(
+        networks.items(),
+        bar_format="Correcting last-minute data for networks: {n_fmt}/{total_fmt} {bar}",
+        colour="green",
+    ):
         for node in networks[key].nodes:
             networks[key].nodes[node]["node_id"] = slugify(node)
             networks[key].nodes[node]["category"] = "performer"
@@ -907,8 +960,11 @@ for url_data in urls:
 
         networks[grouped_by].finished = datetime.datetime.now()
 
-    print(f"`{PREFIX}`: Saving JSON files for each network")
-    for key in networks:
+    for key in tqdm(
+        networks,
+        bar_format="Saving JSON files for each network: {n_fmt}/{total_fmt} {bar}",
+        colour="green",
+    ):
         file_name = f"{PREFIX}-co-occurrence-{key}.json"
 
         data = nx.node_link_data(networks[key])
@@ -921,17 +977,32 @@ for url_data in urls:
         }
         data["days"] = re.findall(r"\d+", key)[0]
 
-        with open("./network-app/data/" + file_name, "w+") as fp:
+        with open("network-app/data/" + file_name, "w+") as fp:
             json.dump(obj=data, fp=fp)
 
-    with open(f"./network-app/data/{PREFIX}-co-occurrence-_metadata.json", "w+") as fp:
+    with open(f"network-app/data/{PREFIX}-co-occurrence-_metadata.json", "w+") as fp:
         json.dump(obj=metadata, fp=fp)
 
-    print(f"`{PREFIX}`: Saving Gephi files for each network")
     gexf_networks = copy.deepcopy(networks)
 
-    for key in gexf_networks:
+    for key in tqdm(
+        gexf_networks,
+        bar_format="Saving Gephi files for each network: {n_fmt}/{total_fmt} {bar}",
+        colour="green",
+    ):
         for node in gexf_networks[key].nodes:
+            if "degrees" in gexf_networks[key].nodes[node]:
+                for k, v in gexf_networks[key].nodes[node]["degrees"].items():
+                    gexf_networks[key].nodes[node][f"degrees-{k}"] = v
+
+            if "centralities" in gexf_networks[key].nodes[node]:
+                for k, v in gexf_networks[key].nodes[node]["centralities"].items():
+                    gexf_networks[key].nodes[node][f"centrality-{k}"] = v
+
+            if "modularities" in gexf_networks[key].nodes[node]:
+                for k, v in gexf_networks[key].nodes[node]["modularities"].items():
+                    gexf_networks[key].nodes[node][f"modularity-{k}"] = v
+
             for k in [
                 "comments",
                 "legal_names",
@@ -942,10 +1013,17 @@ for url_data in urls:
                 "fan_dancer",
                 "blackface",
                 "sepia",
+                "centralities",
+                "modularities",
             ]:
                 if k in gexf_networks[key].nodes[node]:
                     del gexf_networks[key].nodes[node][k]
+
         for edge in gexf_networks[key].edges:
+            if "weights" in gexf_networks[key].edges[edge]:
+                for k, v in gexf_networks[key].edges[edge]["weights"].items():
+                    gexf_networks[key].edges[edge][f"weight-{k}"] = v
+
             for k in [
                 "coLocated",
                 "revues",
@@ -963,3 +1041,127 @@ for url_data in urls:
         file_name = f"gephi/{PREFIX}-co-occurrence-{key}.gexf"
 
         nx.write_gexf(gexf_networks[key], file_name)
+
+    # Report name conjunctions
+
+    with open("network-app/data/live-co-occurrence-_metadata.json") as f:
+        data = json.loads(f.read())
+
+    performer_names = [x for x in data["content"]["performers"].keys()]
+
+    THRESHOLD = 0.94
+
+    similar_names = []
+    for name in performer_names:
+        for cmp in [
+            x for x in performer_names if not x == name and not "unnamed" in x.lower()
+        ]:
+            fsh = jellyfish.jaro_winkler_similarity(name, cmp)
+            if fsh > THRESHOLD:
+                if (
+                    not (name, cmp, fsh) in similar_names
+                    and not (cmp, name, fsh) in similar_names
+                ):
+                    similar_names.append((name, cmp, fsh))
+
+    if similar_names:
+        print(f"------- Similar names in dataset `{PREFIX}` reported: ----------\n")
+
+        similar_names = sorted(similar_names, key=lambda x: x[2])
+        similar_names.reverse()
+        similar_names = [(x, y, round(z, 2) * 100) for x, y, z in similar_names]
+        name1_max = max([len(x[0]) for x in similar_names])
+        name2_max = max([len(x[1]) for x in similar_names])
+
+        for name1, name2, percentage in similar_names:
+            percentage = str(percentage) + "%"
+            print(
+                " "
+                + percentage.ljust(10, " ")
+                + name1.ljust(name1_max + 3)
+                + name2.ljust(name2_max + 3)
+            )
+
+        print()
+        print(
+            " "
+            + "[jellyfish.jaro_winkler_similarity]".rjust(
+                10 + name1_max + 3 + name2_max + 3
+            )
+        )
+        print("------------------------------------------------------------------")
+
+    df = get_raw_data(verbose=False, url=URL)
+    df = filter_data(
+        df,
+        min_date=datetime.datetime(year=1930, month=1, day=1),
+        max_date=datetime.datetime(year=1940, month=12, day=31),
+        verbose=False,
+        skip_unsure=True,
+    )
+
+    def chunks(lst, n):
+        """Yield successive n-sized chunks from lst."""
+        for i in range(0, len(lst), n):
+            yield lst[i : i + n]
+
+    unsure = set(
+        [
+            row["Normalized performer"]
+            for ix, row in df[df["Unsure whether drag artist"] == True].iterrows()
+            if row["Normalized performer"]
+        ]
+    )
+    sure = set(
+        [
+            row["Normalized performer"]
+            for ix, row in df[df["Unsure whether drag artist"] == ""].iterrows()
+            if row["Normalized performer"]
+        ]
+    )
+    intersection = list(sure.intersection(unsure))
+    col_width = max(
+        [
+            max([len(x) for x in col])
+            for col in chunks(intersection, round(len(intersection) / 3))
+        ]
+    )
+
+    if intersection:
+        print(
+            f"------- Names reported both `False` and `True` for `Unsure whether drag artist` in dataset `{PREFIX}` reported: -----\n"
+        )
+
+        cols = [x for x in chunks(intersection, round(len(intersection) / 3))]
+        printed = []
+        for i, name in enumerate(cols[0]):
+            try:
+                name1 = cols[0][i]
+            except:
+                name1 = ""
+
+            try:
+                name2 = cols[1][i]
+            except:
+                name2 = ""
+
+            try:
+                name3 = cols[2][i]
+            except:
+                name3 = ""
+
+            print(
+                name1.ljust(col_width + 3)
+                + name2.ljust(col_width + 3)
+                + name3.ljust(col_width + 3)
+            )
+            if name1:
+                intersection.remove(name1)
+            if name2:
+                intersection.remove(name2)
+            if name3:
+                intersection.remove(name3)
+
+        if intersection:
+            for name in intersection:
+                print(name)
