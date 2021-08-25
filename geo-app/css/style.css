@@ -76,7 +76,7 @@ body {
     background-color: var(--background);
 }
 
-svg {
+svg#map {
     background-color: var(--map-background);
 }
 
