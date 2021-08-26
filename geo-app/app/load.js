@@ -24,10 +24,10 @@ const load = () => {
     };
 
     const setupMap = () => {
-        d3.json("data/us.json").then((json) => {
+        d3.json(DATA_DIR + "/us.json").then((json) => {
             renderMap(json);
         });
-        d3.json("data/USA_Major_Cities.geojson").then((cities) => {
+        d3.json(DATA_DIR + "/USA_Major_Cities.geojson").then((cities) => {
             renderCities(cities);
         });
     };
@@ -40,11 +40,12 @@ const load = () => {
     }
     const setupNetworkData = () => {
         d3.json(
-            "data/co-occurrence-grouped-by-14-days-no-unnamed-performers.json"
+            DATA_DIR + "/v1-co-occurrence-grouped-by-14-days-no-unnamed-performers.json"
         )
             .then((data) => {
                 data = networkCleanup(data);
                 store.networkData = data;
+                console.log(DATA_DIR + "/v1-co-occurrence-grouped-by-14-days-no-unnamed-performers.json loaded.....!!!!")
             })
             .then(() => {
                 store.modularitiesArray = store.networkData.nodes.map(
@@ -111,7 +112,7 @@ const load = () => {
             year: +d.year
         }
     }
-    d3.csv("data/geolocated_performers.csv", performerTypes)
+    d3.csv(DATA_DIR + "/geolocated_performers.csv", performerTypes)
         .then((data) => {
             setupStore(data);
         })
