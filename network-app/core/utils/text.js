@@ -401,7 +401,7 @@ const quickEdgeInfo = (edge) => {
 
     if (!isVisible("#nodeTable")) show("#quickEdgeInfo");
     document.querySelector("#quickEdgeInfo").innerHTML = html;
-    document.querySelector("#quickEdgeInfo").style.left = "20px";
+    document.querySelector("#quickEdgeInfo").style.left = `${window.LEFT}px`;
     document.querySelector("#quickEdgeInfo").style.top = `${window.innerHeight - document.querySelector("#quickEdgeInfo").offsetHeight - 20}px`
 };
 
