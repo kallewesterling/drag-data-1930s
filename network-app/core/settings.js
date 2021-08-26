@@ -62,6 +62,14 @@ const ensureDisabledLabels = (interfaceSettings = undefined) => {
     });
 };
 
+const getChargePercentage = (value) => {
+    return ((+value + 5100) / 10).toFixed(0) + "%"
+}
+
+const getLinkStrengthPercentage = (value) => {
+    return (value * 100).toFixed(0) + "%"
+}
+
 /**
  * updateLabel takes one required argument, the name of any given label to update. Depending on checkboxes, it may disable slider UI elements.
  * The return value is always true.
@@ -80,7 +88,7 @@ const updateLabel = (
     // special handling
     switch (name) {
         case "charge":
-            value = ((+value + 5100) / 10).toFixed(0) + "%";
+            value = getChargePercentage(value);
             break;
 
         // percentages
@@ -88,7 +96,7 @@ const updateLabel = (
         case "edgeMultiplier":
         case "nodeMultiplier":
         case "linkStrength":
-            value = (value * 100).toFixed(0) + "%";
+            value = getLinkStrengthPercentage(value);
             break;
 
         default:
@@ -125,6 +133,8 @@ const saveToStorage = (settings = undefined, zoom_event = undefined) => {
     output_msgs.push(settings);
 
     localStorage.setItem("settings", JSON.stringify(settings));
+
+    explainSettings(settings, true);
 
     _output(output_msgs, false, saveToStorage);
 
@@ -810,6 +820,13 @@ const setupSettingInteractivity = () => {
     window._selectors.showClusterInfo.on("click", function (d) {
         toggle("#nodeTable");
         if (isVisible("#nodeTable")) hide("#quickEdgeInfo");
+    });
+    window._selectors.explainSettingsToggle.on("click", function (d) {
+        if (isVisible("#explanation")) {
+            hide("#explanation");
+        } else {
+            explainSettings();
+        }
     });
     window._selectors.nudgeNodes.on("click", function (d) {
         graph.simulation.restart().alpha(0.15);

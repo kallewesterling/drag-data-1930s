@@ -26,10 +26,11 @@
     <body>
         <nav class="px-3 navbar navbar-expand-xl navbar-light justify-content-between shadow-sm border-bottom">
             <section class="d-flex">
-                <a class="btn btn-sm btn-outline-secondary me-3" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample"><i class="bi bi-three-dots-vertical"></i></a>
-                <a id="switchMode" class="order-md-3 order-0 btn btn-sm btn-outline-secondary me-3"></a>
-                <a id="nudgeNodes" class="order-4 btn btn-sm btn-outline-secondary me-3"><i class="bi bi-unlock-fill me-md-1"></i><span class="d-none d-md-inline-block">Fix stuck nodes</span></a>
-                <a id="showClusterInfo" class="order-5 btn btn-sm btn-outline-secondary"><i class="bi bi-triangle-fill me-md-1"></i><span class="d-none d-md-inline-block">Community details</span></a>
+                <a class="order-0 btn btn-sm btn-outline-secondary me-3" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample"><i class="bi bi-three-dots-vertical"></i></a>
+                <a id="switchMode" class="order-1 btn btn-sm btn-outline-secondary me-3"></a>
+                <a id="nudgeNodes" class="order-2 btn btn-sm btn-outline-secondary me-3"><i class="bi bi-unlock-fill me-md-1"></i><span class="d-none d-md-inline-block">Fix stuck nodes</span></a>
+                <a id="showClusterInfo" class="order-3 btn btn-sm btn-outline-secondary me-3"><i class="bi bi-triangle-fill me-md-1"></i><span class="d-none d-md-inline-block">Community details</span></a>
+                <a id="explainSettingsToggle" class="order-4 btn btn-sm btn-outline-secondary"><i class="bi bi-patch-question-fill me-md-1"></i><span class="d-none d-md-inline-block">Explain visualization</span></a>
             </section>
             <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent" style="width:auto; max-width:100%">
                 <div id="info" class="d-flex align-items-center">
@@ -81,6 +82,9 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <div id="explanation" class="p-3 w-100 d-flex flex-column text-white d-none">
+            
         </div>
         <div id="nodeTable" class="w-100 d-flex justify-content-center d-none">
             <div id="nodeTableContainer">
@@ -277,9 +281,6 @@
                         <label class="small p-0 m-0" for="startYear">endYear</label>
                         <select id="endYear"></select>
                     </div>
-                    <div class="mt-3 mb-2">
-                        <p class="mb-1 text-muted small fw-bold">behavior</p>
-                    </div>
                     <!--
                         <div class="mb-2">
                         <label class="me-1" for="weightFromCurrent"><input type="checkbox" id="weightFromCurrent"> determine weight from current graph</label>
@@ -345,6 +346,17 @@
                         </div>
                     </div>
                 </li>
+        
+                <li class="list-group-item">
+                    <div class="mb-2">
+                        <a id="showEntireDataset" class="mb-2 d-block order-2 btn btn-sm btn-outline-success me-3" href="https://docs.google.com/spreadsheets/d/1UlpFQ9WWA6_6X-RuMJ3vHdIbyqhCZ1VRYgcQYjXprAg/edit#gid=0" target="_blank"><i class="bi bi-file-earmark-spreadsheet-fill me-1"></i><span class="">Dataset</span></a>
+                    </div>
+                    <div class="mb-2">
+                        <a id="resetLocalStorage" class="mb-2 d-block order-5 btn btn-sm btn-outline-secondary me-3"><i class="bi bi-cloud-slash-fill me-1"></i><span>Reset settings</span></a>
+                    </div>
+                </li>
+
+
 
                 <!--
                 <li class="list-group-item">

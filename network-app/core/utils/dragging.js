@@ -1,71 +1,26 @@
-// https://www.w3schools.com/howto/howto_js_draggable.asp
-
-function dragElement(elmnt) {
-    var pos1 = 0,
-        pos2 = 0,
-        pos3 = 0,
-        pos4 = 0;
-    if (document.getElementById(elmnt.id + "header")) {
-        // if present, the header is where you move the DIV from:
-        document.getElementById(elmnt.id + "header").onmousedown =
-            dragMouseDown;
-    } else {
-        // otherwise, move the DIV from anywhere inside the DIV:
-        elmnt.onmousedown = dragMouseDown;
-    }
-
-    function dragMouseDown(e) {
-        e = e || window.event;
-        let testElement = e.path
-            .map((p) => p.id)
-            .filter(
-                (p) =>
-                    p !== undefined &&
-                    p !== null &&
-                    p !== "" &&
-                    p !== "settingsContainer" &&
-                    p !== "settingsToggle" &&
-                    p !== "settings" &&
-                    p !== "quickEdgeInfo" &&
-                    p !== "nodeEdgeInfoContainer" &&
-                    p !== "nodeEdgeInfo" &&
-                    p !== "infoToggleDiv"
-            );
-        // console.log(testElement.length);
-        if (testElement.length === 0) {
-            e.preventDefault();
-            // get the mouse cursor position at startup:
-            pos3 = e.clientX;
-            pos4 = e.clientY;
-            document.onmouseup = closeDragElement;
-            // call a function whenever the cursor moves:
-            document.onmousemove = elementDrag;
-        } else {
-            // console.log(testElement)
-        }
-    }
-
-    function elementDrag(e) {
-        e = e || window.event;
-        e.preventDefault();
-        // calculate the new cursor position:
-        pos1 = pos3 - e.clientX;
-        pos2 = pos4 - e.clientY;
-        pos3 = e.clientX;
-        pos4 = e.clientY;
-        //if (getComputedStyle(elmnt)['bottom'])
-        // set the element's new position:
-        elmnt.style.top = elmnt.offsetTop - pos2 + "px";
-        elmnt.style.left = elmnt.offsetLeft - pos1 + "px";
-    }
-
-    function closeDragElement() {
-        // stop moving when mouse button is released:
-        document.onmouseup = null;
-        document.onmousemove = null;
-    }
+const started = (evt, selector) => {
+    style = getComputedStyle(document.querySelector(selector));
+    elemX = style.left.replace('px', '');
+    elemY = style.top.replace('px', '');
+    window._offsetX = evt.x-elemX;
+    window._offsetY = evt.y-elemY;
 }
 
-dragElement(document.getElementById("settings"));
-dragElement(document.getElementById("quickEdgeInfo"));
-dragElement(document.getElementById("nodeEdgeInfo"));
+const dragged = (evt, selector) => {
+    elem = document.querySelector(selector);
+    elem.style.left = `${evt.x-window._offsetX}px`;
+    elem.style.top = `${evt.y-window._offsetY}px`;
+}
+
+const ended = (evt, selector) => {
+    window._offsetX = undefined;
+    window._offsetY = undefined;
+}
+
+const func = (evt) => {
+    return !evt.path.map(elem=>elem.tagName).includes('INPUT');
+}
+
+d3.select("#settings").call(d3.drag().filter(func).on("start", evt => started(evt, '#settings')).on("drag", evt => dragged(evt, '#settings')).on("end", evt => ended(evt, '#settings')));
+d3.select("#quickEdgeInfo").call(d3.drag().filter(func).on("start", evt => started(evt, '#quickEdgeInfo')).on("drag", evt => dragged(evt, '#quickEdgeInfo')).on("end", evt => ended(evt, '#quickEdgeInfo')));
+d3.select("#nodeEdgeInfo").call(d3.drag().filter(func).on("start", evt => started(evt, '#nodeEdgeInfo')).on("drag", evt => dragged(evt, '#nodeEdgeInfo')).on("end", evt => ended(evt, '#nodeEdgeInfo')));

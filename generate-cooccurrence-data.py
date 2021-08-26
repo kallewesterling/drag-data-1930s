@@ -3,7 +3,7 @@
 
 import community as community_louvain
 import copy
-from colorama import Fore, Back, Style
+from colorama import Fore, Style
 import networkx as nx
 from collections import Counter
 import unicodedata

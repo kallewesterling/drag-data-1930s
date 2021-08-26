@@ -154,6 +154,7 @@ let _elementNames = [
     "loading",
     "switchMode",
     "showClusterInfo",
+    "explainSettingsToggle",
     "nudgeNodes",
     "resetLocalStorage",
     "clearUnconnected",

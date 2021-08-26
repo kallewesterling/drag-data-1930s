@@ -544,7 +544,7 @@ section {
     }
 }
 
-#nodeTable {
+#nodeTable, #explanation {
     font-size: 0.75em;
     position: absolute;
     bottom: 1em;
@@ -556,6 +556,18 @@ section {
     box-shadow: 0 -0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
     -webkit-backdrop-filter: blur(4px);
     backdrop-filter: blur(4px);
+}
+
+#explanation {
+    max-height: 35rem;
+    background-color: rgba(0,0,0,0.85) !important;
+    bottom: 0;
+    z-index: 400;
+    font-size: inherit !important;
+}
+
+#explanation a {
+    color: white !important;
 }
 
 #nodeTable div table tbody th,
