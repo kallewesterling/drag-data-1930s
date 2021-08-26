@@ -579,7 +579,7 @@ const modifySimulation = (settings) => {
         edgeElements.attr("y2", (e) => e.target.y);
 
         textElements.attr("x", (n) => {
-            nodeElement = document.querySelector(`text[data-node=${n.node_id}]`);
+            let nodeElement = document.querySelector(`text[data-node=${n.node_id}]`);
             if (nodeElement) {
                 return n.x - (nodeElement.getBBox().width/2); 
             } else {
