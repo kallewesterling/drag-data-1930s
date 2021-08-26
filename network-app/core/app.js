@@ -3,7 +3,7 @@
 // Immediately invoked function to set the theme on initial load
 (function () {
     window.ERROR_LEVEL = 1;
-    window.DATA_DIR = "data";
+    // window.DATA_DIR = "data";
 
     // start by reading in environment variables, if they exist
     d3.json("env.json").then((env_content) => {
@@ -11,15 +11,17 @@
             throw "env.json does not contain ERROR_LEVEL variable"
         else
             window.ERROR_LEVEL = env_content.ERROR_LEVEL;
+        /*
         if (env_content.DATA_DIR === undefined)
             throw "env.json does not contain DATA_DIR variable"
         else
             window.DATA_DIR = env_content.DATA_DIR;
+        */
     }).catch((err) => {
         console.error(err);
         console.error('Setting automatic environment variables');
         window.ERROR_LEVEL = 1;
-        window.DATA_DIR = "data";
+        // window.DATA_DIR = "data";
     }).finally(() => {
         // set egoNetwork to false, since we're not in egoNetwork when we start a new window
         window.egoNetwork = false;
