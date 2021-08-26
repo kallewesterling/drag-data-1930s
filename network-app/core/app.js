@@ -2,7 +2,7 @@
 
 // Immediately invoked function to set the theme on initial load
 (function () {
-    window.ERROR_LEVEL = 1;
+    // window.ERROR_LEVEL = 1;
     // window.DATA_DIR = "data";
 
     // start by reading in environment variables, if they exist
@@ -19,8 +19,8 @@
         */
     }).catch((err) => {
         console.error(err);
-        console.error('Setting automatic environment variables');
-        window.ERROR_LEVEL = 1;
+        console.error(`Setting automatic environment variables to ERROR_LEVEL ${window.ERROR_LEVEL} and DATA_DIR ${window.DATA_DIR}.`);
+        // window.ERROR_LEVEL = 1;
         // window.DATA_DIR = "data";
     }).finally(() => {
         // set egoNetwork to false, since we're not in egoNetwork when we start a new window
