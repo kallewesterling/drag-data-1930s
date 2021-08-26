@@ -3,7 +3,7 @@ const processGeo = () => {
         .geoAlbersUsa()
         .scale(400)
         .translate([window.innerWidth / 2, window.innerHeight / 2]);
-    d3.json("data/counties-albers-10m.json").then((data) => {
+    d3.json(DATA_DIR + "/counties-albers-10m.json").then((data) => {
         var path = d3.geoPath();
         us = data;
         map = `<g fill="none" stroke="#000" stroke-linejoin="round" stroke-linecap="round">
