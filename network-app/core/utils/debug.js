@@ -108,7 +108,7 @@ const troubleshoot = (fix = false) => {
     if (fix) {
         if (returnObject.storeNodes.inGraph > returnObject.graphNodes.inGraph) {
             /* // TODO: turn on this message?
-            console.log(
+            // console.log(
                 "there are more filtered nodes in store than in graph, correcting..."
             );*/
             returnObject.storeNodes.inGraph.forEach((node) => {

@@ -1,7 +1,7 @@
 "use strict";
 
 const dropNode = (node) => {
-    console.log(node)
+    // console.log(node)
     if (node.inGraph) {
         graph.nodes.forEach((o, i) => {
             if (node.node_id === o.node_id) {
@@ -594,7 +594,7 @@ const filterNodesWithoutName = () => {
         updateInfo();
     }
 
-    console.log(returnObject);
+    // console.log(returnObject);
     return returnObject; // could be passed to a debugMessage thus: debugMessage(`Dropped nodes with no edges (after ${runs} runs).`, "Information");
 };
 

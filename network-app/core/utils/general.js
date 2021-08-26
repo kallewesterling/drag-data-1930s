@@ -751,7 +751,7 @@ const findComment = (search_term) => {
 const resetForSearch = (type) => {
     let isAlreadySearching = [...document.querySelector('body').classList].includes(type);
     if (!isAlreadySearching) {
-        console.log('start searching...');
+        // console.log('start searching...');
         document.querySelector('body').classList.add(type);
         deselectNodes();
         textElements.attr('opacity', 0.2)
@@ -759,7 +759,7 @@ const resetForSearch = (type) => {
 }
 
 const resetAfterSearch = (type) => {
-    console.log('stop searching...')
+    // console.log('stop searching...')
     document.querySelector('body').classList.remove(type)
 }
 
@@ -769,14 +769,14 @@ const highlightSelected = (arg) => {
     nodeElements.classed('highlighted', node => arg.nodes.includes(node))
     textElements.attr('opacity', node => arg.nodes.includes(node) ? 1 : 0.2);
     textElements.classed('selected', node => arg.nodes.includes(node) ? 1 : 0.2);
-    console.log('highlightSelected finished')
+    // console.log('highlightSelected finished')
 }
 
 const searchEdge = (e) => {
-    console.log(e)
+    // console.log(e)
     if (e.inputType === 'insertText' || e.inputType === 'insertFromPaste' || (e.inputType === 'deleteContentBackward' && document.querySelector('#searchEdge').value !== '')) {
         resetForSearch('searchEdge');
-        console.log('continue searching...');
+        // console.log('continue searching...');
         let selectedEdges = findVenue(document.querySelector('#searchEdge').value);
         let selectedSources = selectedEdges.map(e=>e.source);
         let selectedTargets = selectedEdges.map(e=>e.target);
@@ -791,7 +791,7 @@ const searchComment = (e) => {
     let searchField = document.querySelector('#searchComment').value;
     if (e.inputType === 'insertText' || e.inputType === 'insertFromPaste' || (e.inputType === 'deleteContentBackward' && searchField !== '')) {
         resetForSearch('searchComment');
-        console.log('continue searching...');
+        // console.log('continue searching...');
         let selectedNodes = findComment(searchField);
         nodeElements.classed('selected', node => selectedNodes.includes(node))
         highlightSelected({edges: [], nodes: selectedNodes});
