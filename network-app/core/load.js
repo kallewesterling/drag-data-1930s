@@ -155,6 +155,8 @@ const loadNetwork = (callback = []) => {
         ? _.datafile.filename
         : window.autoSettings.datafile.filename;
 
+    filename = DATA_DIR + '/' + filename;
+
     include("includes/project.html").then((html) => {
         d3.select("#project-description").html(html);
     });
@@ -172,7 +174,7 @@ const loadNetwork = (callback = []) => {
         .then((data) => {
             data = networkCleanup(data);
             if (window.ERROR_LEVEL > 0) console.log(data);
-            _output("File loaded", false, loadNetwork);
+            _output(`File loaded: ${filename}`, false, loadNetwork);
             // for debug purposes (TODO can be removed)
             store.raw = data;
 
@@ -288,12 +290,12 @@ const loadNetwork = (callback = []) => {
 
     /*
     let json_files = [
-        "data/co-occurrence-grouped-by-3-days.json",
-        "data/co-occurrence-grouped-by-14-days.json",
-        "data/co-occurrence-grouped-by-31-days.json",
-        "data/co-occurrence-grouped-by-93-days.json",
-        "data/co-occurrence-grouped-by-186-days.json",
-        "data/co-occurrence-grouped-by-365-days.json",
+        DATA_DIR + "/co-occurrence-grouped-by-3-days.json",
+        DATA_DIR + "/co-occurrence-grouped-by-14-days.json",
+        DATA_DIR + "/co-occurrence-grouped-by-31-days.json",
+        DATA_DIR + "/co-occurrence-grouped-by-93-days.json",
+        DATA_DIR + "/co-occurrence-grouped-by-186-days.json",
+        DATA_DIR + "/co-occurrence-grouped-by-365-days.json",
     ];
     Promise.all(json_files.map(file=>d3.json(file))).then(function(files) {
         files.forEach((file, ix)=>{
