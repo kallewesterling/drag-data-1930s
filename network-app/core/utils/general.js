@@ -578,7 +578,15 @@ const modifySimulation = (settings) => {
         edgeElements.attr("x2", (e) => e.target.x);
         edgeElements.attr("y2", (e) => e.target.y);
 
-        textElements.attr("x", (n) => n.x - (document.querySelector(`text[data-node=${n.node_id}]`).getBBox().width/2));
+        textElements.attr("x", (n) => {
+            nodeElement = document.querySelector(`text[data-node=${n.node_id}]`);
+            if (nodeElement) {
+                return n.x - (nodeElement.getBBox().width/2); 
+            } else {
+                console.log(`error, selector text[data-node=${n.node_id}] does not work.`);
+                return 0;
+            }
+            });
         textElements.attr("y", (n) => n.y + n.r/2);
     });
 
