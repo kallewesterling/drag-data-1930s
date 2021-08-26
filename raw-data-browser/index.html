@@ -17,42 +17,109 @@
             integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x"
             crossorigin="anonymous"
         />
+        <link
+            href="index.css"
+            rel="stylesheet"
+            crossorigin="anonymous"
+        />
         <title>U.S. Drag in the 1930s</title>
     </head>
     <body>
-        <div class="container">
-            <div class="row">
-                <div class="col-6 m-3">
-                    <h1>Raw data</h1>
+        <div id="popup" class="d-none d-block p-1 bg-light rounded shadow border border-dark small">
+            <div id="displayNum"></div>
+        </div>
+        <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+            <symbol id="home" viewBox="0 0 16 16">
+                <path d="M8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4.5a.5.5 0 0 0 .5-.5v-4h2v4a.5.5 0 0 0 .5.5H14a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.354 1.146zM2.5 14V7.707l5.5-5.5 5.5 5.5V14H10v-4a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v4H2.5z"></path>
+            </symbol>
+            <symbol id="speedometer2" viewBox="0 0 16 16">
+                <path d="M8 4a.5.5 0 0 1 .5.5V6a.5.5 0 0 1-1 0V4.5A.5.5 0 0 1 8 4zM3.732 5.732a.5.5 0 0 1 .707 0l.915.914a.5.5 0 1 1-.708.708l-.914-.915a.5.5 0 0 1 0-.707zM2 10a.5.5 0 0 1 .5-.5h1.586a.5.5 0 0 1 0 1H2.5A.5.5 0 0 1 2 10zm9.5 0a.5.5 0 0 1 .5-.5h1.5a.5.5 0 0 1 0 1H12a.5.5 0 0 1-.5-.5zm.754-4.246a.389.389 0 0 0-.527-.02L7.547 9.31a.91.91 0 1 0 1.302 1.258l3.434-4.297a.389.389 0 0 0-.029-.518z"></path>
+                <path fill-rule="evenodd" d="M0 10a8 8 0 1 1 15.547 2.661c-.442 1.253-1.845 1.602-2.932 1.25C11.309 13.488 9.475 13 8 13c-1.474 0-3.31.488-4.615.911-1.087.352-2.49.003-2.932-1.25A7.988 7.988 0 0 1 0 10zm8-7a7 7 0 0 0-6.603 9.329c.203.575.923.876 1.68.63C4.397 12.533 6.358 12 8 12s3.604.532 4.923.96c.757.245 1.477-.056 1.68-.631A7 7 0 0 0 8 3z"></path>
+            </symbol>
+            <symbol id="speedometer" viewBox="0 0 16 16">
+                <path d="M8 2a.5.5 0 0 1 .5.5V4a.5.5 0 0 1-1 0V2.5A.5.5 0 0 1 8 2zM3.732 3.732a.5.5 0 0 1 .707 0l.915.914a.5.5 0 1 1-.708.708l-.914-.915a.5.5 0 0 1 0-.707zM2 8a.5.5 0 0 1 .5-.5h1.586a.5.5 0 0 1 0 1H2.5A.5.5 0 0 1 2 8zm9.5 0a.5.5 0 0 1 .5-.5h1.5a.5.5 0 0 1 0 1H12a.5.5 0 0 1-.5-.5zm.754-4.246a.389.389 0 0 0-.527-.02L7.547 7.31A.91.91 0 1 0 8.85 8.569l3.434-4.297a.389.389 0 0 0-.029-.518z"></path>
+                <path fill-rule="evenodd" d="M6.664 15.889A8 8 0 1 1 9.336.11a8 8 0 0 1-2.672 15.78zm-4.665-4.283A11.945 11.945 0 0 1 8 10c2.186 0 4.236.585 6.001 1.606a7 7 0 1 0-12.002 0z"></path>
+            </symbol>
+            <symbol id="network" viewBox="0 0 16 16">
+                <path d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5z"/>
+            </symbol>
+        </svg>
+        
+        <!-- Start of content -->
+        <main>
+            <div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark" style="width: 280px;  height: -webkit-fill-available; height: 100vh; max-height: 100vh;">
+                    <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+                    <svg class="bi me-2" width="40" height="32" fill="white"><use xlink:href="#speedometer2"></use></svg>
+                    <span class="fs-4">Data browser</span>
+                </a>
+                <hr>
+                <ul class="nav nav-pills flex-column mb-auto">
+                    <!--
+                    <li class="nav-item">
+                        <a href="#" class="nav-link text-white" aria-current="page">
+                            <svg class="bi me-2" width="16" height="16" fill="white"><use xlink:href="#home"></use></svg>
+                            Home
+                        </a>
+                    </li>
+                    -->
+                    <li class="nav-item">
+                        <a href="#" class="nav-link text-white" aria-current="page">
+                            <svg class="bi me-2" width="16" height="16" fill="white"><use xlink:href="#network"></use></svg>
+                            Network
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link active text-white">
+                            <svg class="bi me-2" width="16" height="16" fill="white"><use xlink:href="#speedometer2"></use></svg>
+                            Continuous performers
+                        </a>
+                    </li>
+                </ul>
+                <hr>
+                <div class="dropdown">
+                    <!--
+                    <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="https://github.com/kallewesterling.png" alt="" width="32" height="32" class="rounded-circle me-2">
+                        <strong>kallewesterling</strong>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
+                        <li><a class="dropdown-item" href="#">New project...</a></li>
+                        <li><a class="dropdown-item" href="#">Settings</a></li>
+                        <li><a class="dropdown-item" href="#">Profile</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#">Sign out</a></li>
+                    </ul>
+                    -->
                 </div>
             </div>
-        </div>
+            <div class="d-flex flex-column overflow-auto w-100">
+                <div class="container m-5">
+                    <div class="row p-5">
+                        <div class="col-12">
+                            <h1>Performers within a given month period</h1>
+                            <p class="lead">Given that the dataset of drag performers is likely limited due to the record, etc., one can make some assumptions and run algorithms to see what the dataset looks like under certain assumed conditions.</p>
+                            <h2>X</h2>
+                            Explanation goes here
+                            
+                            <svg class="overflow-auto border shadow-sm my-4" id="tolerance0"></svg>
+                            <h2>X</h2>
+                            Explanation goes here
+                            <svg class="overflow-auto border shadow-sm my-4" id="tolerance1"></svg>
+                            <h2>X</h2>
+                            Explanation goes here
+                            <svg class="overflow-auto border shadow-sm my-4" id="tolerance2"></svg>
+                            <h2>X</h2>
+                            Explanation goes here
+                            <svg class="overflow-auto border shadow-sm my-4" id="tolerance3"></svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
 
-        <script>
-            const clean = (data) => {
-                dateParser = d3.timeParse('%Y-%m-%d');
-                newDate = dateParser(data['Date']);
-                for (const [key, value] of Object.entries(data)) {
-                    let newValueSet = false;
-                    newValue = undefined;
-                    if (value==="") {
-                        newValue = undefined;
-                        newValueSet = true;
-                    }
-                    if (newValueSet) {
-                        data[key] = newValue;
-                    }
-                }
-                return Object.assign(data, {
-                    'date': newDate
-                });
-            }
-            let store = {};
-            d3.csv('https://docs.google.com/spreadsheets/d/e/2PACX-1vT0E0Y7txIa2pfBuusA1cd8X5OVhQ_D0qZC8D40KhTU3xB7McsPR2kuB7GH6ncmNT3nfjEYGbscOPp0/pub?gid=95950987&single=true&output=csv', clean).then((data) => {
-                store.data = data;
-                store.thirties = store.data.filter(d=>{if d.date.getFullYear() >= 1930 && d.date.getFullYear() <= 1940);
-                console.log('done');
-            });
-        </script>
+
+        <script src="index.js" crossorigin="anonymous"></script>
+        <script src="load-live-data.js" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
     </body>
 </html>

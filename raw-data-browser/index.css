@@ -1,0 +1,54 @@
+body {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+}
+main {
+    display: flex;
+    flex-wrap: nowrap;
+    height: 100vh;
+    height: -webkit-fill-available;
+    max-height: 100vh;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+svg#tolerance0, svg#tolerance1, svg#tolerance2, svg#tolerance3 {
+    background-color: rgba(0, 0, 0, 0.01);
+    margin-bottom: 1rem;
+}
+.line {
+    fill: none;
+    stroke: steelblue;
+    stroke-width: 1px;
+}
+.shadowLine {
+    fill: none;
+    stroke: rgba(0, 0, 0, 0.04);
+    stroke-width: 6px;
+    
+}
+#popup {
+    position: absolute;
+}
+.legendText {
+    font-size: 0.8em;
+}
+.mouse-line-0, .mouse-line-1, .mouse-line-2, .mouse-line-3 {
+    stroke: rgba(0, 0, 0, 0.05);
+}
+.mouse-line-0 {
+    stroke-width: 5px;
+}
+.mouse-line-1 {
+    stroke-width: 30px;
+}
+.mouse-line-2 {
+    stroke-width: 60px;
+}
+.mouse-line-3 {
+    stroke-width: 90px;
+}
+.node {
+    stroke: #fff;
+    stroke-width: 1px;
+    fill: black;
+}
