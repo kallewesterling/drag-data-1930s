@@ -645,21 +645,23 @@ for url_data in urls:
         url=URL,
     )
 
+    _skip = False
+
     if os.path.exists(PICKLE):
         df_test = pd.read_pickle(PICKLE)
 
         if test_same_df(df, df_test):
             print(Fore.RED + "Dataset is same. Exiting..." + Style.RESET_ALL)
-            skip = True
+            _skip = True
         else:
             print(
                 Fore.GREEN
                 + "Dataset is new/changed. Updating JSON files..."
                 + Style.RESET_ALL
             )
-            skip = False
+            _skip = False
 
-    if skip:
+    if _skip:
         continue
 
     df.to_pickle(PICKLE)
@@ -829,11 +831,6 @@ for url_data in urls:
     ):
         nx.set_node_attributes(networks[key], all_meta["performers"])
 
-    print(
-        Style.DIM
-        + f"`{PREFIX}`: Generating metadata for connected nodes in each network"
-        + Style.RESET_ALL
-    )
     for key in tqdm(
         networks.keys(),
         bar_format="Generating metadata for connected nodes in each network: {n_fmt}/{total_fmt} {bar}",
