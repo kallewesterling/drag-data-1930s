@@ -1052,6 +1052,24 @@ for url_data in urls:
 
     THRESHOLD = 0.94
 
+    def compare_neighbors(node1, node2, networks_dict):
+        node1_neighbors = []
+        node2_neighbors = []
+        for network in networks_dict:
+            try:
+                node1_neighbors.extend(
+                    [x for x in networks_dict[network].neighbors(node1)]
+                )
+            except nx.exception.NetworkXError:
+                print(f"Node {node1} is not found in network `{network}`.")
+            try:
+                node2_neighbors.extend(
+                    [x for x in networks_dict[network].neighbors(node2)]
+                )
+            except nx.exception.NetworkXError:
+                print(f"Node {node2} is not found in network `{network}`.")
+        return (sorted(list(set(node1_neighbors))), sorted(list(set(node2_neighbors))))
+
     similar_names = []
     for name in performer_names:
         for cmp in [
@@ -1063,7 +1081,8 @@ for url_data in urls:
                     not (name, cmp, fsh) in similar_names
                     and not (cmp, name, fsh) in similar_names
                 ):
-                    similar_names.append((name, cmp, fsh))
+                    neighbors1, neighbors2 = compare_neighbors(name, cmp, networks)
+                    similar_names.append((name, cmp, fsh, neighbors1, neighbors2))
 
     file_name = f"{PREFIX}-report-similar-names.json"
 
@@ -1075,7 +1094,9 @@ for url_data in urls:
 
         similar_names = sorted(similar_names, key=lambda x: x[2])
         similar_names.reverse()
-        similar_names = [(x, y, round(z, 2) * 100) for x, y, z in similar_names]
+        similar_names = [
+            (x, y, round(z, 2) * 100) for x, y, z, nb1, nb2 in similar_names
+        ]
         name1_max = max([len(x[0]) for x in similar_names])
         name2_max = max([len(x[1]) for x in similar_names])
 
