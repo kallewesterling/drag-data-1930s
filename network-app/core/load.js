@@ -155,7 +155,7 @@ const loadNetwork = (callback = []) => {
         ? _.datafile.filename
         : window.autoSettings.datafile.filename;
 
-    filename = DATA_DIR + '/' + filename;
+    filename = window.DATA_DIR + '/' + filename;
 
     include("includes/project.html").then((html) => {
         d3.select("#project-description").html(html);

@@ -401,8 +401,7 @@ const quickEdgeInfo = (edge) => {
 
     if (!isVisible("#nodeTable")) show("#quickEdgeInfo");
     document.querySelector("#quickEdgeInfo").innerHTML = html;
-    document.querySelector("#quickEdgeInfo").style.left = `${window.LEFT}px`;
-    document.querySelector("#quickEdgeInfo").style.top = `${window.innerHeight - document.querySelector("#quickEdgeInfo").offsetHeight - 20}px`
+    setLefts();
 };
 
 const quickCommentInfo = (comments, top = 0, left = 0) => {
@@ -414,6 +413,5 @@ const quickCommentInfo = (comments, top = 0, left = 0) => {
     
     if (!isVisible("#nodeTable")) show("#quickEdgeInfo");
     document.querySelector("#quickEdgeInfo").innerHTML = html;
-    document.querySelector("#quickEdgeInfo").style.top = `${top}px`
-    document.querySelector("#quickEdgeInfo").style.left = `${left}px`
+    setLefts();
 };
