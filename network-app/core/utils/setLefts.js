@@ -1,10 +1,10 @@
 window.hostPath = window.location.hostname + window.location.pathname;
 
-if (window.hostPath === "127.0.0.1/network-app/" || window.hostPath === "localhost/network-app/") {
+if (window.hostPath === "127.0.0.1/network-app" || window.hostPath === "localhost/network-app" || window.hostPath === "127.0.0.1/network-app/" || window.hostPath === "localhost/network-app/") {
     window.isDev = true;
     window.isProd = false;
     window.leftMargin = "20px";
-} else if (window.hostPath === "kallewesterling.github.io/drag-network") {
+} else if (window.hostPath === "kallewesterling.github.io/drag-network" || window.hostPath === "kallewesterling.github.io/drag-data-browser" || window.hostPath === "kallewesterling.github.io/drag-network/" || window.hostPath === "kallewesterling.github.io/drag-data-browser/") {
     window.isDev = false;
     window.isProd = true;
 }
