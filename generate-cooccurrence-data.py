@@ -163,21 +163,21 @@ def clean_data(df, drop_cols=[], verbose=True):
             and not "—" in row["Normalized performer"]
             and not "–" in row["Normalized performer"]
         ):
-            return row["Normalized performer"]
+            return row["Normalized performer"].replace("?", "")
 
         if first_name and last_name:
             if not "—" in first_name and not "—" in last_name:
-                return f"{first_name} {last_name}"
+                return f"{first_name} {last_name}".replace("?", "")
 
             elif not "—" in last_name and "—" in first_name:
-                return last_name
+                return last_name.replace("?", "")
 
             elif not "—" in first_name and "—" in last_name:
-                return first_name
+                return first_name.replace("?", "")
 
         for r in ["Normalized performer", "Performer"]:
             if row[r]:
-                return row[r]
+                return row[r].replace("?", "")
 
         return null_value
 
