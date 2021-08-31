@@ -1,4 +1,5 @@
 const started = (evt, selector) => {
+    window[selector.replace('#', '') + 'moved'] = true;
     style = getComputedStyle(document.querySelector(selector));
     elemX = style.left.replace('px', '');
     elemY = style.top.replace('px', '');
