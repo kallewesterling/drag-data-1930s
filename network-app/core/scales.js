@@ -7,14 +7,21 @@
  * @param {number} max
  * The return value is a d3 scaleSqrt function.
  */
-const nodeScale = (settings = undefined, scaleFunc = d3.scaleSqrt()) => {
+const nodeScale = (settings = undefined, forText = false, scaleFunc = d3.scaleSqrt()) => {
     if (!settings)
         console.error(
             "Settings must be passed to an iterative function like nodeScale."
         );
 
-    let rangeMin = settings.nodes.minR; // 1;
-    let rangeMax = settings.nodes.maxR; // 10;
+    let rangeMin = 0
+    let rangeMax = 0;
+    if (forText) {
+        rangeMin = 10;
+        rangeMax = 50;
+    } else {
+        rangeMin = settings.nodes.minR;
+        rangeMax = settings.nodes.maxR
+    }
 
     let domainExtent = [];
     if (settings.nodes.rFrom === "currentDegree") {

@@ -702,8 +702,7 @@ const getSize = (node, type = "r", settings = undefined) => {
         degree = 1;
     }
 
-    let yScale = nodeScale(settings);
-
+    
     if (window.toggledCommentedElements === true) {
         if (node.has_comments) {
             return 10 * nodeMultiplier;
@@ -711,11 +710,13 @@ const getSize = (node, type = "r", settings = undefined) => {
             return 5 * nodeMultiplier;
         }
     }
-
+    
     if (type === "r") {
+        let yScale = nodeScale(settings);
         return yScale(degree) * nodeMultiplier;
     } else if (type === "text") {
-        return yScale(degree) * nodeMultiplier * 1.5;
+        let yScale = nodeScale(settings, true);
+        return yScale(degree) * nodeMultiplier;
     }
 };
 
