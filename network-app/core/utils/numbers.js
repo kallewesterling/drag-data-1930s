@@ -67,20 +67,29 @@ const setCurrentCentralities = () => {
         );
     }
 
+    
     if (typeof betweennessCentralities === "object") {
         Object.entries(betweennessCentralities).forEach((entry) => {
             const [key, value] = entry;
-            findNode(key).currentCentralities.betweenness_centrality_100x = (
-                value * 100
-            ).toFixed(5);
+            if (findNode(key).inGraph) {
+                findNode(key).currentCentralities.betweenness_centrality_100x = (
+                    value * 100
+                ).toFixed(5);
+            } else {
+                console.error(`Trying to set betweenness centrality for node that is not currently in graph: ${key}.`)
+            }
         });
     }
     if (typeof eigenvectorCentralities === "object") {
         Object.entries(eigenvectorCentralities).forEach((entry) => {
             const [key, value] = entry;
-            findNode(key).currentCentralities.eigenvector_centrality_100x = (
-                value * 100
-            ).toFixed(5);
+            if (findNode(key).inGraph) {
+                findNode(key).currentCentralities.eigenvector_centrality_100x = (
+                    value * 100
+                    ).toFixed(5);
+            } else {
+                console.error(`Trying to set eigenvector centrality for node that is not currently in graph: ${key}.`)
+            }
         });
     }
     return graph.nodes;
