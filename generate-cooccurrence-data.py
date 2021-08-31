@@ -73,7 +73,7 @@ def slugify(value, allow_unicode=False, verbose=False):
 
 def get_raw_data(
     verbose=True,
-    url="https://docs.google.com/spreadsheets/d/e/2PACX-1vT0E0Y7txIa2pfBuusA1cd8X5OVhQ_D0qZC8D40KhTU3xB7McsPR2kuB7GH6ncmNT3nfjEYGbscOPp0/pub?gid=95950987&single=true&output=csv",
+    url="https://docs.google.com/spreadsheets/d/e/2PACX-1vT0E0Y7txIa2pfBuusA1cd8X5OVhQ_D0qZC8D40KhTU3xB7McsPR2kuB7GH6ncmNT3nfjEYGbscOPp0/pub?gid=254069133&single=true&output=csv",
 ):
     df = pd.read_csv(url)
 
@@ -255,7 +255,7 @@ def get_clean_network_data(
     max_date=None,
     drop_cols=None,
     verbose=True,
-    url="https://docs.google.com/spreadsheets/d/e/2PACX-1vT0E0Y7txIa2pfBuusA1cd8X5OVhQ_D0qZC8D40KhTU3xB7McsPR2kuB7GH6ncmNT3nfjEYGbscOPp0/pub?gid=95950987&single=true&output=csv",
+    url="https://docs.google.com/spreadsheets/d/e/2PACX-1vT0E0Y7txIa2pfBuusA1cd8X5OVhQ_D0qZC8D40KhTU3xB7McsPR2kuB7GH6ncmNT3nfjEYGbscOPp0/pub?gid=254069133&single=true&output=csv",
 ):
     """A "collector" function that runs through `get_raw_data`, `filter_data` and `clean_data` in that order and then resets the index."""
 
@@ -567,7 +567,7 @@ def get_meta(
     df=None,
     category=None,
     verbose=False,
-    url="https://docs.google.com/spreadsheets/d/e/2PACX-1vT0E0Y7txIa2pfBuusA1cd8X5OVhQ_D0qZC8D40KhTU3xB7McsPR2kuB7GH6ncmNT3nfjEYGbscOPp0/pub?gid=95950987&single=true&output=csv",
+    url="https://docs.google.com/spreadsheets/d/e/2PACX-1vT0E0Y7txIa2pfBuusA1cd8X5OVhQ_D0qZC8D40KhTU3xB7McsPR2kuB7GH6ncmNT3nfjEYGbscOPp0/pub?gid=254069133&single=true&output=csv",
 ):
     if not isinstance(df, pd.DataFrame):
         log("Building new clean data for node meta information...", verbose=verbose)
