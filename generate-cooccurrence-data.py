@@ -11,7 +11,7 @@ import re
 import pandas as pd
 import json
 import jellyfish
-import os
+from pathlib import Path
 import datetime
 from tqdm import tqdm
 
@@ -148,38 +148,42 @@ def filter_data(df, min_date=None, max_date=None, verbose=True, skip_unsure=Fals
     return df
 
 
-def clean_data(df, drop_cols=[], verbose=True):
+def clean_data(df, drop_cols=[], verbose=True, forbidden=["?", "[", "]"]):
     def get_performer(row, null_value=""):
         """(internal) for use with DataFrame lambda function to return the cleaned-up version of a performer's name (in an order of priority)"""
 
         first_name = row["Performer first-name"]
         last_name = row["Performer last-name"]
 
-        if last_name and not first_name:
-            return last_name
+        returnVal = None
 
-        if (
+        if not returnVal and (last_name and not first_name):
+            returnVal = last_name
+
+        if not returnVal and (
             row["Normalized performer"]
             and not "—" in row["Normalized performer"]
             and not "–" in row["Normalized performer"]
         ):
-            return row["Normalized performer"].replace("?", "")
+            returnVal = row["Normalized performer"]
 
-        if first_name and last_name:
+        if not returnVal and (first_name and last_name):
             if not "—" in first_name and not "—" in last_name:
-                return f"{first_name} {last_name}".replace("?", "")
+                returnVal = f"{first_name} {last_name}"
 
             elif not "—" in last_name and "—" in first_name:
-                return last_name.replace("?", "")
+                returnVal = last_name
 
             elif not "—" in first_name and "—" in last_name:
-                return first_name.replace("?", "")
+                returnVal = first_name
 
-        for r in ["Normalized performer", "Performer"]:
-            if row[r]:
-                return row[r].replace("?", "")
+        if not returnVal and row["Performer"]:
+            returnVal = row["Performer"]
 
-        return null_value
+        if not returnVal:
+            return null_value
+
+        return "".join([x for x in returnVal if not x in forbidden])
 
     def get_city(row, null_value=""):
         """(internal) for use with DataFrame lambda function to return the cleaned-up version of a city's name (in an order of priority)"""
@@ -647,7 +651,7 @@ for url_data in urls:
 
     _skip = False
 
-    if os.path.exists(PICKLE):
+    if Path(PICKLE).exists():
         df_test = pd.read_pickle(PICKLE)
 
         if test_same_df(df, df_test):
@@ -1061,7 +1065,12 @@ for url_data in urls:
                 ):
                     similar_names.append((name, cmp, fsh))
 
+    file_name = f"{PREFIX}-report-similar-names.json"
+
     if similar_names:
+        with open("network-app/data/" + file_name, "w+") as fp:
+            json.dump(obj=similar_names, fp=fp)
+
         print(f"------- Similar names in dataset `{PREFIX}` reported: ----------\n")
 
         similar_names = sorted(similar_names, key=lambda x: x[2])
@@ -1087,6 +1096,9 @@ for url_data in urls:
             )
         )
         print("------------------------------------------------------------------")
+    else:
+        if Path("network-app/data/" + file_name).exists():
+            Path("network-app/data/" + file_name).unlink()
 
     df = get_raw_data(verbose=False, url=URL)
     df = filter_data(
@@ -1124,7 +1136,11 @@ for url_data in urls:
         ]
     )
 
+    file_name = f"{PREFIX}-report-unsure-drag-artist.json"
     if intersection:
+        with open("network-app/data/" + file_name, "w+") as fp:
+            json.dump(obj=intersection, fp=fp)
+
         print(
             f"------- Names reported both `False` and `True` for `Unsure whether drag artist` in dataset `{PREFIX}` reported: -----\n"
         )
@@ -1162,3 +1178,6 @@ for url_data in urls:
         if intersection:
             for name in intersection:
                 print(name)
+    else:
+        if Path("network-app/data/" + file_name).exists():
+            Path("network-app/data/" + file_name).unlink()
