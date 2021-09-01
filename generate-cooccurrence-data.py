@@ -981,6 +981,41 @@ for url_data in urls:
         with open("network-app/data/" + file_name, "w+") as fp:
             json.dump(obj=data, fp=fp)
 
+        if not "no-unnamed-performers" in key:
+            continue
+
+        if not "14-days" in key:
+            continue
+
+        for node, node_data in tqdm(
+            networks[key].nodes(data=True),
+            bar_format="Saving individual network files for "
+            + key
+            + ": {n_fmt}/{total_fmt} {bar}",
+            colour="green",
+        ):
+            G_network = networks[key]
+            ego_network = nx.ego.ego_graph(G_network, node)
+
+            file_name = f"{node_data['node_id']}.json"
+
+            data = nx.node_link_data(ego_network)
+            data["createdDate"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+            if not Path(
+                f"network-app/data/individual-networks/{PREFIX}-co-occurrence-{key}/"
+            ).exists():
+                Path(
+                    f"network-app/data/individual-networks/{PREFIX}-co-occurrence-{key}/"
+                ).mkdir(parents=True)
+
+            with open(
+                f"network-app/data/individual-networks/{PREFIX}-co-occurrence-{key}/"
+                + file_name,
+                "w+",
+            ) as fp:
+                json.dump(obj=data, fp=fp)
+
     with open(f"network-app/data/{PREFIX}-co-occurrence-_metadata.json", "w+") as fp:
         json.dump(obj=metadata, fp=fp)
 
