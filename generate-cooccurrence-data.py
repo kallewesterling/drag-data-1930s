@@ -995,7 +995,7 @@ for url_data in urls:
             colour="green",
         ):
             G_network = networks[key]
-            ego_network = nx.ego.ego_graph(G_network, node, 2)
+            ego_network = nx.ego.ego_graph(G_network, node, 1)
 
             file_name = f"{node_data['node_id']}.json"
 
