@@ -1,0 +1,652 @@
+1630587919147	geckodriver	INFO	Listening on 127.0.0.1:53210
+1630587920150	mozrunner::runner	INFO	Running command: "/Applications/Firefox.app/Contents/MacOS/firefox-bin" "--marionette" "-foreground" "-no-remote" "-profile" "/var/folders/jd/bjlyb2z12cv0t5g2_ff8ysv40000gn/T/rust_mozprofilekXMLnP"
+1630587921210	Marionette	INFO	Marionette enabled
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /var/folders/jd/bjlyb2z12cv0t5g2_ff8ysv40000gn/T/rust_mozprofilekXMLnP/search.json.mozlz4", (void 0)))
+console.error: BackgroundUpdate: 
+  _reasonsToNotScheduleUpdates: Failed to check for Maintenance Service Registry Key: [Exception... "Component returned failure code: 0x80004001 (NS_ERROR_NOT_IMPLEMENTED) [nsIUpdateProcessor.getServiceRegKeyExists]"  nsresult: "0x80004001 (NS_ERROR_NOT_IMPLEMENTED)"  location: "JS frame :: resource://gre/modules/BackgroundUpdate.jsm :: _reasonsToNotScheduleUpdates :: line 243"  data: no]
+1630587923065	Marionette	INFO	Listening on port 53225
+1630587923105	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript error: resource://devtools/server/actors/network-monitor/network-event-actor.js, line 108: Error: Got a request https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap without a browsingContextID set
+JavaScript error: resource://devtools/server/actors/network-monitor/network-event-actor.js, line 108: Error: Got a request https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css without a browsingContextID set
+JavaScript error: resource://devtools/server/actors/network-monitor/network-event-actor.js, line 108: Error: Got a request https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.0/font/bootstrap-icons.css without a browsingContextID set
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+console.error: services.settings: 
+  main/doh-providers Signature failed  InvalidSignatureError: Invalid content signature (main/doh-providers)
+console.error: services.settings: 
+  main/doh-providers local data was corrupted
+console.warn: services.settings: main/doh-providers Signature verified failed. Retry from scratch
+console.error: services.settings: 
+  main/doh-config Signature failed  InvalidSignatureError: Invalid content signature (main/doh-config)
+console.error: services.settings: 
+  main/doh-config local data was corrupted
+console.warn: services.settings: main/doh-config Signature verified failed. Retry from scratch
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+console.log: WebExtensions: reset-default-search: starting.
+console.log: WebExtensions: reset-default-search: No addons in our list are installed.
+JavaScript error: http://localhost:5502/docs/network/core/utils/dragging.js, line 22: TypeError: evt.path is undefined
+JavaScript error: http://localhost:5502/docs/network/core/utils/dragging.js, line 22: TypeError: evt.path is undefined
+JavaScript error: https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js, line 6: TypeError: i is null
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+console.error: (new TypeError("parent is null", "resource://devtools/client/inspector/shared/style-change-tracker.js", 67))
+TypeError: parent is null: canMutationImpactCurrentStyles@resource://devtools/client/inspector/shared/style-change-tracker.js:67:24
+onMutations@resource://devtools/client/inspector/shared/style-change-tracker.js:84:41
+_emit@resource://devtools/shared/event-emitter.js:226:34
+emit@resource://devtools/shared/event-emitter.js:172:18
+emit@resource://devtools/shared/event-emitter.js:324:18
+getMutations@resource://devtools/client/fronts/walker.js:311:10
+
+console.error: "Error while calling actor 'pagestyle's method 'getLayout'" "node is null"
+console.error: (new TypeError("node is null", "resource://devtools/server/actors/page-style.js", 1001))
+console.error: (new Error("Protocol error (TypeError): node is null from: server0.conn0.child4/pagestyle28 (resource://devtools/server/actors/page-style.js:1001:5)", "resource://devtools/shared/protocol/Front.js", 365))
+JavaScript error: http://localhost:5502/docs/network/core/utils/dragging.js, line 22: TypeError: evt.path is undefined
+JavaScript error: http://localhost:5502/docs/network/core/utils/dragging.js, line 22: TypeError: evt.path is undefined
+JavaScript error: http://localhost:5502/docs/network/core/utils/dragging.js, line 22: TypeError: evt.path is undefined
+JavaScript error: http://localhost:5502/docs/network/core/utils/dragging.js, line 22: TypeError: evt.path is undefined
+JavaScript error: http://localhost:5502/docs/network/core/utils/dragging.js, line 22: TypeError: evt.path is undefined
+JavaScript error: http://localhost:5502/docs/network/core/utils/dragging.js, line 22: TypeError: evt.path is undefined
+console.error: "Error while calling actor 'pagestyle's method 'getLayout'" "node is null"
+console.error: (new TypeError("node is null", "resource://devtools/server/actors/page-style.js", 1001))
+console.error: "Error while calling actor 'pagestyle's method 'getApplied'" "node is null"
+console.error: (new TypeError("node is null", "resource://devtools/server/actors/page-style.js", 570))
+console.error: (new Error("Protocol error (TypeError): node is null from: server0.conn0.child4/pagestyle28 (resource://devtools/server/actors/page-style.js:1001:5)", "resource://devtools/shared/protocol/Front.js", 365))
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript error: http://localhost:5502/docs/network/core/utils/dragging.js, line 22: TypeError: evt.path is undefined
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript error: http://localhost:5502/docs/network/core/load.js, line 284: ReferenceError: _error is not defined
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript error: http://localhost:5502/docs/network/core/load.js, line 284: ReferenceError: _error is not defined
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript error: http://localhost:5502/docs/network/core/load.js, line 284: ReferenceError: _error is not defined
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+console.error: "stylesheets: fetch failed for http://localhost:5502/docs/network/css/style.css, using system principal instead."
+JavaScript error: resource://devtools/server/actors/page-style.js, line 570: TypeError: node is null
+console.error: (new TypeError("this.nodeHierarchy[this.currentIndex] is undefined", "resource://devtools/client/inspector/breadcrumbs.js", 804))
+console.error: "Error while calling actor 'pagestyle's method 'getApplied'" "InspectorUtils.hasRulesModifiedByCSSOM: Argument 1 does not implement interface CSSStyleSheet."
+console.error: (new TypeError("InspectorUtils.hasRulesModifiedByCSSOM: Argument 1 does not implement interface CSSStyleSheet.", "resource://devtools/server/actors/style-rule.js", 157))
+console.error: "Error while calling actor 'pagestyle's method 'getApplied'" "node is null"
+console.error: (new TypeError("node is null", "resource://devtools/server/actors/page-style.js", 570))
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+console.error: "stylesheets: fetch failed for https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css, using system principal instead."
+console.error: "stylesheets: fetch failed for http://localhost:5502/docs/network/css/themes.css, using system principal instead."
+console.error: "Error while calling actor 'pagestyle's method 'getApplied'" "InspectorUtils.hasRulesModifiedByCSSOM: Argument 1 does not implement interface CSSStyleSheet."
+console.error: (new TypeError("InspectorUtils.hasRulesModifiedByCSSOM: Argument 1 does not implement interface CSSStyleSheet.", "resource://devtools/server/actors/style-rule.js", 157))
+console.error: "Error writing response to: getApplied"
+console.error: "Error while calling actor 'pagestyle's method 'getApplied'" "can't access dead object"
+console.error: (new TypeError("can't access dead object", "resource://devtools/server/actors/style-rule.js", 362))
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript error: resource://devtools/server/actors/page-style.js, line 570: TypeError: node is null
+console.error: "stylesheets: fetch failed for http://localhost:5502/docs/network/css/style.css, using system principal instead."
+console.error: "Error while calling actor 'pagestyle's method 'getApplied'" "InspectorUtils.hasRulesModifiedByCSSOM: Argument 1 does not implement interface CSSStyleSheet."
+console.error: (new TypeError("InspectorUtils.hasRulesModifiedByCSSOM: Argument 1 does not implement interface CSSStyleSheet.", "resource://devtools/server/actors/style-rule.js", 157))
+console.error: "Error while calling actor 'pagestyle's method 'getApplied'" "node is null"
+console.error: (new TypeError("node is null", "resource://devtools/server/actors/page-style.js", 570))
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript error: , line 0: AbortError: The operation was aborted. 
+JavaScript error: http://localhost:5502/docs/network/core/load.js, line 284: ReferenceError: _error is not defined
+console.error: (new TypeError("this.nodeHierarchy[this.currentIndex] is undefined", "resource://devtools/client/inspector/breadcrumbs.js", 804))
+console.error: "Error while calling actor 'pagestyle's method 'getApplied'" "node is null"
+console.error: (new TypeError("node is null", "resource://devtools/server/actors/page-style.js", 570))
+console.error: (new Error("Protocol error (noSuchActor): No such actor for ID: server0.conn0.child4/domnode45005 from: server0.conn0.child4/domnode45005", "resource://devtools/shared/protocol/Front.js", 365))
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+console.error: "stylesheets: fetch failed for http://localhost:5502/docs/network/css/style.css, using system principal instead."
+console.error: (new TypeError("this.nodeHierarchy[this.currentIndex] is undefined", "resource://devtools/client/inspector/breadcrumbs.js", 804))
+JavaScript error: resource://devtools/server/actors/page-style.js, line 570: TypeError: node is null
+console.error: "Error while calling actor 'pagestyle's method 'getApplied'" "InspectorUtils.hasRulesModifiedByCSSOM: Argument 1 does not implement interface CSSStyleSheet."
+console.error: (new TypeError("InspectorUtils.hasRulesModifiedByCSSOM: Argument 1 does not implement interface CSSStyleSheet.", "resource://devtools/server/actors/style-rule.js", 157))
+console.error: "Error while calling actor 'pagestyle's method 'getApplied'" "node is null"
+console.error: (new TypeError("node is null", "resource://devtools/server/actors/page-style.js", 570))
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript error: http://localhost:5502/docs/network/core/load.js, line 284: ReferenceError: _error is not defined
+console.error: "Error while calling actor 'pagestyle's method 'getApplied'" "node is null"
+console.error: (new TypeError("node is null", "resource://devtools/server/actors/page-style.js", 570))
+console.error: (new Error("Protocol error (noSuchActor): No such actor for ID: server0.conn0.child4/domnode46443 from: server0.conn0.child4/domnode46443", "resource://devtools/shared/protocol/Front.js", 365))
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+console.error: "stylesheets: fetch failed for http://localhost:5502/docs/includes/style.css, using system principal instead."
+JavaScript error: resource://devtools/server/actors/page-style.js, line 570: TypeError: node is null
+console.error: "Error while calling actor 'pagestyle's method 'getApplied'" "InspectorUtils.hasRulesModifiedByCSSOM: Argument 1 does not implement interface CSSStyleSheet."
+console.error: (new TypeError("InspectorUtils.hasRulesModifiedByCSSOM: Argument 1 does not implement interface CSSStyleSheet.", "resource://devtools/server/actors/style-rule.js", 157))
+console.error: "Error while calling actor 'pagestyle's method 'getApplied'" "node is null"
+console.error: (new TypeError("node is null", "resource://devtools/server/actors/page-style.js", 570))
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+console.error: "stylesheets: fetch failed for https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css, using system principal instead."
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+console.error: "stylesheets: fetch failed for http://localhost:5502/docs/network/css/style.css, using system principal instead."
+JavaScript error: resource://devtools/server/actors/page-style.js, line 570: TypeError: node is null
+console.error: "Error while calling actor 'pagestyle's method 'getApplied'" "InspectorUtils.hasRulesModifiedByCSSOM: Argument 1 does not implement interface CSSStyleSheet."
+console.error: (new TypeError("InspectorUtils.hasRulesModifiedByCSSOM: Argument 1 does not implement interface CSSStyleSheet.", "resource://devtools/server/actors/style-rule.js", 157))
+console.error: "Error while calling actor 'pagestyle's method 'getApplied'" "node is null"
+console.error: (new TypeError("node is null", "resource://devtools/server/actors/page-style.js", 570))
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+console.error: "stylesheets: fetch failed for http://localhost:5502/docs/network/css/style.css, using system principal instead."
+JavaScript error: resource://devtools/server/actors/page-style.js, line 570: TypeError: node is null
+console.error: "Error while calling actor 'pagestyle's method 'getApplied'" "node is null"
+console.error: (new TypeError("node is null", "resource://devtools/server/actors/page-style.js", 570))
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+console.error: "stylesheets: fetch failed for http://localhost:5502/docs/network/css/style.css, using system principal instead."
+console.error: (new TypeError("this.nodeHierarchy[this.currentIndex] is undefined", "resource://devtools/client/inspector/breadcrumbs.js", 804))
+JavaScript error: resource://devtools/server/actors/page-style.js, line 570: TypeError: node is null
+console.error: "Error while calling actor 'pagestyle's method 'getApplied'" "InspectorUtils.hasRulesModifiedByCSSOM: Argument 1 does not implement interface CSSStyleSheet."
+console.error: (new TypeError("InspectorUtils.hasRulesModifiedByCSSOM: Argument 1 does not implement interface CSSStyleSheet.", "resource://devtools/server/actors/style-rule.js", 157))
+console.error: "Error while calling actor 'pagestyle's method 'getApplied'" "node is null"
+console.error: (new TypeError("node is null", "resource://devtools/server/actors/page-style.js", 570))
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+console.error: (new TypeError("this.nodeHierarchy[this.currentIndex] is undefined", "resource://devtools/client/inspector/breadcrumbs.js", 804))
+console.error: "stylesheets: fetch failed for http://localhost:5502/docs/network/css/style.css, using system principal instead."
+JavaScript error: resource://devtools/server/actors/page-style.js, line 570: TypeError: node is null
+console.error: "Error while calling actor 'pagestyle's method 'getApplied'" "InspectorUtils.hasRulesModifiedByCSSOM: Argument 1 does not implement interface CSSStyleSheet."
+console.error: (new TypeError("InspectorUtils.hasRulesModifiedByCSSOM: Argument 1 does not implement interface CSSStyleSheet.", "resource://devtools/server/actors/style-rule.js", 157))
+console.error: "Error while calling actor 'pagestyle's method 'getApplied'" "node is null"
+console.error: (new TypeError("node is null", "resource://devtools/server/actors/page-style.js", 570))
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+console.error: "stylesheets: fetch failed for http://localhost:5502/docs/network/css/style.css, using system principal instead."
+console.error: (new TypeError("currentNode is null", "resource://devtools/client/inspector/shared/style-change-tracker.js", 66))
+TypeError: currentNode is null: canMutationImpactCurrentStyles@resource://devtools/client/inspector/shared/style-change-tracker.js:66:20
+onMutations@resource://devtools/client/inspector/shared/style-change-tracker.js:84:41
+_emit@resource://devtools/shared/event-emitter.js:226:34
+emit@resource://devtools/shared/event-emitter.js:172:18
+emit@resource://devtools/shared/event-emitter.js:324:18
+getMutations@resource://devtools/client/fronts/walker.js:311:10
+
+console.error: "Error while calling actor 'pagestyle's method 'getApplied'" "InspectorUtils.hasRulesModifiedByCSSOM: Argument 1 does not implement interface CSSStyleSheet."
+console.error: (new TypeError("InspectorUtils.hasRulesModifiedByCSSOM: Argument 1 does not implement interface CSSStyleSheet.", "resource://devtools/server/actors/style-rule.js", 157))
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+console.error: "stylesheets: fetch failed for http://localhost:5502/docs/network/css/style.css, using system principal instead."
+JavaScript error: resource://devtools/server/actors/page-style.js, line 570: TypeError: node is null
+console.error: "Error while calling actor 'pagestyle's method 'getApplied'" "InspectorUtils.hasRulesModifiedByCSSOM: Argument 1 does not implement interface CSSStyleSheet."
+console.error: (new TypeError("InspectorUtils.hasRulesModifiedByCSSOM: Argument 1 does not implement interface CSSStyleSheet.", "resource://devtools/server/actors/style-rule.js", 157))
+console.error: "Error while calling actor 'pagestyle's method 'getApplied'" "node is null"
+console.error: (new TypeError("node is null", "resource://devtools/server/actors/page-style.js", 570))
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+console.error: "stylesheets: fetch failed for http://localhost:5502/docs/network/css/style.css, using system principal instead."
+JavaScript error: resource://devtools/server/actors/page-style.js, line 570: TypeError: node is null
+console.error: "Error while calling actor 'pagestyle's method 'getApplied'" "InspectorUtils.hasRulesModifiedByCSSOM: Argument 1 does not implement interface CSSStyleSheet."
+console.error: (new TypeError("InspectorUtils.hasRulesModifiedByCSSOM: Argument 1 does not implement interface CSSStyleSheet.", "resource://devtools/server/actors/style-rule.js", 157))
+console.error: "Error while calling actor 'pagestyle's method 'getApplied'" "node is null"
+console.error: (new TypeError("node is null", "resource://devtools/server/actors/page-style.js", 570))
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript error: resource://devtools/server/actors/page-style.js, line 570: TypeError: node is null
+console.error: "stylesheets: fetch failed for http://localhost:5502/docs/network/css/style.css, using system principal instead."
+console.error: "Error while calling actor 'pagestyle's method 'getApplied'" "InspectorUtils.hasRulesModifiedByCSSOM: Argument 1 does not implement interface CSSStyleSheet."
+console.error: (new TypeError("InspectorUtils.hasRulesModifiedByCSSOM: Argument 1 does not implement interface CSSStyleSheet.", "resource://devtools/server/actors/style-rule.js", 157))
+console.error: "Error while calling actor 'pagestyle's method 'getApplied'" "node is null"
+console.error: (new TypeError("node is null", "resource://devtools/server/actors/page-style.js", 570))
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript error: http://localhost:5502/docs/network/core/utils/dragging.js, line 22: TypeError: evt.path is undefined
+JavaScript error: http://localhost:5502/docs/network/core/utils/dragging.js, line 22: TypeError: evt.path is undefined
+JavaScript error: http://localhost:5502/docs/network/core/utils/dragging.js, line 22: TypeError: evt.path is undefined
+JavaScript error: http://localhost:5502/docs/network/core/utils/dragging.js, line 22: TypeError: evt.path is undefined
+JavaScript error: http://localhost:5502/docs/network/core/utils/dragging.js, line 22: TypeError: evt.path is undefined
+JavaScript error: http://localhost:5502/docs/network/core/utils/dragging.js, line 22: TypeError: evt.path is undefined
+JavaScript error: http://localhost:5502/docs/network/core/utils/dragging.js, line 22: TypeError: evt.path is undefined
+JavaScript error: http://localhost:5502/docs/network/core/utils/dragging.js, line 22: TypeError: evt.path is undefined
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript error: http://localhost:5502/docs/network/core/utils/dragging.js, line 22: TypeError: evt.path is undefined
+JavaScript error: , line 0: TypeError: NetworkError when attempting to fetch resource.
+JavaScript error: , line 0: TypeError: NetworkError when attempting to fetch resource.
+Handler function threw an exception: TypeError: topFrame.browsingContext is null
+Stack: matchRequest@resource://devtools/server/actors/network-monitor/network-observer.js:126:9
+_onRequestHeader@resource://devtools/server/actors/network-monitor/network-observer.js:814:10
+NetworkObserver.prototype.observeActivity<@resource://devtools/server/actors/network-monitor/network-observer.js:699:12
+exports.makeInfallible/<@resource://devtools/shared/ThreadSafeDevToolsUtils.js:103:22
+Line: 126, column: 9
+console.error: (new TypeError("topFrame.browsingContext is null", "resource://devtools/server/actors/network-monitor/network-observer.js", 126))
+JavaScript error: , line 0: TypeError: NetworkError when attempting to fetch resource.
+JavaScript error: http://localhost:5502/docs/network/core/utils/dragging.js, line 22: TypeError: evt.path is undefined
+JavaScript error: http://localhost:5502/docs/network/core/utils/dragging.js, line 22: TypeError: evt.path is undefined
+JavaScript error: http://localhost:5502/docs/network/core/utils/dragging.js, line 22: TypeError: evt.path is undefined
+JavaScript error: http://localhost:5502/docs/network/core/utils/dragging.js, line 22: TypeError: evt.path is undefined
+JavaScript error: http://localhost:5502/docs/network/core/utils/dragging.js, line 22: TypeError: evt.path is undefined
+JavaScript error: http://localhost:5502/docs/network/core/utils/dragging.js, line 22: TypeError: evt.path is undefined
+JavaScript error: http://localhost:5502/docs/network/core/utils/dragging.js, line 22: TypeError: evt.path is undefined
+JavaScript error: http://localhost:5502/docs/network/core/utils/dragging.js, line 22: TypeError: evt.path is undefined
+JavaScript error: http://localhost:5502/docs/network/core/utils/dragging.js, line 22: TypeError: evt.path is undefined
+JavaScript error: http://localhost:5502/docs/network/core/utils/dragging.js, line 22: TypeError: evt.path is undefined
+JavaScript error: http://localhost:5502/docs/network/core/utils/dragging.js, line 22: TypeError: evt.path is undefined
+JavaScript error: http://localhost:5502/docs/network/core/utils/dragging.js, line 22: TypeError: evt.path is undefined
+JavaScript error: http://localhost:5502/docs/network/core/utils/dragging.js, line 22: TypeError: evt.path is undefined
+JavaScript error: http://localhost:5502/docs/network/core/utils/dragging.js, line 22: TypeError: evt.path is undefined
+JavaScript error: http://localhost:5502/docs/network/core/utils/dragging.js, line 22: TypeError: evt.path is undefined
+JavaScript error: http://localhost:5502/docs/network/core/utils/dragging.js, line 22: TypeError: evt.path is undefined
+JavaScript error: http://localhost:5502/docs/network/core/utils/dragging.js, line 22: TypeError: evt.path is undefined
+JavaScript error: http://localhost:5502/docs/network/core/utils/dragging.js, line 22: TypeError: evt.path is undefined
+JavaScript error: http://localhost:5502/docs/network/core/utils/dragging.js, line 22: TypeError: evt.path is undefined
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+console.error: "stylesheets: fetch failed for http://localhost:5502/docs/network/css/style.css, using system principal instead."
+JavaScript error: resource://devtools/server/actors/page-style.js, line 570: TypeError: node is null
+console.error: "Error while calling actor 'pagestyle's method 'getApplied'" "node is null"
+console.error: (new TypeError("node is null", "resource://devtools/server/actors/page-style.js", 570))
+JavaScript error: http://localhost:5502/docs/network/core/load.js, line 284: ReferenceError: _error is not defined
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+JavaScript warning: http://localhost:5502/docs/network/core/filters.js, line 187: unreachable code after return statement
+console.error: "stylesheets: fetch failed for http://localhost:5502/docs/network/css/style.css, using system principal instead."
+console.error: (new TypeError("currentNode is null", "resource://devtools/client/inspector/shared/style-change-tracker.js", 66))
+TypeError: currentNode is null: canMutationImpactCurrentStyles@resource://devtools/client/inspector/shared/style-change-tracker.js:66:20
+onMutations@resource://devtools/client/inspector/shared/style-change-tracker.js:84:41
+_emit@resource://devtools/shared/event-emitter.js:226:34
+emit@resource://devtools/shared/event-emitter.js:172:18
+emit@resource://devtools/shared/event-emitter.js:324:18
+getMutations@resource://devtools/client/fronts/walker.js:311:10
+
+console.error: "Error while calling actor 'pagestyle's method 'getApplied'" "InspectorUtils.hasRulesModifiedByCSSOM: Argument 1 does not implement interface CSSStyleSheet."
+console.error: (new TypeError("InspectorUtils.hasRulesModifiedByCSSOM: Argument 1 does not implement interface CSSStyleSheet.", "resource://devtools/server/actors/style-rule.js", 157))
