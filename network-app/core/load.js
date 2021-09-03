@@ -486,7 +486,8 @@ const setupInteractivity = (settings = undefined) => {
 
 let textElements = g.labels.selectAll("text"),
     nodeElements = g.nodes.selectAll("circle"),
-    edgeElements = g.edges.selectAll("line");
+    edgeElements = g.edges.selectAll("line"),
+    personElements = g.nodes.selectAll("path");
 
 /**
  * setupFilteredElements is called after filtering and contains all the d3 logic to process the filtered data. It takes no arguments.
@@ -511,6 +512,22 @@ const setupFilteredElements = (settings = undefined) => {
             (update) => update,
             (exit) => exit.transition(750).attr("r", 0).remove()
         );
+
+    /*
+    personElements = g.nodes
+        .selectAll("path")
+        .data(graph.nodes, (node) => node.node_id)
+        .join(
+            (enter) =>
+                enter
+                    .append("path")
+                    .attr("d", "M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z")
+                    .attr("id", (node) => node.node_id)
+                    .attr("stroke-width", 0.1),
+            (update) => update,
+            (exit) => exit.transition(750).attr("r", 0).remove()
+        );
+    */
 
     textElements = g.labels
         .selectAll("text")

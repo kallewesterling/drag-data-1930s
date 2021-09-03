@@ -573,6 +573,8 @@ const modifySimulation = (settings) => {
         nodeElements.attr("cx", (n) => n.x);
         nodeElements.attr("cy", (n) => n.y);
 
+        // personElements.attr("transform", n => {let width = getSize(n, "r", settings); return `translate(${n.x-width/2},${n.y-width/2})`})
+
         edgeElements.attr("x1", (e) => e.source.x);
         edgeElements.attr("y1", (e) => e.source.y);
         edgeElements.attr("x2", (e) => e.target.x);
