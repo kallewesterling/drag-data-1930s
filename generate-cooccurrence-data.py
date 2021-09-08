@@ -28,7 +28,7 @@ urls = [
     },
     {
         "prefix": "live",
-        "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vT0E0Y7txIa2pfBuusA1cd8X5OVhQ_D0qZC8D40KhTU3xB7McsPR2kuB7GH6ncmNT3nfjEYGbscOPp0/pub?gid=0&single=true&output=csv",
+        "url": "https://docs.google.com/spreadsheets/d/e/2PACX-1vT0E0Y7txIa2pfBuusA1cd8X5OVhQ_D0qZC8D40KhTU3xB7McsPR2kuB7GH6ncmNT3nfjEYGbscOPp0/pub?gid=2042982575&single=true&output=csv",
     },
 ]
 
@@ -264,7 +264,10 @@ def get_clean_network_data(
 
     if not drop_cols:
         drop_cols = [
-            "EIMA",
+            "EIMA_Search",
+            "EIMA_ID",
+            "Newspaper_ID",
+            "Newspaper",
             "Imported from former archive",
             "Search (newspapers.com)",
             "Search (fulton)",
