@@ -7,3 +7,4 @@ __pycache__
 env.json
 source-code
 node_modules
+auth.json
