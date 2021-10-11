@@ -169,47 +169,46 @@ const loadNetwork = (callback = []) => {
   d3.json(filename)
       .then((data) => {
         data = networkCleanup(data);
-        if (window.ERROR_LEVEL > 0) console.log(data);
         _output(`File loaded: ${filename}`, false, loadNetwork);
         // for debug purposes (TODO can be removed)
-        store.raw = data;
+        window.store.raw = data;
 
         let cdHTML = `<p><strong>Visualization last generated</strong>:`;
-        cdHTML += `${store.raw.createdDate}</p>`;
+        cdHTML += `${window.store.raw.createdDate}</p>`;
         d3.select('#createdDate')
             .html(cdHTML);
         // set up store
-        store.comments = Object.assign({}, data.comments);
-        store.count = Object.assign({}, data.count);
-        store.nodes = setupStoreNodes(data.nodes);
-        store.edges = setupStoreEdges(data.links);
+        window.store.comments = Object.assign({}, data.comments);
+        window.store.count = Object.assign({}, data.count);
+        window.store.nodes = setupStoreNodes(data.nodes);
+        window.store.edges = setupStoreEdges(data.links);
 
         loadStoreRanges();
 
         if (_) {
-          if (_.edges.startYear < store.ranges.years.min) {
-            // TODO: set startYear to store.ranges.years.min
+          if (_.edges.startYear < window.store.ranges.years.min) {
+            // TODO: set startYear to window.store.ranges.years.min
           }
 
-          if (_.edges.endYear > store.ranges.years.max) {
-            // TODO: set endYear to store.ranges.years.max
+          if (_.edges.endYear > window.store.ranges.years.max) {
+            // TODO: set endYear to window.store.ranges.years.max
           }
         }
 
         // setup settings box
-        if (!store.settingsFinished) setupSettingsInterface('root');
+        if (!window.store.settingsFinished) setupSettingsInterface('root');
 
-        store.settingsFinished = true;
+        window.store.settingsFinished = true;
 
         // Link up store edges with nodes, and vice versa
-        store.edges.forEach((e) => {
-          e.source = store.nodes.find((node) => node.id === e.source);
-          e.target = store.nodes.find((node) => node.id === e.target);
+        window.store.edges.forEach((e) => {
+          e.source = window.store.nodes.find((node) => node.id === e.source);
+          e.target = window.store.nodes.find((node) => node.id === e.target);
         });
 
-        store.nodes.forEach((node) => {
+        window.store.nodes.forEach((node) => {
           // Set up node.connected.edges for each node
-          node.connected.edges = store.edges.filter(
+          node.connected.edges = window.store.edges.filter(
               (e) =>
                 e.source.node_id === node.node_id ||
                 e.target.node_id === node.node_id,
@@ -250,7 +249,7 @@ const loadNetwork = (callback = []) => {
           });
 
           node.sourceRange = startYear && endYear ?
-            range(startYear, endYear, 1) :
+            d3.range(startYear, endYear, 1) :
             [];
         });
 
@@ -281,10 +280,13 @@ const loadNetwork = (callback = []) => {
         // make the datafileContainer look like "warning"
         document.querySelector('#datafileContainer')
             .setAttribute('style', 'background-color: #ffc107 !important;');
-        errorMsg = '<strong>Data file could not be found.</strong>';
+        let errorMsg = `<p><strong>An error has occurred:</strong></p>`;
+        errorMsg += `<p class="m-0 small">${e}</p>`;
+        /*
         errorMsg += `<p class="m-0 small text-muted">${filename}</p>`;
         errorMsg += `<p class="mt-3 mb-0">Change datafile in the dropdown.</p>`;
-        _error(errorMsg);
+        */
+        error(errorMsg);
         zoom.on('zoom', null);
         return false;
       });
@@ -345,8 +347,6 @@ const setupInteractivity = (settings = undefined) => {
   if (!settings) settings = settingsFromDashboard('setupInteractivity');
 
   nodeElements.on('click', (event, node) => {
-    // console.log('event', event);
-    // console.log('node', node);
     event.stopPropagation();
     if (event.altKey === true &&
         event.metaKey === true &&
@@ -398,7 +398,7 @@ const setupInteractivity = (settings = undefined) => {
         event.metaKey === true &&
         event.shiftKey === true) {
       const nodes = [];
-      graph.nodes.forEach((n)=>{
+      window.graph.nodes.forEach((n)=>{
         if (n !== node) {
           nodes.push(n);
         }
@@ -435,9 +435,13 @@ const setupInteractivity = (settings = undefined) => {
   nodeElements.call(
       d3.drag()
           .on('start', (event, node) => {
-            graph.simulation.restart().alpha(0.15);
-            // uncomment to avoid restart except on the first drag start event:
-            // if (!event.active) graph.simulation.alphaTarget(0.3).restart();
+            window.graph.simulation.restart().alpha(0.15);
+            // uncomment to avoid restart except on first drag start event:
+            /*
+            if (!event.active) {
+              window.graph.simulation.alphaTarget(0.3).restart();
+            }
+            */
             node.fx = node.x;
             node.fy = node.y;
           })
@@ -449,7 +453,11 @@ const setupInteractivity = (settings = undefined) => {
           })
           .on('end', (event, node) => {
             // uncomment to restore alphaTarget to normal value
-            // if (!event.active) graph.simulation.alphaTarget(0);
+            /*
+            if (!event.active) {
+              window.graph.simulation.alphaTarget(0);
+            }
+            */
             if (settings.nodes.stickyNodes) {
               node.fx = node.x;
               node.fy = node.y;
@@ -463,9 +471,13 @@ const setupInteractivity = (settings = undefined) => {
   textElements.call(
       d3.drag()
           .on('start', (event, node) => {
-            graph.simulation.restart().alpha(0.15);
+            window.graph.simulation.restart().alpha(0.15);
             // uncomment avoid restart except on the first drag start event:
-            // if (!event.active) graph.simulation.alphaTarget(0.3).restart();
+            /*
+            if (!event.active) {
+              window.graph.simulation.alphaTarget(0.3).restart();
+            }
+            */
             node.fx = node.x;
             node.fy = node.y;
           })
@@ -477,8 +489,11 @@ const setupInteractivity = (settings = undefined) => {
           })
           .on('end', (event, node) => {
             // uncomment to restore alphaTarget to normal value
-            // if (!event.active) graph.simulation.alphaTarget(0);
-
+            /*
+            if (!event.active) {
+              window.graph.simulation.alphaTarget(0);
+            }
+            */
             if (settings.nodes.stickyNodes) {
               node.fx = node.x;
               node.fy = node.y;
@@ -490,10 +505,10 @@ const setupInteractivity = (settings = undefined) => {
   );
 };
 
-let textElements = g.labels.selectAll('text');
-let nodeElements = g.nodes.selectAll('circle');
-let edgeElements = g.edges.selectAll('line');
-// let personElements = g.nodes.selectAll('path');
+let textElements = window.graph.elements.labels.selectAll('text');
+let nodeElements = window.graph.elements.nodes.selectAll('circle');
+let edgeElements = window.graph.elements.edges.selectAll('line');
+// let personElements = window.graph.elements.nodes.selectAll('path');
 
 /**
  * setupFilteredElements is called after filtering and contains all the d3
@@ -506,9 +521,9 @@ let edgeElements = g.edges.selectAll('line');
 const setupFilteredElements = (settings = undefined) => {
   _output('Called', false, setupFilteredElements);
 
-  nodeElements = g.nodes
+  nodeElements = window.graph.elements.nodes
       .selectAll('circle')
-      .data(graph.nodes, (node) => node.node_id)
+      .data(window.graph.nodes, (node) => node.node_id)
       .join(
           (enter) =>
             enter
@@ -525,9 +540,9 @@ const setupFilteredElements = (settings = undefined) => {
   let personSVG = 'M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 ';
   personSVG += '3 0 1 0 0-6 3 3 0 0 0 0 6z';
 
-  personElements = g.nodes
+  personElements = window.graph.elements.nodes
     .selectAll("path")
-    .data(graph.nodes, (node) => node.node_id)
+    .data(window.graph.nodes, (node) => node.node_id)
     .join(
       (enter) =>
         enter
@@ -540,9 +555,9 @@ const setupFilteredElements = (settings = undefined) => {
     );
   */
 
-  textElements = g.labels
+  textElements = window.graph.elements.labels
       .selectAll('text')
-      .data(graph.nodes, (node) => node.node_id)
+      .data(window.graph.nodes, (node) => node.node_id)
       .join(
           (enter) =>
             enter
@@ -556,9 +571,9 @@ const setupFilteredElements = (settings = undefined) => {
           (exit) => exit.transition(750).attr('opacity', 0).remove(),
       );
 
-  edgeElements = g.edges
+  edgeElements = window.graph.elements.edges
       .selectAll('line')
-      .data(graph.edges, (edge) => edge.edge_id)
+      .data(window.graph.edges, (edge) => edge.edge_id)
       .join(
           (enter) =>
             enter
@@ -579,42 +594,43 @@ const loadStoreRanges = () => {
   const outputMessages = ['Called'];
 
   if (
-    store.ranges.nodeDegree &&
-    store.ranges.edgeWidth &&
-    store.ranges.years.min &&
-    store.ranges.years.max &&
-    store.ranges.years.array
+    window.store.ranges.nodeDegree &&
+    window.store.ranges.edgeWidth &&
+    window.store.ranges.years.min &&
+    window.store.ranges.years.max &&
+    window.store.ranges.years.array
   ) {
     outputMessages.push('Ranges already existed');
     _output(outputMessages, false, loadStoreRanges);
-    return store.ranges;
+    return window.store.ranges;
   }
 
-  store.ranges.nodeDegree = d3.extent(store.nodes, (node)=>node.degrees.degree);
-  store.ranges.edgeWidth = d3.extent(store.edges, (edge)=>edge.weights.weight);
+  window.store.ranges.nodeDegree = d3.extent(window.store.nodes, (node) =>
+    node.degrees.degree);
 
-  store.ranges.years = {
-    min: d3.min(
-        store.edges.map((d) =>
-        d.range.start ? +d.range.start.substring(0, 4) : 1930,
-        ),
-    ),
-    max: d3.max(
-        store.edges.map((d) =>
-        d.range.end ? +d.range.end.substring(0, 4) : 1930,
-        ),
-    ),
+  window.store.ranges.edgeWidth = d3.extent(window.store.edges, (edge) =>
+    edge.weights.weight);
+
+  const startYears = window.store.edges.map((d) => d.range.start ?
+      +d.range.start.substring(0, 4) :
+      1930);
+
+  const endYears = window.store.edges.map((d) => d.range.end ?
+      +d.range.end.substring(0, 4) :
+      1930);
+
+  window.store.ranges.years = {
+    min: d3.min(startYears),
+    max: d3.max(endYears),
   };
 
-  store.ranges.years.array = range(
-      store.ranges.years.min,
-      store.ranges.years.max,
-      1,
-  );
+  window.store.ranges.years.array = d3.range(
+      d3.min(startYears),
+      d3.max(endYears) + 1);
 
   // setup the setting nodes
   let options = '';
-  store.ranges.years.array.forEach((year) => {
+  window.store.ranges.years.array.forEach((year) => {
     options += `<option value="${year}">${year}</option>`;
   });
   window._elements.startYear.innerHTML = options;
@@ -622,7 +638,7 @@ const loadStoreRanges = () => {
 
   // setup the community algorithms
   options = '';
-  const algorithms = ['', ...store.algorithms];
+  const algorithms = ['', ...window.store.algorithms];
 
   algorithms.forEach((algorithm) => {
     if (algorithm === 'jLouvain') {
@@ -670,7 +686,7 @@ const loadStoreRanges = () => {
   });
   window._elements.rFrom.innerHTML = options;
 
-  outputMessages.push('Finished', store.ranges);
+  outputMessages.push('Finished', window.store.ranges);
   _output(outputMessages, false, loadStoreRanges);
-  return store.ranges;
+  return window.store.ranges;
 };

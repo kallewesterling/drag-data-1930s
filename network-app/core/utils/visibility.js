@@ -1,232 +1,253 @@
-"use strict";
+/* eslint no-unused-vars: ["error", { "vars": "local" }] */
+'use strict';
 
 /**
- * isVisible takes one argument, which can be the string of the selector that you want to know whether it visible or not, or the d3 selected object (created using `d3.select(selector)`).
- * The return value will tell you whether the selector is currently visible (`true`) or not (`false`).
- * @param {string|object} selector - The string of the DOM selector or d3 selection
- * @returns {boolean} - Whether the selector is currently visible or not
+ * isVisible takes one argument, which can be the string of the selector
+ * that you want to know whether it visible or not, or the d3 selected
+ * object (created using `d3.select(selector)`).
+ * The return value will tell you whether the selector is currently
+ * visible (`true`) or not (`false`).
+ * @arg {string|object} selector - The string of the DOM selector or
+ *                                 d3 selection
+ * @return {boolean} - Whether the selector is currently visible or not
  */
 const isVisible = (selector) => {
-    try {
-        return d3.select(selector).classed("d-none") === false;
-    } catch {
-        console.error("Selector cannot be found");
-        console.error(selector);
-        return false;
-    }
+  try {
+    return d3.select(selector).classed('d-none') === false;
+  } catch {
+    console.error('Selector cannot be found');
+    console.error(selector);
+    return false;
+  }
 };
 
 /**
- * toggle takes one argument, which should be the string of the selector you want to toggle, or the d3 selection (created using `d3.select(selector)`). The function uses the `isVisible` function to determine whether the selector should be shown or hidden. It also has some special rules added to it.
+ * toggle takes one argument, which should be the string of the selector you
+ * want to toggle, or the d3 selection (created using `d3.select(selector)`).
+ * The function uses the `isVisible` function to determine whether the selector
+ * should be shown or hidden. It also has some special rules added to it.
  * The return value is always true.
- * @param {string|object} selector - The string of the DOM selector or d3 selection
- * @returns {boolean} - true
+ * @arg {string|object} selector - The string of the DOM selector/a d3 selection
+ * @return {boolean} - true
  */
 const toggle = (selector) => {
-    try {
-        if (typeof selector === "object") {
-            selector.classed("d-none", isVisible(selector));
-        } else {
-            d3.select(selector).classed("d-none", isVisible(selector));
-        }
-
-        // special rules
-        if (selector === "#settingsContainer") {
-            window._selectors["settingsToggle"].classed(
-                "toggled",
-                !isVisible(selector)
-            );
-        } else if (selector === "#infoToggleDiv") {
-            window._selectors["infoToggle"].classed(
-                "toggled",
-                !isVisible(selector)
-            );
-        } else if (selector === "#popupNav") {
-            let menuWidth = getComputedStyle(
-                document.querySelector(".popup-nav")
-            ).width;
-            if (
-                document.getElementById("popupNav").style.left ==
-                `-${menuWidth}`
-            ) {
-                document.getElementById("popupNav").style.left = "0px";
-            } else {
-                document.getElementById(
-                    "popupNav"
-                ).style.left = `-${menuWidth}`;
-            }
-        }
-
-        return true;
-    } catch {
-        console.error("Selector cannot be found");
-        console.error(selector);
-        return false;
+  try {
+    if (typeof selector === 'object') {
+      selector.classed('d-none', isVisible(selector));
+    } else {
+      d3.select(selector).classed('d-none', isVisible(selector));
     }
+
+    // special rules
+    if (selector === '#settingsContainer') {
+      window._selectors['settingsToggle'].classed(
+          'toggled',
+          !isVisible(selector),
+      );
+    } else if (selector === '#infoToggleDiv') {
+      window._selectors['infoToggle'].classed(
+          'toggled',
+          !isVisible(selector),
+      );
+    } else if (selector === '#popupNav') {
+      const menuWidth = getComputedStyle(
+          document.querySelector('.popup-nav'),
+      ).width;
+      if (
+        document.getElementById('popupNav').style.left ==
+        `-${menuWidth}`
+      ) {
+        document.getElementById('popupNav').style.left = '0px';
+      } else {
+        document.getElementById(
+            'popupNav',
+        ).style.left = `-${menuWidth}`;
+      }
+    }
+
+    return true;
+  } catch {
+    console.error('Selector cannot be found');
+    console.error(selector);
+    return false;
+  }
 };
 
 /**
- * hide takes one argument, which can be the string of the selector that you want hidden (added class `d-none` to the element) or the d3 selected object (created using `d3.select(selector)`).
+ * hide takes one argument, which can be the string of the selector that
+ * you want hidden (added class `d-none` to the element) or the d3 selected
+ * object (created using `d3.select(selector)`).
  * The return value is always true.
- * @param {string|object} selector - The string of the DOM selector or d3 selection to hide
- * @returns {boolean} - true
+ * @arg {string|object} selector - The string of the DOM selector or d3
+ *                                 selection to hide
+ * @return {boolean} - true
  */
 const hide = (selector) => {
-    if (typeof selector === "object") {
-        selector.classed("d-none", true);
+  if (typeof selector === 'object') {
+    selector.classed('d-none', true);
+  } else {
+    if (!selector.startsWith('#')) {
+      d3.selectAll(selector).classed('d-none', true);
     } else {
-        if (!selector.startsWith("#")) {
-            d3.selectAll(selector).classed("d-none", true);
-        } else {
-            d3.select(selector).classed("d-none", true);
-        }
+      d3.select(selector).classed('d-none', true);
     }
-    return true;
+  }
+  return true;
 };
 
 /**
- * show takes one argument, which can be the string of the selector that you want shown (removed class `d-none` from the element) or the d3 selected object (created using `d3.select(selector)`).
+ * show takes one argument, which can be the string of the selector that
+ * you want shown (removed class `d-none` from the element) or the d3
+ * selected object (created using `d3.select(selector)`).
  * The return value is always true.
- * @param {string|object} selector - The string of the DOM selector or d3 selection to show
- * @returns {boolean} - true
+ * @arg {string|object} selector - The string of the DOM selector or d3
+ *                                 selection to show
+ * @return {boolean} - true
  */
 const show = (selector) => {
-    if (typeof selector === "object") {
-        selector.classed("d-none", false);
+  if (typeof selector === 'object') {
+    selector.classed('d-none', false);
+  } else {
+    if (!selector.startsWith('#')) {
+      d3.selectAll(selector).classed('d-none', false);
     } else {
-        if (!selector.startsWith("#")) {
-            d3.selectAll(selector).classed("d-none", false);
-        } else {
-            d3.select(selector).classed("d-none", false);
-        }
+      d3.select(selector).classed('d-none', false);
     }
+  }
+  return true;
 };
 
 /**
- * setNodeEdgeInfo takes one argument and determines whether the provided element is a node or an edge, updates the information box, and finally shows it.
+ * setNodeEdgeInfo takes one argument and determines whether the provided
+ * element is a node or an edge, updates the information box, and finally
+ * shows it.
  * The return value is always true.
- * @param {Object} - The d3 selection of a node or an edge from the visualization.
- * @returns {boolean} - true
+ * @arg {Object} elem - The d3 selection of a node or an edge from the
+ *                      visualization.
+ * @return {boolean} - true
  */
 const setNodeEdgeInfo = (elem) => {
-    let selector = d3.select("#nodeEdgeInfoContainer .list-group");
-    if (elem.node_id) {
-        selector.html(elem.infoHTML);
-    } else if (elem.edge_id) {
-        selector.html(elem.infoHTML);
-    }
-    let container = window._selectors["nodeEdgeInfo"];
-    show(container);
+  const selector = d3.select('#nodeEdgeInfoContainer .list-group');
+  if (elem.node_id) {
+    selector.html(elem.infoHTML);
+  } else if (elem.edge_id) {
+    selector.html(elem.infoHTML);
+  }
+  const container = window._selectors['nodeEdgeInfo'];
+  show(container);
+  return true;
 };
 
 const toggleColorNetworks = () => {
-    _output("Called", false, toggleColorNetworks);
-    if (!window.coloredNetworks) {
-        window.coloredNetworks = true;
-        colorNetworks();
-    } else {
-        window.coloredNetworks = false;
-        resetDraw();
-    }
-    d3.select(".colorNetworks")
-        .classed("text-dark", !window.coloredNetworks)
-        .classed("text-warning", window.coloredNetworks);
+  _output('Called', false, toggleColorNetworks);
+  if (!window.coloredNetworks) {
+    window.coloredNetworks = true;
+    colorNetworks();
+  } else {
+    window.coloredNetworks = false;
+    resetDraw();
+  }
+  d3.select('.colorNetworks')
+      .classed('text-dark', !window.coloredNetworks)
+      .classed('text-warning', window.coloredNetworks);
 };
 
 /**
- * updateInfo takes no arguments acts as a quick access point for functions that need to update the information about the visualization.
+ * updateInfo takes no arguments acts as a quick access point for functions
+ * that need to update the information about the visualization.
  * The return value is always true.
  * @return {boolean} true
  */
 const updateInfo = () => {
-    show("#info");
-    d3.select(".colorNetworks").on("click", toggleColorNetworks);
-    d3.select(".commentedNodes").on("click", toggleCommentedElements);
+  show('#info');
+  d3.select('.colorNetworks').on('click', toggleColorNetworks);
+  d3.select('.commentedNodes').on('click', toggleCommentedElements);
 
-    // getCurrentGraphInfo()
-    let updateValues = getCurrentGraphInfo();
-    document.querySelectorAll(".numNodes").forEach((elem) => {
-        elem.innerHTML =
-            '<i class="me-1 small bi bi-record-fill"></i>' +
-            updateValues.numNodes.content;
-    });
-    document.querySelectorAll(".numEdges").forEach((elem) => {
-        elem.innerHTML =
-            '<i class="me-1 small bi bi-slash"></i>' +
-            updateValues.numEdges.content;
-    }); // share-fill
-    document.querySelectorAll(".unconnectedNodes").forEach((elem) => {
-        elem.innerHTML =
-            '<i class="me-1 bi bi-node-minus"></i>' +
-            updateValues.unconnectedNodes.content;
-    });
-    document.querySelectorAll(".currentZoom").forEach((elem) => {
-        elem.innerHTML =
-            '<i class="me-1 bi bi-search"></i>' +
-            updateValues.currentZoom.content;
-    });
-    document.querySelectorAll(".numCommunities").forEach((elem) => {
-        elem.innerHTML =
-            '<i class="me-1 bi bi-heart-fill"></i>' +
-            updateValues.numCommunities.content;
-    });
-    document.querySelectorAll(".commentedNodes").forEach((elem) => {
-        elem.innerHTML = "" + updateValues.commentedNodes.content;
-    });
-    document.querySelectorAll(".colorNetworks").forEach((elem) => {
-        elem.innerHTML =
-            '<i class="me-1 bi bi-share-fill"></i>' +
-            updateValues.colorNetworks.content;
-    });
+  // getCurrentGraphInfo()
+  const updateValues = getCurrentGraphInfo();
+  document.querySelectorAll('.numNodes').forEach((elem) => {
+    elem.innerHTML =
+      '<i class="me-1 small bi bi-record-fill"></i>' +
+      updateValues.numNodes.content;
+  });
+  document.querySelectorAll('.numEdges').forEach((elem) => {
+    elem.innerHTML =
+      '<i class="me-1 small bi bi-slash"></i>' +
+      updateValues.numEdges.content;
+  }); // share-fill
+  document.querySelectorAll('.unconnectedNodes').forEach((elem) => {
+    elem.innerHTML =
+      '<i class="me-1 bi bi-node-minus"></i>' +
+      updateValues.unconnectedNodes.content;
+  });
+  document.querySelectorAll('.currentZoom').forEach((elem) => {
+    elem.innerHTML =
+      '<i class="me-1 bi bi-search"></i>' +
+      updateValues.currentZoom.content;
+  });
+  document.querySelectorAll('.numCommunities').forEach((elem) => {
+    elem.innerHTML =
+      '<i class="me-1 bi bi-heart-fill"></i>' +
+      updateValues.numCommunities.content;
+  });
+  document.querySelectorAll('.commentedNodes').forEach((elem) => {
+    elem.innerHTML = '' + updateValues.commentedNodes.content;
+  });
+  document.querySelectorAll('.colorNetworks').forEach((elem) => {
+    elem.innerHTML =
+      '<i class="me-1 bi bi-share-fill"></i>' +
+      updateValues.colorNetworks.content;
+  });
 
-    updateValues.colorNetworks.class.forEach((c) => {
-        document.querySelectorAll(".colorNetworks").forEach((elem) => {
-            elem.classList.add(c);
-        });
+  updateValues.colorNetworks.class.forEach((c) => {
+    document.querySelectorAll('.colorNetworks').forEach((elem) => {
+      elem.classList.add(c);
     });
-    updateValues.commentedNodes.class.forEach((c) => {
-        document.querySelectorAll(".commentedNodes").forEach((elem) => {
-            elem.classList.add(c);
-        });
+  });
+  updateValues.commentedNodes.class.forEach((c) => {
+    document.querySelectorAll('.commentedNodes').forEach((elem) => {
+      elem.classList.add(c);
     });
+  });
 
-    return true;
+  return true;
 };
 
 const showCities = () => {
-    // TODO: #24 the showCities function is not working - should be rewritten to be able to highlight/pulse any given category of node...
-    let original = {
-        fill: {},
-        classList: {},
-        r: {},
-    };
+  // TODO: #24 the showCities function is not working - should be rewritten
+  // to be able to highlight/pulse any given category of node...
+  const original = {
+    fill: {},
+    classList: {},
+    r: {},
+  };
 
-    graph.nodes.forEach((n) => {
-        let node = d3.select(`#${n.node_id}`);
-        original.fill[n.node_id] = node.style("fill");
-        original.classList[n.node_id] = node.attr("class");
-        original.r[n.node_id] = +node.attr("r");
+  window.graph.nodes.forEach((n) => {
+    const node = d3.select(`#${n.node_id}`);
+    original.fill[n.node_id] = node.style('fill');
+    original.classList[n.node_id] = node.attr('class');
+    original.r[n.node_id] = +node.attr('r');
 
-        node.transition()
-            .attr("class", null)
-            .transition()
-            .duration(500)
-            .style("fill", (n) => {
-                if (n.category === "city") {
-                    return "red";
-                } else {
-                    return "gray";
-                }
-            })
-            .transition()
-            .delay(1000)
-            .duration(500)
-            .attr("r", (n) => {
-                if (n.category === "city") {
-                    return original.r[n.node_id] * 3;
-                } else {
-                    return 1;
-                }
-            });
-    });
+    node.transition()
+        .attr('class', null)
+        .transition()
+        .duration(500)
+        .style('fill', (n) => {
+          if (n.category === 'city') {
+            return 'red';
+          } else {
+            return 'gray';
+          }
+        })
+        .transition()
+        .delay(1000)
+        .duration(500)
+        .attr('r', (n) => {
+          if (n.category === 'city') {
+            return original.r[n.node_id] * 3;
+          } else {
+            return 1;
+          }
+        });
+  });
 };
