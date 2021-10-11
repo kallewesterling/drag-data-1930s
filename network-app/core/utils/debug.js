@@ -80,7 +80,6 @@ const _output = (
  *
  */
 const error = (message, hide = false, clearTimeout = true) => {
-  console.log(window._selectors);
   if (hide) {
     d3.select('#loading').classed('d-none', true);
   } else {
@@ -134,10 +133,6 @@ const troubleshoot = (fix = false) => {
   // If `fix` is set to true, we will check for inconsistency in data...
   if (fix) {
     if (returnObject.storeNodes.inGraph > returnObject.graphNodes.inGraph) {
-      /* // TODO: turn on this message?
-      // console.log(
-        "there are more filtered nodes in store than in graph, correcting..."
-      );*/
       returnObject.storeNodes.inGraph.forEach((node) => {
         if (
           returnObject.graphNodes.inGraph.find(
@@ -166,10 +161,8 @@ const troubleshoot = (fix = false) => {
 /*
 const debugMessage = (message, header = "Warning") => {
   if (settingsFromDashboard('debugMessage').debugMessages === false) {
-    // console.log("[debugMessage: " + header + "] " + message);
-    // console.log("debugMessage suppressed."); //TODO: Turn back on?
     return false;
- }
+  }
   let _id = `toast${window.store.toasterCounter}`;
   let _html = window._selectors["wrapToasters"].html();
   _html += `<div class="toast" role="alert"
@@ -187,9 +180,8 @@ const debugMessage = (message, header = "Warning") => {
   // $(`#${_id}`).toast({delay: 5000});
   $(`#${_id}`).toast("show");
   let t = setTimeout(() => {
-    // console.log(`removing ${_id}`);
     d3.selectAll(`#${_id}`).remove();
- }, 6000);
+  }, 6000);
   window.store.toasterCounter += 1;
   return t;
 };

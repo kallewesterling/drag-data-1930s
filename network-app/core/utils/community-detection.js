@@ -161,7 +161,7 @@ const getNodeClusterInfo = (returnFullNodes = false) => {
     id = +id;
     const data = {
       id: id,
-      nodes: window.graph.nodes.filter((n) => n.cluster === id),
+      nodes: window.graph.nodes.filter((node) => node.cluster === id),
     };
     returnValue.push(data);
   });
@@ -259,7 +259,7 @@ const getNodeClusterInfo = (returnFullNodes = false) => {
         data['by-category']['performer'].forEach((node) => {
           let nodeElement = nodeElements
               .data()
-              .filter((n) => n.id === node);
+              .filter((cmpNode) => cmpNode.id === node);
           if (nodeElement.length === 1) nodeElement = nodeElement[0];
           else console.error('Found too many nodes with ID!');
           html += `<span class="badge me-1 cluster"
@@ -295,7 +295,6 @@ const getNodeClusterInfo = (returnFullNodes = false) => {
 
 /*
 const setupLegend = () => {
-  // console.log('called!');
   legend = document.querySelector('#legend');
   legend.innerHTML = '';
   Object.entries(window.graph.clusterColors).forEach(([cluster, color]) => {
@@ -309,7 +308,7 @@ const setupLegend = () => {
     txt = document.createTextNode(cluster)
     div.appendChild(txt)
     legend.appendChild(div)
- });
+  });
   // d3.select('#legend').html(`${htmlText}`);
 }
 */

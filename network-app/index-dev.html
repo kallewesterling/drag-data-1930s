@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html class="theme-light">
+    <head>
+        <script src="https://d3js.org/d3.v6.min.js"></script>
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+        <link rel="stylesheet" href="css/themes.css">
+        <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="css/menu.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.0/font/bootstrap-icons.css">
+        <script src="https://unpkg.com/topojson@3"></script>
+        <title>U.S. Drag in the 1930s</title>
+        <script>
+            if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+                window.DATA_DIR = "/network-app/data";
+                window.ERROR_LEVEL = 1;
+            } else if (window.location.hostname === "kallewesterling.github.io") {
+                window.DATA_DIR = "/drag-data-browser/data";
+                window.ERROR_LEVEL = 0;
+            }
+        </script>
+    </head>
+    <body>
+        <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+            <symbol id="person" viewBox="0 0 16 16">
+                <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+            </symbol>
+        </svg>
+        <nav class="px-3 navbar navbar-expand-xl navbar-light justify-content-between shadow-sm border-bottom">
+            <section class="d-flex">
+                <a class="order-0 btn btn-sm btn-outline-secondary me-3" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample"><i class="bi bi-three-dots-vertical"></i></a>
+                <a id="switchMode" class="order-1 btn btn-sm btn-outline-secondary me-3"></a>
+                <a id="nudgeNodes" class="order-2 btn btn-sm btn-outline-secondary me-3"><i class="bi bi-unlock-fill me-md-1"></i><span class="d-none d-md-inline-block">Fix stuck nodes</span></a>
+                <a id="showClusterInfo" class="order-3 btn btn-sm btn-outline-secondary me-3"><i class="bi bi-triangle-fill me-md-1"></i><span class="d-none d-md-inline-block">Community details</span></a>
+                <a id="explainSettingsToggle" class="order-4 btn btn-sm btn-outline-secondary"><i class="bi bi-patch-question-fill me-md-1"></i><span class="d-none d-md-inline-block">Explain visualization</span></a>
+            </section>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent" style="width:auto; max-width:100%">
+                <div id="info" class="d-flex align-items-center">
+                    <span id="" class="numNodes small me-3" data-bs-trigger="click" data-bs-toggle="popover" title="Number of nodes" data-bs-content='The numbers here show <strong>number of current nodes</strong>/number of all nodes in the graph. It is an indicator of how much the graph you are seeing has been filtered. You can change the filtering of the edges under the "Node filtering" section in the "Settings" below.'><i class="me-1 small bi bi-record-fill"></i></span>
+                    <span id="" class="numEdges small me-3" data-bs-trigger="click" data-bs-toggle="popover" title="Number of edges" data-bs-content='The numbers here show <strong>number of current edges</strong>/number of all edges in the graph. It is an indicator of how much the graph you are seeing has been filtered. You can change the filtering of the edges under the "Edge filtering" section in the "Settings" below.'><i class="me-1 small bi bi-slash"></i></span>
+                    <span id="" class="unconnectedNodes small me-3" data-bs-trigger="click" data-bs-toggle="popover" title="Number of unconnected nodes" data-bs-content='The number here shows how many nodes are present in the current graph you are seeing that are unconnected from one another. If you have "auto-clear unconnected nodes" turned on in the "Node filtering" settings, this number should always stay at 0 since any lingering unconnected nodes are removed on rendering.'><i class="me-1 bi bi-node-minus"></i></span>
+                    <span id="" class="numCommunities small me-3" data-bs-trigger="click" data-bs-toggle="popover" title="Number of communities" data-bs-content='The number that would sit next to this heart would show how many number of communities have been identified in the graph you are currently seeing. Since you have not chosen to detect communities in the Settings box, the heart displays no community information.'></span>
+                    <span id="" class="colorNetworks me-3" data-bs-trigger="hover" data-bs-toggle="popover" title="Number of networks" data-bs-content='The number here shows how many disconnected networks are present in the current graph. The fewer the networks, the higher degree of connection between all the nodes. Click the button to color the nodes after which network they belong to. When the coloring is activated, this button will be yellow.'></span>
+                    <span id="" class="commentedNodes m-0 me-3 badge" data-bs-trigger="hover" data-bs-toggle="popover" title="Number of commented nodes" data-bs-content='The number of nodes in the current graph that has a comment assigned to them. If you want to show only the nodes that have comments assigned to them and see how they relate to one another, click this button. When this view is activated, this button will be yellow.'></span>
+                    <span id="" class="currentZoom small" data-bs-trigger="click" data-bs-toggle="popover" title="Current zoom level" data-bs-content='This number shows you how scaled the current graph is, between 60–400%.'></span>
+                </div>
+            </div>
+            <i id="loadingDot" class="ms-4 small bi bi-record-fill"></i>
+        </nav>
+        <nav id="popupNav" class="popup-nav shadow-lg">
+            <div class="p-4 small">
+            </div>
+        </nav>
+
+        <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel" data-bs-backdrop="false">
+            <!--
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title" id="offcanvasExampleLabel">Offcanvas</h5>
+                    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+            -->
+            <div class="offcanvas-body">
+                <div id="project-description"></div>
+                <!-- <a data-bs-toggle="modal" data-bs-target="#rationale" data-bs-keyboard="true" type="button" class="d-block order-1 btn btn-sm btn-outline-success me-3"><i class="bi bi-patch-question-fill"></i><span>Rationale</span></a> -->
+                <div id="createdDate"></div>
+                <a id="showEntireDataset" class="mb-2 d-block order-2 btn btn-sm btn-outline-success me-3" href="https://docs.google.com/spreadsheets/d/1UlpFQ9WWA6_6X-RuMJ3vHdIbyqhCZ1VRYgcQYjXprAg/edit#gid=0" target="_blank"><i class="bi bi-file-earmark-spreadsheet-fill me-1"></i><span class="">Dataset</span></a>
+                 <a id="resetLocalStorage" class="mb-2 d-block order-5 btn btn-sm btn-outline-secondary me-3"><i class="bi bi-cloud-slash-fill me-1"></i><span>Reset settings</span></a>
+            </div>
+        </div>
+
+        <div id="floatingInfo" class="d-flex flex-column p-2 rounded-3 border">
+            <span id="" class="numNodes small me-3 text-muted" data-bs-trigger="click" data-bs-toggle="popover" title="Number of nodes" data-bs-content='The numbers here show <strong>number of current nodes</strong>/number of all nodes in the graph. It is an indicator of how much the graph you are seeing has been filtered. You can change the filtering of the edges under the "Node filtering" section in the "Settings" below.'><i class="me-1 small bi bi-record-fill"></i></span>
+            <span id="" class="numEdges small me-3 text-muted" data-bs-trigger="click" data-bs-toggle="popover" title="Number of edges" data-bs-content='The numbers here show <strong>number of current edges</strong>/number of all edges in the graph. It is an indicator of how much the graph you are seeing has been filtered. You can change the filtering of the edges under the "Edge filtering" section in the "Settings" below.'><i class="me-1 small bi bi-slash"></i></span>
+            <span id="" class="unconnectedNodes small me-3 text-muted" data-bs-trigger="click" data-bs-toggle="popover" title="Number of unconnected nodes" data-bs-content='The number here shows how many nodes are present in the current graph you are seeing that are unconnected from one another. If you have "auto-clear unconnected nodes" turned on in the "Node filtering" settings, this number should always stay at 0 since any lingering unconnected nodes are removed on rendering.'><i class="me-1 bi bi-node-minus"></i></span>
+            <span id="" class="currentZoom small me-3 text-muted" data-bs-trigger="click" data-bs-toggle="popover" title="Current zoom level" data-bs-content='This number shows you how scaled the current graph is, between 60–400%.'></span>
+            <span id="" class="numCommunities small me-3 text-muted" data-bs-trigger="click" data-bs-toggle="popover" title="Number of communities" data-bs-content='The number that would sit next to this heart would show how many number of communities have been identified in the graph you are currently seeing. Since you have not chosen to detect communities in the Settings box, the heart displays no community information.'></span>
+        </div>
+        <div class="modal" id="numberModal">
+            <div class="modal-dialog modal-dialog-centered justify-content-center">
+                <div class="modal-content w-auto shadow-lg">
+                    <div class="modal-body">
+                        <h5></h5>
+                        <h1></h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="explanation" class="p-3 w-100 d-flex flex-column text-white d-none">
+            
+        </div>
+        <div id="nodeTable" class="w-100 d-flex justify-content-center d-none">
+            <div id="nodeTableContainer">
+                <table class="table" class="">
+                    <thead>
+                    <tr>
+                        <th scope="col" id="nodeTableHeader1">C#</th>
+                        <th scope="col" id="nodeTableHeader2">N#</th>
+                        <th scope="col" id="nodeTableHeader3">Performers</th>
+                        <th scope="col" id="nodeTableHeader4">Venues</th>
+                        <th scope="col" id="nodeTableHeader5">Cities</th>
+                    </tr>
+                    </thead>
+                    <tbody id="appendHere"></tbody>
+                </table>
+            </div>
+        </div>
+        <div id="rationale" class="modal">
+            <div class="modal-dialog modal-xl modal-fullscreen-xxl-down">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Rationale</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-12 col-md">
+                                <h1 class="h3">Header</h1>
+                                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Sint impedit tenetur vel provident! Minima ratione repellat voluptates, quisquam, assumenda error voluptatem quidem, tenetur saepe itaque repellendus possimus optio alias ut?</p>
+
+                                <h2 class="h5">Keyboard Shortcuts</h2>
+                                <div class="row">
+                                    <div class="col-1">
+                                        <kbd>esc</kbd>
+                                    </div>
+                                    <div class="col">
+                                        <p>Hide the frontmost element. When this information window (which you're currently looking at) is showing, it will hide this window. If you're in the network visualization screen, it will toggle the visibility of the setting boxes.</p>
+                                    </div>
+                                    <div class="col-1 border-left">
+                                        <kbd>&#8679;</kbd><kbd>&#8592;</kbd> or<br />
+                                        <kbd>&#8679;</kbd><kbd>&#8594;</kbd>
+                                    </div>
+                                    <div class="col">
+                                        <p>Adjust edge's minimum weight up and down. <strong>What does that mean?</strong></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-3 d-flex flex-column" id="dashboard">
+                                <h1 class="h3">Dashboard</h1>
+                                <div class="rounded border mb-2 p-1">
+                                    <p class="fw-bold">Number of nodes</p>
+                                    <p class="mb-2">257</p>
+                                    <p><small class="text-muted">Explanation here</small></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="wrapToasters"></div>
+        <div id="settings" class="small card shadow-sm border rounded-3">
+            <div class="card-header d-flex justify-content-between align-items-center" id="settingsToggle">
+                <span><i class="bi bi-gear me-2"></i>Settings</span>
+                <span id="toggledSettings"></i></span>
+            </div>
+            <ul id="settingsContainer" class="list-group list-group-flush">
+                <li class="list-group-item" id="datafileContainer">
+                    <div class="mb-2">
+                        <p class="small text-muted p-0 m-0 fw-bold" data-toggle="datafileToggle">Co-occurrence Dataset</p>
+                    </div>
+                    <div class="mb-2" id="datafileToggle">
+                        <select id="datafile">
+                            <option value="" disabled>Version 1:</option>
+                            <option value="v1-co-occurrence-grouped-by-3-days.json">&nbsp;&nbsp;&nbsp;unfiltered 3-day span</option>
+                            <option value="v1-co-occurrence-grouped-by-14-days.json">&nbsp;&nbsp;&nbsp;unfiltered 14-day span</option>
+                            <option value="v1-co-occurrence-grouped-by-31-days.json">&nbsp;&nbsp;&nbsp;unfiltered 31-day span</option>
+                            <option value="v1-co-occurrence-grouped-by-93-days.json">&nbsp;&nbsp;&nbsp;unfiltered 93-day span</option>
+                            <option value="v1-co-occurrence-grouped-by-186-days.json">&nbsp;&nbsp;&nbsp;unfiltered 186-day span</option>
+                            <option value="v1-co-occurrence-grouped-by-365-days.json">&nbsp;&nbsp;&nbsp;unfiltered 365-day span</option>
+                            <option value="" disabled>&nbsp;&nbsp;&nbsp;Unnamed performers pre-filtered:</option>
+                            <option value="v1-co-occurrence-grouped-by-3-days-no-unnamed-performers.json">&nbsp;&nbsp;&nbsp;pre-filtered 3-day span</option>
+                            <option value="v1-co-occurrence-grouped-by-14-days-no-unnamed-performers.json">&nbsp;&nbsp;&nbsp;pre-filtered 14-day span</option>
+                            <option value="v1-co-occurrence-grouped-by-31-days-no-unnamed-performers.json">&nbsp;&nbsp;&nbsp;pre-filtered 31-day span</option>
+                            <option value="v1-co-occurrence-grouped-by-93-days-no-unnamed-performers.json">&nbsp;&nbsp;&nbsp;pre-filtered 93-day span</option>
+                            <option value="v1-co-occurrence-grouped-by-186-days-no-unnamed-performers.json">&nbsp;&nbsp;&nbsp;pre-filtered 186-day span</option>
+                            <option value="v1-co-occurrence-grouped-by-365-days-no-unnamed-performers.json">&nbsp;&nbsp;&nbsp;pre-filtered 365-day span</option>
+                            <option value="" disabled>--------------</option>
+                            <option value="" disabled>Live data:</option>
+                            <option value="live-co-occurrence-grouped-by-3-days.json">&nbsp;&nbsp;&nbsp;unfiltered 3-day span</option>
+                            <option value="live-co-occurrence-grouped-by-14-days.json">&nbsp;&nbsp;&nbsp;unfiltered 14-day span</option>
+                            <option value="live-co-occurrence-grouped-by-31-days.json">&nbsp;&nbsp;&nbsp;unfiltered 31-day span</option>
+                            <option value="live-co-occurrence-grouped-by-93-days.json">&nbsp;&nbsp;&nbsp;unfiltered 93-day span</option>
+                            <option value="live-co-occurrence-grouped-by-186-days.json">&nbsp;&nbsp;&nbsp;unfiltered 186-day span</option>
+                            <option value="live-co-occurrence-grouped-by-365-days.json">&nbsp;&nbsp;&nbsp;unfiltered 365-day span</option>
+                            <option value="" disabled>&nbsp;&nbsp;&nbsp;Unnamed performers pre-filtered:</option>
+                            <option value="live-co-occurrence-grouped-by-3-days-no-unnamed-performers.json">&nbsp;&nbsp;&nbsp;pre-filtered 3-day span</option>
+                            <option value="live-co-occurrence-grouped-by-14-days-no-unnamed-performers.json">&nbsp;&nbsp;&nbsp;pre-filtered 14-day span</option>
+                            <option value="live-co-occurrence-grouped-by-31-days-no-unnamed-performers.json">&nbsp;&nbsp;&nbsp;pre-filtered 31-day span</option>
+                            <option value="live-co-occurrence-grouped-by-93-days-no-unnamed-performers.json">&nbsp;&nbsp;&nbsp;pre-filtered 93-day span</option>
+                            <option value="live-co-occurrence-grouped-by-186-days-no-unnamed-performers.json">&nbsp;&nbsp;&nbsp;pre-filtered 186-day span</option>
+                            <option value="live-co-occurrence-grouped-by-365-days-no-unnamed-performers.json">&nbsp;&nbsp;&nbsp;pre-filtered 365-day span</option>
+                            <!--
+                            <option value="" disabled>Other datasets (beta):</option>
+                            <option value="unipartite-city-data.json">unipartite city-performer relations</option>
+                            <option value="bipartite-city-data.json">bipartite city-performer relations</option>
+                            <option value="new-relations.json">co-occurrence (14-day span)</option>
+                            <option value="multipartite-data.json">multi-partite graph</option>
+                            <option value="bipartite-data-performer-city.json">bipartite graph (performer-city)</option>
+                            <option value="bipartite-data-performer-venue.json">bipartite graph (performer-venue)</option>
+                            -->
+                        </select>
+                    </div>
+                </li>
+                <li class="list-group-item">
+                    <div class="mb-2">
+                        <p class="small text-muted p-0 m-0 fw-bold">Node filtering</p>
+                    </div>
+                    <div class="mb-2">
+                        <input class="p-0 m-0" type="range" id="minDegree" name="minDegree" min="1" max="40" value="1" step="1">
+                        <label class="small p-0 m-0" for="minDegree" id="minDegree_label">minDegree</label>
+                        <span class="text-nowrap small metaShow d-none"><key class="small rounded ms-1 bg-success text-white p-1 fw-bold">&#8592;</key><key class="rounded small ms-1 bg-success text-white p-1 fw-bold">&#8594;</key></span>
+                    </div>
+                    <div class="mb-2">
+                        <p class="small text-muted p-0 m-0 fw-bold">sizing</p>
+                    </div>
+                    <div class="mb-2">
+                        <input class="p-0 m-0" type="range" id="nodeMultiplier" name="nodeMultiplier" min="0.1" max="40" value="1" step="0.1">
+                        <label class="small p-0 m-0" for="nodeMultiplier" id="nodeMultiplier_label">size nodeMultiplier</label>
+                        <span class="text-nowrap small metaShow d-none"><key class="rounded small ms-1 bg-success text-white p-1 fw-bold">+</key><key class="rounded small ms-1 bg-success text-white p-1 fw-bold">-</key></span>
+                    </div>
+                    <div class="mb-2">
+                        <label class="small p-0 m-0" for="rFrom">node size from</label>
+                        <select id="rFrom"></select>
+                    </div>
+                    <div class="mt-3 mb-2">
+                        <p class="mb-1 text-muted small fw-bold">behavior</p>
+                    </div>
+                    <div class="mb-2">
+                        <p class="m-0">
+                            <label class="me-1" for="autoClearNodes"><input type="checkbox" id="autoClearNodes"> auto-clear unconnected nodes</label>
+                            <span class="text-nowrap small metaShow d-none"><key class="rounded small ms-1 bg-success text-white p-1 fw-bold">&#8984; + C</key></span>
+                        </p>
+                    </div>
+                    <div class="mb-2">
+                        <p class="m-0">
+                            <label class="me-1" for="autoClearUnnamed"><input type="checkbox" id="autoClearUnnamed"> auto-clear unnamed nodes</label>
+                        </p>
+                    </div>
+                    <div class="mb-2">
+                        <label class="me-1" for="stickyNodes"><input type="checkbox" id="stickyNodes"> stickyNodes</label>
+                    </div>
+                    <!--
+                    <div class="mb-2">
+                        <label class="me-1" for="nodeSizeFromCurrent"><input type="checkbox" id="nodeSizeFromCurrent"> node size from current graph</label>
+                        <span class="text-nowrap small metaShow d-none"><key class="rounded small ms-1 bg-success text-white p-1 fw-bold">&#8679; + N</key></span>
+                    </div>
+                    -->
+                    <div class="mt-3 mb-2">
+                        <p class="mb-1 text-muted small fw-bold">Detect communities</p>
+                    </div>
+                    <div class="mb-2">
+                        <label class="small p-0 m-0" for="communityDetection">algorithm</label>
+                        <select id="communityDetection"></select>
+                    </div>
+                </li>
+
+                <li class="list-group-item">
+                    <div class="mb-2">
+                        <p class="small text-muted p-0 m-0 fw-bold">Edge filtering</p>
+                    </div>
+                    <div class="mb-2">
+                        <input class="p-0 m-0" type="range" id="minWeight" name="minWeight" min="0" max="40" value="1" step="1">
+                        <label class="small p-0 m-0" for="minWeight" id="minWeight_label">minWeight</label>
+                        <span class="text-nowrap small metaShow d-none"><key class="rounded small ms-1 bg-success text-white p-1 fw-bold">&#8679; + &#8592;</key><key class="rounded small ms-1 bg-success text-white p-1 fw-bold">&#8679; + &#8594;</key></span>
+                    </div>
+                    <div class="mb-2">
+                        <p class="small text-muted p-0 m-0 fw-bold">sizing</p>
+                    </div>
+                    <div class="mb-2">
+                        <input class="p-0 m-0" type="range" id="edgeMultiplier" name="edgeMultiplier" min="1" max="40" value="1" step="1">
+                        <label class="small p-0 m-0" for="edgeMultiplier" id="edgeMultiplier_label">size edgeMultiplier</label>
+                        <span class="text-nowrap small metaShow d-none"><key class="rounded small ms-1 bg-success text-white p-1 fw-bold">+</key><key class="rounded small ms-1 bg-success text-white p-1 fw-bold">-</key></span>
+                    </div>
+                    <div class="mb-2">
+                        <label class="small p-0 m-0" for="weightFrom">weight from</label>
+                        <select id="weightFrom"></select>
+                    </div>
+                    <div class="mb-2">
+                        <label class="small p-0 m-0" for="startYear">startYear</label>
+                        <select id="startYear"></select>
+                        <label class="small p-0 m-0" for="startYear">endYear</label>
+                        <select id="endYear"></select>
+                    </div>
+                    <!--
+                        <div class="mb-2">
+                        <label class="me-1" for="weightFromCurrent"><input type="checkbox" id="weightFromCurrent"> determine weight from current graph</label>
+                    </div>
+                    -->
+                </li>
+
+                <li class="list-group-item">
+                    <div class="mb-2">
+                        <p class="small text-muted p-0 m-0 fw-bold" data-toggle="forceToggle" id="forceToggleID">Force settings</p>
+                    </div>
+                    <div class="mb-2 d-none" id="forceToggle">
+                        <div class="mb-2">
+                            <p class="m-0">
+                                <label class="me-1" for="layoutCenter"><input type="checkbox" id="layoutCenter"> center</label>
+                                <label class="me-1" for="layoutForceX"><input type="checkbox" id="layoutForceX"> forceX</label>
+                                <label class="me-1" for="layoutForceY"><input type="checkbox" id="layoutForceY"> forceY</label>
+                            </p>
+                            <p class="m-0">
+                                <label class="me-1" for="layoutCollide"><input type="checkbox" id="layoutCollide"> collide</label>
+                                <label class="me-1" for="layoutCharge"><input type="checkbox" id="layoutCharge"> charge</label>
+                            </p>
+                        </div>
+                        <div class="mb-2" id="chargeContainer">
+                            <input class="p-0 m-0" type="range" id="charge" name="charge" min="1" max="40" value="1" step="1">
+                            <label class="small p-0 m-0" for="charge" id="charge_label">charge</label>
+                            <span class="text-nowrap small metaShow d-none"><key class="small rounded ms-1 bg-success text-white p-1 fw-bold">&#8593;</key><key class="rounded small ms-1 bg-success text-white p-1 fw-bold">&#8595;</key></span>
+                        </div>
+                        <div class="mb-2" id="collideContainer">
+                            <input class="p-0 m-0" type="range" id="collide" name="collide" min="1" max="40" value="1" step="1">
+                            <label class="small p-0 m-0" for="collide" id="collide_label">collide</label>
+                        </div>
+                        <div class="mb-2" id="linkStrengthContainer">
+                            <input class="p-0 m-0" type="range" id="linkStrength" name="linkStrength" min="1" max="40" value="1" step="1">
+                            <label class="small p-0 m-0" for="linkStrength" id="linkStrength_label">linkStrength</label>
+                        </div>
+                        <div class="mb-2">
+                            <p class="m-0">
+                                <label class="me-1" for="layoutClustering"><input type="checkbox" id="layoutClustering"> clustering</label>
+                            </p>
+                        </div>
+                    </div>
+                </li>
+                
+                <li class="list-group-item">
+                    <div class="mb-2">
+                        <p class="small text-muted p-0 m-0 fw-bold" data-toggle="searchToggle" id="searchToggleID">Search</p>
+                    </div>
+                    <div class="mb-2 d-none" id="searchToggle">
+                        <div class="mt-3 mb-2">
+                            <p class="mb-1 text-muted small fw-bold">edges</p>
+                        </div>
+                        <div class="mb-2">
+                            <label class="small p-0 m-0" for="searchEdge">venue</label>
+                            <input type="text" id="searchEdge">
+                        </div>
+                        <div class="mt-3 mb-2">
+                            <p class="mb-1 text-muted small fw-bold">nodes</p>
+                        </div>
+                        <div class="mb-2">
+                            <label class="small p-0 m-0" for="searchComment">comment</label>
+                            <input type="text" id="searchComment">
+                        </div>
+                    </div>
+                </li>
+        
+                <li class="list-group-item">
+                    <div class="mb-2">
+                        <a id="showEntireDataset" class="mb-2 d-block order-2 btn btn-sm btn-outline-success me-3" href="https://docs.google.com/spreadsheets/d/1UlpFQ9WWA6_6X-RuMJ3vHdIbyqhCZ1VRYgcQYjXprAg/edit#gid=0" target="_blank"><i class="bi bi-file-earmark-spreadsheet-fill me-1"></i><span class="">Dataset</span></a>
+                    </div>
+                    <div class="mb-2">
+                        <a id="resetLocalStorage" class="mb-2 d-block order-5 btn btn-sm btn-outline-secondary me-3"><i class="bi bi-cloud-slash-fill me-1"></i><span>Reset settings</span></a>
+                    </div>
+                </li>
+
+
+
+                <!--
+                <li class="list-group-item">
+                    <div class="mb-2">
+                        <p class="small text-muted p-0 m-0 fw-bold" data-toggle="debugToggle">Debug</p>
+                    </div>
+                    <div class="mb-2 d-none" id="debugToggle">
+                        <label class="me-1" for="debugMessages"><input type="checkbox" id="debugMessages"> debugMessages</label>
+                    </div>
+                </li>
+                -->
+            </ul>
+        </div>
+        <div id="infoContainer"></div>
+        <div id="nodeEdgeInfo" class="card small shadow-sm border rounded-3 d-none">
+            <div class="card-header d-flex justify-content-between align-items-center" id="infoToggleDiv">
+                <span><i class="bi bi-share-fill me-2"></i>Node/Edge information</span>
+            </div>
+            <div id="nodeEdgeInfoContainer" class="">
+                <ul class="list-group list-group-flush"></ul>
+            </div>
+        </div>
+        <div id="previewData" class="small shadow-sm border p-3 rounded-3 d-none"><svg id="preview"></svg></div>
+
+        <div id="loading" class="h-100 d-flex justify-content-center d-none">
+            <div id="loadingContainer" class="my-auto p-4 bg-white rounded shadow-lg d-flex flex-column">
+                <div id="loadingMessage"></div>
+                <div class="text-center" id="loadingSpinner">
+                    <div class="spinner-grow mt-2" role="status"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-3 shadow rounded small" id="quickEdgeInfo"></div>
+
+        <svg id="main" width="100%" height="100%" oncontextmenu="return false;">
+            <g id="background"><rect x="-100%" y="-100%" width="200%" height="200%" fill="rgba(0, 0, 0, 0.009)"></rect></g>
+        </svg>
+
+        <!--
+        <div class="container" style="top:80%; height:20%; position: absolute;">
+            <div class="row">
+                <div class="col-12">
+                    <table class="table" id="data-info">
+                        <thead></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        -->
+
+        <div id="popup-info" class="d-none shadow-lg"></div>
+        <div id="egoNetwork" class="d-none shadow-lg p-2 text-center bg-warning">Ego network for node <span id="node">NODE</span>.<i id="closeEgoNetwork" class="ms-3 bi bi-stop-circle"></i></div>
+    
+        <!--<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>-->
+        <script src="core/utils/moment.js"></script>
+        <script src="core/models/Edge.js"></script>
+        <script src="core/style.js"></script>
+        <script src="core/include.js"></script>
+        <script src="core/utils/collide.js"></script>
+        <script src="core/utils/debug.js"></script>
+        <script src="core/settings.js"></script>
+        <script src="core/regex.js"></script>
+        <script src="core/theme.js"></script>
+        <script src="core/setup.js"></script>
+        <script src="core/utils/colors.js"></script>
+        <script src="core/utils/general.js"></script>
+        <script src="core/utils/text.js"></script>
+        <script src="core/utils/visibility.js"></script>
+        <script src="core/utils/community-detection-algorithms/jlouvain.js"></script>
+        <script src="core/utils/community-detection.js"></script>
+        <script src="core/scales.js"></script>
+        <script src="core/filters.js"></script>
+        <script src="core/load.js"></script>
+        <script src="core/zoom.js"></script>
+        <script src="core/app.js"></script>
+        <script src="core/utils/dragging.js"></script>
+        <script src="core/utils/jsnetworkx.js"></script>
+        <script src="core/utils/numbers.js"></script>
+
+        <script src="core/geo.js"></script>
+        <script src="core/tour.js"></script>
+        <script src="core/utils/setLefts.js"></script>
+
+        <!-- JavaScript Bundle with Popper -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+
+        <script>
+            var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+            var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+                let options = {'placement': 'bottom', 'html': true};
+                new bootstrap.Popover(popoverTriggerEl, options);
+            });
+        </script>
+    </body>
+</html>

@@ -1,39 +1,6 @@
 /* eslint no-unused-vars: ["error", { "vars": "local" }] */
 'use strict';
 
-/**
- * fixMonth takes X argument/s... TODO: Needs docstring
- * The return value is ...
- */
-/*
-const fixMonth = (monthString) => {
-  return monthString
-      .replace('January', '01')
-      .replace('February', '02')
-      .replace('March', '03')
-      .replace('April', '04')
-      .replace('May', '05')
-      .replace('June', '06')
-      .replace('July', '07')
-      .replace('August', '08')
-      .replace('September', '09')
-      .replace('October', '10')
-      .replace('November', '11')
-      .replace('December', '12')
-      .replace('Jan', '01')
-      .replace('Feb', '02')
-      .replace('Mar', '03')
-      .replace('Apr', '04')
-      .replace('May', '05')
-      .replace('Jun', '06')
-      .replace('Jul', '07')
-      .replace('Aug', '08')
-      .replace('Sep', '09')
-      .replace('Oct', '10')
-      .replace('Nov', '11')
-      .replace('Dec', '12');
-};
-*/
 
 /**
  * dateParser takes a string and extracts an ISO date from it.

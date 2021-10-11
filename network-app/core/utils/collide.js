@@ -1,3 +1,4 @@
+/* eslint-disable require-jsdoc */
 /* eslint no-unused-vars: ["error", { "vars": "local" }] */
 
 // See https://bl.ocks.org/emeeks/7669aa65a172bf69688ace5f6041223d

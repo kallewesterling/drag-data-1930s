@@ -458,7 +458,6 @@ const getQuickEdgeInfoHTML = (
   /*
   Object.keys(edge.coLocated).forEach((location) => {
     const allYears = splitDate(location);
-    // console.log(allYears);
   });
   */
   const numVenues = Object.keys(edge.coLocated).length;

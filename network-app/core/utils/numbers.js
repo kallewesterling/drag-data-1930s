@@ -110,12 +110,12 @@ const setCurrentCentralities = () => {
 };
 
 const getCitiesByEdge = (edgeList = window.graph.edges) => {
-  _ = {};
+  returnValue = {};
   edgeList.map((edge) => {
-    _[edge.edge_id] = [];
-    edge.cities.forEach((city) => _[edge.edge_id].push(city));
+    returnValue[edge.edge_id] = [];
+    edge.cities.forEach((city) => returnValue[edge.edge_id].push(city));
   });
-  return _;
+  return returnValue;
 };
 
 const getCitiesByNode = (arg) => {
@@ -125,18 +125,18 @@ const getCitiesByNode = (arg) => {
   };
   arg = _arg; // TODO: allow for arguments here
 
-  _ = {};
+  returnValue = {};
   arg.nodeList.forEach((node) => {
-    _[node.id] = [];
+    returnValue[node.id] = [];
     node.connected.edges.forEach((edge) => {
-      edge.cities.forEach((city) => _[node.id].push(city));
+      edge.cities.forEach((city) => returnValue[node.id].push(city));
     });
-    _[node.id] = [...new Set(_[node.id])].sort();
+    returnValue[node.id] = [...new Set(returnValue[node.id])].sort();
   });
-  if (arg.threshold === undefined) return _;
+  if (arg.threshold === undefined) return returnValue;
 
   return__ = {};
-  for (const [key, value] of Object.entries(_)) {
+  for (const [key, value] of Object.entries(returnValue)) {
     if (value.length >= arg.threshold) {
       return__[key] = value;
     }

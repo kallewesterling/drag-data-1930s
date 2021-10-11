@@ -115,7 +115,6 @@ const explainSettings = (settings, remainHidden=false) => {
             information will be displayed about that particular connection.
             </li>`;
 
-  // console.log(settings.datafile.bipartite);
   story += `<li>The connections between the nodes are always filtered by a range
             of years. In your case, the settings include links if their
             connections occurred between ${settings.edges.startYear} and

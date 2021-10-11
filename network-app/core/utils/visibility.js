@@ -222,32 +222,22 @@ const showCities = () => {
     r: {},
   };
 
-  window.graph.nodes.forEach((n) => {
-    const node = d3.select(`#${n.node_id}`);
-    original.fill[n.node_id] = node.style('fill');
-    original.classList[n.node_id] = node.attr('class');
-    original.r[n.node_id] = +node.attr('r');
+  window.graph.nodes.forEach((node) => {
+    node = d3.select(`#${node.node_id}`);
+    original.fill[node.node_id] = node.style('fill');
+    original.classList[node.node_id] = node.attr('class');
+    original.r[node.node_id] = +node.attr('r');
 
     node.transition()
         .attr('class', null)
         .transition()
         .duration(500)
-        .style('fill', (n) => {
-          if (n.category === 'city') {
-            return 'red';
-          } else {
-            return 'gray';
-          }
-        })
+        .style('fill', (node) =>
+          node.category === 'city' ? 'red' : 'gray')
         .transition()
         .delay(1000)
         .duration(500)
-        .attr('r', (n) => {
-          if (n.category === 'city') {
-            return original.r[n.node_id] * 3;
-          } else {
-            return 1;
-          }
-        });
+        .attr('r', (node) =>
+          node.category === 'city' ? original.r[node.node_id] * 3 : 1);
   });
 };

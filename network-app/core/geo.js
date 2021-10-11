@@ -32,15 +32,14 @@ const processGeo = () => {
     document.querySelector('svg#main').insertAdjacentHTML('beforeend', map);
   });
 
-  window.graph.nodes.forEach((n) => {
-    if (n.geodata) {
-      coords = projection([n.geodata.lon, n.geodata.lat]);
+  window.graph.nodes.forEach((node) => {
+    if (node.geodata) {
+      coords = projection([node.geodata.lon, node.geodata.lat]);
 
       const [x, y] = coords;
       if (x && y) {
-        console.log(x, y);
-        n.fx = x;
-        n.fy = y;
+        node.fx = x;
+        node.fy = y;
       }
     }
   });

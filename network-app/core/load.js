@@ -76,10 +76,6 @@ const setupStoreEdges = (edgeList) => {
     storeEdges.push(newEdge);
   });
   storeEdges.forEach((edge) => {
-    const testDate = dateParser(edge.date);
-    if (testDate && testDate.iso !== undefined) {
-      edge.dates.push(testDate.iso);
-    }
     if (!edge.found) {
       edge.found = edge.found.filter((found) => {
         return found != null && found != '' && found != '' ? true : false;
@@ -88,8 +84,8 @@ const setupStoreEdges = (edgeList) => {
       edge.found.forEach((source) => {
         let date = moment(source);
         if (!date.isValid()) {
-          console.error(`Cannot interpret date ${date}. Trying solution...`);
-          const date = dateParser(source);
+          throw new Error('Invalid date found in dataset.');
+          // date = dateParser(source);
         } else {
           date = {
             date: date,
@@ -99,7 +95,7 @@ const setupStoreEdges = (edgeList) => {
         if (date && date.iso !== undefined) {
           edge.dates.push(date.iso);
         } else if (date.iso === undefined) {
-          console.error(`Cannot interpret date from ${source}. Backup failed.`);
+          throw new Error(`Unable to interpret date ${source}.`);
         }
       });
     } else {
@@ -115,7 +111,7 @@ const setupStoreEdges = (edgeList) => {
       edge.range['startYear'] = +edge.range.start.substring(0, 4);
       edge.range['endYear'] = +edge.range.end.substring(0, 4);
     } else {
-      console.error('No ranges set. The graph will not render.');
+      throw new Error('No ranges set. The graph will not render.');
     }
 
     const locations = Object.keys(edge.coLocated);
@@ -201,30 +197,31 @@ const loadNetwork = (callback = []) => {
         window.store.settingsFinished = true;
 
         // Link up store edges with nodes, and vice versa
-        window.store.edges.forEach((e) => {
-          e.source = window.store.nodes.find((node) => node.id === e.source);
-          e.target = window.store.nodes.find((node) => node.id === e.target);
+        window.store.edges.forEach((edge) => {
+          edge.source = window.store.nodes.find((node) =>
+            node.id === edge.source);
+          edge.target = window.store.nodes.find((node) =>
+            node.id === edge.target);
         });
 
         window.store.nodes.forEach((node) => {
           // Set up node.connected.edges for each node
-          node.connected.edges = window.store.edges.filter(
-              (e) =>
-                e.source.node_id === node.node_id ||
-                e.target.node_id === node.node_id,
+          node.connected.edges = window.store.edges.filter((edge) =>
+            edge.source.node_id === node.node_id ||
+            edge.target.node_id === node.node_id,
           );
 
           // Set up node.connected.nodes for each node
           node.connected.nodes = [];
           node.connected.nodes.push(
               ...node.connected.edges
-                  .map((e) => e.source)
-                  .filter((n) => n.node_id !== node.node_id),
+                  .map((edge) => edge.source)
+                  .filter((cmpNode) => cmpNode.node_id !== node.node_id),
           );
           node.connected.nodes.push(
               ...node.connected.edges
-                  .map((e) => e.target)
-                  .filter((n) => n.node_id !== node.node_id),
+                  .map((edge) => edge.target)
+                  .filter((cmpNode) => cmpNode.node_id !== node.node_id),
           );
           node.connected.nodes = [...new Set(node.connected.nodes)];
 
@@ -271,8 +268,8 @@ const loadNetwork = (callback = []) => {
 
         return true;
       })
-      .catch((e) => {
-        console.error(e);
+      .catch((err) => {
+        console.error(err);
         setupSettingInteractivity();
         setupMiscInteractivity();
         disableSettings(['datafile']);
@@ -281,7 +278,7 @@ const loadNetwork = (callback = []) => {
         document.querySelector('#datafileContainer')
             .setAttribute('style', 'background-color: #ffc107 !important;');
         let errorMsg = `<p><strong>An error has occurred:</strong></p>`;
-        errorMsg += `<p class="m-0 small">${e}</p>`;
+        errorMsg += `<p class="m-0 small">${err}</p>`;
         /*
         errorMsg += `<p class="m-0 small text-muted">${filename}</p>`;
         errorMsg += `<p class="mt-3 mb-0">Change datafile in the dropdown.</p>`;
@@ -398,9 +395,9 @@ const setupInteractivity = (settings = undefined) => {
         event.metaKey === true &&
         event.shiftKey === true) {
       const nodes = [];
-      window.graph.nodes.forEach((n)=>{
-        if (n !== node) {
-          nodes.push(n);
+      window.graph.nodes.forEach((node)=>{
+        if (node !== node) {
+          nodes.push(node);
         }
       });
       filter(nodes);

@@ -351,9 +351,9 @@ const selectRelatedEdges = (node) => {
   window.graph.elements.edges.selectAll('line.link')
       .classed('deselected', true);
 
-  getRelatedEdges(node).forEach((e) => {
-    d3.select(`#${e.edge_id}`).classed('selected', true);
-    d3.select(`#${e.edge_id}`).classed('deselected', false);
+  getRelatedEdges(node).forEach((edge) => {
+    d3.select(`#${edge.edge_id}`).classed('selected', true);
+    d3.select(`#${edge.edge_id}`).classed('deselected', false);
   });
   return true;
 };
@@ -377,10 +377,10 @@ const getRelated = (node) => {
   let secondaryEdges = getRelatedEdges(node);
   const secondaryNodeIDs = [
     ...new Set([
-      ...secondaryEdges.map((e) => e.source.node_id),
-      ...secondaryEdges.map((e) => e.target.node_id),
+      ...secondaryEdges.map((edge) => edge.source.node_id),
+      ...secondaryEdges.map((edge) => edge.target.node_id),
     ]),
-  ].filter((d) => d != node.node_id);
+  ].filter((cmp) => cmp != node.node_id);
 
   let tertiaryNodeIDs = [];
   let tertiaryEdges = [];
@@ -388,15 +388,16 @@ const getRelated = (node) => {
     const _tertiaryEdges = getRelatedEdges(nodeID);
     const _tertiaryNodeIDs = [
       ...new Set([
-        ..._tertiaryEdges.map((e) => e.source.node_id),
-        ..._tertiaryEdges.map((e) => e.target.node_id),
+        ..._tertiaryEdges.map((edge) => edge.source.node_id),
+        ..._tertiaryEdges.map((edge) => edge.target.node_id),
       ]),
-    ].filter((d) => d != nodeID && d != node.node_id);
+    ].filter((cmpNode) => cmpNode != nodeID &&
+                          cmpNode != node.node_id);
     tertiaryNodeIDs = [...tertiaryNodeIDs, ..._tertiaryNodeIDs];
     tertiaryEdges = [...tertiaryEdges, ..._tertiaryEdges];
   });
-  secondaryEdges = secondaryEdges.map((e) => e.edge_id);
-  tertiaryEdges = tertiaryEdges.map((e) => e.edge_id);
+  secondaryEdges = secondaryEdges.map((edge) => edge.edge_id);
+  tertiaryEdges = tertiaryEdges.map((edge) => edge.edge_id);
   const returnValue = {
     primary: node,
     secondaryNodeIDs: secondaryNodeIDs,
@@ -445,9 +446,9 @@ const styleGraphElements = (settings = undefined) => {
       });
 
   edgeElements
-      .attr('class', (e) => getEdgeClass(e))
+      .attr('class', (edge) => getEdgeClass(edge))
       .transition()
-      .style('stroke-width', (e) => getEdgeStrokeWidth(e, settings));
+      .style('stroke-width', (edge) => getEdgeStrokeWidth(edge, settings));
 
   if (!settings.nodes.stickyNodes) {
     textElements.attr('', (node) => {
@@ -521,9 +522,9 @@ const toggleEdge = (edge) => {
  * @return {boolean} - true
  */
 const modifyNodeDegrees = () => {
-  window.graph.nodes.forEach((n) => {
-    n.currentDegree = nodeHasEdges(n, true);
-    n.degrees.current_calculated = nodeHasEdges(n, true);
+  window.graph.nodes.forEach((node) => {
+    node.currentDegree = nodeHasEdges(node, true);
+    node.degrees.current_calculated = nodeHasEdges(node, true);
   });
   return true;
 };
@@ -537,7 +538,7 @@ const modifyNodeDegrees = () => {
  *                     window.graph.nodes or not
  */
 const graphNodesContains = (nodeID) => {
-  return [...window.graph.nodes.map((n) => n.node_id)].includes(nodeID);
+  return [...window.graph.nodes.map((node) => node.node_id)].includes(nodeID);
 };
 
 /**
@@ -549,7 +550,9 @@ const graphNodesContains = (nodeID) => {
  *                     window.graph.edges or not
  */
 const graphEdgesContains = (edgeID) => {
-  return [...window.graph.edges.map((e) => e.edge_id)].includes(edgeID);
+  return [...window.graph.edges
+      .map((edge) => edge.edge_id)]
+      .includes(edgeID);
 };
 
 /**
@@ -614,12 +617,12 @@ const modifySimulation = (settings) => {
   }
   if (settings.force.layoutCollide) {
     const collide = d3
-        .bboxCollide((d) => {
+        .bboxCollide((node) => {
           const width = document
-              .querySelector(`text[data-node="${d.node_id}"]`)
+              .querySelector(`text[data-node="${node.node_id}"]`)
               .getBBox().width;
           const height = document
-              .querySelector(`text[data-node="${d.node_id}"]`)
+              .querySelector(`text[data-node="${node.node_id}"]`)
               .getBBox().height;
           const divider = 2;
           return [
@@ -638,31 +641,31 @@ const modifySimulation = (settings) => {
 
   window.graph.simulation.on('tick', () => {
     d3.select('#loadingDot').attr('data-running', true);
-    nodeElements.attr('cx', (n) => n.x);
-    nodeElements.attr('cy', (n) => n.y);
+    nodeElements.attr('cx', (node) => node.x);
+    nodeElements.attr('cy', (node) => node.y);
 
     /* personElements
-        .attr("transform", (n) => {
-                let width = getSize(n, "r", settings);
-                return `translate(${n.x-width/2},${n.y-width/2})`
+        .attr("transform", (node) => {
+                let width = getSize(node, "r", settings);
+                return `translate(${node.x-width/2},${node.y-width/2})`
               })
     */
 
-    edgeElements.attr('x1', (e) => e.source.x);
-    edgeElements.attr('y1', (e) => e.source.y);
-    edgeElements.attr('x2', (e) => e.target.x);
-    edgeElements.attr('y2', (e) => e.target.y);
+    edgeElements.attr('x1', (edge) => edge.source.x);
+    edgeElements.attr('y1', (edge) => edge.source.y);
+    edgeElements.attr('x2', (edge) => edge.target.x);
+    edgeElements.attr('y2', (edge) => edge.target.y);
 
-    textElements.attr('x', (n) => {
+    textElements.attr('x', (node) => {
       const nodeElement = document
-          .querySelector(`text[data-node=${n.node_id}]`);
+          .querySelector(`text[data-node=${node.node_id}]`);
       if (nodeElement) {
-        return n.x - (nodeElement.getBBox().width/2);
+        return node.x - (nodeElement.getBBox().width/2);
       } else {
-        throw new Error(`text[data-node=${n.node_id}] does not exist.`);
+        throw new Error(`text[data-node=${node.node_id}] does not exist.`);
       }
     });
-    textElements.attr('y', (n) => n.y + n.r/2);
+    textElements.attr('y', (node) => node.y + node.r/2);
   });
 
   // restart the simulation now that everything is set
@@ -817,7 +820,9 @@ const findNode = (nodeID, nodeList = window.store.nodes) => {
 };
 
 const hasFixedNodes = () => {
-  return window.graph.nodes.map((n) => n.fx).every((d) => d === null);
+  return window.graph.nodes
+      .map((node) => node.fx)
+      .every((d) => d === null);
 };
 
 const getVenuesForNode = (nodeID) => {
@@ -844,15 +849,16 @@ const findVenue = (searchTerm) => {
 };
 
 const findComment = (searchTerm) => {
-  const res = [];
-  window.store.nodes.filter((n) => n.has_comments).forEach((n)=>{
-    n.comments.forEach((comment) => {
-      if (comment.content.toLowerCase().includes(searchTerm)) {
-        res.push(n);
-      }
-    });
-  });
-  return res;
+  const returnValue = [];
+  window.store.nodes
+      .filter((node) => node.has_comments).forEach((node)=>{
+        node.comments.forEach((comment) => {
+          if (comment.content.toLowerCase().includes(searchTerm)) {
+            returnValue.push(node);
+          }
+        });
+      });
+  return returnValue;
 };
 
 const resetForSearch = (type) => {
@@ -888,10 +894,10 @@ const highlightSelected = (arg) => {
       .classed('selected', (node) => arg.nodes.includes(node) ? 1 : 0.2);
 };
 
-const searchEdge = (e) => {
-  if (e.inputType === 'insertText' ||
-      e.inputType === 'insertFromPaste' ||
-      (e.inputType === 'deleteContentBackward' &&
+const searchEdge = (edge) => {
+  if (edge.inputType === 'insertText' ||
+      edge.inputType === 'insertFromPaste' ||
+      (edge.inputType === 'deleteContentBackward' &&
        document.querySelector('#searchEdge').value !== '')) {
     resetForSearch('searchEdge');
     // continue searching...
@@ -902,29 +908,29 @@ const searchEdge = (e) => {
       edges: selected,
       nodes: [...selectedTargets, ...selectedSources],
     });
-  } else if (e.inputType.includes('delete') &&
+  } else if (edge.inputType.includes('delete') &&
              document.querySelector('#searchEdge').value === '') {
     resetAfterSearch('searchEdge');
     styleGraphElements();
   }
 };
 
-const searchComment = (e) => {
+const searchComment = (edge) => {
   const searchField = document.querySelector('#searchComment').value;
-  if (e.inputType === 'insertText' ||
-      e.inputType === 'insertFromPaste' ||
-      (e.inputType === 'deleteContentBackward' &&
+  if (edge.inputType === 'insertText' ||
+      edge.inputType === 'insertFromPaste' ||
+      (edge.inputType === 'deleteContentBackward' &&
        searchField !== '')) {
     resetForSearch('searchComment');
     // continue searching...
     const selectedNodes = findComment(searchField);
     nodeElements.classed('selected', (node) => selectedNodes.includes(node));
     highlightSelected({edges: [], nodes: selectedNodes});
-  } else if (e.inputType === 'deleteContentBackward' && searchField === '') {
+  } else if (edge.inputType === 'deleteContentBackward' && searchField === '') {
     resetAfterSearch('searchComment');
     styleGraphElements();
   }
 };
 
-d3.select('#searchEdge').on('input', (e) => searchEdge(e));
-d3.select('#searchComment').on('input', (e) => searchComment(e));
+d3.select('#searchEdge').on('input', (edge) => searchEdge(edge));
+d3.select('#searchComment').on('input', (edge) => searchComment(edge));

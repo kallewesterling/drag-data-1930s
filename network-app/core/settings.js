@@ -108,7 +108,7 @@ const updateLabel = (
       break;
 
     default:
-      // console.log('Unhandled name', name);
+      // Unhandled names include minDegree and minWeight
       break;
   }
 
@@ -238,7 +238,7 @@ const refreshValues = (caller = undefined) => {
         break;
 
       default:
-        // console.log("Unhandled tagname", element.tagName);
+        // Unhandled tag names - long list...
         break;
     }
 
@@ -298,18 +298,21 @@ const filterStore = (settings = undefined, interfaceSettings = undefined) => {
   } else {
     console.warn('Could not load minDegree setting, so moving forward with 0.');
   }
+  // URGENT TODO
   console.log(interfaceSettings.minDegree, minDegree, settings);
   // if (settings.nodes)
   //   console.log(settings.nodes.minDegree);
 
-  window.store.nodes.forEach((n) => {
+  window.store.nodes.forEach((node) => {
     // set the correct `passes` for every node
-    n.passes = {};
-    n.passes.minDegree =
-      n.degrees.degree >= interfaceSettings.minDegree ? true : false;
-    n.passes.unnamed = n.id.toLowerCase().includes('unnamed') ?
-      false :
-      true;
+    node.passes = {
+      minDegree: node.degrees.degree >= interfaceSettings.minDegree ?
+                 true :
+                 false,
+      unnamed: node.id.toLowerCase().includes('unnamed') ?
+               false :
+               true,
+    };
 
     // set the correct `inGraph` for every node
     if (!document.querySelector(`circle#${node.node_id}`)) {
@@ -587,7 +590,6 @@ const toggleSetting = (name) => {
     return false;
   }
 
-  // console.log(currentSettings[name] === true);
   window._elements[name].click(); // no this is not what we want
 };
 
@@ -598,7 +600,7 @@ const editSetting = (name, value) => {
 
   switch (typeof currentSettings[name]) {
     case 'number':
-      console.trace('Cannot toggle number; must provide value.');
+      throw new Error('Cannot toggle number; must provide value.');
       // console.log('number:', name, currentSettings[name]);
       // console.log(window._elements[name].type);
       break;
@@ -654,9 +656,6 @@ const changeSetting = (
     restartSim = true,
 ) => {
   _output('Called', false, changeSetting);
-
-  // console.log(selector);
-  // console.log(typeof(selector));
 
   if (typeof selector === 'object') {
     setTo = selector.setTo;
@@ -714,8 +713,7 @@ const changeSetting = (
       Function(func)();
     });
   } else {
-    // console.log("already correctly set.");
-    // console.log(type);
+    // the setting was already correctly set.
   }
   return true;
 };
@@ -755,7 +753,6 @@ const setupSettingInteractivity = () => {
   // slider interactivity
   window._selectors.minDegree.on('input', () => {
     updateLabel('minDegree');
-    // console.log(filterNodes([], false), "possible nodes?")
   });
   window._selectors.minDegree.on('change', () => {
     changeSetting('#minDegree', 'force', true, 'slider');
@@ -907,7 +904,6 @@ const setupSettingInteractivity = () => {
 
   // set up settings containers
   window._selectors.settingsToggle.on('click', () => {
-    // console.log(evt)
     toggle('#settingsContainer');
   });
   window._selectors.infoToggle.on('click', () => {
@@ -945,11 +941,11 @@ const setupSettingInteractivity = () => {
  */
 const setupKeyHandlers = () => {
   // resetting on keyUp
-  d3.select('html').on('keyup', (e) => {
-    if (e.key === 'Meta' || e.key === 'Shift') {
+  d3.select('html').on('keyup', (evt) => {
+    if (evt.key === 'Meta' || evt.key === 'Shift') {
       hide('.metaShow');
     }
-    if (e.key === 'Alt') {
+    if (evt.key === 'Alt') {
       // toggleCommentedElements(); // moved to button instead
     }
   });
@@ -961,44 +957,39 @@ const setupKeyHandlers = () => {
       {},
   );
 
-  d3.select('html').on('keydown', (e) => {
-    if (e.key === 'Meta' || e.key === 'Shift') {
+  d3.select('html').on('keydown', (evt) => {
+    if (evt.key === 'Meta' || evt.key === 'Shift') {
       show('.metaShow');
-    } else if (e.key === 'Alt') {
+    } else if (evt.key === 'Alt') {
       // toggleCommentedElements(); // moved to button instead
-    } else if (e.key === 'Escape' && window.egoNetwork) {
-      // console.log("Escape 1 called!");
+    } else if (evt.key === 'Escape' && window.egoNetwork) {
       egoNetworkOff();
       show('#settings');
       show('#infoContainer');
-    } else if (e.key === 'Escape' && isVisible('#popupNav')) {
-      // console.log("Escape 2 called!");
+    } else if (evt.key === 'Escape' && isVisible('#popupNav')) {
       toggle('#popupNav');
-    } else if (e.key === 'Escape' && isVisible('#popup-info')) {
-      // console.log("Escape 2 called!");
+    } else if (evt.key === 'Escape' && isVisible('#popup-info')) {
       hide('#popup-info');
-    } else if (e.key === 'Escape' && isVisible('#nodeEdgeInfo')) {
-      // console.log("Escape 3 called!");
+    } else if (evt.key === 'Escape' && isVisible('#nodeEdgeInfo')) {
       window.edgeSelected = undefined;
       window.nodeSelected = undefined;
       resetDraw();
-    } else if (e.key === 'Escape') {
+    } else if (evt.key === 'Escape') {
       uiToggleAllSettingBoxes();
-    } else if (e.key === 'c' && e.metaKey) {
-      // console.log("command+c called");
+    } else if (evt.key === 'c' && evt.metaKey) {
       changeSetting(
           '#autoClearNodes',
-          !settingsFromDashboard('selectKeyDown1').nodes.autoClearNodes,
+          !settingsFromDashboard('selectKeyDown1').nodes
+              .autoClearNodes,
       );
-    } else if (e.key === '+') {
+    } else if (evt.key === '+') {
       changeSetting({
         selector: '#nodeMultiplier',
         type: 'slider',
-        setTo:
-          settingsFromDashboard('selectKeyDown2').nodes
-              .nodeMultiplier + 0.25,
+        setTo: settingsFromDashboard('selectKeyDown2').nodes
+            .nodeMultiplier + 0.25,
       });
-    } else if (e.key === '-') {
+    } else if (evt.key === '-') {
       changeSetting({
         selector: '#nodeMultiplier',
         type: 'slider',
@@ -1007,9 +998,9 @@ const setupKeyHandlers = () => {
       });
     }
     if (
-      ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'].includes(e.key)
+      ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'].includes(evt.key)
     ) {
-      numbers.push(e.key);
+      numbers.push(evt.key);
       if (years.length === 1) {
         numberModal._element.querySelector('h5')
             .innerText = 'End year';
@@ -1034,16 +1025,13 @@ const setupKeyHandlers = () => {
           // and finally let the user know that nothing happened.
         }
         numbers = [];
-        // console.log(years);
         let startYear = undefined;
         let endYear = undefined;
         if (years.length == 2) {
           startYear = years.slice(-2)[0];
           endYear = years.slice(-2)[1];
-          // console.log(`setting year range: ${startYear}-${endYear}`);
           years = [];
         } else if (years.slice(-2).length == 1) {
-          // console.log(`setting start year: ${years[0]}`);
           startYear = years[0];
         }
         if (startYear) {
@@ -1066,18 +1054,18 @@ const setupKeyHandlers = () => {
     }
     Object.keys(window.keyMapping).forEach((key) => {
       if (
-        key === e.key &&
+        key === evt.key &&
         window.keyMapping[key].noMeta &&
-        e.shiftKey == false &&
-        e.metaKey == false &&
-        e.altKey == false &&
-        e.ctrlKey == false
+        evt.shiftKey == false &&
+        evt.metaKey == false &&
+        evt.altKey == false &&
+        evt.ctrlKey == false
       ) {
         Function(window.keyMapping[key].noMeta)();
       } else if (
-        key === e.key &&
+        key === evt.key &&
         window.keyMapping[key].shiftKey &&
-        e.shiftKey == true
+        evt.shiftKey == true
       ) {
         Function(window.keyMapping[key].shiftKey)();
       }
@@ -1101,7 +1089,6 @@ const setupMiscInteractivity = () => {
     } else {
       event.target.classList.add('toggled');
     }
-    // console.log(event.target);
     toggle('#' + event.target.dataset.toggle);
   });
 
