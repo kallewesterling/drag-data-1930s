@@ -318,7 +318,7 @@ const getEgoNetwork = (node, maxIterations = 1000) => {
 const egoNetworkOn = async (node) => {
   _output('Called', false, egoNetworkOn);
   window._selectors.egoNetwork.classed('d-none', false);
-  d3.select('egoNetwork > #node').html(node.id); // TODO: #29 fix this line....
+  d3.select('#egoNetwork #node').html(node.id);
   const egoNetwork = getEgoNetwork(node);
   filter(egoNetwork);
   // setupFilteredElements();

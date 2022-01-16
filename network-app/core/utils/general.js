@@ -161,7 +161,7 @@ const edgeIsSelected = (edge) => {
  *                             from the process.
  * @return {boolean} - true
  */
-const deselectNodes = (excludeNode = undefined) => {
+const deselectNodes = (excludeNode = undefined, freeze=true) => {
   nodeElements.classed('selected', (node) => {
     if (excludeNode && node === excludeNode) {
       if (nodeIsSelected(node)) {
@@ -185,8 +185,10 @@ const deselectNodes = (excludeNode = undefined) => {
   let related = undefined;
   nodeElements.classed('deselected', (node) => {
     if (excludeNode && node === excludeNode) {
-      node.fx = node.x;
-      node.fy = node.y;
+      if (freeze) {
+        node.fx = node.x;
+        node.fy = node.y;
+      }
       related = getRelated(node);
       return false;
     } else {
@@ -195,19 +197,25 @@ const deselectNodes = (excludeNode = undefined) => {
   });
   if (related) {
     related.secondaryNodeIDs.forEach((nodeID) => {
-      const elem = d3.select(`#${nodeID}`);
-      elem.classed('selected-secondary', true);
-      elem.classed('deselected', false);
+      d3.select(`#${nodeID}`)
+        .classed('selected-secondary', true)
+        .classed('deselected', false);
+      d3.select(`text[data-node="${nodeID}"]`)
+        .classed('label-selected-secondary', true)
+        .classed('deselected', false);
     });
     related.tertiaryNodeIDs.forEach((nodeID) => {
-      const elem = d3.select(`#${nodeID}`);
-      elem.classed('selected-tertiary', true);
-      elem.classed('deselected', false);
+      d3.select(`#${nodeID}`)
+        .classed('selected-tertiary', true)
+        .classed('deselected', false);
+      d3.select(`text[data-node="${nodeID}"]`)
+        .classed('label-selected-tertiary', true)
+        .classed('deselected', false);
     });
     related.tertiaryEdges.forEach((edgeID) => {
-      const elem = d3.select(`#${edgeID}`);
-      elem.classed('selected-tertiary', true);
-      elem.classed('deselected', false);
+      d3.select(`#${edgeID}`)
+        .classed('selected-tertiary', true)
+        .classed('deselected', false);
     });
   }
 
@@ -351,6 +359,8 @@ const selectRelatedEdges = (node) => {
   window.graph.elements.edges.selectAll('line.link')
       .classed('deselected', true);
 
+  // TODO: Also dim all text.
+
   getRelatedEdges(node).forEach((edge) => {
     d3.select(`#${edge.edge_id}`).classed('selected', true);
     d3.select(`#${edge.edge_id}`).classed('deselected', false);
@@ -480,7 +490,7 @@ const styleGraphElements = (settings = undefined) => {
  * @arg {Object} node - d3 selector for a given node.
  * @return {boolean} - true
  */
-const toggleNode = (node) => {
+const toggleNode = (node, freeze=true) => {
   if (nodeIsSelected(node)) {
     window.nodeSelected = undefined;
     hide('#nodeEdgeInfo');
@@ -488,7 +498,7 @@ const toggleNode = (node) => {
   } else {
     window.nodeSelected = true;
     styleGraphElements();
-    deselectNodes(node);
+    deselectNodes(node, freeze);
     selectRelatedEdges(node);
     setNodeEdgeInfo(node);
   }
@@ -816,7 +826,15 @@ const getSize = (node, type = 'r', settings = undefined) => {
 };
 
 const findNode = (nodeID, nodeList = window.store.nodes) => {
-  return nodeList.find((node) => node.node_id === nodeID);
+  let search1 = nodeList.find((node) => node.node_id === nodeID);
+  if (search1) {
+    return search1;
+  }
+  let search2 = nodeList.find((node) => node.display === nodeID);
+  if (search2) {
+    return search2;
+  }
+  return undefined;
 };
 
 const hasFixedNodes = () => {

@@ -31,11 +31,13 @@ const setupStoreNodes = (nodeList) => {
           node.node_id.charAt(0).match(/[_—–—.]/),
       );
     }
-    if (prohibitedID.match) console.error(prohibitedID);
+    if (prohibitedID.match) {
+      throw new Error(`Found prohibited ID: ${prohibitedID}`);
+    }
 
     if (testForErroneousNode(node)) {
-      console.error('found an erroneous data point:');
       console.error(node);
+      throw new Error('found an erroneous data point:');
     } else {
       if (node.display.toLowerCase().includes('unnamed performer')) {
         node.display = 'Unnamed performer';
@@ -43,6 +45,7 @@ const setupStoreNodes = (nodeList) => {
 
       const hasComments =
         node.comments !== undefined && node.comments.length > 0 ? true : false;
+
       storeNodes.push(Object.assign(
           {
             inGraph: false,
@@ -132,6 +135,18 @@ const setupStoreEdges = (edgeList) => {
   return storeEdges;
 };
 
+const setupWindowStore = (data) => {
+  window.store.raw = data;
+  let cdHTML = `<p><strong>Visualization last generated</strong>:`;
+  cdHTML += `${window.store.raw.createdDate}</p>`;
+  d3.select('#createdDate').html(cdHTML);
+  window.store.comments = Object.assign({}, data.comments);
+  window.store.count = Object.assign({}, data.count);
+  window.store.nodes = setupStoreNodes(data.nodes);
+  window.store.edges = setupStoreEdges(data.links);
+  return true;
+}
+
 /**
  * loadNetwork takes no arguments, but loads the entire network, and runs the
  * other appropriate functions at the start of the script.
@@ -156,28 +171,23 @@ const loadNetwork = (callback = []) => {
   enableSettings();
   document.querySelector('#datafileContainer').removeAttribute('style');
 
+  const urlSearchParams = new URLSearchParams(window.location.search);
+  const params = Object.fromEntries(urlSearchParams.entries());
+  // TODO: Use `params.performer` here, for instance, to filter out the data related to that node
+
   const networkCleanup = (data) => {
     const p = d3.timeParse('%Y-%m-%d %H:%M:%S');
     data.createdDate = p(data.createdDate);
     data.days = +data.days;
     return data;
   };
+
   d3.json(filename)
       .then((data) => {
         data = networkCleanup(data);
         _output(`File loaded: ${filename}`, false, loadNetwork);
         // for debug purposes (TODO can be removed)
-        window.store.raw = data;
-
-        let cdHTML = `<p><strong>Visualization last generated</strong>:`;
-        cdHTML += `${window.store.raw.createdDate}</p>`;
-        d3.select('#createdDate')
-            .html(cdHTML);
-        // set up store
-        window.store.comments = Object.assign({}, data.comments);
-        window.store.count = Object.assign({}, data.count);
-        window.store.nodes = setupStoreNodes(data.nodes);
-        window.store.edges = setupStoreEdges(data.links);
+        setupWindowStore(data);
 
         loadStoreRanges();
 
@@ -268,6 +278,22 @@ const loadNetwork = (callback = []) => {
 
         return true;
       })
+      .then(() => {
+        if (params.performer) {
+          let node = findNode(params.performer);
+          if (!node.inGraph) {
+            throw new Error('Node cannot be found with current settings.')
+          }
+          toggleNode(node, false);
+          if (isVisible('#settingsContainer')) {
+            toggle('#settingsContainer');
+          };
+          window.graph.svg
+            .transition()
+            .duration(1000)
+            .call(zoom.transform, d3.zoomIdentity.translate(-window.innerWidth/6, 0).scale(1))
+        };
+      })
       .catch((err) => {
         console.error(err);
         setupSettingInteractivity();
@@ -278,7 +304,8 @@ const loadNetwork = (callback = []) => {
         document.querySelector('#datafileContainer')
             .setAttribute('style', 'background-color: #ffc107 !important;');
         let errorMsg = `<p><strong>An error has occurred:</strong></p>`;
-        errorMsg += `<p class="m-0 small">${err}</p>`;
+        errorMsg += `<p class="m-0 mb-3 small">${err}</p>`;
+        errorMsg += `<p class="m-0 small">Sometimes, it helps to <a class="btn btn-sm btn-dark" href="javascript:resetLocalStorage()">reset the locally stored settings</a>.</p>`;
         /*
         errorMsg += `<p class="m-0 small text-muted">${filename}</p>`;
         errorMsg += `<p class="mt-3 mb-0">Change datafile in the dropdown.</p>`;

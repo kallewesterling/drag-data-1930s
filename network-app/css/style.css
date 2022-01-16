@@ -307,6 +307,13 @@ svg#main {
     fill: var(--performer-selected-tertiary) !important;
 }
 
+.label.selected-secondary {
+    fill: var(--performer-selected-secondary) !important;
+}
+.label.selected-tertiary {
+    fill: var(--performer-selected-tertiary) !important;
+}
+
 /* Bar graph */
 
 .bar {

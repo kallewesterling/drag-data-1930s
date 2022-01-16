@@ -55,6 +55,10 @@
 
     --text-color: rgba(0, 0, 0, 1);
 
+    --label-selected-primary: #ff0000;
+    --label-selected-secondary: #ff7c7c;
+    --label-selected-tertiary: #ffaaaa;
+
     --performer: rgba(238, 108, 77, 1);
     --performer-selected-primary: #ff0000;
     --performer-selected-secondary: #ffb0b0;

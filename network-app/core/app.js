@@ -20,12 +20,15 @@
       window.DATA_DIR = env_content.DATA_DIR;
     */
   }).catch((err) => {
-    console.error(err);
-    console.error('Setting automatic environment variables to:');
-    console.error(`ERROR_LEVEL ${window.ERROR_LEVEL}`);
-    console.error(`and DATA_DIR ${window.DATA_DIR}.`);
-    // window.ERROR_LEVEL = 1;
-    // window.DATA_DIR = "data";
+    if (!err.message.includes('404')) {
+      throw new Error(err);
+    } else {
+      console.groupCollapsed(`Warning: ${err}`);
+      console.warn('Setting automatic environment variables to:');
+      console.warn(`ERROR_LEVEL ${window.ERROR_LEVEL}`);
+      console.warn(`and DATA_DIR ${window.DATA_DIR}.`);
+      console.groupEnd();
+    }
   }).finally(() => {
     // since we're not in egoNetwork when we start a new window:
     // set egoNetwork to false
